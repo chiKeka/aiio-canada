@@ -129,7 +129,7 @@ const previewRanges = {
   'BCPI Data': 'A1:I24',
   'Labour Availability': 'A1:O32',
   'Labour Canada': 'A1:Q28',
-  'Workforce Stock': 'A1:R28',
+  'Workforce Stock': 'A1:S28',
   'Labour Diagnostic': 'A1:N28',
   Sources: 'A1:H17',
   'Release Checks': 'A1:D30',
@@ -550,7 +550,7 @@ function buildWorkforceCanada() {
     workforceCanada,
     'Canada detailed-trade workforce stock',
     `2021 Census reference week ${national.period_start} to ${national.period_end} · six NOC unit groups · national totals excluded`,
-    'R',
+    'S',
   );
   const coverage = [...national.coverage].sort((a, b) => a.geography_label.localeCompare(b.geography_label));
   workforceCanada.getRange('A4:J4').values = [['Geography ID', 'Province / territory', 'Published cells', 'Zero fillers', 'Total cells', 'Coverage', 'Expected published', 'Expected zero', 'Expected total', 'Reconciliation']];
@@ -565,7 +565,7 @@ function buildWorkforceCanada() {
     const row = 5 + index;
     workforceCanada.getRange(`A${row}:B${row}`).values = [[item.geography_id, item.geography_label]];
     workforceCanada.getRange(`C${row}`).formulas = [[`=COUNTIF($B$${observationStart}:$B$${observationEnd},$A${row})`]];
-    workforceCanada.getRange(`D${row}`).formulas = [[`=COUNTIFS($B$${observationStart}:$B$${observationEnd},$A${row},$I$${observationStart}:$I$${observationEnd},0,$Q$${observationStart}:$Q$${observationEnd},"*census_zero_filler*")`]];
+    workforceCanada.getRange(`D${row}`).formulas = [[`=COUNTIFS($B$${observationStart}:$B$${observationEnd},$A${row},$R$${observationStart}:$R$${observationEnd},"YES")`]];
     workforceCanada.getRange(`E${row}`).formulas = [[`=C${row}`]];
     workforceCanada.getRange(`F${row}`).formulas = [[`=IF(I${row}=0,0,C${row}/I${row})`]];
     workforceCanada.getRange(`G${row}:I${row}`).values = [[item.published_cells, item.zero_filler_cells, item.total_cells]];
@@ -577,13 +577,13 @@ function buildWorkforceCanada() {
   const coverageTable = workforceCanada.tables.add(`A4:J${coverageEnd}`, true, 'WorkforceCanadaCoverageTable');
   coverageTable.style = 'TableStyleMedium2';
 
-  workforceCanada.getRange(`A${warningRow}:R${warningRow}`).merge();
+  workforceCanada.getRange(`A${warningRow}:S${warningRow}`).merge();
   workforceCanada.getRange(`A${warningRow}`).values = [[national.warning]];
-  noteBlock(workforceCanada.getRange(`A${warningRow}:R${warningRow}`));
+  noteBlock(workforceCanada.getRange(`A${warningRow}:S${warningRow}`));
   workforceCanada.getRange(`A${warningRow}`).format.rowHeight = 48;
-  workforceCanada.getRange(`A${headerRow}:R${headerRow}`).values = [['Observation ID', 'Geography ID', 'Province / territory', 'StatCan DGUID', 'NOC', 'Occupation', 'Model trade node', 'Statistic', 'Employed persons', 'Unit', 'Period start', 'Period end', 'Release date', 'Evidence status', 'Source ID', 'Transformation ID', 'Quality flags', 'Cell check']];
-  header(workforceCanada.getRange(`A${headerRow}:R${headerRow}`));
-  workforceCanada.getRange(`A${observationStart}:Q${observationEnd}`).values = ordered.map((row) => [
+  workforceCanada.getRange(`A${headerRow}:S${headerRow}`).values = [['Observation ID', 'Geography ID', 'Province / territory', 'StatCan DGUID', 'NOC', 'Occupation', 'Model trade node', 'Statistic', 'Employed persons', 'Unit', 'Period start', 'Period end', 'Release date', 'Evidence status', 'Source ID', 'Transformation ID', 'Quality flags', 'Zero filler', 'Cell check']];
+  header(workforceCanada.getRange(`A${headerRow}:S${headerRow}`));
+  workforceCanada.getRange(`A${observationStart}:R${observationEnd}`).values = ordered.map((row) => [
     row.observation_id,
     row.geography_id,
     row.geography_label,
@@ -601,18 +601,19 @@ function buildWorkforceCanada() {
     row.source_id,
     row.transformation_id,
     row.quality_flags,
+    row.quality_flags.includes('census_zero_filler') ? 'YES' : 'NO',
   ]);
-  workforceCanada.getRange(`R${observationStart}`).formulas = [[`=IF(OR(I${observationStart}>0,AND(I${observationStart}=0,ISNUMBER(SEARCH("census_zero_filler",Q${observationStart})))),"PASS","FAIL")`]];
-  workforceCanada.getRange(`R${observationStart}:R${observationEnd}`).fillDown();
+  workforceCanada.getRange(`S${observationStart}`).formulas = [[`=IF(OR(AND(I${observationStart}>0,R${observationStart}="NO"),AND(I${observationStart}=0,R${observationStart}="YES")),"PASS","FAIL")`]];
+  workforceCanada.getRange(`S${observationStart}:S${observationEnd}`).fillDown();
   workforceCanada.getRange(`I${observationStart}:I${observationEnd}`).format.numberFormat = '#,##0';
   workforceCanada.getRange(`K${observationStart}:M${observationEnd}`).format.numberFormat = 'yyyy-mm-dd';
-  workforceCanada.getRange(`R${observationStart}:R${observationEnd}`).conditionalFormats.add('containsText', { text: 'PASS', format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } } });
-  workforceCanada.getRange(`R${observationStart}:R${observationEnd}`).conditionalFormats.add('containsText', { text: 'FAIL', format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } } });
-  const observationsTable = workforceCanada.tables.add(`A${headerRow}:R${observationEnd}`, true, 'WorkforceCanadaTable');
+  workforceCanada.getRange(`S${observationStart}:S${observationEnd}`).conditionalFormats.add('containsText', { text: 'PASS', format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } } });
+  workforceCanada.getRange(`S${observationStart}:S${observationEnd}`).conditionalFormats.add('containsText', { text: 'FAIL', format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } } });
+  const observationsTable = workforceCanada.tables.add(`A${headerRow}:S${observationEnd}`, true, 'WorkforceCanadaTable');
   observationsTable.style = 'TableStyleMedium2';
   workforceCanada.freezePanes.freezeRows(headerRow);
   workforceCanada.freezePanes.freezeColumns(3);
-  setWidths(workforceCanada, { A: 29, B: 15, C: 28, D: 20, E: 10, F: 46, G: 24, H: 15, I: 18, J: 12, K: 14, L: 14, M: 14, N: 17, O: 35, P: 41, Q: 45, R: 15 }, 28);
+  setWidths(workforceCanada, { A: 29, B: 15, C: 28, D: 20, E: 10, F: 46, G: 24, H: 15, I: 18, J: 12, K: 14, L: 14, M: 14, N: 17, O: 35, P: 41, Q: 45, R: 13, S: 15 }, 28);
 }
 
 function buildLabourDiagnostic() {
@@ -634,7 +635,7 @@ function buildLabourDiagnostic() {
   labourDiagnostic.getRange('A4:G4').values = [['Alberta model trade', 'Current vacancies', '2021 employed stock', 'Per 1,000', 'Complete cells', 'Availability', 'Evidence status']];
   header(labourDiagnostic.getRange('A4:G4'));
   labourDiagnostic.getRange(`A5:G${4 + albertaRows.length}`).values = albertaRows.map((item) => [
-    labelize(item.trade_node_id.replace('trade_', '')),
+    tradeLabel(item.trade_node_id),
     item.vacancies,
     item.workforce_stock,
     item.vacancies_per_1_000_2021_employed,
@@ -748,7 +749,7 @@ function buildReleaseChecks() {
   const workforceCoverageEnd = 4 + release.baseline.labour_workforce_stock_canada.coverage.length;
   const workforceObservationStart = workforceCoverageEnd + 5;
   const workforceObservationEnd = workforceObservationStart + release.baseline.labour_workforce_stock_canada.observations.length - 1;
-  checks.getRange('B25').formulas = [[`=IF(AND(COUNTIF('Workforce Stock'!$J$5:$J$${workforceCoverageEnd},"FAIL")=0,COUNTIF('Workforce Stock'!$R$${workforceObservationStart}:$R$${workforceObservationEnd},"FAIL")=0),"PASS","FAIL")`]];
+  checks.getRange('B25').formulas = [[`=IF(AND(COUNTIF('Workforce Stock'!$J$5:$J$${workforceCoverageEnd},"FAIL")=0,COUNTIF('Workforce Stock'!$S$${workforceObservationStart}:$S$${workforceObservationEnd},"FAIL")=0),"PASS","FAIL")`]];
   const diagnosticWarningRow = 4 + labourPressure.trade_diagnostics.filter((item) => item.geography_id === 'PR_48').length + 2;
   const diagnosticObservationStart = diagnosticWarningRow + 3;
   const diagnosticObservationEnd = diagnosticObservationStart + labourPressure.occupation_diagnostics.length - 1;
@@ -879,6 +880,15 @@ function setWidths(sheet, widths, maxRow) {
 
 function labelize(value) {
   return value.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function tradeLabel(nodeId) {
+  return {
+    trade_concrete: 'Concrete',
+    trade_electricians: 'Electricians',
+    trade_hvac: 'HVAC',
+    trade_power_line: 'Power line',
+  }[nodeId] ?? labelize(nodeId.replace('trade_', ''));
 }
 
 function parseCsv(text) {
