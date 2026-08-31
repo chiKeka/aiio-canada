@@ -213,7 +213,7 @@
       "workforce_unit": "Persons"
     },
     {
-      "availability": "vacancy_not_published",
+      "availability": "vacancy_not_published_and_workforce_denominator_zero",
       "evidence_status": "observed",
       "geography_id": "PR_11",
       "geography_label": "Prince Edward Island",
@@ -1623,7 +1623,7 @@
       "workforce_unit": "Persons"
     },
     {
-      "availability": "vacancy_not_published",
+      "availability": "vacancy_not_published_and_workforce_denominator_zero",
       "evidence_status": "observed",
       "geography_id": "PR_60",
       "geography_label": "Yukon",
@@ -1775,7 +1775,7 @@
       "workforce_unit": "Persons"
     },
     {
-      "availability": "vacancy_not_published",
+      "availability": "vacancy_not_published_and_workforce_denominator_zero",
       "evidence_status": "observed",
       "geography_id": "PR_61",
       "geography_label": "Northwest Territories",
@@ -1827,7 +1827,7 @@
       "workforce_unit": "Persons"
     },
     {
-      "availability": "vacancy_not_published",
+      "availability": "vacancy_not_published_and_workforce_denominator_zero",
       "evidence_status": "observed",
       "geography_id": "PR_62",
       "geography_label": "Nunavut",
@@ -1904,7 +1904,7 @@
       "workforce_unit": "Persons"
     },
     {
-      "availability": "vacancy_not_published",
+      "availability": "vacancy_not_published_and_workforce_denominator_zero",
       "evidence_status": "observed",
       "geography_id": "PR_62",
       "geography_label": "Nunavut",
@@ -1931,7 +1931,7 @@
       "workforce_unit": "Persons"
     },
     {
-      "availability": "vacancy_not_published",
+      "availability": "vacancy_not_published_and_workforce_denominator_zero",
       "evidence_status": "observed",
       "geography_id": "PR_62",
       "geography_label": "Nunavut",
@@ -2114,7 +2114,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_10",
       "geography_label": "Newfoundland and Labrador",
       "noc_codes": [
@@ -2129,7 +2129,7 @@
       "availability": "incomplete_components",
       "complete_cells": 1,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_10",
       "geography_label": "Newfoundland and Labrador",
       "noc_codes": [
@@ -2145,7 +2145,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_10",
       "geography_label": "Newfoundland and Labrador",
       "noc_codes": [
@@ -2160,7 +2160,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_10",
       "geography_label": "Newfoundland and Labrador",
       "noc_codes": [
@@ -2176,7 +2176,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_11",
       "geography_label": "Prince Edward Island",
       "noc_codes": [
@@ -2191,7 +2191,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_11",
       "geography_label": "Prince Edward Island",
       "noc_codes": [
@@ -2207,7 +2207,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_11",
       "geography_label": "Prince Edward Island",
       "noc_codes": [
@@ -2222,7 +2222,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_11",
       "geography_label": "Prince Edward Island",
       "noc_codes": [
@@ -2238,7 +2238,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_12",
       "geography_label": "Nova Scotia",
       "noc_codes": [
@@ -2253,7 +2253,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_12",
       "geography_label": "Nova Scotia",
       "noc_codes": [
@@ -2269,7 +2269,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_12",
       "geography_label": "Nova Scotia",
       "noc_codes": [
@@ -2284,7 +2284,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_12",
       "geography_label": "Nova Scotia",
       "noc_codes": [
@@ -2300,7 +2300,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_13",
       "geography_label": "New Brunswick",
       "noc_codes": [
@@ -2315,7 +2315,7 @@
       "availability": "incomplete_components",
       "complete_cells": 1,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_13",
       "geography_label": "New Brunswick",
       "noc_codes": [
@@ -2331,7 +2331,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_13",
       "geography_label": "New Brunswick",
       "noc_codes": [
@@ -2346,7 +2346,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_13",
       "geography_label": "New Brunswick",
       "noc_codes": [
@@ -2362,7 +2362,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_24",
       "geography_label": "Quebec",
       "noc_codes": [
@@ -2424,7 +2424,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_35",
       "geography_label": "Ontario",
       "noc_codes": [
@@ -2470,7 +2470,7 @@
       "availability": "incomplete_components",
       "complete_cells": 1,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_35",
       "geography_label": "Ontario",
       "noc_codes": [
@@ -2486,7 +2486,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_46",
       "geography_label": "Manitoba",
       "noc_codes": [
@@ -2501,7 +2501,7 @@
       "availability": "incomplete_components",
       "complete_cells": 1,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_46",
       "geography_label": "Manitoba",
       "noc_codes": [
@@ -2517,7 +2517,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_46",
       "geography_label": "Manitoba",
       "noc_codes": [
@@ -2532,7 +2532,7 @@
       "availability": "incomplete_components",
       "complete_cells": 1,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_46",
       "geography_label": "Manitoba",
       "noc_codes": [
@@ -2548,7 +2548,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_47",
       "geography_label": "Saskatchewan",
       "noc_codes": [
@@ -2563,7 +2563,7 @@
       "availability": "incomplete_components",
       "complete_cells": 1,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_47",
       "geography_label": "Saskatchewan",
       "noc_codes": [
@@ -2594,7 +2594,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_47",
       "geography_label": "Saskatchewan",
       "noc_codes": [
@@ -2610,7 +2610,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_48",
       "geography_label": "Alberta",
       "noc_codes": [
@@ -2656,7 +2656,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_48",
       "geography_label": "Alberta",
       "noc_codes": [
@@ -2672,7 +2672,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_59",
       "geography_label": "British Columbia",
       "noc_codes": [
@@ -2687,7 +2687,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_59",
       "geography_label": "British Columbia",
       "noc_codes": [
@@ -2703,7 +2703,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_59",
       "geography_label": "British Columbia",
       "noc_codes": [
@@ -2718,7 +2718,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_59",
       "geography_label": "British Columbia",
       "noc_codes": [
@@ -2734,7 +2734,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_60",
       "geography_label": "Yukon",
       "noc_codes": [
@@ -2749,7 +2749,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_60",
       "geography_label": "Yukon",
       "noc_codes": [
@@ -2765,7 +2765,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_60",
       "geography_label": "Yukon",
       "noc_codes": [
@@ -2780,7 +2780,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_60",
       "geography_label": "Yukon",
       "noc_codes": [
@@ -2796,7 +2796,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_61",
       "geography_label": "Northwest Territories",
       "noc_codes": [
@@ -2811,7 +2811,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_61",
       "geography_label": "Northwest Territories",
       "noc_codes": [
@@ -2827,7 +2827,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_61",
       "geography_label": "Northwest Territories",
       "noc_codes": [
@@ -2842,7 +2842,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_61",
       "geography_label": "Northwest Territories",
       "noc_codes": [
@@ -2858,7 +2858,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_62",
       "geography_label": "Nunavut",
       "noc_codes": [
@@ -2873,7 +2873,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_62",
       "geography_label": "Nunavut",
       "noc_codes": [
@@ -2889,7 +2889,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 1,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_62",
       "geography_label": "Nunavut",
       "noc_codes": [
@@ -2904,7 +2904,7 @@
       "availability": "incomplete_components",
       "complete_cells": 0,
       "component_cells": 2,
-      "evidence_status": "observed",
+      "evidence_status": "inferred",
       "geography_id": "PR_62",
       "geography_label": "Nunavut",
       "noc_codes": [

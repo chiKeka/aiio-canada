@@ -63,7 +63,7 @@ metadata, request coordinates and raw responses. The counts describe the May
 2–8, 2021 reference week, use the 25% long-form sample and are randomly rounded.
 
 Employment is not spare capacity. Any vacancy-to-employment diagnostic must be
-described as a recruitment-pressure signal, retain the LFS and JVWS quality
+described as a recruitment-pressure signal, retain the Census and JVWS quality
 flags, and avoid combining suppressed cells with zero. The two surveys also have
 different reference periods and sampling designs. The five-year timing gap
 between the 2021 Census stock and current vacancy observations must be shown. A

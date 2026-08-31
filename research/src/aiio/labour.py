@@ -50,7 +50,9 @@ def run_labour_recruitment_pressure(
         workforce_value = float(workforce["value"])
         ratio = None
         availability = "available"
-        if vacancy_value is None:
+        if vacancy_value is None and workforce_value <= 0:
+            availability = "vacancy_not_published_and_workforce_denominator_zero"
+        elif vacancy_value is None:
             availability = "vacancy_not_published"
         elif workforce_value <= 0:
             availability = "workforce_denominator_zero"
@@ -113,7 +115,7 @@ def run_labour_recruitment_pressure(
                     "workforce_stock": workforce,
                     "vacancies_per_1_000_2021_employed": ratio,
                     "availability": "available" if complete else "incomplete_components",
-                    "evidence_status": "inferred" if complete else "observed",
+                    "evidence_status": "inferred",
                 }
             )
 

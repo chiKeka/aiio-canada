@@ -41,7 +41,7 @@ const researchLayers = [
   {
     icon: Database,
     title: 'Evidence pipeline',
-    text: 'Capex announcements, construction costs, labour supply and power forecasts—with source and retrieval history.',
+    text: 'Capex announcements, construction costs, labour-demand signals, workforce stock and power scenarios—with source and retrieval history.',
   },
   {
     icon: GitBranch,

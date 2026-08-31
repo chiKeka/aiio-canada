@@ -209,7 +209,7 @@ function formatLabourValue(observation: NationalLabourObservation | null, kind: 
 function formatWorkforceValue(observation: NationalWorkforceObservation | null) {
   if (!observation) return 'Not available';
   const value = Math.round(observation.value).toLocaleString('en-CA');
-  return observation.quality_flags.includes('census_zero_filler') ? `${value} (rounded)` : value;
+  return observation.quality_flags.includes('census_zero_filler') ? `${value} (published zero filler)` : value;
 }
 
 function formatPressureValue(diagnostic: NationalLabourPressure['occupation_diagnostics'][number] | null) {

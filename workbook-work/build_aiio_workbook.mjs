@@ -804,9 +804,11 @@ function buildDashboard() {
     dashboard.getRange(`B${dashboardRow}`).formulas = [[`='Labour Diagnostic'!D${diagnosticRow}`]];
   });
   dashboard.getRange(`B17:B${16 + albertaLabourRows.length}`).format.numberFormat = '0.00';
-  dashboard.getRange('A20:B22').merge();
-  dashboard.getRange('A20').values = [['Cross-vintage screening metric only; incomplete trades are excluded.']];
-  noteBlock(dashboard.getRange('A20:B22'));
+  const recruitmentNoteStart = 18 + albertaLabourRows.length;
+  const recruitmentNoteEnd = Math.min(23, recruitmentNoteStart + 2);
+  dashboard.getRange(`A${recruitmentNoteStart}:B${recruitmentNoteEnd}`).merge();
+  dashboard.getRange(`A${recruitmentNoteStart}`).values = [['Cross-vintage screening metric only; incomplete trades are excluded.']];
+  noteBlock(dashboard.getRange(`A${recruitmentNoteStart}:B${recruitmentNoteEnd}`));
 
   dashboard.getRange('A25:B25').values = [['Year', 'Total capex (CAD bn)']];
   header(dashboard.getRange('A25:B25'));

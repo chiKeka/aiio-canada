@@ -27,7 +27,7 @@ If the vacancy count is unpublished, the diagnostic is null. If the workforce de
 
 ## Evidence status and analytical boundary
 
-The source counts are `observed`; the ratio and complete trade aggregate are `inferred`. The metric does not calibrate graph-edge weights and is not used to turn structural pressure scores into percentages, costs or schedule delays. It is a screening layer that can prioritize which trades require newer administrative or survey evidence.
+The source counts are `observed`; occupation ratios and all constructed trade-diagnostic rows are `inferred`. Incomplete trade rows publish only their coverage decision and no aggregate ratio. The metric does not calibrate graph-edge weights and is not used to turn structural pressure scores into percentages, costs or schedule delays. It is a screening layer that can prioritize which trades require newer administrative or survey evidence.
 
 The 2021 denominator is also subject to the Census long-form sample design, random rounding and the labour-market conditions of the COVID-19 pandemic’s third wave. A future current-stock bridge must be versioned as a separate transformation before current-capacity language is allowed.
 

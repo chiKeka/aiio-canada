@@ -46,6 +46,57 @@ class LabourPressureTests(unittest.TestCase):
             )
             self.assertEqual(pei_zero["availability"], "workforce_denominator_zero")
             self.assertIsNone(pei_zero["vacancies_per_1_000_2021_employed"])
+            yukon_dual_missing = next(
+                item
+                for item in output["occupation_diagnostics"]
+                if item["geography_id"] == "PR_60" and item["noc_code"] == "73100"
+            )
+            self.assertEqual(
+                yukon_dual_missing["availability"],
+                "vacancy_not_published_and_workforce_denominator_zero",
+            )
+            manitoba_published_zero = next(
+                item
+                for item in output["occupation_diagnostics"]
+                if item["geography_id"] == "PR_46" and item["noc_code"] == "72203"
+            )
+            self.assertEqual(manitoba_published_zero["availability"], "available")
+            self.assertEqual(
+                manitoba_published_zero["vacancies_per_1_000_2021_employed"], 0.0
+            )
+
+            alberta_electricians = next(
+                item
+                for item in output["trade_diagnostics"]
+                if item["geography_id"] == "PR_48"
+                and item["trade_node_id"] == "trade_electricians"
+            )
+            self.assertEqual(alberta_electricians["vacancies"], 100.0)
+            self.assertEqual(alberta_electricians["workforce_stock"], 2000.0)
+            self.assertEqual(
+                alberta_electricians["vacancies_per_1_000_2021_employed"], 50.0
+            )
+            self.assertEqual(alberta_electricians["evidence_status"], "inferred")
+            alberta_power_trade = next(
+                item
+                for item in output["trade_diagnostics"]
+                if item["geography_id"] == "PR_48"
+                and item["trade_node_id"] == "trade_power_line"
+            )
+            self.assertEqual(alberta_power_trade["availability"], "incomplete_components")
+            self.assertIsNone(
+                alberta_power_trade["vacancies_per_1_000_2021_employed"]
+            )
+            self.assertEqual(alberta_power_trade["evidence_status"], "inferred")
+            alberta_ranking = next(
+                item for item in output["rankings"] if item["geography_id"] == "PR_48"
+            )
+            self.assertNotIn(
+                "trade_power_line", alberta_ranking["ranked_trade_node_ids"]
+            )
+            self.assertIn(
+                "trade_power_line", alberta_ranking["excluded_trade_node_ids"]
+            )
 
     def _write_vacancies(self, path: Path) -> None:
         fieldnames = (
@@ -65,8 +116,14 @@ class LabourPressureTests(unittest.TestCase):
             for noc_code, trade_node_id in TRADE_NOC_TO_NODE.items():
                 value = ""
                 flags = "status:F|value_missing_or_suppressed"
-                if not (geography_id == "PR_48" and noc_code == "72203"):
+                unpublished = (
+                    geography_id == "PR_48" and noc_code == "72203"
+                ) or (geography_id == "PR_60" and noc_code == "73100")
+                if not unpublished:
                     value = "50"
+                    flags = "status:A"
+                if geography_id == "PR_46" and noc_code == "72203":
+                    value = "0"
                     flags = "status:A"
                 rows.append(
                     {
@@ -114,7 +171,10 @@ class LabourPressureTests(unittest.TestCase):
         rows = []
         for geography_id in PROVINCE_DGUID_TO_GEOGRAPHY_ID.values():
             for noc_code in TRADE_NOC_TO_NODE:
-                is_zero = geography_id == "PR_11" and noc_code == "72202"
+                is_zero = (geography_id, noc_code) in {
+                    ("PR_11", "72202"),
+                    ("PR_60", "73100"),
+                }
                 rows.append(
                     {
                         "geography_id": geography_id,
