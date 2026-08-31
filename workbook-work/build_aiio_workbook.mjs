@@ -640,7 +640,7 @@ function buildLabourDiagnostic() {
     item.workforce_stock,
     item.vacancies_per_1_000_2021_employed,
     `${item.complete_cells} of ${item.component_cells}`,
-    item.availability,
+    labelize(item.availability),
     item.evidence_status,
   ]);
   labourDiagnostic.getRange(`B5:C${4 + albertaRows.length}`).format.numberFormat = '#,##0';
@@ -671,7 +671,7 @@ function buildLabourDiagnostic() {
     item.workforce_stock,
     new Date(`${item.workforce_period_end}T00:00:00Z`),
   ]);
-  labourDiagnostic.getRange(`K${observationStart}:M${observationEnd}`).values = ordered.map((item) => [item.vacancies_per_1_000_2021_employed, item.availability, item.evidence_status]);
+  labourDiagnostic.getRange(`K${observationStart}:M${observationEnd}`).values = ordered.map((item) => [item.vacancies_per_1_000_2021_employed, labelize(item.availability), item.evidence_status]);
   labourDiagnostic.getRange(`J${observationStart}`).formulas = [[`=IF(OR(F${observationStart}="",H${observationStart}<=0),"",ROUND(F${observationStart}/H${observationStart}*1000,2))`]];
   labourDiagnostic.getRange(`J${observationStart}:J${observationEnd}`).fillDown();
   labourDiagnostic.getRange(`N${observationStart}`).formulas = [[`=IF(K${observationStart}="",IF(J${observationStart}="","PASS","FAIL"),IF(ABS(J${observationStart}-K${observationStart})<0.01,"PASS","FAIL"))`]];
