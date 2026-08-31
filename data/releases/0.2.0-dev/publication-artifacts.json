@@ -2,15 +2,15 @@
   "artifacts": [
     {
       "path": "public/data/latest.json",
-      "sha256": "ce7f06d193b01db29e6c0adb821a1cbcca95c48dbf7279a4626e426725bc0686"
+      "sha256": "9c64b95fc80c4495f5a76a597cfb5503f38266882c208f27d70675e5f3b58813"
     },
     {
       "path": "public/data/manifest.json",
-      "sha256": "9e434832c5d0291ffb4c1ccf2bb780ee08ac97f256edf9d60442de94ee812325"
+      "sha256": "822a25744cceb547ffaba4de1b4528c8bfe50237e7e818de3e5c9bad7a3ccf11"
     },
     {
       "path": "public/downloads/AIIO_Alberta_Pilot_0.2.0-dev.xlsx",
-      "sha256": "8a446adc39aa399f52e84b298a7b0de550b92a94bab9fc1c05ca6e25389213de"
+      "sha256": "6c56c40db8d1fb6a65b1b7c1011c2fab878e33e182e625b892b88f2a1c2973ad"
     },
     {
       "path": "public/downloads/alberta_ai_projects.csv",
@@ -21,8 +21,8 @@
       "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
     }
   ],
-  "code_commit": "5bf68c25641cf3c8d2291760d1975486f4e31323",
-  "input_manifest_hash": "sha256:78d80249d4748d8f5f2586b90ddea3456ea7433c49dab3fbdd1d271c57cc55f5",
+  "code_commit": "9812157428b38e578291a31e1a4eb43b6e9d8ec7",
+  "input_manifest_hash": "sha256:88911fcc418a171c66bbe1ad100835dbfc28f4975798a1489e4ee758e4c53c09",
   "release_id": "AIIO_RELEASE_0_2_0_DEV",
   "release_version": "0.2.0-dev",
   "schema_version": "1.0.0"

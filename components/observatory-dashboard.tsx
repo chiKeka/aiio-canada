@@ -122,12 +122,15 @@ export function ObservatoryDashboard() {
       <section id="top" className="relative border-b border-[#d8ded9] bg-[#f5f3ec]">
         <div className="observatory-grid absolute inset-0 opacity-65" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-[1440px] gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[minmax(0,1.2fr)_minmax(390px,.8fr)] lg:px-12 lg:py-20">
+          <div className="inline-flex items-center gap-2 rounded-lg border border-[#d7a47f] bg-[#fff0e4] px-3 py-2 text-xs font-semibold text-[#8d421e] lg:col-span-2">
+            <AlertTriangle className="size-4" /> Counterfactual structural diagnostic · not a finding or forecast
+          </div>
           <div className="max-w-4xl">
             <div className="mb-7 flex flex-wrap items-center gap-2">
               <Badge className="border-[#2f8f83]/30 bg-[#dff0eb] text-[#175e56]">Alberta pilot</Badge>
               <Badge variant="outline" className="border-[#bdc9c3] bg-white/65 text-[#4c625f]">Release {releaseData.manifest.version}</Badge>
               <span className="ml-1 inline-flex items-center gap-1.5 text-xs text-[#526560]">
-                <span className="size-1.5 rounded-full bg-[#2f8f83]" /> Canada-ready architecture
+                <span className="size-1.5 rounded-full bg-[#2f8f83]" /> Canada expansion plan documented
               </span>
             </div>
             <p className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-[#30786e]">
@@ -139,9 +142,6 @@ export function ObservatoryDashboard() {
             <p className="mt-7 max-w-2xl text-pretty text-base leading-7 text-[#49605f] sm:text-lg">
               An uncalibrated research prototype for testing possible mechanisms through labour, materials and project schedules—beginning in Alberta, then expanding across Canada. It does not measure realized effects.
             </p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-[#d7a47f] bg-[#fff0e4] px-3 py-2 text-xs font-semibold text-[#8d421e]">
-              <AlertTriangle className="size-4" /> Counterfactual structural diagnostic · not a finding or forecast
-            </div>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button size="lg" className="h-11 bg-[#0d5760] px-4 text-white hover:bg-[#174750]" onClick={() => document.querySelector('#scenario')?.scrollIntoView({ behavior: 'smooth' })}>
                 Explore Alberta scenario <ArrowRight data-icon="inline-end" />

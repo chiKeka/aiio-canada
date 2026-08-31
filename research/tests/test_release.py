@@ -46,6 +46,13 @@ class ReleaseVerificationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, "input hash mismatch"):
             self.verify()
 
+    def test_verifier_rejects_extra_manifest_input(self) -> None:
+        self.manifest["inputs"]["undeclared"] = "sha256:not-used"
+        write_json(self.release_dir / "manifest.json", self.manifest)
+        write_json(self.public_dir / "latest.json", {"manifest": self.manifest})
+        with self.assertRaisesRegex(ValidationError, "key set"):
+            self.verify()
+
     def test_verifier_rejects_wrong_checked_out_commit(self) -> None:
         with (
             patch("aiio.release.release_input_paths", return_value={"input": self.input_path}),

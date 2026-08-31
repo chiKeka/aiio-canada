@@ -293,10 +293,10 @@ class AlbertaScenarioTests(unittest.TestCase):
         golden_path = (
             self.root / "data" / "model-runs" / "alberta_power_overlay_v0.1.json"
         )
-        expected = json.loads(golden_path.read_text(encoding="utf-8"))
         with tempfile.TemporaryDirectory() as directory:
-            actual = run_power_overlay(self.power_input, Path(directory) / "power.json")
-        self.assertEqual(json.loads(json.dumps(actual)), expected)
+            actual_path = Path(directory) / "power.json"
+            run_power_overlay(self.power_input, actual_path)
+            self.assertEqual(actual_path.read_bytes(), golden_path.read_bytes())
 
 
 if __name__ == "__main__":

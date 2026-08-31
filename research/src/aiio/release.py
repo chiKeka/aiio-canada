@@ -305,7 +305,10 @@ def verify_manifest(root: Path, version: str) -> None:
         actual = sha256_file(release_dir / name)
         if actual != expected:
             raise ValidationError(f"release output hash mismatch: {name}")
-    for name, path in release_input_paths(root).items():
+    current_inputs = release_input_paths(root)
+    if set(current_inputs) != set(manifest["inputs"]):
+        raise ValidationError("release input key set does not match the manifest")
+    for name, path in current_inputs.items():
         actual = sha256_file(path)
         expected = manifest["inputs"].get(name)
         if actual != expected:
