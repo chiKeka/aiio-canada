@@ -19,7 +19,8 @@
     "model:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-scenario data/model/alberta_graph_v0.2.json data/scenarios/alberta_50b_counterfactual_v0.2.json data/model-runs/alberta_50b_counterfactual_v0.2.json",
     "power:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-power-overlay data/scenarios/alberta_power_overlay_v0.1.json data/model-runs/alberta_power_overlay_v0.1.json",
     "release:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-release 0.2.0-dev --created-at 2026-08-31T19:00:00Z",
-    "release:verify": "PYTHONPATH=research/src python3 -m aiio.cli --root . verify-release 0.2.0-dev"
+    "release:verify": "PYTHONPATH=research/src python3 -m aiio.cli --root . verify-release 0.2.0-dev",
+    "publication:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-publication-artifacts 0.2.0-dev outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Alberta_Pilot_0.2.0-dev.xlsx"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

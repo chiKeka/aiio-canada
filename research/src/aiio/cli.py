@@ -14,7 +14,7 @@ from .retrieval import retrieve
 from .schemas import ValidationError
 from .scenario import run_scenario
 from .power import run_power_overlay
-from .release import build_release, verify_manifest
+from .release import build_publication_artifacts, build_release, verify_manifest
 
 
 def main() -> None:
@@ -67,6 +67,13 @@ def main() -> None:
 
     verify_parser = subparsers.add_parser("verify-release", help="verify release and public hashes")
     verify_parser.add_argument("version")
+
+    publication_parser = subparsers.add_parser(
+        "build-publication-artifacts",
+        help="publish the workbook and hash the complete user-facing artifact set",
+    )
+    publication_parser.add_argument("version")
+    publication_parser.add_argument("workbook_path", type=Path)
 
     args = parser.parse_args()
     root = args.root.resolve()
@@ -147,6 +154,21 @@ def main() -> None:
         elif args.command == "verify-release":
             verify_manifest(root, args.version)
             print(json.dumps({"status": "passed", "version": args.version}))
+        elif args.command == "build-publication-artifacts":
+            artifacts = build_publication_artifacts(
+                root,
+                args.version,
+                args.workbook_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "version": args.version,
+                        "artifact_count": len(artifacts["artifacts"]),
+                    }
+                )
+            )
     except ValidationError as exc:
         parser.error(str(exc))
 

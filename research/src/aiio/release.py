@@ -290,6 +290,53 @@ def verify_manifest(root: Path, version: str) -> None:
         raise ValidationError("public latest manifest does not match the immutable release")
 
 
+def build_publication_artifacts(
+    root: Path,
+    version: str,
+    workbook_path: Path,
+) -> dict[str, Any]:
+    """Publish and hash all user-facing artifacts after the workbook is generated."""
+
+    verify_manifest(root, version)
+    if not workbook_path.exists():
+        raise ValidationError(f"workbook does not exist: {workbook_path}")
+    manifest = json.loads(
+        (root / "data" / "releases" / version / "manifest.json").read_text(encoding="utf-8")
+    )
+    downloads_dir = root / "public" / "downloads"
+    downloads_dir.mkdir(parents=True, exist_ok=True)
+    workbook_name = f"AIIO_Alberta_Pilot_{version}.xlsx"
+    public_workbook = downloads_dir / workbook_name
+    shutil.copyfile(workbook_path, public_workbook)
+
+    relative_paths = [
+        Path("public/data/latest.json"),
+        Path("public/data/manifest.json"),
+        Path(f"public/downloads/{workbook_name}"),
+        Path("public/downloads/alberta_ai_projects.csv"),
+        Path("public/downloads/bcpi_alberta.csv"),
+    ]
+    artifacts = {
+        "schema_version": "1.0.0",
+        "release_version": version,
+        "release_id": manifest["release_id"],
+        "code_commit": manifest["code_commit"],
+        "input_manifest_hash": manifest["input_manifest_hash"],
+        "artifacts": [
+            {
+                "path": str(relative_path),
+                "sha256": hashlib.sha256((root / relative_path).read_bytes()).hexdigest(),
+            }
+            for relative_path in relative_paths
+        ],
+    }
+    release_path = root / "data" / "releases" / version / "publication-artifacts.json"
+    public_path = root / "public" / "data" / "publication-artifacts.json"
+    write_json(release_path, artifacts)
+    write_json(public_path, artifacts)
+    return artifacts
+
+
 def write_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
