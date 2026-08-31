@@ -44,6 +44,15 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     model_run = json.loads(inputs["model_run"].read_text(encoding="utf-8"))
     power_run = json.loads(inputs["power_run"].read_text(encoding="utf-8"))
     labour_pressure = json.loads(inputs["labour_pressure_run"].read_text(encoding="utf-8"))
+    material_cost_screen = json.loads(
+        inputs["material_cost_screen_run"].read_text(encoding="utf-8")
+    )
+    public_project_exposure = json.loads(
+        inputs["public_project_exposure_run"].read_text(encoding="utf-8")
+    )
+    power_evidence = json.loads(
+        inputs["power_evidence_run"].read_text(encoding="utf-8")
+    )
     scenario = build_public_scenario(model_run)
     power_overlay = build_public_power_overlay(power_run)
     sources = build_public_sources(inputs["source_registry"])
@@ -55,12 +64,18 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     sources_path = release_dir / "sources.json"
     digest_path = release_dir / "digest.json"
     labour_pressure_path = release_dir / "labour_pressure.json"
+    material_cost_screen_path = release_dir / "material_cost_screen.json"
+    public_project_exposure_path = release_dir / "public_project_exposure.json"
+    power_evidence_path = release_dir / "power_evidence.json"
     write_json(baseline_path, baseline)
     write_json(scenario_path, scenario)
     write_json(power_path, power_overlay)
     write_json(sources_path, sources)
     write_json(digest_path, digest)
     write_json(labour_pressure_path, labour_pressure)
+    write_json(material_cost_screen_path, material_cost_screen)
+    write_json(public_project_exposure_path, public_project_exposure)
+    write_json(power_evidence_path, power_evidence)
     shutil.copyfile(inputs["alberta_ai_projects"], release_dir / "alberta_ai_projects.csv")
     shutil.copyfile(inputs["bcpi_alberta"], release_dir / "bcpi_alberta.csv")
     shutil.copyfile(
@@ -75,6 +90,18 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         inputs["labour_workforce_stock_canada"],
         release_dir / "labour_workforce_stock_canada.csv",
     )
+    shutil.copyfile(
+        inputs["material_cost_screen_csv"],
+        release_dir / "bcpi_material_cost_screen_alberta.csv",
+    )
+    shutil.copyfile(
+        inputs["public_project_exposure_csv"],
+        release_dir / "public_project_exposure_alberta.csv",
+    )
+    shutil.copyfile(
+        inputs["power_evidence_csv"],
+        release_dir / "power_evidence_alberta.csv",
+    )
 
     input_hashes = {name: sha256_file(path) for name, path in sorted(inputs.items())}
     input_manifest_hash = sha256_json(input_hashes)
@@ -85,6 +112,9 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         "sources.json": sha256_file(sources_path),
         "digest.json": sha256_file(digest_path),
         "labour_pressure.json": sha256_file(labour_pressure_path),
+        "material_cost_screen.json": sha256_file(material_cost_screen_path),
+        "public_project_exposure.json": sha256_file(public_project_exposure_path),
+        "power_evidence.json": sha256_file(power_evidence_path),
         "alberta_ai_projects.csv": sha256_file(release_dir / "alberta_ai_projects.csv"),
         "bcpi_alberta.csv": sha256_file(release_dir / "bcpi_alberta.csv"),
         "labour_availability_alberta.csv": sha256_file(
@@ -96,9 +126,18 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         "labour_workforce_stock_canada.csv": sha256_file(
             release_dir / "labour_workforce_stock_canada.csv"
         ),
+        "bcpi_material_cost_screen_alberta.csv": sha256_file(
+            release_dir / "bcpi_material_cost_screen_alberta.csv"
+        ),
+        "public_project_exposure_alberta.csv": sha256_file(
+            release_dir / "public_project_exposure_alberta.csv"
+        ),
+        "power_evidence_alberta.csv": sha256_file(
+            release_dir / "power_evidence_alberta.csv"
+        ),
     }
     manifest = {
-        "schema_version": "1.2.0",
+        "schema_version": "1.3.0",
         "release_id": f"AIIO_RELEASE_{version.upper().replace('.', '_').replace('-', '_')}",
         "version": version,
         "status": "research-prototype",
@@ -132,6 +171,9 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         "sources": sources,
         "digest": digest,
         "labour_pressure": labour_pressure,
+        "material_cost_screen": material_cost_screen,
+        "public_project_exposure": public_project_exposure,
+        "power_evidence": power_evidence,
     }
     latest_path = public_dir / "latest.json"
     write_json(latest_path, latest)
@@ -151,6 +193,18 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     shutil.copyfile(
         release_dir / "labour_workforce_stock_canada.csv",
         downloads_dir / "labour_workforce_stock_canada.csv",
+    )
+    shutil.copyfile(
+        release_dir / "bcpi_material_cost_screen_alberta.csv",
+        downloads_dir / "bcpi_material_cost_screen_alberta.csv",
+    )
+    shutil.copyfile(
+        release_dir / "public_project_exposure_alberta.csv",
+        downloads_dir / "public_project_exposure_alberta.csv",
+    )
+    shutil.copyfile(
+        release_dir / "power_evidence_alberta.csv",
+        downloads_dir / "power_evidence_alberta.csv",
     )
     return manifest
 
@@ -677,6 +731,57 @@ def release_input_paths(root: Path) -> dict[str, Path]:
             / "model-runs"
             / "labour_recruitment_pressure_canada_v0.1.json"
         ),
+        "material_cost_screen_run": (
+            root
+            / "data"
+            / "model-runs"
+            / "bcpi_material_cost_screen_alberta_v0.1.json"
+        ),
+        "material_cost_screen_csv": (
+            root / "data" / "processed" / "bcpi_material_cost_screen_alberta.csv"
+        ),
+        "public_project_exposure_run": (
+            root
+            / "data"
+            / "model-runs"
+            / "public_project_exposure_alberta_v0.1.json"
+        ),
+        "public_project_exposure_csv": (
+            root / "data" / "processed" / "public_project_exposure_alberta.csv"
+        ),
+        "power_evidence_run": (
+            root / "data" / "model-runs" / "power_evidence_alberta_v0.1.json"
+        ),
+        "power_evidence_csv": (
+            root / "data" / "processed" / "power_evidence_alberta.csv"
+        ),
+        "alberta_major_projects": (
+            root / "data" / "processed" / "alberta_major_projects.csv"
+        ),
+        "aeso_data_centre_update_manual_extract": (
+            root / "data" / "manual" / "aeso_data_centre_update_2025_09_page1.json"
+        ),
+        "aeso_data_centre_update_retrieval_manifest": (
+            root
+            / "data"
+            / "raw"
+            / "aeso_data_centre_update_2025_09"
+            / "2026-08-31_d997820b3ed2.pdf.manifest.json"
+        ),
+        "aeso_large_load_projects_retrieval_manifest": (
+            root
+            / "data"
+            / "raw"
+            / "aeso_large_load_projects"
+            / "2026-08-31_43d55ccde558.html.manifest.json"
+        ),
+        "aeso_interim_large_load_retrieval_manifest": (
+            root
+            / "data"
+            / "raw"
+            / "aeso_interim_large_load_2025_06"
+            / "2026-08-31_86ea3ce051e0.html.manifest.json"
+        ),
         "digest_items": root / "data" / "digests" / "items" / "2026-08-31.json",
     }
 
@@ -709,6 +814,9 @@ def build_publication_artifacts(
         Path("public/downloads/labour_availability_alberta.csv"),
         Path("public/downloads/labour_availability_canada.csv"),
         Path("public/downloads/labour_workforce_stock_canada.csv"),
+        Path("public/downloads/bcpi_material_cost_screen_alberta.csv"),
+        Path("public/downloads/public_project_exposure_alberta.csv"),
+        Path("public/downloads/power_evidence_alberta.csv"),
     ]
     artifacts = {
         "schema_version": "1.2.0",

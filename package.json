@@ -23,13 +23,16 @@
     "workforce:fetch": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch-census-workforce",
     "workforce:normalize": "PYTHONPATH=research/src python3 -m aiio.cli --root . normalize-census-workforce data/raw/statcan_census_occupation_98100449/2026-08-31_47d7833ff136.json",
     "labour:pressure": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-labour-pressure data/processed/labour_availability_canada.csv data/processed/labour_workforce_stock_canada.csv data/model-runs/labour_recruitment_pressure_canada_v0.1.json",
+    "materials:screen": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-material-screen data/processed/bcpi_alberta.csv data/model-runs/bcpi_material_cost_screen_alberta_v0.1.json data/processed/bcpi_material_cost_screen_alberta.csv",
+    "projects:exposure": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-public-project-exposure data/processed/alberta_major_projects.csv data/model-runs/public_project_exposure_alberta_v0.1.json data/processed/public_project_exposure_alberta.csv --window-start 2027 --window-end 2036",
+    "power:evidence": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-power-evidence data/manual/aeso_data_centre_update_2025_09_page1.json data/raw/aeso_data_centre_update_2025_09/2026-08-31_d997820b3ed2.pdf data/raw/aeso_large_load_projects/2026-08-31_43d55ccde558.html data/raw/aeso_interim_large_load_2025_06/2026-08-31_86ea3ce051e0.html data/model-runs/power_evidence_alberta_v0.1.json data/processed/power_evidence_alberta.csv",
     "digest:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-digest data/digests/items/2026-08-31.json --date 2026-08-31",
     "model:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-scenario data/model/alberta_graph_v0.2.json data/scenarios/alberta_50b_counterfactual_v0.2.json data/model-runs/alberta_50b_counterfactual_v0.2.json",
     "power:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-power-overlay data/scenarios/alberta_power_overlay_v0.1.json data/model-runs/alberta_power_overlay_v0.1.json",
     "workbook:build": "node workbook-work/build_aiio_workbook.mjs",
-    "release:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-release 0.5.0-dev --created-at 2026-08-31T21:15:00Z",
-    "release:verify": "PYTHONPATH=research/src python3 -m aiio.cli --root . verify-release 0.5.0-dev",
-    "publication:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-publication-artifacts 0.5.0-dev outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Alberta_Pilot_0.5.0-dev.xlsx"
+    "release:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-release 0.6.0-dev --created-at 2026-08-31T23:58:19Z",
+    "release:verify": "PYTHONPATH=research/src python3 -m aiio.cli --root . verify-release 0.6.0-dev",
+    "publication:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-publication-artifacts 0.6.0-dev outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Alberta_Pilot_0.6.0-dev.xlsx"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

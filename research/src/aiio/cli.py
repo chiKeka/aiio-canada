@@ -18,6 +18,9 @@ from .adapters.statcan_census import (
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .digest import build_digest
 from .labour import run_labour_recruitment_pressure
+from .materials import run_material_cost_screen
+from .power_evidence import run_power_evidence_screen
+from .public_projects import run_public_project_exposure
 from .registry import load_registry
 from .retrieval import retrieve
 from .schemas import ValidationError
@@ -69,6 +72,35 @@ def main() -> None:
     labour_pressure_parser.add_argument("vacancy_path", type=Path)
     labour_pressure_parser.add_argument("workforce_path", type=Path)
     labour_pressure_parser.add_argument("output_path", type=Path)
+
+    materials_parser = subparsers.add_parser(
+        "run-material-screen",
+        help="build the Alberta BCPI component-overlap material cost diagnostic",
+    )
+    materials_parser.add_argument("bcpi_path", type=Path)
+    materials_parser.add_argument("output_json_path", type=Path)
+    materials_parser.add_argument("output_csv_path", type=Path)
+
+    public_projects_parser = subparsers.add_parser(
+        "run-public-project-exposure",
+        help="build the Alberta public-delivery asset overlap diagnostic",
+    )
+    public_projects_parser.add_argument("projects_path", type=Path)
+    public_projects_parser.add_argument("output_json_path", type=Path)
+    public_projects_parser.add_argument("output_csv_path", type=Path)
+    public_projects_parser.add_argument("--window-start", type=int, default=2027)
+    public_projects_parser.add_argument("--window-end", type=int, default=2036)
+
+    power_evidence_parser = subparsers.add_parser(
+        "run-power-evidence",
+        help="build the observed AESO request, contract and transmission-boundary screen",
+    )
+    power_evidence_parser.add_argument("manual_extract_path", type=Path)
+    power_evidence_parser.add_argument("source_pdf_path", type=Path)
+    power_evidence_parser.add_argument("large_load_html_path", type=Path)
+    power_evidence_parser.add_argument("interim_html_path", type=Path)
+    power_evidence_parser.add_argument("output_json_path", type=Path)
+    power_evidence_parser.add_argument("output_csv_path", type=Path)
 
     subparsers.add_parser(
         "fetch-major-projects",
@@ -198,6 +230,56 @@ def main() -> None:
                             output["occupation_diagnostics"]
                         ),
                         "trade_diagnostic_count": len(output["trade_diagnostics"]),
+                    }
+                )
+            )
+        elif args.command == "run-material-screen":
+            output = run_material_cost_screen(
+                args.bcpi_path.resolve(),
+                args.output_json_path.resolve(),
+                args.output_csv_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "observation_count": output["observation_count"],
+                    }
+                )
+            )
+        elif args.command == "run-public-project-exposure":
+            output = run_public_project_exposure(
+                args.projects_path.resolve(),
+                args.output_json_path.resolve(),
+                args.output_csv_path.resolve(),
+                window_start=args.window_start,
+                window_end=args.window_end,
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "screened_project_count": output["screened_project_count"],
+                    }
+                )
+            )
+        elif args.command == "run-power-evidence":
+            output = run_power_evidence_screen(
+                args.manual_extract_path.resolve(),
+                args.source_pdf_path.resolve(),
+                args.large_load_html_path.resolve(),
+                args.interim_html_path.resolve(),
+                args.output_json_path.resolve(),
+                args.output_csv_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "metric_count": len(output["metrics"]),
                     }
                 )
             )

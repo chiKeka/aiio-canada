@@ -69,3 +69,15 @@ different reference periods and sampling designs. The five-year timing gap
 between the 2021 Census stock and current vacancy observations must be shown. A
 ratio is therefore an explicit analytical construction rather than a published
 Statistics Canada measure, and it cannot be labelled a current vacancy rate.
+
+## Implemented Alberta power evidence boundary
+
+Three AESO sources are active: the September 2025 data-centre update, the June
+2025 interim large-load announcement, and the current Large Load Projects page.
+Their PDF or HTML responses and retrieval manifests are retained by content hash.
+
+The PDF chart reports cumulative requested data-centre load; requests are not
+contracts, forecasts, or realized demand. The current page reports executed
+contracts under the 1,200 MW Phase 1 limit. AESO's statement that no new
+transmission reinforcement was required is restricted to that interim scope and
+cannot be generalized to the $50 billion counterfactual.

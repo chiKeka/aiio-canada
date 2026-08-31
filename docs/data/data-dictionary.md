@@ -67,6 +67,22 @@ Required fields: `overlay_id`, `parameter_set_id`, `geography_id`, `start_year`,
 
 Power overlays are independent scenario artifacts. `energy_pue` applies to annual energy; `peak_to_it_factor` applies to facility peak. Neither is derived from CAD capex.
 
+## Material cost screen
+
+Required fields: `geography_id`, `archetype`, `component`, `indicator_id`, `period_end`, `index_value`, `unit`, `quarter_over_quarter_percent_change`, `year_over_year_percent_change`, `source_id`, `source_evidence_status`, `change_evidence_status`, `quality_flags`.
+
+BCPI levels are observed; changes are inferred arithmetic transformations. Building archetypes are proxies and cannot be described as data-centre prices, physical availability, or AI-caused effects.
+
+## Public-project exposure
+
+Required fields: `project_id`, `asset_class`, `asset_class_evidence_status`, `sponsor_signal`, `sponsor_signal_evidence_status`, `estimated_cost_cad`, `start_year`, `end_year`, `schedule_overlap_status`, `overlap_years`, `annualized_cost_cad_if_complete`, `indicative_cost_allocated_to_window_cad`, `source_id`, `source_evidence_status`.
+
+Incomplete schedules remain indeterminate unless a reported boundary proves they are outside the window. Asset and sponsor labels are inferences, not ownership findings.
+
+## Power evidence screen
+
+Required fields: `metric_id`, `period`, `value`, `unit`, `evidence_status`, `source_id`, `source_locator`. Requested, allocated, contracted, connected, peak, generation, and transmission quantities remain semantically distinct. A cross-vintage ratio must never be labelled a conversion rate or probability.
+
 ## Release
 
 Required fields: `release_id`, `version`, `published_at`, `code_commit`, `dirty_worktree`, `input_manifest_hash`, `configuration_hash`, `model_version`, `engine_version`, `parameter_set_id`, `status`, `notes`.

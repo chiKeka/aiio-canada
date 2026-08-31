@@ -1,6 +1,107 @@
 import { ScenarioLab } from '@/components/scenario-lab';
-import { PageIntro, SiteFooter, SiteHeader } from '@/components/site-shell';
+import {
+  EvidencePill,
+  PageIntro,
+  SiteFooter,
+  SiteHeader,
+} from '@/components/site-shell';
+import releaseData from '@/public/data/latest.json';
+
+type PowerEvidence = {
+  requested_load: {
+    latest_application_period: string;
+    latest_requested_load_mw: number;
+  };
+  phase1: {
+    allocated_mw: number;
+    allocated_share_of_q3_2025_requested_load_percent: number;
+  };
+  transmission_boundary: {
+    additional_transmission_required_for_50b_counterfactual_mw: number | null;
+  };
+};
 
 export default function ScenarioPage() {
-  return <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]"><SiteHeader /><PageIntro eyebrow="Scenario laboratory" title="What if $50B lands in Alberta over a decade?" description="Explore the published counterfactual diagnostic while keeping capex, local capture, graph pressure and the independent power overlay distinct. Moving a control creates an interpolation for learning—not a new forecast, finding or research release." /><section className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16"><ScenarioLab /></section><SiteFooter /></main>;
+  const evidence = (
+    releaseData as typeof releaseData & { power_evidence?: PowerEvidence }
+  ).power_evidence;
+  return (
+    <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">
+      <SiteHeader />
+      <PageIntro
+        eyebrow="Scenario laboratory"
+        title="What if $50B lands in Alberta over a decade?"
+        description="Explore the published counterfactual diagnostic while keeping capex, local capture, graph pressure and the independent power overlay distinct. Moving a control creates an interpolation for learning—not a new forecast, finding or research release."
+      />
+      {evidence ? <ObservedPowerBoundary evidence={evidence} /> : null}
+      <section className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
+        <ScenarioLab />
+      </section>
+      <SiteFooter />
+    </main>
+  );
+}
+
+function ObservedPowerBoundary({ evidence }: { evidence: PowerEvidence }) {
+  const transmission =
+    evidence.transmission_boundary
+      .additional_transmission_required_for_50b_counterfactual_mw;
+  return (
+    <section className="border-b border-[#d5ddd8] bg-white">
+      <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-12">
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <EvidencePill status="observed" />
+          <EvidencePill status="inferred" />
+          <span className="font-mono text-xs text-[#52645f]">
+            Observed AESO boundary · separate from scenario
+          </span>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          <PowerMetric
+            label={`Requested load · ${evidence.requested_load.latest_application_period}`}
+            value={`${(evidence.requested_load.latest_requested_load_mw / 1_000).toFixed(1)} GW`}
+            note="Requests, not contracts or a forecast"
+          />
+          <PowerMetric
+            label="Phase 1 allocated limit"
+            value={`${(evidence.phase1.allocated_mw / 1_000).toFixed(1)} GW`}
+            note="Executed contracts reconcile to the limit"
+          />
+          <PowerMetric
+            label="$50B additional transmission"
+            value={transmission === null ? 'Unknown' : `${transmission} MW`}
+            note="Requires locations and system studies"
+          />
+        </div>
+        <div className="mt-4 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-4 text-sm leading-6 text-[#825a47]">
+          AESO reported no new reinforcement for its scoped 1.2 GW Phase 1
+          approach. That statement cannot be transferred to larger, later, or
+          differently located loads. The{' '}
+          {evidence.phase1.allocated_share_of_q3_2025_requested_load_percent.toFixed(
+            1,
+          )}
+          % comparison is a cross-vintage screening ratio—not a realization
+          probability or queue-conversion rate.
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PowerMetric({
+  label,
+  note,
+  value,
+}: {
+  label: string;
+  note: string;
+  value: string;
+}) {
+  return (
+    <article className="rounded-xl border border-[#d3dcd6] bg-[#fbfaf5] p-5">
+      <p className="font-mono text-3xl font-semibold text-[#155d59]">{value}</p>
+      <h2 className="mt-3 text-sm font-medium">{label}</h2>
+      <p className="mt-1 text-xs text-[#61726d]">{note}</p>
+    </article>
+  );
 }

@@ -17,6 +17,14 @@
       "observed_change": "AESO's 2026 Long-Term Outlook engagement material explicitly identifies increased data-centre development interest as a source of uncertainty for load growth and generation needs through 2050. The final outlook has not yet been published on this page.",
       "model_implication": "Keep multiple load-realization pathways and connection-stage probabilities in the Alberta power module rather than using a single data-centre load forecast.",
       "evidence_status": "observed"
+    },
+    {
+      "headline": "AESO Phase 1 allocated 1,200 MW while published requests reached 20,700 MW",
+      "source_id": "AESO_LARGE_LOAD_PROJECTS",
+      "source_url": "https://www.aeso.ca/grid/connecting-to-the-grid/large-load-projects/",
+      "observed_change": "AESO's current Large Load Projects page reports that all 1,200 MW of its Phase 1 interim limit was allocated through executed load contracts of 970 MW and 230 MW. AESO's separate September 2025 update chart reports 20,700 MW of cumulative requested data-centre load in 2025 Q3. Requests, contracts, connected load and forecasts are different quantities.",
+      "model_implication": "Publish the request and contract quantities as an observed boundary, not a queue-conversion probability. Keep additional transmission required for the $50 billion counterfactual unknown until locations and system studies are available.",
+      "evidence_status": "observed"
     }
   ]
 }

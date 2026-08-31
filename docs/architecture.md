@@ -12,7 +12,10 @@ Source register + immutable retrieval records
 Normalized observations + claim/evidence coding
     ↓
 Provincial baseline and project inventory
-    ↘ guarded labour recruitment screen
+    ├── guarded labour recruitment screen
+    ├── material-cost component screen
+    ├── public-delivery asset overlap screen
+    └── observed power request/contract boundary
     ↓
 Typed CAD-pressure graph + scenario shocks
     ↓
@@ -48,7 +51,7 @@ Nodes represent shocks, resources, materials, cost signals and public-delivery d
 
 A scenario is an explicit set of non-observed inputs: investment quantum, timing, construction share, local capture and normalization denominators. It produces a versioned structural diagnostic against a named graph. The first Alberta run also tests denominators, absorption, local capture and retention one at a time and in joint lower-/higher-pressure cases. These cases are not probability intervals.
 
-Power-system quantities are deliberately separate. An independent overlay starts with IT load in MW, uses energy PUE only for annual energy, applies a distinct peak-to-IT factor to peak demand, and stages load using an annual commissioning profile. It cannot be inferred from the CAD scenario and is not an AESO needs assessment.
+Power-system quantities are deliberately separate. An observed evidence screen records AESO request, allocation and contract quantities without turning them into a forecast. An independent scenario overlay starts with IT load in MW, uses energy PUE only for annual energy, applies a distinct peak-to-IT factor to peak demand, and stages load using an annual commissioning profile. It cannot be inferred from the CAD scenario and is not an AESO needs assessment.
 
 ### 6. Publication layer
 
@@ -67,8 +70,11 @@ All outputs read an immutable release manifest containing input hashes, code ver
 1. Schema and source validation.
 2. Baseline reconciliation.
 3. Labour geography/NOC coverage, missingness, zero-filler and cross-vintage formula checks.
-4. Graph DAG, self-loop, validity, retention and edge-metadata checks.
-5. Scenario identity, sign, lag, mass-bound, additivity, sensitivity, deterministic and golden-run tests.
-6. Workbook-to-release reconciliation.
-7. Accessibility and public-language review.
-8. Independent methodological review and documented disposition.
+4. Material-series coverage and aligned-period checks.
+5. Public-project classification, schedule-missingness and cost-allocation checks.
+6. Power source-hash, requested-load ordering and Phase 1 reconciliation checks.
+7. Graph DAG, self-loop, validity, retention and edge-metadata checks.
+8. Scenario identity, sign, lag, mass-bound, additivity, sensitivity, deterministic and golden-run tests.
+9. Workbook-to-release reconciliation.
+10. Accessibility and public-language review.
+11. Independent methodological review and documented disposition.

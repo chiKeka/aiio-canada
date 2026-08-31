@@ -41,6 +41,7 @@ CLAUDE.md
 /.wrangler/
 /outputs/
 /work/
+/tmp/
 /workbook-work/*
 !/workbook-work/build_aiio_workbook.mjs
 
