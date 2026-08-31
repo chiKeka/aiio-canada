@@ -2,15 +2,15 @@
   "artifacts": [
     {
       "path": "public/data/latest.json",
-      "sha256": "1d9bbe8a95ae9b3dcb80767955ec2aa3b962f37ea1f681c568e93fc124b25d31"
+      "sha256": "78e4623d7d9e6945751994b17cdf36964dd088aef14307796b30ca8846ec750a"
     },
     {
       "path": "public/data/manifest.json",
-      "sha256": "deb692a46b24f0a7b9096990ebd0d141570af4d6ecd4f036915ca0f73666f2d6"
+      "sha256": "5af101e28bfb82099cc113e2a54463ae60e4329bab45894f9cd6a6772e5e1b37"
     },
     {
-      "path": "public/downloads/AIIO_Alberta_Pilot_0.4.0-dev.xlsx",
-      "sha256": "dbb36af7ae563e376d763da76e1076e3f300ba7df42f474a56338647f19a0b14"
+      "path": "public/downloads/AIIO_Alberta_Pilot_0.5.0-dev.xlsx",
+      "sha256": "37b63499e49474a0e0ba1e27750cc2b022492d342d2c906e4e91dd5facf8533e"
     },
     {
       "path": "public/downloads/alberta_ai_projects.csv",
@@ -27,11 +27,15 @@
     {
       "path": "public/downloads/labour_availability_canada.csv",
       "sha256": "47652b4a8b2dd9ab6eb77b1b16a44b5bbc62a018dd33272fdbefda710ea56f79"
+    },
+    {
+      "path": "public/downloads/labour_workforce_stock_canada.csv",
+      "sha256": "ddaeab6d7eff569738d3e3dac3576dbdd57890f0e0a06d3cc1c98bb202557a89"
     }
   ],
-  "code_commit": "52e01771a204622ada32c206fad8cf8be20fd0b4",
-  "input_manifest_hash": "sha256:6575efdb399dfc2dc5db7ef3b227ab983d0f20ae30020930994242290a086fb7",
-  "release_id": "AIIO_RELEASE_0_4_0_DEV",
-  "release_version": "0.4.0-dev",
-  "schema_version": "1.1.0"
+  "code_commit": "c4749145575ff5c95ddd508b22c8be48384cddb9",
+  "input_manifest_hash": "sha256:d308d8d18e9bc10e2a93ea498ec10b049f34eb4098034ea4ba9ffe9704da9365",
+  "release_id": "AIIO_RELEASE_0_5_0_DEV",
+  "release_version": "0.5.0-dev",
+  "schema_version": "1.2.0"
 }
