@@ -10,6 +10,7 @@ const downloads = [
   { icon: FileSpreadsheet, title: 'Alberta BCPI observations', detail: 'Calgary and Edmonton normalized construction-price rows', href: '/downloads/bcpi_alberta.csv', format: 'CSV' },
   { icon: FileSpreadsheet, title: 'Alberta labour availability', detail: 'Graph-relevant NOC vacancy and offered-wage observations with suppression and quality flags', href: '/downloads/labour_availability_alberta.csv', format: 'CSV' },
   { icon: FileSpreadsheet, title: 'Canada provincial labour availability', detail: 'The same trade indicators for all 13 provinces and territories with geography lineage and no national-average substitution', href: '/downloads/labour_availability_canada.csv', format: 'CSV' },
+  { icon: FileSpreadsheet, title: 'Canada detailed-trade workforce stock', detail: '2021 Census employed-person counts for six NOC unit groups across all provinces and territories, with selected-coordinate lineage and rounding flags', href: '/downloads/labour_workforce_stock_canada.csv', format: 'CSV' },
   { icon: FileSpreadsheet, title: 'Auditable Alberta pilot workbook', detail: 'Formula-driven assumptions, diagnostic outputs, evidence registers and release checks', href: `/downloads/AIIO_Alberta_Pilot_${releaseData.manifest.version}.xlsx`, format: 'XLSX' },
 ];
 

@@ -48,3 +48,24 @@ The full Statistics Canada ZIP is retained as a reproducible local cache because
 its uncompressed table exceeds one gigabyte. Git versions the retrieval manifest,
 content hash, deterministic adapter and normalized extracts instead of the
 large provider file.
+
+## Workforce-stock denominator
+
+An intake test found that Statistics Canada table 14-10-0416-01 stops at broad
+NOC groups such as 72 and 73. It is retained for later broad-group benchmarking,
+but it is not used as a five-digit trade denominator.
+
+The detailed source is 2021 Census table 98-10-0449-01. A selected-coordinate
+Statistics Canada Web Data Service request retrieves employed persons for the six
+graph-relevant NOC 2021 unit groups across all 13 provinces and territories. This
+avoids downloading the full 1.8 GB cube while retaining the official dimension
+metadata, request coordinates and raw responses. The counts describe the May
+2–8, 2021 reference week, use the 25% long-form sample and are randomly rounded.
+
+Employment is not spare capacity. Any vacancy-to-employment diagnostic must be
+described as a recruitment-pressure signal, retain the LFS and JVWS quality
+flags, and avoid combining suppressed cells with zero. The two surveys also have
+different reference periods and sampling designs. The five-year timing gap
+between the 2021 Census stock and current vacancy observations must be shown. A
+ratio is therefore an explicit analytical construction rather than a published
+Statistics Canada measure, and it cannot be labelled a current vacancy rate.

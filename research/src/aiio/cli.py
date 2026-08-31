@@ -11,8 +11,13 @@ from .adapters.statcan import (
     normalize_jvws_alberta,
     normalize_jvws_canada,
 )
+from .adapters.statcan_census import (
+    fetch_census_trade_employment,
+    normalize_census_trade_employment,
+)
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .digest import build_digest
+from .labour import run_labour_recruitment_pressure
 from .registry import load_registry
 from .retrieval import retrieve
 from .schemas import ValidationError
@@ -45,6 +50,25 @@ def main() -> None:
         help="normalize provincial and territorial trade labour observations",
     )
     labour_canada_parser.add_argument("zip_path", type=Path)
+
+    subparsers.add_parser(
+        "fetch-census-workforce",
+        help="retrieve selected provincial and territorial detailed-trade employment cells",
+    )
+
+    census_workforce_parser = subparsers.add_parser(
+        "normalize-census-workforce",
+        help="normalize selected 2021 Census detailed-trade employment cells",
+    )
+    census_workforce_parser.add_argument("raw_path", type=Path)
+
+    labour_pressure_parser = subparsers.add_parser(
+        "run-labour-pressure",
+        help="build the cross-vintage vacancy/workforce recruitment-pressure diagnostic",
+    )
+    labour_pressure_parser.add_argument("vacancy_path", type=Path)
+    labour_pressure_parser.add_argument("workforce_path", type=Path)
+    labour_pressure_parser.add_argument("output_path", type=Path)
 
     subparsers.add_parser(
         "fetch-major-projects",
@@ -139,6 +163,41 @@ def main() -> None:
                         "status": "passed",
                         "project_count": project_count,
                         "ai_relevant_count": ai_count,
+                    }
+                )
+            )
+        elif args.command == "fetch-census-workforce":
+            record = fetch_census_trade_employment(root / "data" / "raw")
+            print(json.dumps(asdict(record), indent=2))
+        elif args.command == "normalize-census-workforce":
+            observations = normalize_census_trade_employment(
+                args.raw_path.resolve(),
+                root / "data" / "processed" / "labour_workforce_stock_canada.csv",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "observation_count": len(observations),
+                        "output": "data/processed/labour_workforce_stock_canada.csv",
+                    }
+                )
+            )
+        elif args.command == "run-labour-pressure":
+            output = run_labour_recruitment_pressure(
+                args.vacancy_path.resolve(),
+                args.workforce_path.resolve(),
+                args.output_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "occupation_diagnostic_count": len(
+                            output["occupation_diagnostics"]
+                        ),
+                        "trade_diagnostic_count": len(output["trade_diagnostics"]),
                     }
                 )
             )

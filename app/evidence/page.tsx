@@ -1,7 +1,7 @@
 import { BriefcaseBusiness, Database, ExternalLink, ShieldCheck } from 'lucide-react';
 
 import { EvidenceExplorer } from '@/components/evidence-explorer';
-import { LabourMarketExplorer, type NationalLabourAvailability } from '@/components/labour-market-explorer';
+import { LabourMarketExplorer, type NationalLabourAvailability, type NationalLabourPressure, type NationalWorkforceStock } from '@/components/labour-market-explorer';
 import { EvidencePill, PageIntro, SiteFooter, SiteHeader } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
 
@@ -17,6 +17,16 @@ export default function EvidencePage() {
       labour_availability_canada?: NationalLabourAvailability;
     }
   ).labour_availability_canada;
+  const workforceCanada = (
+    releaseData.baseline as typeof releaseData.baseline & {
+      labour_workforce_stock_canada?: NationalWorkforceStock;
+    }
+  ).labour_workforce_stock_canada;
+  const labourPressure = (
+    releaseData as typeof releaseData & {
+      labour_pressure?: NationalLabourPressure;
+    }
+  ).labour_pressure;
   return (
     <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">
       <SiteHeader />
@@ -35,7 +45,7 @@ export default function EvidencePage() {
         </div>
         <EvidenceExplorer projects={releaseData.baseline.projects} />
       </section>
-      {labourCanada ? <LabourMarketExplorer labour={labourCanada} /> : labour ? <LabourAvailabilityPanel labour={labour} /> : null}
+      {labourCanada ? <LabourMarketExplorer labour={labourCanada} pressure={labourPressure} workforce={workforceCanada} /> : labour ? <LabourAvailabilityPanel labour={labour} /> : null}
       <section className="border-t border-[#d5ddd8] bg-[#e9ebe5]">
         <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
           <div className="mb-6 flex items-center gap-2"><Database className="size-4 text-[#24746c]" /><h2 className="text-xl font-medium">Registered public sources</h2></div>

@@ -11,6 +11,7 @@ from aiio.adapters.statcan import (
     TRADE_NOC_TO_NODE,
 )
 from aiio.release import (
+    labour_workforce_stock_canada,
     latest_labour_availability,
     latest_labour_availability_canada,
     sha256_file,
@@ -96,6 +97,46 @@ class ReleaseVerificationTests(unittest.TestCase):
                         "STATCAN_JVWS_14100444,observed,2026-03-31,TR_CA,"
                         f"{flags}"
                     )
+        path.write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+    def write_workforce_stock(
+        self,
+        path: Path,
+        *,
+        omit_geography: str | None = None,
+        mismatch_geography: bool = False,
+    ) -> None:
+        header = (
+            "observation_id,indicator_id,geography_label,statcan_dguid,province_code,"
+            "noc_code,occupation_label,trade_node_id,statistic,value,unit,geography_id,"
+            "period_start,period_end,release_date,source_id,evidence_status,as_of_date,"
+            "transformation_id,quality_flags,coordinate"
+        )
+        rows = [header]
+        for dguid, geography_id in PROVINCE_DGUID_TO_GEOGRAPHY_ID.items():
+            if geography_id == omit_geography:
+                continue
+            published_geography_id = (
+                "PR_48" if mismatch_geography and geography_id == "PR_10" else geography_id
+            )
+            province_code = geography_id.removeprefix("PR_")
+            for noc_code, trade_node_id in TRADE_NOC_TO_NODE.items():
+                is_zero = geography_id == "PR_11" and noc_code == "72202"
+                value = "0" if is_zero else "100"
+                flags = (
+                    "census_long_form_25pct_sample|random_rounding|"
+                    "wds_response_status_code:2|census_zero_filler"
+                    if is_zero
+                    else "census_long_form_25pct_sample|random_rounding"
+                )
+                rows.append(
+                    f"OBS_{geography_id}_{noc_code},CENSUS_EMPLOYED_PERSONS_NOC_{noc_code},"
+                    f"{geography_id},{dguid},{province_code},{noc_code},Occupation {noc_code},"
+                    f"{trade_node_id},Employed,{value},Persons,{published_geography_id},"
+                    "2021-05-02,2021-05-08,2022-11-30,"
+                    "STATCAN_CENSUS_OCCUPATION_98100449,observed,2021-05-08,TR_CENSUS,"
+                    f"{flags},COORD_{geography_id}_{noc_code}"
+                )
         path.write_text("\n".join(rows) + "\n", encoding="utf-8")
 
     def verify(self) -> None:
@@ -193,6 +234,35 @@ class ReleaseVerificationTests(unittest.TestCase):
         self.write_canada_labour(labour_path, mismatch_geography=True)
         with self.assertRaisesRegex(ValidationError, "mismatched geography"):
             latest_labour_availability_canada(labour_path)
+
+    def test_workforce_stock_requires_13_geographies_and_preserves_zero(self) -> None:
+        workforce_path = self.root / "workforce.csv"
+        self.write_workforce_stock(workforce_path)
+        baseline = labour_workforce_stock_canada(workforce_path)
+        self.assertEqual(len(baseline["coverage"]), 13)
+        self.assertEqual(len(baseline["observations"]), 78)
+        pei = next(
+            item for item in baseline["coverage"] if item["geography_id"] == "PR_11"
+        )
+        self.assertEqual(pei["zero_filler_cells"], 1)
+        zero = next(
+            item
+            for item in baseline["observations"]
+            if item["geography_id"] == "PR_11" and item["noc_code"] == "72202"
+        )
+        self.assertEqual(zero["value"], 0.0)
+
+    def test_workforce_stock_rejects_missing_geography(self) -> None:
+        workforce_path = self.root / "workforce_missing.csv"
+        self.write_workforce_stock(workforce_path, omit_geography="PR_62")
+        with self.assertRaisesRegex(ValidationError, "exactly 13"):
+            labour_workforce_stock_canada(workforce_path)
+
+    def test_workforce_stock_rejects_dguid_geography_mismatch(self) -> None:
+        workforce_path = self.root / "workforce_mismatch.csv"
+        self.write_workforce_stock(workforce_path, mismatch_geography=True)
+        with self.assertRaisesRegex(ValidationError, "mismatched"):
+            labour_workforce_stock_canada(workforce_path)
 
 
 if __name__ == "__main__":

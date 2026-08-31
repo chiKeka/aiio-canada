@@ -12,6 +12,7 @@ Source register + immutable retrieval records
 Normalized observations + claim/evidence coding
     ↓
 Provincial baseline and project inventory
+    ↘ guarded labour recruitment screen
     ↓
 Typed CAD-pressure graph + scenario shocks
     ↓
@@ -37,7 +38,7 @@ Source-specific adapters retrieve machine-readable files where available. Raw re
 
 ### 3. Baseline
 
-The baseline describes the observed system before a scenario shock: public projects, employment and vacancies by occupation, wages, construction price indices, material supply proxies, generation and transmission outlooks, and known AI/data-centre projects.
+The baseline describes the observed system before a scenario shock: public projects, employment and vacancies by occupation, wages, construction price indices, material supply proxies, generation and transmission outlooks, and known AI/data-centre projects. Detailed current vacancies and the 2021 Census workforce stock remain separately dated. Their guarded cross-vintage ratio is an inferred recruitment screen, not a vacancy rate or graph calibration input.
 
 ### 4. Graph model
 
@@ -65,8 +66,9 @@ All outputs read an immutable release manifest containing input hashes, code ver
 
 1. Schema and source validation.
 2. Baseline reconciliation.
-3. Graph DAG, self-loop, validity, retention and edge-metadata checks.
-4. Scenario identity, sign, lag, mass-bound, additivity, sensitivity, deterministic and golden-run tests.
-5. Workbook-to-release reconciliation.
-6. Accessibility and public-language review.
-7. Independent methodological review and documented disposition.
+3. Labour geography/NOC coverage, missingness, zero-filler and cross-vintage formula checks.
+4. Graph DAG, self-loop, validity, retention and edge-metadata checks.
+5. Scenario identity, sign, lag, mass-bound, additivity, sensitivity, deterministic and golden-run tests.
+6. Workbook-to-release reconciliation.
+7. Accessibility and public-language review.
+8. Independent methodological review and documented disposition.

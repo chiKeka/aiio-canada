@@ -46,3 +46,6 @@ CLAUDE.md
 
 # Large reproducible public-source caches (manifests remain versioned)
 /data/raw/statcan_jvws_14100444/*.zip
+/data/raw/statcan_lfs_occupation_14100416/*.zip
+/data/raw/statcan_census_occupation_98100449/*.json
+!/data/raw/statcan_census_occupation_98100449/*.json.manifest.json

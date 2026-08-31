@@ -29,6 +29,18 @@ Province-preserving statistical extracts additionally retain the public source's
 regions are distinct records and cannot be substituted without an explicit
 transformation.
 
+## Workforce stock
+
+Required fields: `observation_id`, `indicator_id`, `geography_id`, `geography_label`, `statcan_dguid`, `noc_code`, `occupation_label`, `trade_node_id`, `statistic`, `value`, `unit`, `period_start`, `period_end`, `release_date`, `source_id`, `evidence_status`, `transformation_id`, `quality_flags`, `coordinate`.
+
+The first release uses 2021 Census employed-person counts for six NOC unit groups. A published Census zero filler is numeric zero with an explicit quality flag; it is distinct from an unpublished or suppressed value.
+
+## Labour recruitment diagnostic
+
+Required fields: `model_id`, `metric_id`, `geography_id`, `noc_code`, `vacancies`, `vacancy_period_end`, `workforce_stock`, `workforce_period_start`, `workforce_period_end`, `vacancies_per_1_000_2021_employed`, `availability`, `evidence_status`, `vacancy_quality_flags`, `workforce_quality_flags`.
+
+The ratio is cross-vintage and inferred. It is not the Statistics Canada vacancy rate, a current workforce denominator or a measure of spare capacity. Null inputs remain null, and trade aggregates require complete component-NOC coverage.
+
 ## Claim
 
 Required fields: `claim_id`, `claim_text`, `claim_type`, `geography_id`, `valid_from`, `valid_to`, `evidence_status`, `confidence`, `review_status`, `reviewer`, `release_id`.

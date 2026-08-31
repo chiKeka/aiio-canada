@@ -19,6 +19,7 @@ class SourceStatus(StrEnum):
 
 
 ALLOWED_ACCESS_METHODS = {
+    "api_json",
     "bulk_zip",
     "csv",
     "html",
