@@ -48,3 +48,6 @@ Academic-use controls are documented in `docs/governance/dissertation-alignment.
 
 Deployment and release provenance are documented in
 `docs/release/vercel-deployment.md`.
+
+GitHub runs the same lint, evidence-registry, model-test, and dual-build quality
+gate on every change to `main` and on pull requests.
