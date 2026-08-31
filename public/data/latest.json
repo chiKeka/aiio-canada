@@ -65,6 +65,222 @@
     ],
     "evidence_status": "observed_with_inferred_classification",
     "geography_id": "PR_48",
+    "labour_availability": {
+      "evidence_status": "observed",
+      "observations": [
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_AVERAGE_OFFERED_HOURLY_WAGE_NOC_73100",
+          "noc_code": "73100",
+          "observation_id": "OBS_JVWS_D64CA27766B1D77A23B5",
+          "occupation_label": "Concrete finishers",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:E"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Average offered hourly wage",
+          "trade_node_id": "trade_concrete",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Dollars",
+          "value": 32.85
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_JOB_VACANCIES_NOC_73100",
+          "noc_code": "73100",
+          "observation_id": "OBS_JVWS_8518C84C98519EB8DA69",
+          "occupation_label": "Concrete finishers",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:F",
+            "value_missing_or_suppressed"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Job vacancies",
+          "trade_node_id": "trade_concrete",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Number",
+          "value": null
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_AVERAGE_OFFERED_HOURLY_WAGE_NOC_72200",
+          "noc_code": "72200",
+          "observation_id": "OBS_JVWS_329C2BDEB84516DB1AFE",
+          "occupation_label": "Electricians (except industrial and power system)",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:B"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Average offered hourly wage",
+          "trade_node_id": "trade_electricians",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Dollars",
+          "value": 29.3
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_JOB_VACANCIES_NOC_72200",
+          "noc_code": "72200",
+          "observation_id": "OBS_JVWS_996307289B305C086EF1",
+          "occupation_label": "Electricians (except industrial and power system)",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:E"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Job vacancies",
+          "trade_node_id": "trade_electricians",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Number",
+          "value": 460.0
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_AVERAGE_OFFERED_HOURLY_WAGE_NOC_72201",
+          "noc_code": "72201",
+          "observation_id": "OBS_JVWS_AC3E60777ABE191D55B3",
+          "occupation_label": "Industrial electricians",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:B"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Average offered hourly wage",
+          "trade_node_id": "trade_electricians",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Dollars",
+          "value": 45.15
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_JOB_VACANCIES_NOC_72201",
+          "noc_code": "72201",
+          "observation_id": "OBS_JVWS_640E14AAAF5B4B0E3932",
+          "occupation_label": "Industrial electricians",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:E"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Job vacancies",
+          "trade_node_id": "trade_electricians",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Number",
+          "value": 80.0
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_AVERAGE_OFFERED_HOURLY_WAGE_NOC_72402",
+          "noc_code": "72402",
+          "observation_id": "OBS_JVWS_F751E089ADE12F6BE3DC",
+          "occupation_label": "Heating, refrigeration and air conditioning mechanics",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:A"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Average offered hourly wage",
+          "trade_node_id": "trade_hvac",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Dollars",
+          "value": 37.1
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_JOB_VACANCIES_NOC_72402",
+          "noc_code": "72402",
+          "observation_id": "OBS_JVWS_AB9BFCA78334E53B249D",
+          "occupation_label": "Heating, refrigeration and air conditioning mechanics",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:E"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Job vacancies",
+          "trade_node_id": "trade_hvac",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Number",
+          "value": 230.0
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_AVERAGE_OFFERED_HOURLY_WAGE_NOC_72202",
+          "noc_code": "72202",
+          "observation_id": "OBS_JVWS_700A0E6F9E46DE111DEB",
+          "occupation_label": "Power system electricians",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:F",
+            "value_missing_or_suppressed"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Average offered hourly wage",
+          "trade_node_id": "trade_power_line",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Dollars",
+          "value": null
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_JOB_VACANCIES_NOC_72202",
+          "noc_code": "72202",
+          "observation_id": "OBS_JVWS_75B69B7E87BE50BCF8FC",
+          "occupation_label": "Power system electricians",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:F",
+            "value_missing_or_suppressed"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Job vacancies",
+          "trade_node_id": "trade_power_line",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Number",
+          "value": null
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_AVERAGE_OFFERED_HOURLY_WAGE_NOC_72203",
+          "noc_code": "72203",
+          "observation_id": "OBS_JVWS_0BCA937280A1F14B1481",
+          "occupation_label": "Electrical power line and cable workers",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:C"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Average offered hourly wage",
+          "trade_node_id": "trade_power_line",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Dollars",
+          "value": 50.55
+        },
+        {
+          "evidence_status": "observed",
+          "indicator_id": "JVWS_JOB_VACANCIES_NOC_72203",
+          "noc_code": "72203",
+          "observation_id": "OBS_JVWS_B95114EA86545CF4EE09",
+          "occupation_label": "Electrical power line and cable workers",
+          "period_end": "2026-03-31",
+          "quality_flags": [
+            "status:F",
+            "value_missing_or_suppressed"
+          ],
+          "source_id": "STATCAN_JVWS_14100444",
+          "statistic": "Job vacancies",
+          "trade_node_id": "trade_power_line",
+          "transformation_id": "TR_STATCAN_JVWS_AB_NOC_1_0_0",
+          "unit": "Number",
+          "value": null
+        }
+      ],
+      "period_end": "2026-03-31",
+      "source_id": "STATCAN_JVWS_14100444",
+      "warning": "Job vacancies measure unmet labour demand, not total labour supply. Offered wages are posted offers, not realized earnings. Suppressed Statistics Canada values remain missing and are never interpreted as zero."
+    },
     "projects": [
       {
         "ai_relevance": "core_data_centre",
@@ -463,7 +679,7 @@
         "start_year": 2024
       }
     ],
-    "schema_version": "1.0.0"
+    "schema_version": "1.1.0"
   },
   "digest": {
     "edition_date": "2026-08-31",
@@ -489,17 +705,18 @@
     "status": "review"
   },
   "manifest": {
-    "code_commit": "485902bd50faea5e0dc62227d7302762d481a44e",
+    "code_commit": "cc27d80541adcc57bcf0b5243722ea5c4448ab6d",
     "configuration_hash": "sha256:6ba68631a81605eed6f81587736d9c1598da0101723ef388da7a9d22801a5865",
-    "created_at": "2026-08-31T19:00:00Z",
+    "created_at": "2026-08-31T19:15:00Z",
     "dirty_worktree": false,
     "engine_version": "AIIO_GRAPH_ENGINE_0.2.0",
-    "input_manifest_hash": "sha256:88911fcc418a171c66bbe1ad100835dbfc28f4975798a1489e4ee758e4c53c09",
+    "input_manifest_hash": "sha256:0eea597e571102982f92528d49a87d853a853018f80160c41932d32dbd71e10c",
     "inputs": {
       "alberta_ai_projects": "sha256:46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199",
       "bcpi_alberta": "sha256:4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1",
       "digest_items": "sha256:dff0059ac3fd878b9b2d31ba2e2c0223efbc81c9b2c532657f784296c39b6835",
       "graph": "sha256:4ae7347787f0fa53e670f8f03b80c1f7c93f03bc8d75a6b99168e3a3763e1a22",
+      "labour_availability_alberta": "sha256:9454b563aafd4f2919fb996ba84950c55e4e635f1b67ef8b1bcf80f741ac5c24",
       "model_run": "sha256:d8f421a41b7c76453b56a26581ede066ff40dbad4c1c21e238eabd28c027c8c9",
       "power_definition": "sha256:71990595c2ce91009dbebdc42939b57c58efbe6ca170e54665d3112713f9f9f9",
       "power_run": "sha256:17aedd0b731cf27238b299dbf103e1547f898196860f2c4ad3e90624cf470c12",
@@ -509,9 +726,10 @@
     "model_version": "AIIO_AB_GRAPH_0_2",
     "outputs": {
       "alberta_ai_projects.csv": "sha256:46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199",
-      "baseline.json": "sha256:fccb881e40be17cca0d52cf23c0fa6b85b7d46ee9a174ae99692de0380abaa8a",
+      "baseline.json": "sha256:78086410ca0bc5259c585d8e147494bb7f495e1a98ae0d97ebafc4430748d907",
       "bcpi_alberta.csv": "sha256:4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1",
       "digest.json": "sha256:5a25a81b49b65443f1d3e7be45195e690cf47faabadb699d299e3ca1c3d8f69e",
+      "labour_availability_alberta.csv": "sha256:9454b563aafd4f2919fb996ba84950c55e4e635f1b67ef8b1bcf80f741ac5c24",
       "power_overlay.json": "sha256:5f1a10ebcd409b3378fb232a8333db278e9c8743f5b74b30b99cad8efec2b6a9",
       "scenario.json": "sha256:fcb81fd9149300e6c9a75539f554823870954153d1d21d240b6468d44e02f59f",
       "sources.json": "sha256:954266d34c086a6927871fff967e8ff20d2febf8e9634dcaae2e73454cc5f310"
@@ -519,10 +737,10 @@
     "parameter_set_id": "AB_50B_PARAMETERS_0_2",
     "power_overlay_version": "AB_AI_POWER_OVERLAY_2027_2036",
     "publication_note": "Uncalibrated research prototype. Observations, inferences and scenarios remain explicitly separated; diagnostic scores are not findings or forecasts.",
-    "release_id": "AIIO_RELEASE_0_2_0_DEV",
+    "release_id": "AIIO_RELEASE_0_3_0_DEV",
     "schema_version": "1.0.0",
     "status": "research-prototype",
-    "version": "0.2.0-dev"
+    "version": "0.3.0-dev"
   },
   "power_overlay": {
     "cases": {

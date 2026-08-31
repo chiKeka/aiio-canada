@@ -2,15 +2,15 @@
   "artifacts": [
     {
       "path": "public/data/latest.json",
-      "sha256": "b2aad4174bba2548bfd78a66d17fc578839a99b760cd4b5c9b11b27c286588fb"
+      "sha256": "edcf80afb48564772fd2008b316bf4b8aaee22706077c3fce3f4de9b15d5692a"
     },
     {
       "path": "public/data/manifest.json",
-      "sha256": "c8d04b489f17159bd7cb082efbc0f1c2a22b0538a2cb050388a42f4374578d3a"
+      "sha256": "bb3aa2076b4674488aa4ba947af2ed167ecdac0dc22f463746f841e12b8f8997"
     },
     {
-      "path": "public/downloads/AIIO_Alberta_Pilot_0.2.0-dev.xlsx",
-      "sha256": "65b371ebc50c666b6e83bff0cc75529806fa389fe97e0534bd93ba7119df3f7e"
+      "path": "public/downloads/AIIO_Alberta_Pilot_0.3.0-dev.xlsx",
+      "sha256": "6f84950351eea6a08406762e0953c4f3be9e1da255650631a48ee0e139433bf8"
     },
     {
       "path": "public/downloads/alberta_ai_projects.csv",
@@ -19,11 +19,15 @@
     {
       "path": "public/downloads/bcpi_alberta.csv",
       "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
+    },
+    {
+      "path": "public/downloads/labour_availability_alberta.csv",
+      "sha256": "9454b563aafd4f2919fb996ba84950c55e4e635f1b67ef8b1bcf80f741ac5c24"
     }
   ],
-  "code_commit": "485902bd50faea5e0dc62227d7302762d481a44e",
-  "input_manifest_hash": "sha256:88911fcc418a171c66bbe1ad100835dbfc28f4975798a1489e4ee758e4c53c09",
-  "release_id": "AIIO_RELEASE_0_2_0_DEV",
-  "release_version": "0.2.0-dev",
+  "code_commit": "cc27d80541adcc57bcf0b5243722ea5c4448ab6d",
+  "input_manifest_hash": "sha256:0eea597e571102982f92528d49a87d853a853018f80160c41932d32dbd71e10c",
+  "release_id": "AIIO_RELEASE_0_3_0_DEV",
+  "release_version": "0.3.0-dev",
   "schema_version": "1.0.0"
 }
