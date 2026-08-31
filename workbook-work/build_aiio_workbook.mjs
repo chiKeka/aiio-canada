@@ -119,7 +119,7 @@ const previewRanges = {
   'Power Overlay': 'A1:J36',
   'AI Projects': 'A1:Q18',
   'BCPI Data': 'A1:I24',
-  'Labour Availability': 'A1:N32',
+  'Labour Availability': 'A1:O32',
   Sources: 'A1:H15',
   'Release Checks': 'A1:D27',
 };
@@ -418,15 +418,15 @@ function buildBcpi() {
 }
 
 function buildLabour() {
-  titleBand(labour, 'Alberta trade labour evidence', 'Statistics Canada table 14-10-0444-01 · missing and suppressed values remain blank', 'N');
-  const headers = ['Observation ID', 'NOC', 'Occupation', 'Model trade node', 'Statistic', 'Value', 'Unit', 'Period start', 'Period end', 'Evidence status', 'Source ID', 'Transformation ID', 'Quality flags', 'Source URL'];
-  labour.getRange('A4:N4').values = [headers];
-  header(labour.getRange('A4:N4'));
+  titleBand(labour, 'Alberta trade labour evidence', 'Statistics Canada table 14-10-0444-01 · missing and suppressed values remain blank', 'O');
+  const headers = ['Observation ID', 'NOC', 'Occupation', 'Model trade node', 'Statistic', 'Value', 'Unit', 'Period start', 'Period end', 'Evidence status', 'Source ID', 'Transformation ID', 'Quality flags', 'Source URL', 'Missingness check'];
+  labour.getRange('A4:O4').values = [headers];
+  header(labour.getRange('A4:O4'));
   const ordered = [...labourRows].sort((a, b) => {
     const periodOrder = b.period_end.localeCompare(a.period_end);
     return periodOrder || `${a.trade_node_id}|${a.noc_code}|${a.statistic}`.localeCompare(`${b.trade_node_id}|${b.noc_code}|${b.statistic}`);
   });
-  labour.getRange(`A5:N${4 + ordered.length}`).values = ordered.map((row) => [
+  labour.getRange(`A5:O${4 + ordered.length}`).values = ordered.map((row) => [
     row.observation_id,
     row.noc_code,
     row.occupation_label,
@@ -441,14 +441,17 @@ function buildLabour() {
     row.transformation_id,
     row.quality_flags,
     'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410044401',
+    row.value !== '' || row.quality_flags.includes('value_missing_or_suppressed') ? 'PASS' : 'FAIL',
   ]);
   labour.getRange(`F5:F${4 + ordered.length}`).format.numberFormat = '0.00';
   labour.getRange(`H5:I${4 + ordered.length}`).format.numberFormat = 'yyyy-mm-dd';
-  const table = labour.tables.add(`A4:N${4 + ordered.length}`, true, 'LabourAvailabilityTable');
+  labour.getRange(`O5:O${4 + ordered.length}`).conditionalFormats.add('containsText', { text: 'PASS', format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } } });
+  labour.getRange(`O5:O${4 + ordered.length}`).conditionalFormats.add('containsText', { text: 'FAIL', format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } } });
+  const table = labour.tables.add(`A4:O${4 + ordered.length}`, true, 'LabourAvailabilityTable');
   table.style = 'TableStyleMedium2';
   labour.freezePanes.freezeRows(4);
   labour.freezePanes.freezeColumns(3);
-  setWidths(labour, { A: 29, B: 10, C: 46, D: 24, E: 31, F: 13, G: 13, H: 14, I: 14, J: 17, K: 28, L: 31, M: 38, N: 45 }, 26);
+  setWidths(labour, { A: 29, B: 10, C: 46, D: 24, E: 31, F: 13, G: 13, H: 14, I: 14, J: 17, K: 28, L: 31, M: 38, N: 45, O: 18 }, 26);
 }
 
 function buildSources() {
@@ -499,7 +502,7 @@ function buildReleaseChecks() {
   checks.getRange('B20').formulas = [['=IF(ABS(Dashboard!J6*1000-\'Assumptions\'!K24)<0.1,"PASS","FAIL")']];
   checks.getRange('B21').formulas = [[`=IF(COUNTIF('Pressure Results'!$J$5:$J$${4 + release.scenario.trade_pressure_order.length + release.scenario.public_delivery_pressure_order.length},"scenario")=ROWS('Pressure Results'!$J$5:$J$${4 + release.scenario.trade_pressure_order.length + release.scenario.public_delivery_pressure_order.length}),"PASS","FAIL")`]];
   checks.getRange('B22').formulas = [['=IF(B13=FALSE,"PASS","FAIL")']];
-  checks.getRange('B23').formulas = [[`=IF(COUNTBLANK('Labour Availability'!$F$5:$F$${4 + labourRows.length})=COUNTIF('Labour Availability'!$M$5:$M$${4 + labourRows.length},"*value_missing_or_suppressed*"),"PASS","FAIL")`]];
+  checks.getRange('B23').formulas = [[`=IF(COUNTIF('Labour Availability'!$O$5:$O$${4 + labourRows.length},"FAIL")=0,"PASS","FAIL")`]];
   checks.getRange('B16:B23').conditionalFormats.add('containsText', { text: 'PASS', format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } } });
   checks.getRange('B16:B23').conditionalFormats.add('containsText', { text: 'FAIL', format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } } });
   checks.getRange('A26:D27').merge();
