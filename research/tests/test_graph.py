@@ -8,6 +8,7 @@ from pathlib import Path
 from aiio.constants import EvidenceStatus
 from aiio.graph import GraphEdge, GraphModel, GraphNode, Shock, propagate
 from aiio.power import PowerOverlayDefinition, run_power_overlay
+from aiio.release import bounded_display_score
 from aiio.scenario import ScenarioDefinition, run_scenario, scenario_shocks
 from aiio.schemas import ValidationError
 
@@ -223,6 +224,26 @@ class AlbertaScenarioTests(unittest.TestCase):
         self.assertEqual(flows[-1]["year"], 2036)
         self.assertEqual(round(1 - scenario.modelled_component_share, 2), 0.54)
 
+    def test_alberta_signal_and_outcome_high_fan_in_is_bounded(self) -> None:
+        graph = GraphModel.from_json(self.graph_path)
+        constrained = {
+            node.node_id for node in graph.nodes if node.node_type in {"signal", "outcome"}
+        }
+        for node_id in constrained:
+            effective_high = sum(
+                edge.weight_high * (1 - edge.absorption)
+                for edge in graph.edges
+                if edge.target == node_id
+            )
+            self.assertLessEqual(effective_high, 1, node_id)
+
+    def test_public_display_transform_is_bounded_and_monotonic(self) -> None:
+        raw = [0, 0.1, 1, 2.49, 8.06, 1_000_000]
+        displayed = [bounded_display_score(value) for value in raw]
+        self.assertEqual(displayed, sorted(displayed))
+        self.assertTrue(all(0 <= value < 1 for value in displayed))
+        self.assertEqual(displayed[0], 0)
+
     def test_sensitivity_directions_are_coherent(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             output = run_scenario(
@@ -267,6 +288,15 @@ class AlbertaScenarioTests(unittest.TestCase):
         self.assertEqual(json.loads(json.dumps(actual)), expected)
         self.assertEqual(actual["evidence_status"], "scenario")
         self.assertEqual(actual["engine_version"], "AIIO_GRAPH_ENGINE_0.2.0")
+
+    def test_committed_power_golden_matches_engine(self) -> None:
+        golden_path = (
+            self.root / "data" / "model-runs" / "alberta_power_overlay_v0.1.json"
+        )
+        expected = json.loads(golden_path.read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as directory:
+            actual = run_power_overlay(self.power_input, Path(directory) / "power.json")
+        self.assertEqual(json.loads(json.dumps(actual)), expected)
 
 
 if __name__ == "__main__":

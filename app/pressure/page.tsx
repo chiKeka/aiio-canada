@@ -21,12 +21,12 @@ export default function PressurePage() {
       </section>
       <section className="bg-[#0b2a36] text-white">
         <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
-          <div className="mb-10 grid gap-5 border-b border-white/10 pb-8 lg:grid-cols-[1fr_auto]"><div><div className="flex items-center gap-2"><EvidencePill status="scenario" /><EvidencePill status="assumed" /></div><h2 className="mt-4 text-3xl font-medium tracking-[-0.035em]">$50B counterfactual diagnostic · pressure ordering</h2></div><p className="max-w-md text-sm leading-6 text-[#a7bbc1]">Low, central and high cases co-move assumed edge weights and retention. They are structural stress cases, not uncertainty intervals. Scores are not delay percentages.</p></div>
+          <div className="mb-10 grid gap-5 border-b border-white/10 pb-8 lg:grid-cols-[1fr_auto]"><div><div className="flex items-center gap-2"><EvidencePill status="scenario" /><EvidencePill status="assumed" /></div><h2 className="mt-4 text-3xl font-medium tracking-[-0.035em]">$50B counterfactual diagnostic · pressure ordering</h2></div><p className="max-w-md text-sm leading-6 text-[#a7bbc1]">Low, central and high cases co-move assumed edge weights and retention. They are structural stress cases, not uncertainty intervals. Scores are bounded display indices, not delay percentages.</p></div>
           <div className="grid gap-8 lg:grid-cols-2">
             <PressureList title="Trades pinched first" items={trades} max={maxTrade} />
             <PressureList title="Public delivery exposure" items={outcomes} max={maxOutcome} />
           </div>
-          <div className="mt-10 flex gap-3 rounded-xl border border-[#de9b62]/30 bg-[#7c401f]/20 p-5 text-sm leading-6 text-[#e9c7ab]"><AlertTriangle className="mt-0.5 size-5 shrink-0" /><p>The pressure index is dimensionless. It cannot yet be read as a percentage cost increase or schedule delay. Calibration is a release gate, not a cosmetic refinement.</p></div>
+          <div className="mt-10 flex gap-3 rounded-xl border border-[#de9b62]/30 bg-[#7c401f]/20 p-5 text-sm leading-6 text-[#e9c7ab]"><AlertTriangle className="mt-0.5 size-5 shrink-0" /><p>The graph receives 46% of scenario capex; 54% is deliberately outside it. Display values use raw ÷ (1 + raw) only to keep the index in [0,1). They cannot be read as probabilities, percentage cost increases or schedule delays. Calibration is a release gate.</p></div>
         </div>
       </section>
       <SiteFooter />

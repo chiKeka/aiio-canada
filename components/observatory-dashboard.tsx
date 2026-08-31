@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   Activity,
+  AlertTriangle,
   ArrowRight,
   BookOpen,
   Building2,
@@ -32,6 +33,10 @@ import releaseData from '@/public/data/latest.json';
 
 const tradeTones = ['bg-[#d66b35]', 'bg-[#e6a64c]', 'bg-[#2f8f83]', 'bg-[#6b8798]'];
 
+function boundedDisplayScore(rawScore: number) {
+  return rawScore / (1 + rawScore);
+}
+
 const researchLayers = [
   {
     icon: Database,
@@ -41,7 +46,7 @@ const researchLayers = [
   {
     icon: GitBranch,
     title: 'Propagation engine',
-    text: 'A signed, typed graph traces demand through trades, materials, grid capacity, schedules and public assets.',
+    text: 'A signed, typed graph traces demand through trades, building materials, construction-cost signals and public-delivery pressure.',
   },
   {
     icon: Activity,
@@ -56,27 +61,33 @@ export function ObservatoryDashboard() {
 
   const scenario = useMemo(() => {
     const annual = capex / years;
-    const localConstruction = capex * 0.46 * 0.72;
-    const power = releaseData.power_overlay.cases.central.full_buildout.planning_transfer_proxy_mw / 1000;
+    const localConstruction = capex * releaseData.scenario.modelled_component_share * releaseData.scenario.local_capture_share;
+    const outsideGraph = capex * (1 - releaseData.scenario.modelled_component_share);
     const scale = (capex / 50) * (10 / years);
-    const basePressure = Math.max(
-      ...releaseData.scenario.trade_pressure_order.map((trade) => trade.central),
+    const baseRawPressure = Math.max(
+      ...releaseData.scenario.trade_pressure_order.map(
+        (trade) => (trade as typeof trade & { raw_central?: number }).raw_central ?? trade.central,
+      ),
     );
 
     return {
       annual,
       localConstruction,
-      power,
+      outsideGraph,
       scale,
-      pressure: basePressure * scale,
+      pressure: boundedDisplayScore(baseRawPressure * scale),
     };
   }, [capex, years]);
 
   const tradeMix = releaseData.scenario.trade_pressure_order.slice(0, 4).map((trade, index) => ({
     name: trade.label,
-    share: trade.central,
+    rawScore: (trade as typeof trade & { raw_central?: number }).raw_central ?? trade.central,
     tone: tradeTones[index],
   }));
+  const maxTradeScore = Math.max(
+    ...tradeMix.map((trade) => boundedDisplayScore(trade.rawScore * scenario.scale)),
+    0.01,
+  );
 
   return (
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
@@ -123,11 +134,14 @@ export function ObservatoryDashboard() {
               Framing question
             </p>
             <h1 className="max-w-[950px] text-balance font-heading text-[clamp(2.5rem,5.4vw,5.35rem)] font-medium leading-[0.96] tracking-[-0.055em] text-[#0c2935]">
-              How does AI capital expenditure reshape public infrastructure cost and delivery?
+              Where could AI capital spending create pressure on public infrastructure delivery?
             </h1>
             <p className="mt-7 max-w-2xl text-pretty text-base leading-7 text-[#49605f] sm:text-lg">
-              A reproducible public research program connecting AI investment to labour, materials, electricity and project schedules—beginning in Alberta, then expanding across Canada.
+              An uncalibrated research prototype for testing possible mechanisms through labour, materials and project schedules—beginning in Alberta, then expanding across Canada. It does not measure realized effects.
             </p>
+            <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-[#d7a47f] bg-[#fff0e4] px-3 py-2 text-xs font-semibold text-[#8d421e]">
+              <AlertTriangle className="size-4" /> Counterfactual structural diagnostic · not a finding or forecast
+            </div>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button size="lg" className="h-11 bg-[#0d5760] px-4 text-white hover:bg-[#174750]" onClick={() => document.querySelector('#scenario')?.scrollIntoView({ behavior: 'smooth' })}>
                 Explore Alberta scenario <ArrowRight data-icon="inline-end" />
@@ -141,9 +155,9 @@ export function ObservatoryDashboard() {
           <Card id="scenario" className="self-end border-[#bdc8c1] bg-[#fbfaf5]/95 shadow-[0_26px_80px_rgba(14,44,53,.12)] ring-0">
             <CardHeader className="border-b border-[#dde2dc] pb-4">
               <CardTitle className="flex items-center gap-2 text-[#102f39]">
-                <Sparkles className="size-4 text-[#c05f32]" /> Alberta scenario sketch
+                <Sparkles className="size-4 text-[#c05f32]" /> Alberta counterfactual sandbox
               </CardTitle>
-              <CardDescription>Interpolate the published $50B diagnostic.</CardDescription>
+              <CardDescription>Explore a linear interface interpolation of the published $50B diagnostic.</CardDescription>
               <CardAction>
                 <Badge variant="outline" className="border-[#d8a98e] bg-[#fff3e8] text-[#994a25]">Uncalibrated · not a forecast</Badge>
               </CardAction>
@@ -185,11 +199,11 @@ export function ObservatoryDashboard() {
               <div className="grid grid-cols-3 gap-2 border-t border-[#e2e5df] pt-5">
                 <Metric label="Annual flow" value={`$${scenario.annual.toFixed(1)}B`} />
                 <Metric label="Local build flow" value={`$${scenario.localConstruction.toFixed(1)}B`} />
-                <Metric label="Transfer proxy*" value={`${scenario.power.toFixed(1)} GW`} />
+                <Metric label="Outside graph" value={`$${scenario.outsideGraph.toFixed(1)}B`} />
               </div>
             </CardContent>
             <CardFooter className="border-[#e1e3dc] bg-[#f1efe6] text-xs leading-5 text-[#61706d]">
-              Controls are an interface interpolation, not a new model run. Scores are not percentages or findings. *The power proxy is an independent MW scenario, not derived from capex or an AESO finding.
+              Controls are an interface interpolation, not a new model run. Scores are bounded display indices—not percentages, probabilities, measured effects or delay estimates. The power overlay is kept separate in the Scenario Lab.
             </CardFooter>
           </Card>
         </div>
@@ -211,7 +225,7 @@ export function ObservatoryDashboard() {
             <div className="grid min-h-[320px] grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2 rounded-xl border border-white/10 bg-[#0f3341] p-5 sm:p-8">
               <FlowNode icon={Building2} eyebrow="Shock" label={`$${capex}B AI capex`} />
               <FlowArrow />
-              <FlowNode icon={Zap} eyebrow="Constraint" label="Power + trades" active />
+              <FlowNode icon={Zap} eyebrow="Constraint" label="Trades + materials" active />
               <FlowArrow />
               <FlowNode icon={Clock3} eyebrow="Exposure" label="Public schedules" />
             </div>
@@ -224,7 +238,8 @@ export function ObservatoryDashboard() {
               </CardHeader>
               <CardContent className="space-y-5">
                 {tradeMix.map((trade, index) => {
-                  const scaled = Math.min(98, Math.round((trade.share * scenario.scale / 0.48) * 100));
+                  const displayed = boundedDisplayScore(trade.rawScore * scenario.scale);
+                  const scaled = Math.min(98, Math.round((displayed / maxTradeScore) * 100));
                   return (
                     <div key={trade.name}>
                       <div className="mb-2 flex justify-between text-xs"><span className="text-[#d4e0e3]">{trade.name}</span><span className="font-mono text-[#8faab2]">0{index + 1}</span></div>

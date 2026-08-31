@@ -8,6 +8,10 @@ import releaseData from '@/public/data/latest.json';
 
 type PowerCase = 'low' | 'central' | 'high';
 
+function boundedDisplayScore(rawScore: number) {
+  return rawScore / (1 + rawScore);
+}
+
 export function ScenarioLab() {
   const [capex, setCapex] = useState(50);
   const [years, setYears] = useState(10);
@@ -17,7 +21,10 @@ export function ScenarioLab() {
   const power = releaseData.power_overlay.cases[powerCase];
   const annual = capex / years;
   const localBuild = capex * releaseData.scenario.modelled_component_share * releaseData.scenario.local_capture_share;
-  const tradeRows = useMemo(() => releaseData.scenario.trade_pressure_order.map((item) => ({ ...item, displayed: item.central * scale })), [scale]);
+  const tradeRows = useMemo(() => releaseData.scenario.trade_pressure_order.map((item) => {
+    const rawCentral = (item as typeof item & { raw_central?: number }).raw_central ?? item.central;
+    return { ...item, displayed: boundedDisplayScore(rawCentral * scale) };
+  }), [scale]);
   const maxTrade = Math.max(...tradeRows.map((item) => item.displayed), 0.01);
 
   return (
@@ -33,7 +40,7 @@ export function ScenarioLab() {
 
       <div className="space-y-6">
         <section className="rounded-xl border border-[#e0b18b] bg-[#fff1e5] p-5 text-sm leading-6 text-[#815640]">
-          <strong className="text-[#8d421e]">Uncalibrated structural diagnostic.</strong> These scores are not findings, forecasts, probability bounds, or delay percentages. A score of 0.24 does not mean a 24% delay; 54% of capex is outside the graph.
+          <strong className="text-[#8d421e]">Uncalibrated structural diagnostic.</strong> These bounded display scores are not findings, forecasts, probabilities, measured effects, or delay percentages. A score of 0.24 does not mean a 24% delay; 54% of capex is outside the graph.
         </section>
         <section className="grid gap-3 sm:grid-cols-3">
           <Summary label="Annual capex flow" value={`$${annual.toFixed(1)}B`} note={`${years}-year arithmetic average`} />
@@ -41,7 +48,7 @@ export function ScenarioLab() {
           <Summary label="Transfer proxy" value={`${(power.full_buildout.planning_transfer_proxy_mw / 1000).toFixed(2)} GW`} note={`${powerCase} independent MW overlay`} />
         </section>
         <section className="rounded-xl border border-[#d2dbd5] bg-[#fbfaf5] p-5 sm:p-7">
-          <div className="flex flex-col justify-between gap-3 border-b border-[#e0e5e1] pb-5 sm:flex-row sm:items-center"><div><div className="flex items-center gap-2"><GitBranch className="size-4 text-[#27766e]" /><h2 className="font-medium">Trade-pressure ordering</h2></div><p className="mt-1 text-xs text-[#52645f]">Dimensionless pressure index · central assumed weights</p></div><span className="font-mono text-xs text-[#52645f]">scale ×{scale.toFixed(2)}</span></div>
+          <div className="flex flex-col justify-between gap-3 border-b border-[#e0e5e1] pb-5 sm:flex-row sm:items-center"><div><div className="flex items-center gap-2"><GitBranch className="size-4 text-[#27766e]" /><h2 className="font-medium">Trade-pressure ordering</h2></div><p className="mt-1 text-xs text-[#52645f]">Bounded display index [0,1) · central assumed weights</p></div><span className="font-mono text-xs text-[#52645f]">raw scale ×{scale.toFixed(2)}</span></div>
           <div className="mt-6 space-y-5">{tradeRows.map((item, index) => <div key={item.node_id}><div className="mb-2 flex justify-between text-xs"><span><span className="mr-2 font-mono text-[#52645f]">0{index + 1}</span>{item.label}</span><span className="font-mono text-[#356c68]">{item.displayed.toFixed(3)}</span></div><div className="h-2 overflow-hidden rounded-full bg-[#e4e8e4]"><div className={`h-full rounded-full ${index === 0 ? 'bg-[#d46d39]' : 'bg-[#368c82]'}`} style={{ width: `${(item.displayed / maxTrade) * 100}%` }} /></div></div>)}</div>
         </section>
         <section className="grid gap-4 md:grid-cols-2">

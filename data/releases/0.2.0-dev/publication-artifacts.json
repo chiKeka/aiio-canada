@@ -1,0 +1,29 @@
+{
+  "artifacts": [
+    {
+      "path": "public/data/latest.json",
+      "sha256": "ce7f06d193b01db29e6c0adb821a1cbcca95c48dbf7279a4626e426725bc0686"
+    },
+    {
+      "path": "public/data/manifest.json",
+      "sha256": "9e434832c5d0291ffb4c1ccf2bb780ee08ac97f256edf9d60442de94ee812325"
+    },
+    {
+      "path": "public/downloads/AIIO_Alberta_Pilot_0.2.0-dev.xlsx",
+      "sha256": "8a446adc39aa399f52e84b298a7b0de550b92a94bab9fc1c05ca6e25389213de"
+    },
+    {
+      "path": "public/downloads/alberta_ai_projects.csv",
+      "sha256": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199"
+    },
+    {
+      "path": "public/downloads/bcpi_alberta.csv",
+      "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
+    }
+  ],
+  "code_commit": "5bf68c25641cf3c8d2291760d1975486f4e31323",
+  "input_manifest_hash": "sha256:78d80249d4748d8f5f2586b90ddea3456ea7433c49dab3fbdd1d271c57cc55f5",
+  "release_id": "AIIO_RELEASE_0_2_0_DEV",
+  "release_version": "0.2.0-dev",
+  "schema_version": "1.0.0"
+}

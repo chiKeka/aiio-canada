@@ -24,17 +24,7 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     release_dir.mkdir(parents=True, exist_ok=True)
     public_dir.mkdir(parents=True, exist_ok=True)
 
-    inputs = {
-        "source_registry": root / "data" / "registry" / "sources.json",
-        "bcpi_alberta": root / "data" / "processed" / "bcpi_alberta.csv",
-        "alberta_ai_projects": root / "data" / "processed" / "alberta_ai_projects.csv",
-        "graph": root / "data" / "model" / "alberta_graph_v0.2.json",
-        "scenario": root / "data" / "scenarios" / "alberta_50b_counterfactual_v0.2.json",
-        "model_run": root / "data" / "model-runs" / "alberta_50b_counterfactual_v0.2.json",
-        "power_definition": root / "data" / "scenarios" / "alberta_power_overlay_v0.1.json",
-        "power_run": root / "data" / "model-runs" / "alberta_power_overlay_v0.1.json",
-        "digest_items": root / "data" / "digests" / "items" / "2026-08-31.json",
-    }
+    inputs = release_input_paths(root)
     missing = [name for name, path in inputs.items() if not path.exists()]
     if missing:
         raise ValidationError(f"release inputs are missing: {', '.join(missing)}")
@@ -210,8 +200,9 @@ def latest_bcpi(path: Path) -> list[dict[str, Any]]:
 
 
 def build_public_scenario(model_run: dict[str, Any]) -> dict[str, Any]:
-    resources = [item for item in model_run["pressure_peaks"] if item["node_type"] == "resource"]
-    outcomes = [item for item in model_run["pressure_peaks"] if item["node_type"] == "outcome"]
+    public_peaks = [public_pressure_row(item) for item in model_run["pressure_peaks"]]
+    resources = [item for item in public_peaks if item["node_type"] == "resource"]
+    outcomes = [item for item in public_peaks if item["node_type"] == "outcome"]
     return {
         "schema_version": "1.1.0",
         "scenario_id": model_run["scenario_id"],
@@ -228,10 +219,39 @@ def build_public_scenario(model_run: dict[str, Any]) -> dict[str, Any]:
         "trade_pressure_order": sorted(resources, key=lambda item: -item["central"]),
         "public_delivery_pressure_order": sorted(outcomes, key=lambda item: -item["central"]),
         "dominant_outcome_paths": model_run["dominant_outcome_paths"],
-        "sensitivity": model_run["sensitivity"],
+        "sensitivity": [public_sensitivity_row(item) for item in model_run["sensitivity"]],
+        "diagnostic_scale": {
+            "display_score_range": "[0, 1)",
+            "display_transform": "raw_pressure / (1 + raw_pressure)",
+            "interpretation": "Monotone bounded display score only; not a probability, percentage, effect size or delay estimate.",
+        },
         "case_note": model_run["case_note"],
         "limitations": model_run["limitations"],
     }
+
+
+def bounded_display_score(raw_pressure: float) -> float:
+    if raw_pressure < 0:
+        raise ValidationError("absolute pressure scores cannot be negative")
+    return min(0.9999, round(raw_pressure / (1 + raw_pressure), 4))
+
+
+def public_pressure_row(item: dict[str, Any]) -> dict[str, Any]:
+    output = dict(item)
+    for case in ("low", "central", "high"):
+        output[f"raw_{case}"] = item[case]
+        output[case] = bounded_display_score(item[case])
+    return output
+
+
+def public_sensitivity_row(item: dict[str, Any]) -> dict[str, Any]:
+    output = dict(item)
+    for key in ("top_resource", "top_public_delivery_outcome"):
+        peak = dict(item[key])
+        peak["raw_pressure_score"] = peak["pressure_score"]
+        peak["pressure_score"] = bounded_display_score(peak["pressure_score"])
+        output[key] = peak
+    return output
 
 
 def build_public_power_overlay(power_run: dict[str, Any]) -> dict[str, Any]:
@@ -285,9 +305,31 @@ def verify_manifest(root: Path, version: str) -> None:
         actual = sha256_file(release_dir / name)
         if actual != expected:
             raise ValidationError(f"release output hash mismatch: {name}")
+    for name, path in release_input_paths(root).items():
+        actual = sha256_file(path)
+        expected = manifest["inputs"].get(name)
+        if actual != expected:
+            raise ValidationError(f"release input hash mismatch: {name}")
+    current_commit, _ = git_state(root)
+    if current_commit != manifest["code_commit"]:
+        raise ValidationError("current HEAD does not match the release code_commit")
     latest = json.loads((root / "public" / "data" / "latest.json").read_text(encoding="utf-8"))
     if latest["manifest"] != manifest:
         raise ValidationError("public latest manifest does not match the immutable release")
+
+
+def release_input_paths(root: Path) -> dict[str, Path]:
+    return {
+        "source_registry": root / "data" / "registry" / "sources.json",
+        "bcpi_alberta": root / "data" / "processed" / "bcpi_alberta.csv",
+        "alberta_ai_projects": root / "data" / "processed" / "alberta_ai_projects.csv",
+        "graph": root / "data" / "model" / "alberta_graph_v0.2.json",
+        "scenario": root / "data" / "scenarios" / "alberta_50b_counterfactual_v0.2.json",
+        "model_run": root / "data" / "model-runs" / "alberta_50b_counterfactual_v0.2.json",
+        "power_definition": root / "data" / "scenarios" / "alberta_power_overlay_v0.1.json",
+        "power_run": root / "data" / "model-runs" / "alberta_power_overlay_v0.1.json",
+        "digest_items": root / "data" / "digests" / "items" / "2026-08-31.json",
+    }
 
 
 def build_publication_artifacts(

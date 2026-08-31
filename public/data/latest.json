@@ -489,7 +489,7 @@
     "status": "review"
   },
   "manifest": {
-    "code_commit": "cf2234fd5f342ce79e4bc7cabf31489c36d50a23",
+    "code_commit": "5bf68c25641cf3c8d2291760d1975486f4e31323",
     "configuration_hash": "sha256:176bfe4c9d4d2aa7e853de9772e08afc979065cab7e6d564eda0113225111aaa",
     "created_at": "2026-08-31T19:00:00Z",
     "dirty_worktree": false,
