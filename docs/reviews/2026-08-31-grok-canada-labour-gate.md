@@ -28,3 +28,13 @@ The gate can move from HOLD only when v0.4 is built from a clean commit, all
 automated checks pass, the workbook contains no failed reconciliation checks,
 publication artifacts include the national CSV, and the website, workbook and
 immutable manifest identify the same release.
+
+## Post-release re-review
+
+Verdict: **GO**
+
+After v0.4.0-dev was built from source commit `52e01771a204622ada32c206fad8cf8be20fd0b4`,
+the reviewer re-inspected the sealed release. It confirmed the 13-by-12 spine,
+DGUID/geography validation, published-zero handling, distinct `F`/`x`/`..`
+public labels, manifest/download/workbook reconciliation and uncalibrated
+publication boundary. It reported no Blocker, High or Medium findings.
