@@ -39,4 +39,8 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
-/workbook-work/
+/workbook-work/*
+!/workbook-work/build_aiio_workbook.mjs
+
+# Large reproducible public-source caches (manifests remain versioned)
+/data/raw/statcan_jvws_14100444/*.zip

@@ -1,6 +1,8 @@
 # Initial source register
 
-This is the human-readable planning register. The database and machine-readable registry will become authoritative once adapters are implemented. URLs and access methods must be revalidated at ingestion time.
+This is the human-readable planning register. `data/registry/sources.json` is the
+machine-readable authority for implemented and candidate adapters. URLs and
+access methods must be revalidated at ingestion time.
 
 | Domain | Candidate authoritative source | Intended variables | Geography/frequency | Adapter priority |
 |---|---|---|---|---|
@@ -23,3 +25,22 @@ This is the human-readable planning register. The database and machine-readable 
 ## Intake rule
 
 Each adapter must capture the source metadata defined in the data dictionary, retain a raw-file hash, emit a schema validation report and document any suppression, revision or licensing limitation. Discovery sources can enter the digest but cannot directly calibrate a material model parameter without promotion through evidence review.
+
+## Implemented labour slice
+
+The Alberta pilot normalizes quarterly rows from Statistics Canada table
+14-10-0444-01 for NOC 72200, 72201, 72202, 72203, 72402 and 73100. These map to
+the electrician, power-line, HVAC and concrete graph nodes. The extract retains
+the table's quality codes and includes both job vacancies and average offered
+hourly wages. Missing or suppressed values are represented as missing with an
+explicit `value_missing_or_suppressed` flag—not as zero.
+
+Job vacancies describe unmet demand, not the number of workers available.
+Offered wages are posted offers, not realized earnings. Neither series directly
+calibrates a graph edge or proves that a trade is constrained; they are observed
+baseline signals for later calibration.
+
+The full Statistics Canada ZIP is retained as a reproducible local cache because
+its uncompressed table exceeds one gigabyte. Git versions the retrieval manifest,
+content hash, deterministic adapter and normalized Alberta extract instead of the
+large provider file.

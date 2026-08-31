@@ -20,6 +20,9 @@ Required fields: `source_id`, `title`, `publisher`, `canonical_url`, `source_typ
 
 Required fields: `observation_id`, `indicator_id`, `value`, `unit`, `geography_id`, `period_start`, `period_end`, `source_id`, `evidence_status`, `transformation_id`, `quality_flags`, `release_id`.
 
+`value` may be missing only when `quality_flags` explains the missingness or
+suppression. A blank observed value must never be coerced to zero.
+
 ## Claim
 
 Required fields: `claim_id`, `claim_text`, `claim_type`, `geography_id`, `valid_from`, `valid_to`, `evidence_status`, `confidence`, `review_status`, `reviewer`, `release_id`.

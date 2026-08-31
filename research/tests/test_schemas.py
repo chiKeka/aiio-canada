@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+import zipfile
 from datetime import date
 from pathlib import Path
 
-from aiio.adapters.statcan import quarter_bounds, slug
+from aiio.adapters.statcan import normalize_jvws_alberta, quarter_bounds, slug
 from aiio.adapters.alberta_projects import (
     classify_ai_relevance,
     extract_coordinates,
@@ -32,6 +33,22 @@ class SchemaTests(unittest.TestCase):
             as_of_date="2026-03-31",
         )
         with self.assertRaisesRegex(ValidationError, "scenario values"):
+            observation.validate()
+
+    def test_missing_observation_requires_quality_flag(self) -> None:
+        observation = ObservationRecord(
+            observation_id="OBS_MISSING",
+            indicator_id="TEST",
+            value=None,
+            unit="Number",
+            geography_id="PR_48",
+            period_start="2026-01-01",
+            period_end="2026-03-31",
+            source_id="SOURCE_1",
+            evidence_status=EvidenceStatus.OBSERVED,
+            as_of_date="2026-03-31",
+        )
+        with self.assertRaisesRegex(ValidationError, "quality flag"):
             observation.validate()
 
     def test_scenario_requires_scenario_status(self) -> None:
@@ -67,6 +84,34 @@ class SchemaTests(unittest.TestCase):
         self.assertEqual(quarter_bounds("2026-Q2"), ("2026-04-01", "2026-06-30"))
         self.assertEqual(quarter_bounds("2026-04"), ("2026-04-01", "2026-06-30"))
         self.assertEqual(slug("Non-residential building"), "NON_RESIDENTIAL_BUILDING")
+
+    def test_jvws_normalizer_preserves_suppression_and_trade_mapping(self) -> None:
+        header = (
+            '"REF_DATE","GEO","DGUID","National Occupational Classification",'
+            '"Statistics","UOM","VALUE","STATUS","SYMBOL","TERMINATED"\n'
+        )
+        rows = [
+            '"2026-01","Alberta","2021A000248","Electricians (except industrial and power system) [72200]","Job vacancies","Number","460","E","",""',
+            '"2026-01","Alberta","2021A000248","Electrical power line and cable workers [72203]","Job vacancies","Number","","F","",""',
+            '"2026-01","Ontario","2021A000235","Electricians (except industrial and power system) [72200]","Job vacancies","Number","1000","A","",""',
+            '"2026-01","Alberta","2021A000248","Carpenters [72310]","Job vacancies","Number","900","A","",""',
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive_path = root / "jvws.zip"
+            output_path = root / "labour.csv"
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("14100444.csv", header + "\n".join(rows) + "\n")
+            observations = normalize_jvws_alberta(archive_path, output_path)
+            self.assertEqual(len(observations), 2)
+            self.assertEqual(observations[0].value, 460.0)
+            self.assertEqual(observations[1].value, None)
+            self.assertIn("status:F", observations[1].quality_flags)
+            self.assertIn("value_missing_or_suppressed", observations[1].quality_flags)
+            output = output_path.read_text(encoding="utf-8")
+            self.assertIn("trade_electricians", output)
+            self.assertIn("trade_power_line", output)
+            self.assertNotIn("Ontario", output)
 
     def test_major_projects_token_extraction(self) -> None:
         html = '<form><input name="__RequestVerificationToken" type="hidden" value="public-session-token" /></form>'

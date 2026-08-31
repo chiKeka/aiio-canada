@@ -104,7 +104,7 @@ class SourceRecord:
 class ObservationRecord:
     observation_id: str
     indicator_id: str
-    value: float
+    value: float | None
     unit: str
     geography_id: str
     period_start: str
@@ -125,6 +125,8 @@ class ObservationRecord:
         _iso_date(self.as_of_date, "as_of_date")
         if self.period_start > self.period_end:
             raise ValidationError("period_start cannot be after period_end")
+        if self.value is None and not self.quality_flags:
+            raise ValidationError("missing observation values require a quality flag")
         if self.evidence_status is EvidenceStatus.SCENARIO:
             raise ValidationError("scenario values cannot enter the observation layer")
 

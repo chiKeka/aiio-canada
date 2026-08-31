@@ -8,7 +8,8 @@ const downloads = [
   { icon: Fingerprint, title: 'Release manifest', detail: 'Input and output hashes, model version and code state', href: '/data/manifest.json', format: 'JSON' },
   { icon: FileSpreadsheet, title: 'Alberta AI project register', detail: 'Observed project fields with inferred AI classification', href: '/downloads/alberta_ai_projects.csv', format: 'CSV' },
   { icon: FileSpreadsheet, title: 'Alberta BCPI observations', detail: 'Calgary and Edmonton normalized construction-price rows', href: '/downloads/bcpi_alberta.csv', format: 'CSV' },
-  { icon: FileSpreadsheet, title: 'Auditable Alberta pilot workbook', detail: 'Formula-driven assumptions, diagnostic outputs, evidence registers and release checks', href: '/downloads/AIIO_Alberta_Pilot_0.2.0-dev.xlsx', format: 'XLSX' },
+  { icon: FileSpreadsheet, title: 'Alberta labour availability', detail: 'Graph-relevant NOC vacancy and offered-wage observations with suppression and quality flags', href: '/downloads/labour_availability_alberta.csv', format: 'CSV' },
+  { icon: FileSpreadsheet, title: 'Auditable Alberta pilot workbook', detail: 'Formula-driven assumptions, diagnostic outputs, evidence registers and release checks', href: `/downloads/AIIO_Alberta_Pilot_${releaseData.manifest.version}.xlsx`, format: 'XLSX' },
 ];
 
 export default function DownloadsPage() {

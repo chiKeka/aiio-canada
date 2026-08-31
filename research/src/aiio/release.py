@@ -29,7 +29,11 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     if missing:
         raise ValidationError(f"release inputs are missing: {', '.join(missing)}")
 
-    baseline = build_baseline(inputs["alberta_ai_projects"], inputs["bcpi_alberta"])
+    baseline = build_baseline(
+        inputs["alberta_ai_projects"],
+        inputs["bcpi_alberta"],
+        inputs["labour_availability_alberta"],
+    )
     model_run = json.loads(inputs["model_run"].read_text(encoding="utf-8"))
     power_run = json.loads(inputs["power_run"].read_text(encoding="utf-8"))
     scenario = build_public_scenario(model_run)
@@ -49,6 +53,10 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     write_json(digest_path, digest)
     shutil.copyfile(inputs["alberta_ai_projects"], release_dir / "alberta_ai_projects.csv")
     shutil.copyfile(inputs["bcpi_alberta"], release_dir / "bcpi_alberta.csv")
+    shutil.copyfile(
+        inputs["labour_availability_alberta"],
+        release_dir / "labour_availability_alberta.csv",
+    )
 
     input_hashes = {name: sha256_file(path) for name, path in sorted(inputs.items())}
     input_manifest_hash = sha256_json(input_hashes)
@@ -60,6 +68,9 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         "digest.json": sha256_file(digest_path),
         "alberta_ai_projects.csv": sha256_file(release_dir / "alberta_ai_projects.csv"),
         "bcpi_alberta.csv": sha256_file(release_dir / "bcpi_alberta.csv"),
+        "labour_availability_alberta.csv": sha256_file(
+            release_dir / "labour_availability_alberta.csv"
+        ),
     }
     manifest = {
         "schema_version": "1.0.0",
@@ -103,10 +114,18 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     downloads_dir.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(release_dir / "alberta_ai_projects.csv", downloads_dir / "alberta_ai_projects.csv")
     shutil.copyfile(release_dir / "bcpi_alberta.csv", downloads_dir / "bcpi_alberta.csv")
+    shutil.copyfile(
+        release_dir / "labour_availability_alberta.csv",
+        downloads_dir / "labour_availability_alberta.csv",
+    )
     return manifest
 
 
-def build_baseline(projects_path: Path, bcpi_path: Path) -> dict[str, Any]:
+def build_baseline(
+    projects_path: Path,
+    bcpi_path: Path,
+    labour_path: Path,
+) -> dict[str, Any]:
     with projects_path.open(encoding="utf-8") as handle:
         projects = list(csv.DictReader(handle))
     if not projects:
@@ -118,8 +137,9 @@ def build_baseline(projects_path: Path, bcpi_path: Path) -> dict[str, Any]:
     stages = Counter(item["stage"] for item in projects)
 
     bcpi_latest = latest_bcpi(bcpi_path)
+    labour_latest = latest_labour_availability(labour_path)
     return {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "geography_id": "PR_48",
         "as_of_date": max(item["as_of_date"] for item in projects),
         "evidence_status": "observed_with_inferred_classification",
@@ -140,6 +160,7 @@ def build_baseline(projects_path: Path, bcpi_path: Path) -> dict[str, Any]:
             "warning": "Reported project values are announcements, not commitments or realized spend. Totals are not probability-weighted and may contain portfolio or phase overlap.",
         },
         "construction_prices": bcpi_latest,
+        "labour_availability": labour_latest,
         "projects": [
             {
                 "project_id": item["project_id"],
@@ -163,6 +184,53 @@ def build_baseline(projects_path: Path, bcpi_path: Path) -> dict[str, Any]:
             }
             for item in sorted(projects, key=lambda row: row["name"])
         ],
+    }
+
+
+def latest_labour_availability(path: Path) -> dict[str, Any]:
+    with path.open(encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    if not rows:
+        raise ValidationError("labour availability baseline cannot be empty")
+    groups: dict[tuple[str, str], list[dict[str, str]]] = {}
+    for item in rows:
+        groups.setdefault((item["noc_code"], item["statistic"]), []).append(item)
+
+    latest_rows = [
+        sorted(items, key=lambda item: item["period_end"])[-1]
+        for _, items in sorted(groups.items())
+    ]
+    period_end = max(item["period_end"] for item in latest_rows)
+    observations = []
+    for item in sorted(latest_rows, key=lambda row: (row["trade_node_id"], row["noc_code"], row["statistic"])):
+        value = float(item["value"]) if item["value"] else None
+        observations.append(
+            {
+                "observation_id": item["observation_id"],
+                "indicator_id": item["indicator_id"],
+                "noc_code": item["noc_code"],
+                "occupation_label": item["occupation_label"],
+                "trade_node_id": item["trade_node_id"],
+                "statistic": item["statistic"],
+                "value": value,
+                "unit": item["unit"],
+                "period_end": item["period_end"],
+                "source_id": item["source_id"],
+                "evidence_status": item["evidence_status"],
+                "transformation_id": item["transformation_id"],
+                "quality_flags": [flag for flag in item["quality_flags"].split("|") if flag],
+            }
+        )
+    return {
+        "period_end": period_end,
+        "source_id": "STATCAN_JVWS_14100444",
+        "evidence_status": "observed",
+        "observations": observations,
+        "warning": (
+            "Job vacancies measure unmet labour demand, not total labour supply. Offered wages are "
+            "posted offers, not realized earnings. Suppressed Statistics Canada values remain missing "
+            "and are never interpreted as zero."
+        ),
     }
 
 
@@ -325,6 +393,9 @@ def release_input_paths(root: Path) -> dict[str, Path]:
     return {
         "source_registry": root / "data" / "registry" / "sources.json",
         "bcpi_alberta": root / "data" / "processed" / "bcpi_alberta.csv",
+        "labour_availability_alberta": (
+            root / "data" / "processed" / "labour_availability_alberta.csv"
+        ),
         "alberta_ai_projects": root / "data" / "processed" / "alberta_ai_projects.csv",
         "graph": root / "data" / "model" / "alberta_graph_v0.2.json",
         "scenario": root / "data" / "scenarios" / "alberta_50b_counterfactual_v0.2.json",
@@ -360,6 +431,7 @@ def build_publication_artifacts(
         Path(f"public/downloads/{workbook_name}"),
         Path("public/downloads/alberta_ai_projects.csv"),
         Path("public/downloads/bcpi_alberta.csv"),
+        Path("public/downloads/labour_availability_alberta.csv"),
     ]
     artifacts = {
         "schema_version": "1.0.0",

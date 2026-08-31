@@ -1,4 +1,4 @@
-import { Database, ExternalLink, ShieldCheck } from 'lucide-react';
+import { BriefcaseBusiness, Database, ExternalLink, ShieldCheck } from 'lucide-react';
 
 import { EvidenceExplorer } from '@/components/evidence-explorer';
 import { EvidencePill, PageIntro, SiteFooter, SiteHeader } from '@/components/site-shell';
@@ -6,6 +6,11 @@ import releaseData from '@/public/data/latest.json';
 
 export default function EvidencePage() {
   const pipeline = releaseData.baseline.ai_project_pipeline;
+  const labour = (
+    releaseData.baseline as typeof releaseData.baseline & {
+      labour_availability?: LabourAvailability;
+    }
+  ).labour_availability;
   return (
     <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">
       <SiteHeader />
@@ -24,6 +29,7 @@ export default function EvidencePage() {
         </div>
         <EvidenceExplorer projects={releaseData.baseline.projects} />
       </section>
+      {labour ? <LabourAvailabilityPanel labour={labour} /> : null}
       <section className="border-t border-[#d5ddd8] bg-[#e9ebe5]">
         <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
           <div className="mb-6 flex items-center gap-2"><Database className="size-4 text-[#24746c]" /><h2 className="text-xl font-medium">Registered public sources</h2></div>
@@ -41,6 +47,84 @@ export default function EvidencePage() {
       <SiteFooter />
     </main>
   );
+}
+
+type LabourObservation = {
+  noc_code: string;
+  occupation_label: string;
+  trade_node_id: string;
+  statistic: string;
+  value: number | null;
+  unit: string;
+  period_end: string;
+  quality_flags: string[];
+};
+
+type LabourAvailability = {
+  period_end: string;
+  warning: string;
+  observations: LabourObservation[];
+};
+
+function LabourAvailabilityPanel({ labour }: { labour: LabourAvailability }) {
+  const occupations = Array.from(
+    labour.observations.reduce((groups, observation) => {
+      const existing = groups.get(observation.noc_code) ?? {
+        nocCode: observation.noc_code,
+        occupation: observation.occupation_label,
+        tradeNode: observation.trade_node_id,
+        vacancies: null as LabourObservation | null,
+        wage: null as LabourObservation | null,
+      };
+      if (observation.statistic === 'Job vacancies') existing.vacancies = observation;
+      if (observation.statistic === 'Average offered hourly wage') existing.wage = observation;
+      groups.set(observation.noc_code, existing);
+      return groups;
+    }, new Map<string, { nocCode: string; occupation: string; tradeNode: string; vacancies: LabourObservation | null; wage: LabourObservation | null }>()).values(),
+  );
+
+  return (
+    <section className="border-t border-[#d5ddd8] bg-white">
+      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
+        <div className="mb-3 flex items-center gap-2">
+          <BriefcaseBusiness className="size-4 text-[#24746c]" />
+          <h2 className="text-xl font-medium">Alberta trade labour snapshot</h2>
+        </div>
+        <p className="max-w-4xl text-sm leading-6 text-[#52645f]">
+          Statistics Canada table 14-10-0444-01 · quarter ending {labour.period_end}. Values are observed survey estimates; quality codes are retained.
+        </p>
+        <div className="mt-6 overflow-x-auto rounded-xl border border-[#d2dad5]">
+          <table className="w-full min-w-[820px] border-collapse text-left text-sm">
+            <thead className="bg-[#e8eeea] text-xs uppercase tracking-wide text-[#48635d]">
+              <tr><th className="px-4 py-3">Model trade</th><th className="px-4 py-3">Occupation</th><th className="px-4 py-3">Vacancies</th><th className="px-4 py-3">Offered wage</th><th className="px-4 py-3">StatCan quality</th></tr>
+            </thead>
+            <tbody className="divide-y divide-[#dce3de] bg-[#fbfaf5]">
+              {occupations.map((item) => (
+                <tr key={item.nocCode}>
+                  <td className="px-4 py-3 font-mono text-xs text-[#1f665f]">{item.tradeNode.replace('trade_', '').replaceAll('_', ' ')}</td>
+                  <td className="px-4 py-3"><span className="font-medium">{item.occupation}</span><span className="ml-2 font-mono text-xs text-[#70817c]">NOC {item.nocCode}</span></td>
+                  <td className="px-4 py-3 font-mono">{formatLabourValue(item.vacancies, 'vacancies')}</td>
+                  <td className="px-4 py-3 font-mono">{formatLabourValue(item.wage, 'wage')}</td>
+                  <td className="px-4 py-3 text-xs text-[#52645f]">{qualitySummary(item.vacancies, item.wage)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-4 text-sm leading-6 text-[#825a47]">{labour.warning}</div>
+      </div>
+    </section>
+  );
+}
+
+function formatLabourValue(observation: LabourObservation | null, kind: 'vacancies' | 'wage') {
+  if (!observation || observation.value === null) return 'Suppressed';
+  return kind === 'wage' ? `$${observation.value.toFixed(2)}/hr` : Math.round(observation.value).toLocaleString('en-CA');
+}
+
+function qualitySummary(...observations: Array<LabourObservation | null>) {
+  const statuses = observations.flatMap((observation) => observation?.quality_flags ?? []).filter((flag) => flag.startsWith('status:')).map((flag) => flag.replace('status:', ''));
+  return statuses.length ? `Codes ${statuses.join(' / ')}` : 'No code reported';
 }
 
 function Metric({ label, value, note }: { label: string; value: string; note: string }) {

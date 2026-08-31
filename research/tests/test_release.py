@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from aiio.release import sha256_file, verify_manifest, write_json
+from aiio.release import latest_labour_availability, sha256_file, verify_manifest, write_json
 from aiio.schemas import ValidationError
 
 
@@ -60,6 +60,22 @@ class ReleaseVerificationTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(ValidationError, "HEAD"):
                 verify_manifest(self.root, self.version)
+
+    def test_latest_labour_baseline_keeps_suppressed_value_missing(self) -> None:
+        labour_path = self.root / "labour.csv"
+        labour_path.write_text(
+            "observation_id,indicator_id,noc_code,occupation_label,trade_node_id,statistic,value,unit,geography_id,period_start,period_end,source_id,evidence_status,as_of_date,transformation_id,quality_flags\n"
+            "OBS_OLD,JVWS_JOB_VACANCIES_NOC_72203,72203,Power line workers,trade_power_line,Job vacancies,50,Number,PR_48,2025-10-01,2025-12-31,STATCAN_JVWS_14100444,observed,2025-12-31,TR_TEST,status:E\n"
+            "OBS_NEW,JVWS_JOB_VACANCIES_NOC_72203,72203,Power line workers,trade_power_line,Job vacancies,,Number,PR_48,2026-01-01,2026-03-31,STATCAN_JVWS_14100444,observed,2026-03-31,TR_TEST,status:F|value_missing_or_suppressed\n",
+            encoding="utf-8",
+        )
+        baseline = latest_labour_availability(labour_path)
+        self.assertEqual(baseline["period_end"], "2026-03-31")
+        self.assertIsNone(baseline["observations"][0]["value"])
+        self.assertIn(
+            "value_missing_or_suppressed",
+            baseline["observations"][0]["quality_flags"],
+        )
 
 
 if __name__ == "__main__":

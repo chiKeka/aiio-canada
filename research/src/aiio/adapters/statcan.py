@@ -4,11 +4,26 @@ import csv
 import hashlib
 import io
 import re
+from contextlib import closing
+from io import TextIOWrapper
 import zipfile
 from pathlib import Path
 
 from ..constants import EvidenceStatus
 from ..schemas import ObservationRecord, ValidationError
+
+
+ALBERTA_TRADE_NOC_TO_NODE = {
+    "72200": "trade_electricians",
+    "72201": "trade_electricians",
+    "72202": "trade_power_line",
+    "72203": "trade_power_line",
+    "72402": "trade_hvac",
+    "73100": "trade_concrete",
+}
+
+JVWS_STATISTICS = {"Job vacancies", "Average offered hourly wage"}
+JVWS_TRANSFORMATION_ID = "TR_STATCAN_JVWS_AB_NOC_1_0_0"
 
 
 def normalize_bcpi_alberta(zip_path: Path, output_path: Path) -> list[ObservationRecord]:
@@ -88,6 +103,148 @@ def normalize_bcpi_alberta(zip_path: Path, output_path: Path) -> list[Observatio
                 }
             )
     return observations
+
+
+def normalize_jvws_alberta(zip_path: Path, output_path: Path) -> list[ObservationRecord]:
+    """Normalize Alberta vacancy and offered-wage rows for graph-relevant trades.
+
+    Statistics Canada suppression and quality codes are retained. A suppressed
+    value is published as missing with flags and is never converted to zero.
+    """
+    observations: list[tuple[ObservationRecord, dict[str, str]]] = []
+    with zipfile.ZipFile(zip_path) as archive:
+        csv_names = [
+            name for name in archive.namelist() if name.endswith(".csv") and "MetaData" not in name
+        ]
+        if len(csv_names) != 1:
+            raise ValidationError(f"expected one JVWS data CSV, found {csv_names}")
+        with closing(archive.open(csv_names[0])) as binary_handle:
+            with TextIOWrapper(binary_handle, encoding="utf-8-sig", newline="") as text_handle:
+                reader = csv.DictReader(text_handle)
+                required = {
+                    "REF_DATE",
+                    "GEO",
+                    "DGUID",
+                    "National Occupational Classification",
+                    "Statistics",
+                    "UOM",
+                    "VALUE",
+                    "STATUS",
+                    "SYMBOL",
+                    "TERMINATED",
+                }
+                if not reader.fieldnames or not required.issubset(reader.fieldnames):
+                    raise ValidationError(
+                        f"JVWS schema changed; missing {sorted(required - set(reader.fieldnames or []))}"
+                    )
+
+                for raw in reader:
+                    if raw["GEO"].strip() != "Alberta":
+                        continue
+                    occupation = raw["National Occupational Classification"].strip()
+                    match = re.search(r"\[(\d{5})\]\s*$", occupation)
+                    if not match:
+                        continue
+                    noc_code = match.group(1)
+                    if noc_code not in ALBERTA_TRADE_NOC_TO_NODE:
+                        continue
+                    statistic = raw["Statistics"].strip()
+                    if statistic not in JVWS_STATISTICS:
+                        continue
+
+                    period_start, period_end = quarter_bounds(raw["REF_DATE"].strip())
+                    value_text = raw["VALUE"].strip()
+                    quality_flags = tuple(
+                        flag
+                        for flag in (
+                            f"status:{raw['STATUS'].strip()}" if raw["STATUS"].strip() else "",
+                            f"symbol:{raw['SYMBOL'].strip()}" if raw["SYMBOL"].strip() else "",
+                            f"terminated:{raw['TERMINATED'].strip()}"
+                            if raw["TERMINATED"].strip()
+                            else "",
+                            "value_missing_or_suppressed" if not value_text else "",
+                        )
+                        if flag
+                    )
+                    identity = "|".join(
+                        (
+                            raw["REF_DATE"].strip(),
+                            raw["DGUID"].strip(),
+                            noc_code,
+                            statistic,
+                            raw["UOM"].strip(),
+                        )
+                    )
+                    observation = ObservationRecord(
+                        observation_id=(
+                            f"OBS_JVWS_{hashlib.sha256(identity.encode()).hexdigest()[:20].upper()}"
+                        ),
+                        indicator_id=f"JVWS_{slug(statistic)}_NOC_{noc_code}",
+                        value=float(value_text) if value_text else None,
+                        unit=raw["UOM"].strip(),
+                        geography_id="PR_48",
+                        period_start=period_start,
+                        period_end=period_end,
+                        source_id="STATCAN_JVWS_14100444",
+                        evidence_status=EvidenceStatus.OBSERVED,
+                        as_of_date=period_end,
+                        transformation_id=JVWS_TRANSFORMATION_ID,
+                        quality_flags=quality_flags,
+                    )
+                    observation.validate()
+                    observations.append(
+                        (
+                            observation,
+                            {
+                                "noc_code": noc_code,
+                                "occupation_label": occupation.rsplit(" [", 1)[0],
+                                "trade_node_id": ALBERTA_TRADE_NOC_TO_NODE[noc_code],
+                                "statistic": statistic,
+                            },
+                        )
+                    )
+
+    observations.sort(
+        key=lambda item: (
+            item[0].period_start,
+            item[1]["trade_node_id"],
+            item[1]["noc_code"],
+            item[1]["statistic"],
+        )
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = (
+        "observation_id",
+        "indicator_id",
+        "noc_code",
+        "occupation_label",
+        "trade_node_id",
+        "statistic",
+        "value",
+        "unit",
+        "geography_id",
+        "period_start",
+        "period_end",
+        "source_id",
+        "evidence_status",
+        "as_of_date",
+        "transformation_id",
+        "quality_flags",
+    )
+    with output_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        for observation, dimensions in observations:
+            writer.writerow(
+                {
+                    **dimensions,
+                    **observation.__dict__,
+                    "value": "" if observation.value is None else observation.value,
+                    "evidence_status": observation.evidence_status.value,
+                    "quality_flags": "|".join(observation.quality_flags),
+                }
+            )
+    return [observation for observation, _ in observations]
 
 
 def quarter_bounds(reference_period: str) -> tuple[str, str]:

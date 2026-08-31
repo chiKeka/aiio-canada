@@ -13,7 +13,7 @@ variables for the current public-data prototype.
 - Install command: `npm install`.
 - Build command: `npm run build`.
 - Output directory: managed by Next.js and Vercel.
-- Environment variables: none for v0.2.0-dev.
+- Environment variables: none for the current research-prototype release.
 
 The canonical Next.js commands are `npm run dev`, `npm run build`, and
 `npm run start`. The alternative Sites build remains available through the
