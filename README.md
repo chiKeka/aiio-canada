@@ -26,6 +26,11 @@ npm install
 npm run dev
 ```
 
+`npm run dev`, `npm run build`, and `npm run start` use the native Next.js
+runtime and are the canonical GitHub/Vercel path. The existing Sites-compatible
+target remains available through `npm run dev:sites`, `npm run build:sites`, and
+`npm run start:sites`.
+
 The reproducible analytical gates are:
 
 ```bash
@@ -40,3 +45,6 @@ npm run release:verify
 Research architecture and protocols live in `docs/`. The public application lives in `app/` and `components/`. Data, model, workbook and digest packages are added as the build advances.
 
 Academic-use controls are documented in `docs/governance/dissertation-alignment.md` and `docs/governance/ai-assistance-log.md`. The Observatory supports the research; it does not replace the researcher's submitted argument, source verification or required AI disclosure.
+
+Deployment and release provenance are documented in
+`docs/release/vercel-deployment.md`.
