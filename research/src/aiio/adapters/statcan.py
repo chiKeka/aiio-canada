@@ -13,7 +13,7 @@ from ..constants import EvidenceStatus
 from ..schemas import ObservationRecord, ValidationError
 
 
-ALBERTA_TRADE_NOC_TO_NODE = {
+TRADE_NOC_TO_NODE = {
     "72200": "trade_electricians",
     "72201": "trade_electricians",
     "72202": "trade_power_line",
@@ -22,8 +22,25 @@ ALBERTA_TRADE_NOC_TO_NODE = {
     "73100": "trade_concrete",
 }
 
+PROVINCE_DGUID_TO_GEOGRAPHY_ID = {
+    "2021A000210": "PR_10",
+    "2021A000211": "PR_11",
+    "2021A000212": "PR_12",
+    "2021A000213": "PR_13",
+    "2021A000224": "PR_24",
+    "2021A000235": "PR_35",
+    "2021A000246": "PR_46",
+    "2021A000247": "PR_47",
+    "2021A000248": "PR_48",
+    "2021A000259": "PR_59",
+    "2021A000260": "PR_60",
+    "2021A000261": "PR_61",
+    "2021A000262": "PR_62",
+}
+
 JVWS_STATISTICS = {"Job vacancies", "Average offered hourly wage"}
-JVWS_TRANSFORMATION_ID = "TR_STATCAN_JVWS_AB_NOC_1_0_0"
+JVWS_ALBERTA_TRANSFORMATION_ID = "TR_STATCAN_JVWS_AB_NOC_1_0_0"
+JVWS_CANADA_TRANSFORMATION_ID = "TR_STATCAN_JVWS_CA_PROVINCES_NOC_1_0_0"
 
 
 def normalize_bcpi_alberta(zip_path: Path, output_path: Path) -> list[ObservationRecord]:
@@ -111,6 +128,39 @@ def normalize_jvws_alberta(zip_path: Path, output_path: Path) -> list[Observatio
     Statistics Canada suppression and quality codes are retained. A suppressed
     value is published as missing with flags and is never converted to zero.
     """
+    return _normalize_jvws_trade_scope(
+        zip_path,
+        output_path,
+        {"2021A000248": "PR_48"},
+        transformation_id=JVWS_ALBERTA_TRANSFORMATION_ID,
+        include_geography_dimensions=False,
+    )
+
+
+def normalize_jvws_canada(zip_path: Path, output_path: Path) -> list[ObservationRecord]:
+    """Normalize the same trade indicators for all provinces and territories.
+
+    Province and territory estimates remain separate. Canada totals and economic
+    regions are deliberately excluded so a national value cannot silently stand
+    in for local labour-market conditions.
+    """
+    return _normalize_jvws_trade_scope(
+        zip_path,
+        output_path,
+        PROVINCE_DGUID_TO_GEOGRAPHY_ID,
+        transformation_id=JVWS_CANADA_TRANSFORMATION_ID,
+        include_geography_dimensions=True,
+    )
+
+
+def _normalize_jvws_trade_scope(
+    zip_path: Path,
+    output_path: Path,
+    geography_dguid_to_id: dict[str, str],
+    *,
+    transformation_id: str,
+    include_geography_dimensions: bool,
+) -> list[ObservationRecord]:
     observations: list[tuple[ObservationRecord, dict[str, str]]] = []
     with zipfile.ZipFile(zip_path) as archive:
         csv_names = [
@@ -139,14 +189,15 @@ def normalize_jvws_alberta(zip_path: Path, output_path: Path) -> list[Observatio
                     )
 
                 for raw in reader:
-                    if raw["GEO"].strip() != "Alberta":
+                    statcan_dguid = raw["DGUID"].strip()
+                    if statcan_dguid not in geography_dguid_to_id:
                         continue
                     occupation = raw["National Occupational Classification"].strip()
                     match = re.search(r"\[(\d{5})\]\s*$", occupation)
                     if not match:
                         continue
                     noc_code = match.group(1)
-                    if noc_code not in ALBERTA_TRADE_NOC_TO_NODE:
+                    if noc_code not in TRADE_NOC_TO_NODE:
                         continue
                     statistic = raw["Statistics"].strip()
                     if statistic not in JVWS_STATISTICS:
@@ -182,13 +233,13 @@ def normalize_jvws_alberta(zip_path: Path, output_path: Path) -> list[Observatio
                         indicator_id=f"JVWS_{slug(statistic)}_NOC_{noc_code}",
                         value=float(value_text) if value_text else None,
                         unit=raw["UOM"].strip(),
-                        geography_id="PR_48",
+                        geography_id=geography_dguid_to_id[statcan_dguid],
                         period_start=period_start,
                         period_end=period_end,
                         source_id="STATCAN_JVWS_14100444",
                         evidence_status=EvidenceStatus.OBSERVED,
                         as_of_date=period_end,
-                        transformation_id=JVWS_TRANSFORMATION_ID,
+                        transformation_id=transformation_id,
                         quality_flags=quality_flags,
                     )
                     observation.validate()
@@ -198,8 +249,10 @@ def normalize_jvws_alberta(zip_path: Path, output_path: Path) -> list[Observatio
                             {
                                 "noc_code": noc_code,
                                 "occupation_label": occupation.rsplit(" [", 1)[0],
-                                "trade_node_id": ALBERTA_TRADE_NOC_TO_NODE[noc_code],
+                                "trade_node_id": TRADE_NOC_TO_NODE[noc_code],
                                 "statistic": statistic,
+                                "geography_label": raw["GEO"].strip(),
+                                "statcan_dguid": statcan_dguid,
                             },
                         )
                     )
@@ -207,34 +260,47 @@ def normalize_jvws_alberta(zip_path: Path, output_path: Path) -> list[Observatio
     observations.sort(
         key=lambda item: (
             item[0].period_start,
+            item[0].geography_id,
             item[1]["trade_node_id"],
             item[1]["noc_code"],
             item[1]["statistic"],
         )
     )
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fieldnames = (
+    fieldnames = [
         "observation_id",
         "indicator_id",
-        "noc_code",
-        "occupation_label",
-        "trade_node_id",
-        "statistic",
-        "value",
-        "unit",
-        "geography_id",
-        "period_start",
-        "period_end",
-        "source_id",
-        "evidence_status",
-        "as_of_date",
-        "transformation_id",
-        "quality_flags",
+    ]
+    if include_geography_dimensions:
+        fieldnames.extend(("geography_label", "statcan_dguid"))
+    fieldnames.extend(
+        (
+            "noc_code",
+            "occupation_label",
+            "trade_node_id",
+            "statistic",
+            "value",
+            "unit",
+            "geography_id",
+            "period_start",
+            "period_end",
+            "source_id",
+            "evidence_status",
+            "as_of_date",
+            "transformation_id",
+            "quality_flags",
+        )
     )
     with output_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         for observation, dimensions in observations:
+            if not include_geography_dimensions:
+                dimensions = {
+                    key: value
+                    for key, value in dimensions.items()
+                    if key not in {"geography_label", "statcan_dguid"}
+                }
             writer.writerow(
                 {
                     **dimensions,

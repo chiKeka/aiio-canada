@@ -26,12 +26,16 @@ access methods must be revalidated at ingestion time.
 
 Each adapter must capture the source metadata defined in the data dictionary, retain a raw-file hash, emit a schema validation report and document any suppression, revision or licensing limitation. Discovery sources can enter the digest but cannot directly calibrate a material model parameter without promotion through evidence review.
 
-## Implemented labour slice
+## Implemented labour spine
 
-The Alberta pilot normalizes quarterly rows from Statistics Canada table
+The pipeline normalizes quarterly rows from Statistics Canada table
 14-10-0444-01 for NOC 72200, 72201, 72202, 72203, 72402 and 73100. These map to
-the electrician, power-line, HVAC and concrete graph nodes. The extract retains
-the table's quality codes and includes both job vacancies and average offered
+the electrician, power-line, HVAC and concrete graph nodes. One Alberta extract
+supports the pilot model and a second province-preserving extract covers all 13
+provinces and territories. Canada totals and economic regions are excluded from
+the provincial extract so they cannot silently substitute for local conditions.
+Both extracts retain
+the table's quality codes and include both job vacancies and average offered
 hourly wages. Missing or suppressed values are represented as missing with an
 explicit `value_missing_or_suppressed` flag—not as zero.
 
@@ -42,5 +46,5 @@ baseline signals for later calibration.
 
 The full Statistics Canada ZIP is retained as a reproducible local cache because
 its uncompressed table exceeds one gigabyte. Git versions the retrieval manifest,
-content hash, deterministic adapter and normalized Alberta extract instead of the
+content hash, deterministic adapter and normalized extracts instead of the
 large provider file.

@@ -5,7 +5,18 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from aiio.release import latest_labour_availability, sha256_file, verify_manifest, write_json
+from aiio.adapters.statcan import (
+    JVWS_STATISTICS,
+    PROVINCE_DGUID_TO_GEOGRAPHY_ID,
+    TRADE_NOC_TO_NODE,
+)
+from aiio.release import (
+    latest_labour_availability,
+    latest_labour_availability_canada,
+    sha256_file,
+    verify_manifest,
+    write_json,
+)
 from aiio.schemas import ValidationError
 
 
@@ -30,6 +41,62 @@ class ReleaseVerificationTests(unittest.TestCase):
         }
         write_json(self.release_dir / "manifest.json", self.manifest)
         write_json(self.public_dir / "latest.json", {"manifest": self.manifest})
+
+    def write_canada_labour(
+        self,
+        path: Path,
+        *,
+        omit_geography: str | None = None,
+        omit_pair_for: tuple[str, str, str] | None = None,
+        mismatch_geography: bool = False,
+    ) -> None:
+        header = (
+            "observation_id,indicator_id,geography_label,statcan_dguid,noc_code,"
+            "occupation_label,trade_node_id,statistic,value,unit,geography_id,"
+            "period_start,period_end,source_id,evidence_status,as_of_date,"
+            "transformation_id,quality_flags"
+        )
+        labels = {"PR_48": "Alberta", "PR_35": "Ontario", "PR_46": "Manitoba"}
+        rows = [header]
+        for dguid, geography_id in PROVINCE_DGUID_TO_GEOGRAPHY_ID.items():
+            if geography_id == omit_geography:
+                continue
+            published_geography_id = (
+                "PR_48" if mismatch_geography and geography_id == "PR_10" else geography_id
+            )
+            for noc_code, trade_node_id in TRADE_NOC_TO_NODE.items():
+                for statistic in sorted(JVWS_STATISTICS):
+                    if omit_pair_for == (geography_id, noc_code, statistic):
+                        continue
+                    is_ab_missing = (
+                        geography_id == "PR_48"
+                        and noc_code == "72200"
+                        and statistic == "Average offered hourly wage"
+                    )
+                    is_mb_zero = (
+                        geography_id == "PR_46"
+                        and noc_code == "72203"
+                        and statistic == "Job vacancies"
+                    )
+                    value = "" if is_ab_missing else ("0.0" if is_mb_zero else "10")
+                    status = "F" if is_ab_missing else "A"
+                    flags = (
+                        "status:F|value_missing_or_suppressed"
+                        if is_ab_missing
+                        else f"status:{status}"
+                    )
+                    unit = "Dollars" if statistic == "Average offered hourly wage" else "Number"
+                    statistic_slug = statistic.upper().replace(" ", "_")
+                    rows.append(
+                        f"OBS_{geography_id}_{noc_code}_{statistic_slug},"
+                        f"JVWS_{statistic_slug}_NOC_{noc_code},"
+                        f"{labels.get(geography_id, geography_id)},{dguid},{noc_code},"
+                        f"Occupation {noc_code},{trade_node_id},{statistic},{value},{unit},"
+                        f"{published_geography_id},2026-01-01,2026-03-31,"
+                        "STATCAN_JVWS_14100444,observed,2026-03-31,TR_CA,"
+                        f"{flags}"
+                    )
+        path.write_text("\n".join(rows) + "\n", encoding="utf-8")
 
     def verify(self) -> None:
         with (
@@ -76,6 +143,56 @@ class ReleaseVerificationTests(unittest.TestCase):
             "value_missing_or_suppressed",
             baseline["observations"][0]["quality_flags"],
         )
+
+    def test_canada_labour_snapshot_reports_missingness_by_province(self) -> None:
+        labour_path = self.root / "labour_canada.csv"
+        self.write_canada_labour(labour_path)
+        baseline = latest_labour_availability_canada(labour_path)
+        self.assertEqual(len(baseline["coverage"]), 13)
+        alberta = next(
+            item for item in baseline["coverage"] if item["geography_id"] == "PR_48"
+        )
+        self.assertEqual(alberta["observed_cells"], 11)
+        self.assertEqual(alberta["not_published_cells"], 1)
+        self.assertEqual(alberta["coverage_percent"], 91.7)
+        self.assertIsNone(
+            next(
+                item
+                for item in baseline["observations"]
+                if item["geography_id"] == "PR_48"
+                and item["noc_code"] == "72200"
+                and item["statistic"] == "Average offered hourly wage"
+            )["value"]
+        )
+        manitoba_zero = next(
+            item
+            for item in baseline["observations"]
+            if item["geography_id"] == "PR_46"
+            and item["noc_code"] == "72203"
+            and item["statistic"] == "Job vacancies"
+        )
+        self.assertEqual(manitoba_zero["value"], 0.0)
+
+    def test_canada_labour_snapshot_requires_all_13_geographies(self) -> None:
+        labour_path = self.root / "labour_canada_missing_geo.csv"
+        self.write_canada_labour(labour_path, omit_geography="PR_62")
+        with self.assertRaisesRegex(ValidationError, "exactly 13"):
+            latest_labour_availability_canada(labour_path)
+
+    def test_canada_labour_snapshot_requires_all_12_cells(self) -> None:
+        labour_path = self.root / "labour_canada_missing_cell.csv"
+        self.write_canada_labour(
+            labour_path,
+            omit_pair_for=("PR_48", "72200", "Job vacancies"),
+        )
+        with self.assertRaisesRegex(ValidationError, "incomplete for PR_48"):
+            latest_labour_availability_canada(labour_path)
+
+    def test_canada_labour_snapshot_rejects_dguid_geography_mismatch(self) -> None:
+        labour_path = self.root / "labour_canada_mismatch.csv"
+        self.write_canada_labour(labour_path, mismatch_geography=True)
+        with self.assertRaisesRegex(ValidationError, "mismatched geography"):
+            latest_labour_availability_canada(labour_path)
 
 
 if __name__ == "__main__":

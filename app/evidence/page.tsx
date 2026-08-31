@@ -1,6 +1,7 @@
 import { BriefcaseBusiness, Database, ExternalLink, ShieldCheck } from 'lucide-react';
 
 import { EvidenceExplorer } from '@/components/evidence-explorer';
+import { LabourMarketExplorer, type NationalLabourAvailability } from '@/components/labour-market-explorer';
 import { EvidencePill, PageIntro, SiteFooter, SiteHeader } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
 
@@ -11,6 +12,11 @@ export default function EvidencePage() {
       labour_availability?: LabourAvailability;
     }
   ).labour_availability;
+  const labourCanada = (
+    releaseData.baseline as typeof releaseData.baseline & {
+      labour_availability_canada?: NationalLabourAvailability;
+    }
+  ).labour_availability_canada;
   return (
     <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">
       <SiteHeader />
@@ -29,7 +35,7 @@ export default function EvidencePage() {
         </div>
         <EvidenceExplorer projects={releaseData.baseline.projects} />
       </section>
-      {labour ? <LabourAvailabilityPanel labour={labour} /> : null}
+      {labourCanada ? <LabourMarketExplorer labour={labourCanada} /> : labour ? <LabourAvailabilityPanel labour={labour} /> : null}
       <section className="border-t border-[#d5ddd8] bg-[#e9ebe5]">
         <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
           <div className="mb-6 flex items-center gap-2"><Database className="size-4 text-[#24746c]" /><h2 className="text-xl font-medium">Registered public sources</h2></div>
@@ -95,8 +101,9 @@ function LabourAvailabilityPanel({ labour }: { labour: LabourAvailability }) {
         </p>
         <div className="mt-6 overflow-x-auto rounded-xl border border-[#d2dad5]">
           <table className="w-full min-w-[820px] border-collapse text-left text-sm">
+            <caption className="sr-only">Alberta trade labour observations</caption>
             <thead className="bg-[#e8eeea] text-xs uppercase tracking-wide text-[#48635d]">
-              <tr><th className="px-4 py-3">Model trade</th><th className="px-4 py-3">Occupation</th><th className="px-4 py-3">Vacancies</th><th className="px-4 py-3">Offered wage</th><th className="px-4 py-3">StatCan quality</th></tr>
+              <tr><th className="px-4 py-3" scope="col">Model trade</th><th className="px-4 py-3" scope="col">Occupation</th><th className="px-4 py-3" scope="col">Vacancies</th><th className="px-4 py-3" scope="col">Offered wage</th><th className="px-4 py-3" scope="col">StatCan quality</th></tr>
             </thead>
             <tbody className="divide-y divide-[#dce3de] bg-[#fbfaf5]">
               {occupations.map((item) => (
@@ -118,7 +125,7 @@ function LabourAvailabilityPanel({ labour }: { labour: LabourAvailability }) {
 }
 
 function formatLabourValue(observation: LabourObservation | null, kind: 'vacancies' | 'wage') {
-  if (!observation || observation.value === null) return 'Suppressed';
+  if (!observation || observation.value === null) return 'Not published';
   return kind === 'wage' ? `$${observation.value.toFixed(2)}/hr` : Math.round(observation.value).toLocaleString('en-CA');
 }
 

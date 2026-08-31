@@ -6,7 +6,12 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
-from aiio.adapters.statcan import normalize_jvws_alberta, quarter_bounds, slug
+from aiio.adapters.statcan import (
+    normalize_jvws_alberta,
+    normalize_jvws_canada,
+    quarter_bounds,
+    slug,
+)
 from aiio.adapters.alberta_projects import (
     classify_ai_relevance,
     extract_coordinates,
@@ -112,6 +117,35 @@ class SchemaTests(unittest.TestCase):
             self.assertIn("trade_electricians", output)
             self.assertIn("trade_power_line", output)
             self.assertNotIn("Ontario", output)
+
+    def test_jvws_canada_normalizer_keeps_provinces_separate(self) -> None:
+        header = (
+            '"REF_DATE","GEO","DGUID","National Occupational Classification",'
+            '"Statistics","UOM","VALUE","STATUS","SYMBOL","TERMINATED"\n'
+        )
+        rows = [
+            '"2026-01","Alberta","2021A000248","Electricians (except industrial and power system) [72200]","Job vacancies","Number","460","E","",""',
+            '"2026-01","Ontario","2021A000235","Electricians (except industrial and power system) [72200]","Job vacancies","Number","1000","A","",""',
+            '"2026-01","Canada","2021A000011124","Electricians (except industrial and power system) [72200]","Job vacancies","Number","3000","A","",""',
+            '"2026-01","Calgary, Alberta","2021S05004830","Electricians (except industrial and power system) [72200]","Job vacancies","Number","200","A","",""',
+            '"2026-01","Edmonton economic region, Alberta","2021A00034820","Electricians (except industrial and power system) [72200]","Job vacancies","Number","250","A","",""',
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive_path = root / "jvws.zip"
+            output_path = root / "labour_canada.csv"
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("14100444.csv", header + "\n".join(rows) + "\n")
+            observations = normalize_jvws_canada(archive_path, output_path)
+            self.assertEqual(len(observations), 2)
+            self.assertEqual({item.geography_id for item in observations}, {"PR_35", "PR_48"})
+            output = output_path.read_text(encoding="utf-8")
+            self.assertIn("Alberta,2021A000248", output)
+            self.assertIn("Ontario,2021A000235", output)
+            self.assertNotIn("Canada,2021A000011124", output)
+            self.assertNotIn("Calgary, Alberta", output)
+            self.assertNotIn("Edmonton economic region", output)
+            self.assertIn("TR_STATCAN_JVWS_CA_PROVINCES_NOC_1_0_0", output)
 
     def test_major_projects_token_extraction(self) -> None:
         html = '<form><input name="__RequestVerificationToken" type="hidden" value="public-session-token" /></form>'

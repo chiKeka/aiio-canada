@@ -10,6 +10,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from .adapters.statcan import (
+    JVWS_STATISTICS,
+    PROVINCE_DGUID_TO_GEOGRAPHY_ID,
+    TRADE_NOC_TO_NODE,
+)
 from .schemas import ValidationError
 
 
@@ -33,6 +38,7 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         inputs["alberta_ai_projects"],
         inputs["bcpi_alberta"],
         inputs["labour_availability_alberta"],
+        inputs["labour_availability_canada"],
     )
     model_run = json.loads(inputs["model_run"].read_text(encoding="utf-8"))
     power_run = json.loads(inputs["power_run"].read_text(encoding="utf-8"))
@@ -57,6 +63,10 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         inputs["labour_availability_alberta"],
         release_dir / "labour_availability_alberta.csv",
     )
+    shutil.copyfile(
+        inputs["labour_availability_canada"],
+        release_dir / "labour_availability_canada.csv",
+    )
 
     input_hashes = {name: sha256_file(path) for name, path in sorted(inputs.items())}
     input_manifest_hash = sha256_json(input_hashes)
@@ -71,9 +81,12 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         "labour_availability_alberta.csv": sha256_file(
             release_dir / "labour_availability_alberta.csv"
         ),
+        "labour_availability_canada.csv": sha256_file(
+            release_dir / "labour_availability_canada.csv"
+        ),
     }
     manifest = {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "release_id": f"AIIO_RELEASE_{version.upper().replace('.', '_').replace('-', '_')}",
         "version": version,
         "status": "research-prototype",
@@ -118,6 +131,10 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         release_dir / "labour_availability_alberta.csv",
         downloads_dir / "labour_availability_alberta.csv",
     )
+    shutil.copyfile(
+        release_dir / "labour_availability_canada.csv",
+        downloads_dir / "labour_availability_canada.csv",
+    )
     return manifest
 
 
@@ -125,6 +142,7 @@ def build_baseline(
     projects_path: Path,
     bcpi_path: Path,
     labour_path: Path,
+    labour_canada_path: Path,
 ) -> dict[str, Any]:
     with projects_path.open(encoding="utf-8") as handle:
         projects = list(csv.DictReader(handle))
@@ -138,8 +156,9 @@ def build_baseline(
 
     bcpi_latest = latest_bcpi(bcpi_path)
     labour_latest = latest_labour_availability(labour_path)
+    labour_canada_latest = latest_labour_availability_canada(labour_canada_path)
     return {
-        "schema_version": "1.1.0",
+        "schema_version": "1.2.0",
         "geography_id": "PR_48",
         "as_of_date": max(item["as_of_date"] for item in projects),
         "evidence_status": "observed_with_inferred_classification",
@@ -161,6 +180,7 @@ def build_baseline(
         },
         "construction_prices": bcpi_latest,
         "labour_availability": labour_latest,
+        "labour_availability_canada": labour_canada_latest,
         "projects": [
             {
                 "project_id": item["project_id"],
@@ -230,6 +250,115 @@ def latest_labour_availability(path: Path) -> dict[str, Any]:
             "Job vacancies measure unmet labour demand, not total labour supply. Offered wages are "
             "posted offers, not realized earnings. Suppressed Statistics Canada values remain missing "
             "and are never interpreted as zero."
+        ),
+    }
+
+
+def latest_labour_availability_canada(path: Path) -> dict[str, Any]:
+    """Build a province-preserving latest-quarter labour evidence snapshot."""
+    with path.open(encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    if not rows:
+        raise ValidationError("Canada labour availability baseline cannot be empty")
+
+    period_end = max(item["period_end"] for item in rows)
+    latest_rows = [item for item in rows if item["period_end"] == period_end]
+    expected_geographies = set(PROVINCE_DGUID_TO_GEOGRAPHY_ID.values())
+    expected_pairs = {
+        (noc_code, statistic)
+        for noc_code in TRADE_NOC_TO_NODE
+        for statistic in JVWS_STATISTICS
+    }
+    geography_groups: dict[str, list[dict[str, str]]] = {}
+    for item in latest_rows:
+        expected_geography_id = PROVINCE_DGUID_TO_GEOGRAPHY_ID.get(
+            item["statcan_dguid"]
+        )
+        if expected_geography_id != item["geography_id"]:
+            raise ValidationError(
+                "latest Canada labour snapshot contains a non-provincial or "
+                f"mismatched geography: {item['geography_id']} / {item['statcan_dguid']}"
+            )
+        geography_groups.setdefault(item["geography_id"], []).append(item)
+
+    actual_geographies = set(geography_groups)
+    if actual_geographies != expected_geographies:
+        missing = sorted(expected_geographies - actual_geographies)
+        unexpected = sorted(actual_geographies - expected_geographies)
+        raise ValidationError(
+            "latest Canada labour snapshot must contain exactly 13 provinces and "
+            f"territories; missing={missing}, unexpected={unexpected}"
+        )
+
+    coverage = []
+    for geography_id, items in sorted(geography_groups.items()):
+        actual_pairs = {(item["noc_code"], item["statistic"]) for item in items}
+        if actual_pairs != expected_pairs or len(items) != len(expected_pairs):
+            missing_pairs = sorted(expected_pairs - actual_pairs)
+            unexpected_pairs = sorted(actual_pairs - expected_pairs)
+            raise ValidationError(
+                f"latest Canada labour snapshot is incomplete for {geography_id}: "
+                f"{len(items)} of {len(expected_pairs)} cells; "
+                f"missing={missing_pairs}, unexpected={unexpected_pairs}"
+            )
+        observed_cells = sum(item["value"] != "" for item in items)
+        total_cells = len(items)
+        coverage.append(
+            {
+                "geography_id": geography_id,
+                "geography_label": items[0]["geography_label"],
+                "observed_cells": observed_cells,
+                "not_published_cells": total_cells - observed_cells,
+                "total_cells": total_cells,
+                "coverage_percent": round(observed_cells / total_cells * 100, 1),
+            }
+        )
+
+    observations = []
+    for item in sorted(
+        latest_rows,
+        key=lambda row: (
+            row["geography_id"],
+            row["trade_node_id"],
+            row["noc_code"],
+            row["statistic"],
+        ),
+    ):
+        observations.append(
+            {
+                "observation_id": item["observation_id"],
+                "indicator_id": item["indicator_id"],
+                "geography_id": item["geography_id"],
+                "geography_label": item["geography_label"],
+                "statcan_dguid": item["statcan_dguid"],
+                "noc_code": item["noc_code"],
+                "occupation_label": item["occupation_label"],
+                "trade_node_id": item["trade_node_id"],
+                "statistic": item["statistic"],
+                "value": float(item["value"]) if item["value"] else None,
+                "unit": item["unit"],
+                "period_end": item["period_end"],
+                "source_id": item["source_id"],
+                "evidence_status": item["evidence_status"],
+                "transformation_id": item["transformation_id"],
+                "quality_flags": [
+                    flag for flag in item["quality_flags"].split("|") if flag
+                ],
+            }
+        )
+
+    return {
+        "period_end": period_end,
+        "source_id": "STATCAN_JVWS_14100444",
+        "evidence_status": "observed",
+        "geography_scope": "13 provinces and territories; Canada totals excluded",
+        "coverage": coverage,
+        "observations": observations,
+        "warning": (
+            "Cross-province comparisons must account for survey quality, confidentiality, "
+            "suppression and unavailable cells. "
+            "Vacancies measure unmet demand rather than workforce stock; offered wages are posted "
+            "offers rather than realized earnings. Missing cells are not zero and are not imputed."
         ),
     }
 
@@ -396,6 +525,9 @@ def release_input_paths(root: Path) -> dict[str, Path]:
         "labour_availability_alberta": (
             root / "data" / "processed" / "labour_availability_alberta.csv"
         ),
+        "labour_availability_canada": (
+            root / "data" / "processed" / "labour_availability_canada.csv"
+        ),
         "alberta_ai_projects": root / "data" / "processed" / "alberta_ai_projects.csv",
         "graph": root / "data" / "model" / "alberta_graph_v0.2.json",
         "scenario": root / "data" / "scenarios" / "alberta_50b_counterfactual_v0.2.json",
@@ -432,9 +564,10 @@ def build_publication_artifacts(
         Path("public/downloads/alberta_ai_projects.csv"),
         Path("public/downloads/bcpi_alberta.csv"),
         Path("public/downloads/labour_availability_alberta.csv"),
+        Path("public/downloads/labour_availability_canada.csv"),
     ]
     artifacts = {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "release_version": version,
         "release_id": manifest["release_id"],
         "code_commit": manifest["code_commit"],

@@ -36,6 +36,7 @@ The reproducible analytical gates are:
 ```bash
 npm run research:validate
 npm run labour:normalize
+npm run labour:normalize:canada
 npm run model:run
 npm run power:run
 npm run research:test
@@ -45,8 +46,10 @@ npm run release:verify
 
 Research architecture and protocols live in `docs/`. The public application lives in `app/` and `components/`. Data, model, workbook and digest packages are added as the build advances.
 
-The committed Alberta labour extract contains graph-relevant NOC vacancy and
-offered-wage observations from Statistics Canada table 14-10-0444-01. Suppressed
+The committed labour extracts contain graph-relevant NOC vacancy and
+offered-wage observations from Statistics Canada table 14-10-0444-01. One file
+supports the Alberta pilot; the Canada-ready file preserves all 13 provincial
+and territorial estimates without substituting a national average. Suppressed
 values remain blank with their quality flags; they are never converted to zero.
 
 Academic-use controls are documented in `docs/governance/dissertation-alignment.md` and `docs/governance/ai-assistance-log.md`. The Observatory supports the research; it does not replace the researcher's submitted argument, source verification or required AI disclosure.

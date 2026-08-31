@@ -22,9 +22,16 @@ Add British Columbia, Ontario and Quebec because they provide contrasting power 
 
 Cross-province comparisons are prohibited until definitions, periods, units and project-stage classifications reconcile.
 
+**Current common-spine status:** quarterly job-vacancy and offered-wage
+observations for the six graph-relevant occupations now cover every province and
+territory under one deterministic adapter. This establishes a common labour
+evidence structure, not comparable province-level model calibration. Smaller
+jurisdictions have substantial unavailable, confidential or suppressed cells
+that must remain visible.
+
 ### Phase 2 — national coverage
 
-Extend the same schema to the remaining provinces and territories. Statistics Canada series provide the common national spine; provincial and municipal sources add project, procurement, utility and workforce detail. Missingness is published rather than silently imputed.
+Extend the remaining evidence domains to every province and territory. Statistics Canada series provide the common national spine; provincial and municipal sources add project, procurement, utility and workforce detail. Missingness is published rather than silently imputed.
 
 ## Provincial adapter contract
 

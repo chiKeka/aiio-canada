@@ -23,6 +23,12 @@ Required fields: `observation_id`, `indicator_id`, `value`, `unit`, `geography_i
 `value` may be missing only when `quality_flags` explains the missingness or
 suppression. A blank observed value must never be coerced to zero.
 
+Province-preserving statistical extracts additionally retain the public source's
+`geography_label` and `statcan_dguid`. The normalized `geography_id` uses the
+`PR_<code>` convention. National totals, provincial estimates and subprovincial
+regions are distinct records and cannot be substituted without an explicit
+transformation.
+
 ## Claim
 
 Required fields: `claim_id`, `claim_text`, `claim_type`, `geography_id`, `valid_from`, `valid_to`, `evidence_status`, `confidence`, `review_status`, `reviewer`, `release_id`.

@@ -6,7 +6,11 @@ from dataclasses import asdict
 from datetime import date
 from pathlib import Path
 
-from .adapters.statcan import normalize_bcpi_alberta, normalize_jvws_alberta
+from .adapters.statcan import (
+    normalize_bcpi_alberta,
+    normalize_jvws_alberta,
+    normalize_jvws_canada,
+)
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .digest import build_digest
 from .registry import load_registry
@@ -35,6 +39,12 @@ def main() -> None:
         help="normalize Alberta job-vacancy and offered-wage rows for graph-relevant trades",
     )
     labour_parser.add_argument("zip_path", type=Path)
+
+    labour_canada_parser = subparsers.add_parser(
+        "normalize-jvws-canada",
+        help="normalize provincial and territorial trade labour observations",
+    )
+    labour_canada_parser.add_argument("zip_path", type=Path)
 
     subparsers.add_parser(
         "fetch-major-projects",
@@ -105,6 +115,12 @@ def main() -> None:
             observations = normalize_jvws_alberta(
                 args.zip_path.resolve(),
                 root / "data" / "processed" / "labour_availability_alberta.csv",
+            )
+            print(json.dumps({"status": "passed", "observation_count": len(observations)}))
+        elif args.command == "normalize-jvws-canada":
+            observations = normalize_jvws_canada(
+                args.zip_path.resolve(),
+                root / "data" / "processed" / "labour_availability_canada.csv",
             )
             print(json.dumps({"status": "passed", "observation_count": len(observations)}))
         elif args.command == "fetch-major-projects":

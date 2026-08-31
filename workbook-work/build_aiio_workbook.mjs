@@ -13,6 +13,7 @@ const release = JSON.parse(await fs.readFile(path.join(projectRoot, 'public', 'd
 const outputPath = path.join(outputDir, `AIIO_Alberta_Pilot_${release.manifest.version}.xlsx`);
 const bcpiRows = parseCsv(await fs.readFile(path.join(projectRoot, 'data', 'processed', 'bcpi_alberta.csv'), 'utf8'));
 const labourRows = parseCsv(await fs.readFile(path.join(projectRoot, 'data', 'processed', 'labour_availability_alberta.csv'), 'utf8'));
+const labourCanadaRows = parseCsv(await fs.readFile(path.join(projectRoot, 'data', 'processed', 'labour_availability_canada.csv'), 'utf8'));
 const scenarioDefinition = JSON.parse(await fs.readFile(path.join(projectRoot, 'data', 'scenarios', 'alberta_50b_counterfactual_v0.2.json'), 'utf8'));
 const powerDefinition = JSON.parse(await fs.readFile(path.join(projectRoot, 'data', 'scenarios', 'alberta_power_overlay_v0.1.json'), 'utf8'));
 
@@ -27,6 +28,7 @@ const powerOverlay = workbook.worksheets.add('Power Overlay');
 const projects = workbook.worksheets.add('AI Projects');
 const bcpi = workbook.worksheets.add('BCPI Data');
 const labour = workbook.worksheets.add('Labour Availability');
+const labourCanada = workbook.worksheets.add('Labour Canada');
 const sources = workbook.worksheets.add('Sources');
 const checks = workbook.worksheets.add('Release Checks');
 
@@ -47,7 +49,7 @@ const C = {
   soft: '#EBEEE8',
 };
 
-for (const sheet of [readme, dashboard, assumptions, timeline, pressure, sensitivity, powerOverlay, projects, bcpi, labour, sources, checks]) {
+for (const sheet of [readme, dashboard, assumptions, timeline, pressure, sensitivity, powerOverlay, projects, bcpi, labour, labourCanada, sources, checks]) {
   sheet.showGridLines = false;
 }
 
@@ -62,6 +64,7 @@ buildPowerOverlay();
 buildProjects();
 buildBcpi();
 buildLabour();
+buildLabourCanada();
 buildSources();
 buildReleaseChecks();
 buildDashboard();
@@ -93,9 +96,9 @@ console.log(inspectDashboard.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D27',
+  range: 'Release Checks!A1:D28',
   include: 'values,formulas',
-  tableMaxRows: 27,
+  tableMaxRows: 28,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
@@ -109,7 +112,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H36',
+  'Read Me': 'A1:H37',
   Dashboard: 'A1:L44',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -119,8 +122,9 @@ const previewRanges = {
   'AI Projects': 'A1:Q18',
   'BCPI Data': 'A1:I24',
   'Labour Availability': 'A1:O32',
+  'Labour Canada': 'A1:Q28',
   Sources: 'A1:H15',
-  'Release Checks': 'A1:D27',
+  'Release Checks': 'A1:D28',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({ sheetName, range, scale: 1, format: 'png' });
@@ -159,7 +163,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H28').values = [
+  readme.getRange('A18:H29').values = [
     ['1', 'Dashboard', 'Read key observed and scenario outputs with their status labels.', '', '', '', '', ''],
     ['2', 'Assumptions', 'Edit blue-font scenario inputs only; formula cells remain black.', '', '', '', '', ''],
     ['3', 'Scenario Timeline', 'Inspect the annual capex decomposition and formula lineage.', '', '', '', '', ''],
@@ -169,21 +173,22 @@ function buildReadMe() {
     ['7', 'AI Projects', 'Inspect public project fields and the inferred AI classification.', '', '', '', '', ''],
     ['8', 'BCPI Data', 'Review the recent Calgary and Edmonton price-index observations.', '', '', '', '', ''],
     ['9', 'Labour Availability', 'Inspect Alberta vacancies, offered wages, quality flags and suppressed cells.', '', '', '', '', ''],
-    ['10', 'Sources', 'Open authoritative public URLs and check source vintages.', '', '', '', '', ''],
-    ['11', 'Release Checks', 'Confirm formula reconciliations and manifest identity.', '', '', '', '', ''],
+    ['10', 'Labour Canada', 'Compare latest-quarter publication coverage across all provinces and territories.', '', '', '', '', ''],
+    ['11', 'Sources', 'Open authoritative public URLs and check source vintages.', '', '', '', '', ''],
+    ['12', 'Release Checks', 'Confirm formula reconciliations and manifest identity.', '', '', '', '', ''],
   ];
-  readme.getRange('A18:A28').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B28').format.font = { bold: true };
-  readme.getRange('C18:H28').merge(true);
-  readme.getRange('A30:H30').merge();
-  readme.getRange('A30').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A30:H30'), C.amber);
-  readme.getRange('A31:H35').merge();
-  readme.getRange('A31').values = [[
+  readme.getRange('A18:A29').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B29').format.font = { bold: true };
+  readme.getRange('C18:H29').merge(true);
+  readme.getRange('A31:H31').merge();
+  readme.getRange('A31').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A31:H31'), C.amber);
+  readme.getRange('A32:H36').merge();
+  readme.getRange('A32').values = [[
     'UNCALIBRATED STRUCTURAL DIAGNOSTIC. Pressure scores are not findings, forecasts, probabilities or percentages: 0.24 does not mean a 24% delay. The graph excludes 54% of scenario capex. Power values come from an independent MW-based overlay and are not an AESO needs assessment.',
   ]];
-  readme.getRange('A31:H35').format = { fill: C.amberLight, font: { color: '#7B4529' }, wrapText: true, verticalAlignment: 'center' };
-  setWidths(readme, { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 }, 36);
+  readme.getRange('A32:H36').format = { fill: C.amberLight, font: { color: '#7B4529' }, wrapText: true, verticalAlignment: 'center' };
+  setWidths(readme, { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 }, 37);
 }
 
 function buildAssumptions() {
@@ -453,6 +458,82 @@ function buildLabour() {
   setWidths(labour, { A: 29, B: 10, C: 46, D: 24, E: 31, F: 13, G: 13, H: 14, I: 14, J: 17, K: 28, L: 31, M: 38, N: 45, O: 18 }, 26);
 }
 
+function buildLabourCanada() {
+  const national = release.baseline.labour_availability_canada;
+  titleBand(
+    labourCanada,
+    'Canada provincial trade labour evidence',
+    `Statistics Canada table 14-10-0444-01 · latest quarter ${national.period_end} · national totals excluded`,
+    'Q',
+  );
+
+  const coverage = [...national.coverage].sort((a, b) => a.geography_label.localeCompare(b.geography_label));
+  labourCanada.getRange('A4:I4').values = [['Geography ID', 'Province / territory', 'Reported cells', 'Not published', 'Total cells', 'Coverage', 'Expected reported', 'Expected not published', 'Reconciliation']];
+  header(labourCanada.getRange('A4:I4'));
+  const coverageEnd = 4 + coverage.length;
+  const latestRows = labourCanadaRows
+    .filter((row) => row.period_end === national.period_end)
+    .sort((a, b) => `${a.geography_id}|${a.trade_node_id}|${a.noc_code}|${a.statistic}`.localeCompare(`${b.geography_id}|${b.trade_node_id}|${b.noc_code}|${b.statistic}`));
+  const warningRow = coverageEnd + 3;
+  const headerRow = warningRow + 1;
+  const observationStart = headerRow + 1;
+  const observationEnd = observationStart + latestRows.length - 1;
+  coverage.forEach((item, index) => {
+    const row = 5 + index;
+    labourCanada.getRange(`A${row}:B${row}`).values = [[item.geography_id, item.geography_label]];
+    labourCanada.getRange(`C${row}`).formulas = [[`=COUNTIFS($B$${observationStart}:$B$${observationEnd},$A${row},$I$${observationStart}:$I$${observationEnd},"<>")`]];
+    labourCanada.getRange(`D${row}`).formulas = [[`=COUNTIF($B$${observationStart}:$B$${observationEnd},$A${row})-C${row}`]];
+    labourCanada.getRange(`E${row}`).formulas = [[`=C${row}+D${row}`]];
+    labourCanada.getRange(`F${row}`).formulas = [[`=IF(E${row}=0,0,C${row}/E${row})`]];
+    labourCanada.getRange(`G${row}:H${row}`).values = [[item.observed_cells, item.not_published_cells]];
+    labourCanada.getRange(`I${row}`).formulas = [[`=IF(AND(C${row}=G${row},D${row}=H${row}),"PASS","FAIL")`]];
+  });
+  labourCanada.getRange(`F5:F${coverageEnd}`).format.numberFormat = '0.0%';
+  labourCanada.getRange(`F5:F${coverageEnd}`).conditionalFormats.add('colorScale', {
+    colors: ['#F6D5C2', '#F4E7B2', '#B7DED3'],
+    thresholds: ['min', '50%', 'max'],
+  });
+  labourCanada.getRange(`I5:I${coverageEnd}`).conditionalFormats.add('containsText', { text: 'PASS', format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } } });
+  labourCanada.getRange(`I5:I${coverageEnd}`).conditionalFormats.add('containsText', { text: 'FAIL', format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } } });
+  const coverageTable = labourCanada.tables.add(`A4:I${coverageEnd}`, true, 'LabourCanadaCoverageTable');
+  coverageTable.style = 'TableStyleMedium2';
+
+  labourCanada.getRange(`A${warningRow}:Q${warningRow}`).merge();
+  labourCanada.getRange(`A${warningRow}`).values = [[national.warning]];
+  noteBlock(labourCanada.getRange(`A${warningRow}:Q${warningRow}`));
+  labourCanada.getRange(`A${warningRow}`).format.rowHeight = 42;
+  labourCanada.getRange(`A${headerRow}:Q${headerRow}`).values = [['Observation ID', 'Geography ID', 'Province / territory', 'StatCan DGUID', 'NOC', 'Occupation', 'Model trade node', 'Statistic', 'Value', 'Unit', 'Period end', 'Evidence status', 'Source ID', 'Transformation ID', 'Quality flags', 'Source URL', 'Missingness check']];
+  header(labourCanada.getRange(`A${headerRow}:Q${headerRow}`));
+  labourCanada.getRange(`A${observationStart}:Q${observationEnd}`).values = latestRows.map((row) => [
+    row.observation_id,
+    row.geography_id,
+    row.geography_label,
+    row.statcan_dguid,
+    row.noc_code,
+    row.occupation_label,
+    row.trade_node_id,
+    row.statistic,
+    row.value === '' ? null : Number(row.value),
+    row.unit,
+    new Date(`${row.period_end}T00:00:00Z`),
+    row.evidence_status,
+    row.source_id,
+    row.transformation_id,
+    row.quality_flags,
+    'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410044401',
+    row.value !== '' || row.quality_flags.includes('value_missing_or_suppressed') ? 'PASS' : 'FAIL',
+  ]);
+  labourCanada.getRange(`I${observationStart}:I${observationEnd}`).format.numberFormat = '0.00';
+  labourCanada.getRange(`K${observationStart}:K${observationEnd}`).format.numberFormat = 'yyyy-mm-dd';
+  labourCanada.getRange(`Q${observationStart}:Q${observationEnd}`).conditionalFormats.add('containsText', { text: 'PASS', format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } } });
+  labourCanada.getRange(`Q${observationStart}:Q${observationEnd}`).conditionalFormats.add('containsText', { text: 'FAIL', format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } } });
+  const observationsTable = labourCanada.tables.add(`A${headerRow}:Q${observationEnd}`, true, 'LabourCanadaLatestTable');
+  observationsTable.style = 'TableStyleMedium2';
+  labourCanada.freezePanes.freezeRows(headerRow);
+  labourCanada.freezePanes.freezeColumns(3);
+  setWidths(labourCanada, { A: 28, B: 15, C: 28, D: 20, E: 10, F: 44, G: 24, H: 31, I: 13, J: 13, K: 14, L: 17, M: 28, N: 38, O: 40, P: 45, Q: 18 }, 28);
+}
+
 function buildSources() {
   titleBand(sources, 'Public source register', `Authoritative and candidate sources included in release ${release.manifest.version}`, 'H');
   sources.getRange('A4:H4').values = [['Source ID', 'Title', 'Publisher', 'Domain', 'Geography', 'As-of date', 'Status', 'Canonical URL']];
@@ -492,8 +573,9 @@ function buildReleaseChecks() {
     ['All pressure rows are scenario-labelled', 'PASS'],
     ['Release was built from a clean worktree', 'PASS'],
     ['Suppressed labour values remain flagged', 'PASS'],
+    ['Canada labour coverage reconciles to release', 'PASS'],
   ];
-  checks.getRange('A16:C23').values = checkLabels.map(([label, expected]) => [label, null, expected]);
+  checks.getRange('A16:C24').values = checkLabels.map(([label, expected]) => [label, null, expected]);
   checks.getRange('B16').formulas = [['=IF(ABS(\'Assumptions\'!B19-1)<0.000001,"PASS","FAIL")']];
   checks.getRange('B17').formulas = [['=IF(ABS(SUM(\'Scenario Timeline\'!B5:B14)-1)<0.000001,"PASS","FAIL")']];
   checks.getRange('B18').formulas = [['=IF(ABS(\'Scenario Timeline\'!C15-\'Assumptions\'!B5)<1,"PASS","FAIL")']];
@@ -502,12 +584,16 @@ function buildReleaseChecks() {
   checks.getRange('B21').formulas = [[`=IF(COUNTIF('Pressure Results'!$J$5:$J$${4 + release.scenario.trade_pressure_order.length + release.scenario.public_delivery_pressure_order.length},"scenario")=ROWS('Pressure Results'!$J$5:$J$${4 + release.scenario.trade_pressure_order.length + release.scenario.public_delivery_pressure_order.length}),"PASS","FAIL")`]];
   checks.getRange('B22').formulas = [['=IF(B13=FALSE,"PASS","FAIL")']];
   checks.getRange('B23').formulas = [[`=IF(COUNTIF('Labour Availability'!$O$5:$O$${4 + labourRows.length},"FAIL")=0,"PASS","FAIL")`]];
-  checks.getRange('B16:B23').conditionalFormats.add('containsText', { text: 'PASS', format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } } });
-  checks.getRange('B16:B23').conditionalFormats.add('containsText', { text: 'FAIL', format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } } });
-  checks.getRange('A26:D27').merge();
-  checks.getRange('A26').values = [['A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, or if assumptions/scenarios are presented as observations.']];
-  noteBlock(checks.getRange('A26:D27'));
-  setWidths(checks, { A: 42, B: 61, C: 15, D: 18 }, 27);
+  const canadaCoverageEnd = 4 + release.baseline.labour_availability_canada.coverage.length;
+  const canadaObservationStart = canadaCoverageEnd + 5;
+  const canadaObservationEnd = canadaObservationStart + release.baseline.labour_availability_canada.observations.length - 1;
+  checks.getRange('B24').formulas = [[`=IF(AND(COUNTIF('Labour Canada'!$I$5:$I$${canadaCoverageEnd},"FAIL")=0,COUNTIF('Labour Canada'!$Q$${canadaObservationStart}:$Q$${canadaObservationEnd},"FAIL")=0),"PASS","FAIL")`]];
+  checks.getRange('B16:B24').conditionalFormats.add('containsText', { text: 'PASS', format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } } });
+  checks.getRange('B16:B24').conditionalFormats.add('containsText', { text: 'FAIL', format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } } });
+  checks.getRange('A27:D28').merge();
+  checks.getRange('A27').values = [['A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, or if assumptions/scenarios are presented as observations.']];
+  noteBlock(checks.getRange('A27:D28'));
+  setWidths(checks, { A: 42, B: 61, C: 15, D: 18 }, 28);
 }
 
 function buildDashboard() {
