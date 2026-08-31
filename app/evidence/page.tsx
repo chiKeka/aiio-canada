@@ -102,7 +102,7 @@ function LabourAvailabilityPanel({ labour }: { labour: LabourAvailability }) {
               {occupations.map((item) => (
                 <tr key={item.nocCode}>
                   <td className="px-4 py-3 font-mono text-xs text-[#1f665f]">{item.tradeNode.replace('trade_', '').replaceAll('_', ' ')}</td>
-                  <td className="px-4 py-3"><span className="font-medium">{item.occupation}</span><span className="ml-2 font-mono text-xs text-[#70817c]">NOC {item.nocCode}</span></td>
+                  <td className="px-4 py-3"><span className="font-medium">{item.occupation}</span><span className="ml-2 font-mono text-xs text-[#566761]">NOC {item.nocCode}</span></td>
                   <td className="px-4 py-3 font-mono">{formatLabourValue(item.vacancies, 'vacancies')}</td>
                   <td className="px-4 py-3 font-mono">{formatLabourValue(item.wage, 'wage')}</td>
                   <td className="px-4 py-3 text-xs text-[#52645f]">{qualitySummary(item.vacancies, item.wage)}</td>

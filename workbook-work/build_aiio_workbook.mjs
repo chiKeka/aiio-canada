@@ -13,7 +13,6 @@ const release = JSON.parse(await fs.readFile(path.join(projectRoot, 'public', 'd
 const outputPath = path.join(outputDir, `AIIO_Alberta_Pilot_${release.manifest.version}.xlsx`);
 const bcpiRows = parseCsv(await fs.readFile(path.join(projectRoot, 'data', 'processed', 'bcpi_alberta.csv'), 'utf8'));
 const labourRows = parseCsv(await fs.readFile(path.join(projectRoot, 'data', 'processed', 'labour_availability_alberta.csv'), 'utf8'));
-const graph = JSON.parse(await fs.readFile(path.join(projectRoot, 'data', 'model', 'alberta_graph_v0.2.json'), 'utf8'));
 const scenarioDefinition = JSON.parse(await fs.readFile(path.join(projectRoot, 'data', 'scenarios', 'alberta_50b_counterfactual_v0.2.json'), 'utf8'));
 const powerDefinition = JSON.parse(await fs.readFile(path.join(projectRoot, 'data', 'scenarios', 'alberta_power_overlay_v0.1.json'), 'utf8'));
 
@@ -402,7 +401,7 @@ function buildBcpi() {
     .filter((row) => ['BCPI_NON_RESIDENTIAL_BUILDINGS_622_DIVISION_COMPOSITE', 'BCPI_SCHOOL_DIVISION_COMPOSITE'].includes(row.indicator_id))
     .sort((a, b) => `${a.indicator_id}|${a.geography_id}|${a.period_end}`.localeCompare(`${b.indicator_id}|${b.geography_id}|${b.period_end}`));
   const recent = [];
-  for (const key of [...new Set(selected.map((row) => `${row.indicator_id}|${row.geography_id}`))]) {
+  for (const key of new Set(selected.map((row) => `${row.indicator_id}|${row.geography_id}`))) {
     recent.push(...selected.filter((row) => `${row.indicator_id}|${row.geography_id}` === key).slice(-12));
   }
   bcpi.getRange('A4:I4').values = [['Observation ID', 'Indicator ID', 'Geography ID', 'Period end', 'Value', 'Unit', 'Evidence status', 'Source ID', 'Source URL']];
