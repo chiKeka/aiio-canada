@@ -81,7 +81,7 @@ Incomplete schedules remain indeterminate unless a reported boundary proves they
 
 ## Power evidence screen
 
-Required fields: `metric_id`, `period`, `value`, `unit`, `evidence_status`, `source_id`, `source_locator`. Requested, allocated, contracted, connected, peak, generation, and transmission quantities remain semantically distinct. A cross-vintage ratio must never be labelled a conversion rate or probability.
+Required fields: `metric_id`, `period`, `value`, `unit`, `evidence_status`, `source_id`, `source_locator`. Requested, allocated, contracted, connected, peak, generation, and transmission quantities remain semantically distinct. The public screen does not publish a quotient across the differently dated request and contract records.
 
 ## Release
 

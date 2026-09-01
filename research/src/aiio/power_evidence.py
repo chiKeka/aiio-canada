@@ -39,6 +39,10 @@ def run_power_evidence_screen(
         raise ValidationError(
             "manual AESO chart extraction does not match the supplied source PDF hash"
         )
+    if manual.get("review_status") != "independently_reviewed":
+        raise ValidationError(
+            "manual AESO chart extraction must pass independent source review before publication"
+        )
     requested_series = manual.get("requested_load_series", [])
     if len(requested_series) != 6:
         raise ValidationError("AESO requested-load extraction must contain six chart bars")
@@ -84,7 +88,6 @@ def run_power_evidence_screen(
 
     latest_requested = requested_series[-1]
     requested_load_mw = float(latest_requested["requested_load_mw"])
-    contracted_share = round(allocated_mw / requested_load_mw * 100, 3)
     metrics = [
         {
             "metric_id": "AESO_DC_REQUESTED_LOAD",
@@ -135,15 +138,6 @@ def run_power_evidence_screen(
                 "source_id": "AESO_LARGE_LOAD_PROJECTS",
                 "source_locator": "Phase 1 project list, P3083",
             },
-            {
-                "metric_id": "AIIO_PHASE1_ALLOCATED_SHARE_OF_Q3_2025_REQUESTS",
-                "period": "cross-vintage",
-                "value": contracted_share,
-                "unit": "percent",
-                "evidence_status": "inferred",
-                "source_id": "AESO_LARGE_LOAD_PROJECTS|AESO_DATA_CENTRE_UPDATE_2025_09",
-                "source_locator": "AIIO division of 1,200 MW by 20,700 MW",
-            },
         ]
     )
 
@@ -151,7 +145,14 @@ def run_power_evidence_screen(
         "model_id": "AIIO_AB_POWER_EVIDENCE_SCREEN_0_1",
         "geography_id": "PR_48",
         "as_of_date": "2026-08-31",
-        "evidence_status": "observed_with_guarded_inference",
+        "evidence_status": "observed_with_scoped_interpretation",
+        "manual_extraction_review": {
+            "status": manual["review_status"],
+            "reviewed_by": manual["reviewed_by"],
+            "reviewer_type": manual["reviewer_type"],
+            "reviewed_at": manual["reviewed_at"],
+            "review_record": manual["review_record"],
+        },
         "requested_load": {
             "latest_application_period": latest_requested["application_period"],
             "latest_requested_load_mw": requested_load_mw,
@@ -169,8 +170,6 @@ def run_power_evidence_screen(
                     "mw": keephills_mw,
                 },
             ],
-            "allocated_share_of_q3_2025_requested_load_percent": contracted_share,
-            "share_interpretation": "Cross-vintage screening ratio only; it is not a realization probability or queue conversion rate.",
         },
         "transmission_boundary": {
             "phase1_new_transmission_reinforcement_required": False,
@@ -186,7 +185,7 @@ def run_power_evidence_screen(
         },
         "limitations": [
             "Requested MW, executed load-contract MW, connected MW, coincident peak and transmission capacity are distinct quantities.",
-            "The 1,200/20,700 comparison mixes publication vintages and project scopes and is retained only as a labelled screening ratio.",
+            "The Q3 2025 request quantity and the later executed-contract record have different publication vintages and must not be treated as one queue-conversion snapshot.",
             "No province-wide scalar can convert the $50B CAD scenario into a transmission build requirement.",
             "The independent scenario power overlay remains separate and is not calibrated by this evidence screen.",
         ],

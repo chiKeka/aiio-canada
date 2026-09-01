@@ -23,6 +23,11 @@ class PowerEvidenceScreenTests(unittest.TestCase):
                         "source_id": "AESO_DATA_CENTRE_UPDATE_2025_09",
                         "source_content_hash": f"sha256:{digest}",
                         "source_locator": "page 1 chart",
+                        "review_status": "independently_reviewed",
+                        "reviewed_by": "independent fixture reviewer",
+                        "reviewer_type": "test_fixture",
+                        "reviewed_at": "2026-08-31",
+                        "review_record": "fixture-review-record",
                         "requested_load_series": [
                             {"application_period": "2024-Q2", "requested_load_mw": 5000},
                             {"application_period": "2024-Q3", "requested_load_mw": 6400},
@@ -57,9 +62,14 @@ class PowerEvidenceScreenTests(unittest.TestCase):
                 root / "power.csv",
             )
         self.assertEqual(result["phase1"]["allocated_mw"], 1200)
+        self.assertEqual(len(result["metrics"]), 10)
+        self.assertNotIn(
+            "AIIO_PHASE1_ALLOCATED_SHARE_OF_Q3_2025_REQUESTS",
+            {item["metric_id"] for item in result["metrics"]},
+        )
         self.assertEqual(
-            result["phase1"]["allocated_share_of_q3_2025_requested_load_percent"],
-            5.797,
+            result["manual_extraction_review"]["status"],
+            "independently_reviewed",
         )
         self.assertFalse(
             result["transmission_boundary"][

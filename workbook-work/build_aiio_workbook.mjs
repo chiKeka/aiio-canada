@@ -2028,51 +2028,48 @@ function buildPowerEvidence() {
     'Requested load, Phase 1 allocation and executed contracts · separate from the AIIO MW scenario',
     'H',
   );
-  powerEvidence.getRange('A5:A11').values = [
+  powerEvidence.getRange('A5:A10').values = [
     ['Latest requested load (MW)'],
     ['Phase 1 interim limit (MW)'],
     ['Phase 1 allocated contracts (MW)'],
     ['Executed contract sum (MW)'],
-    ['Allocated/requested screening ratio'],
     ['$50B additional transmission (MW)'],
     ['Phase 1 reconciliation'],
   ];
-  powerEvidence.getRange('A5:A11').format.font = { bold: true, color: C.ink };
+  powerEvidence.getRange('A5:A10').format.font = { bold: true, color: C.ink };
   powerEvidence.getRange('B5').formulas = [['=C19']];
   powerEvidence.getRange('B6').formulas = [['=C20']];
   powerEvidence.getRange('B7').formulas = [['=C21']];
   powerEvidence.getRange('B8').formulas = [['=SUM(C22:C23)']];
-  powerEvidence.getRange('B9').formulas = [['=B7/B5']];
-  powerEvidence.getRange('B10').values = [['UNKNOWN']];
-  powerEvidence.getRange('B11').formulas = [
+  powerEvidence.getRange('B9').values = [['UNKNOWN']];
+  powerEvidence.getRange('B10').formulas = [
     ['=IF(AND(B6=B7,B7=B8),"PASS","FAIL")'],
   ];
-  powerEvidence.getRange('B5:B11').format = {
+  powerEvidence.getRange('B5:B10').format = {
     fill: C.soft,
     borders: { preset: 'outside', style: 'thin', color: C.line },
   };
   powerEvidence.getRange('B5:B8').format.numberFormat = '#,##0.0';
-  powerEvidence.getRange('B9').format.numberFormat = '0.0%';
   powerEvidence
-    .getRange('B11')
+    .getRange('B10')
     .conditionalFormats.add('containsText', {
       text: 'PASS',
       format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
     });
   powerEvidence
-    .getRange('B11')
+    .getRange('B10')
     .conditionalFormats.add('containsText', {
       text: 'FAIL',
       format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
     });
 
-  powerEvidence.getRange('D5:H11').merge();
+  powerEvidence.getRange('D5:H10').merge();
   powerEvidence.getRange('D5').values = [
     [
-      `${release.power_evidence.requested_load.warning} AESO's no-reinforcement statement applies only to its scoped 1,200 MW interim approach through 2028. Additional transmission for the $50B counterfactual remains unknown pending locations, connection studies and a system needs assessment.`,
+      `${release.power_evidence.requested_load.warning} Requested load, allocated limits, executed contracts, connected load and forecasts are different quantities. AESO's no-reinforcement statement applies only to its scoped 1,200 MW interim approach through 2028 on the existing transmission system. Additional transmission for the separate $50B counterfactual remains unknown pending locations, connection studies and a system needs assessment.`,
     ],
   ];
-  powerEvidence.getRange('D5:H11').format = {
+  powerEvidence.getRange('D5:H10').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
@@ -2297,7 +2294,7 @@ function buildReleaseChecks() {
   ];
   checks.getRange('B29').formulas = [
     [
-      `=IF(AND('Power Evidence'!B11="PASS",'Power Evidence'!B10="UNKNOWN"),"PASS","FAIL")`,
+      `=IF(AND('Power Evidence'!B10="PASS",'Power Evidence'!B9="UNKNOWN"),"PASS","FAIL")`,
     ],
   ];
   checks

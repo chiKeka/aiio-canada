@@ -234,6 +234,10 @@ def run_public_project_exposure(
         "as_of_date": max(item["as_of_date"] for item in records),
         "evidence_status": "observed_with_inferred_classification_and_annualization",
         "source_inventory_project_count": len(source_rows),
+        "excluded_ai_relevant_project_count": sum(
+            raw["ai_relevance"] != "none" for raw in source_rows
+        ),
+        "exclusion_rule": "Exclude records classified by the upstream controlled AI-relevance taxonomy as core_data_centre or enabling_power so the scenario shock is not counted as an exposed public-delivery asset.",
         "screened_project_count": len(records),
         "asset_class_summaries": summaries,
         "annual_screen": annual,
@@ -244,6 +248,7 @@ def run_public_project_exposure(
             "Reported costs are estimates, are not probability-weighted and may be missing. Missing costs remain null.",
             "Uniform annualization is a scheduling screen, not an expenditure forecast or a claim about construction curves.",
             "Overlap identifies simultaneous delivery windows; it does not prove competition, delay or cost causation.",
+            "Core data-centre and classified enabling-power records are excluded by the declared AI-relevance rule; this screen is not an AI-project census.",
         ],
     }
 

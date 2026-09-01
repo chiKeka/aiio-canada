@@ -14,7 +14,6 @@ type PowerEvidence = {
   };
   phase1: {
     allocated_mw: number;
-    allocated_share_of_q3_2025_requested_load_percent: number;
   };
   transmission_boundary: {
     additional_transmission_required_for_50b_counterfactual_mw: number | null;
@@ -51,9 +50,8 @@ function ObservedPowerBoundary({ evidence }: { evidence: PowerEvidence }) {
       <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-12">
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <EvidencePill status="observed" />
-          <EvidencePill status="inferred" />
           <span className="font-mono text-xs text-[#52645f]">
-            Observed AESO boundary · separate from scenario
+            AESO-published quantities · independently checked against archived sources
           </span>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
@@ -65,7 +63,7 @@ function ObservedPowerBoundary({ evidence }: { evidence: PowerEvidence }) {
           <PowerMetric
             label="Phase 1 allocated limit"
             value={`${(evidence.phase1.allocated_mw / 1_000).toFixed(1)} GW`}
-            note="Executed contracts reconcile to the limit"
+            note="Executed load contracts; not connected or in-service load"
           />
           <PowerMetric
             label="$50B additional transmission"
@@ -74,14 +72,13 @@ function ObservedPowerBoundary({ evidence }: { evidence: PowerEvidence }) {
           />
         </div>
         <div className="mt-4 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-4 text-sm leading-6 text-[#825a47]">
-          AESO reported no new reinforcement for its scoped 1.2 GW Phase 1
-          approach. That statement cannot be transferred to larger, later, or
-          differently located loads. The{' '}
-          {evidence.phase1.allocated_share_of_q3_2025_requested_load_percent.toFixed(
-            1,
-          )}
-          % comparison is a cross-vintage screening ratio—not a realization
-          probability or queue-conversion rate.
+          Requested load, allocated limits, executed contracts, connected load,
+          and forecasts are different quantities. AESO&apos;s statement that no
+          new transmission system reinforcement was required applies only to
+          its 1.2 GW interim approach through 2028 on the existing transmission
+          system. It does not establish transmission needs for remaining
+          requests, Phase 2, other locations, or the separate $50B
+          counterfactual.
         </div>
       </div>
     </section>

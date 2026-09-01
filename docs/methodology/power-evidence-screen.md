@@ -16,10 +16,12 @@ Three AESO sources are retained by content hash:
 - the June 2025 interim-approach announcement.
 
 The six cumulative requested-load bars on page 1 of the PDF are manually
-transcribed with a page/chart locator and bound to the PDF SHA-256 hash. The
-manual extraction remains pending independent review. HTML values are parsed by
+transcribed with a page/chart locator and bound to the PDF SHA-256 hash. Grok
+CLI independently re-extracted all six labels and values from the embedded
+chart image, recomputed the hash, and found no discrepancies. This is a recorded
+independent machine review, not human peer review. HTML values are parsed by
 explicit source-language patterns and must reconcile: the 970 MW and 230 MW
-executed contracts sum to the 1,200 MW allocated Phase 1 limit.
+executed load contracts sum to the 1,200 MW allocated Phase 1 limit.
 
 ## Quantity distinctions
 
@@ -28,8 +30,9 @@ peak demand, generation capacity, and transmission capability are distinct. The
 screen preserves these meanings rather than treating a request queue as a load
 forecast.
 
-The ratio of 1,200 MW to the separately published 20,700 MW Q3 2025 requested
-load is labelled a cross-vintage screening ratio. It is not a realization
+The Q3 2025 request quantity and the later executed-contract record are shown as
+separate source facts. AIIO does not publish their quotient because their
+vintages and project scopes differ and it could be misread as a realization
 probability or queue-conversion rate.
 
 ## Transmission boundary
@@ -40,4 +43,3 @@ the needs of larger, later, or differently located loads. AIIO therefore leaves
 the additional transmission requirement for the $50 billion counterfactual
 null. Locations, connection studies, and a system needs assessment are required
 before a physical addition can be stated.
-
