@@ -4,11 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { SpreadsheetFile, Workbook } from '@oai/artifact-tool';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const projectRoot = path.resolve(scriptDir, '..');
+const projectRoot = path.resolve(
+  process.env.AIIO_PROJECT_ROOT ?? path.join(scriptDir, '..'),
+);
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
-const previewDir = path.join(scriptDir, 'previews');
-const workbookBuildVersion = '0.7.0-dev';
+const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
+const workbookBuildVersion = '0.8.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -18,7 +20,7 @@ const release = JSON.parse(
 );
 const outputPath = path.join(
   outputDir,
-  `AIIO_Alberta_Pilot_${workbookBuildVersion}.xlsx`,
+  `AIIO_Canada_Research_${workbookBuildVersion}.xlsx`,
 );
 const costBaseline = JSON.parse(
   await fs.readFile(
@@ -120,6 +122,51 @@ const powerDefinition = JSON.parse(
     'utf8',
   ),
 );
+const provincialProjects = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'public_projects_bc_on_qc_intake_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const provincialCostBaseline = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'bc_on_qc_bcpi_reference_baseline_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const provincialPowerPlanning = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'provincial_power_planning_contract_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const digestManifest = JSON.parse(
+  await fs.readFile(
+    path.join(projectRoot, 'data', 'digests', '2026-09-01.manifest.json'),
+    'utf8',
+  ),
+);
+const currentSourceRegistry = JSON.parse(
+  await fs.readFile(
+    path.join(projectRoot, 'data', 'registry', 'sources.json'),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -141,6 +188,7 @@ const projectExposure = workbook.worksheets.add('Project Exposure');
 const powerEvidence = workbook.worksheets.add('Power Evidence');
 const costBaselineSheet = workbook.worksheets.add('Cost Baseline');
 const projectCost = workbook.worksheets.add('Project Cost Check');
+const canadaExpansion = workbook.worksheets.add('Canada Expansion');
 const sources = workbook.worksheets.add('Sources');
 const checks = workbook.worksheets.add('Release Checks');
 
@@ -180,6 +228,7 @@ for (const sheet of [
   powerEvidence,
   costBaselineSheet,
   projectCost,
+  canadaExpansion,
   sources,
   checks,
 ]) {
@@ -205,6 +254,7 @@ buildProjectExposure();
 buildPowerEvidence();
 buildCostBaseline();
 buildProjectCostCheck();
+buildCanadaExpansion();
 buildSources();
 buildReleaseChecks();
 buildDashboard();
@@ -262,12 +312,21 @@ console.log(inspectProjectCost.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D38',
+  range: 'Release Checks!A1:D42',
   include: 'values,formulas',
-  tableMaxRows: 38,
+  tableMaxRows: 42,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
+
+const inspectCanadaExpansion = await workbook.inspect({
+  kind: 'table',
+  range: 'Canada Expansion!A1:J48',
+  include: 'values,formulas',
+  tableMaxRows: 48,
+  tableMaxCols: 10,
+});
+console.log(inspectCanadaExpansion.ndjson);
 
 const errors = await workbook.inspect({
   kind: 'match',
@@ -296,8 +355,9 @@ const previewRanges = {
   'Power Evidence': 'A1:H28',
   'Cost Baseline': 'A1:P54',
   'Project Cost Check': 'A1:L38',
+  'Canada Expansion': 'A1:J48',
   Sources: 'A1:H17',
-  'Release Checks': 'A1:D38',
+  'Release Checks': 'A1:D42',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -323,7 +383,7 @@ function buildReadMe() {
   titleBand(
     readme,
     'AI Infrastructure Impact Observatory Canada',
-    `Alberta pilot workbook ${workbookBuildVersion} · public release basis ${release.manifest.version}`,
+    `Canada development workbook ${workbookBuildVersion} · public release basis ${release.manifest.version}`,
     'H',
   );
   readme.getRange('A5:H5').merge();
@@ -332,7 +392,7 @@ function buildReadMe() {
   readme.getRange('A6:H8').merge();
   readme.getRange('A6').values = [
     [
-      'This workbook is an auditable analysis component of AIIO Canada. It reproduces selected release outputs, exposes scenario assumptions and carries the internal cost-baseline validation layer. The evidence registry, analytical code and immutable artifacts remain the system of record. Cost outputs remain withheld until every required model and review gate passes.',
+      'This workbook is an auditable analysis component of AIIO Canada. It reproduces selected public-release outputs, exposes scenario assumptions and carries internal validation plus clearly gated Canada-expansion evidence. The evidence registry, analytical code and immutable artifacts remain the system of record. Research-intake sheets do not change the public release basis, and cost outputs remain withheld until every required model and review gate passes.',
     ],
   ];
   noteBlock(readme.getRange('A6:H8'));
@@ -362,7 +422,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H36').values = [
+  readme.getRange('A18:H37').values = [
     [
       '1',
       'Dashboard',
@@ -535,6 +595,16 @@ function buildReadMe() {
     ],
     [
       '18',
+      'Canada Expansion',
+      'Inspect current provincial intake summaries and the gates that keep them outside Decision Mode.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '19',
       'Sources',
       'Open authoritative public URLs and check source vintages.',
       '',
@@ -544,7 +614,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '19',
+      '20',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -554,25 +624,25 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A36').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B36').format.font = { bold: true };
-  readme.getRange('C18:H36').merge(true);
-  readme.getRange('A38:H38').merge();
-  readme.getRange('A38').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A38:H38'), C.amber);
+  readme.getRange('A18:A37').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B37').format.font = { bold: true };
+  readme.getRange('C18:H37').merge(true);
   readme.getRange('A39:H39').merge();
-  readme.getRange('A39').values = [
+  readme.getRange('A39').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A39:H39'), C.amber);
+  readme.getRange('A40:H40').merge();
+  readme.getRange('A40').values = [
     [
       'WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case and every AI-attributable cost or schedule increment remain unknown.',
     ],
   ];
-  readme.getRange('A39:H39').format = {
+  readme.getRange('A40:H40').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A39').format.rowHeight = 96;
+  readme.getRange('A40').format.rowHeight = 96;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
@@ -2564,6 +2634,270 @@ function buildProjectCostCheck() {
   );
 }
 
+function buildCanadaExpansion() {
+  titleBand(
+    canadaExpansion,
+    'Canada expansion evidence gate',
+    `Current research intake · excluded from public release basis ${release.manifest.version}`,
+    'J',
+  );
+
+  canadaExpansion.getRange('A5:B5').values = [['Control', 'Value']];
+  header(canadaExpansion.getRange('A5:B5'));
+  canadaExpansion.getRange('A6:B20').values = [
+    ['Public release basis', release.manifest.version],
+    ['Project intake ID', provincialProjects.transformation_id],
+    [
+      'Project exposure authorized',
+      provincialProjects.publication_boundary.public_project_exposure_authorized
+        ? 'YES'
+        : 'NO',
+    ],
+    ['Normalized project records', provincialProjects.record_count],
+    ['Provincial BCPI model ID', provincialCostBaseline.model_id],
+    [
+      'Provincial BCPI horizon results',
+      provincialCostBaseline.publication_summary.horizon_result_count,
+    ],
+    [
+      'Provincial projections authorized',
+      provincialCostBaseline.publication_authorization
+        .public_projection_authorized
+        ? 'YES'
+        : 'NO',
+    ],
+    ['Power-planning contract ID', provincialPowerPlanning.model_id],
+    ['Power-planning metrics', provincialPowerPlanning.metric_count],
+    [
+      'Named transmission actions',
+      provincialPowerPlanning.transmission_action_count,
+    ],
+    [
+      'Power profile authorized',
+      provincialPowerPlanning.publication_boundary
+        .provincial_power_profile_authorized
+        ? 'YES'
+        : 'NO',
+    ],
+    ['Digest ID', digestManifest.digest_id],
+    ['Digest edition (UTC)', new Date(`${digestManifest.edition_date}T00:00:00Z`)],
+    ['Digest items', digestManifest.item_count],
+    ['Automatic model change', digestManifest.automatic_model_change ? 'YES' : 'NO'],
+  ];
+  canadaExpansion.getRange('A6:A20').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  canadaExpansion.getRange('B6:B20').format = {
+    fill: C.white,
+    font: { color: C.ink },
+    borders: { preset: 'inside', style: 'thin', color: C.line },
+  };
+  canadaExpansion.getRange('B18').format.numberFormat = 'yyyy-mm-dd';
+  for (const cell of ['B8', 'B12', 'B16', 'B20']) {
+    canadaExpansion.getRange(cell).format = {
+      fill: C.amberLight,
+      font: { bold: true, color: '#8A4826' },
+      borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+    };
+  }
+
+  canadaExpansion.getRange('D5:J5').merge();
+  canadaExpansion.getRange('D5').values = [['Interpretation boundary']];
+  sectionHeader(canadaExpansion.getRange('D5:J5'), C.amber);
+  canadaExpansion.getRange('D6:J9').merge();
+  canadaExpansion.getRange('D6').values = [
+    [
+      'PUBLIC PROJECTS — RESEARCH INTAKE ONLY. B.C., Ontario and Quebec source inventories differ in scope, vintage, threshold and schedule completeness. Counts support source audit; they do not authorize pooled exposure, cost totals, delay estimates or AI-attributable escalation.',
+    ],
+  ];
+  noteBlock(canadaExpansion.getRange('D6:J9'));
+  canadaExpansion.getRange('D11:J14').merge();
+  canadaExpansion.getRange('D11').values = [
+    [
+      'PROVINCIAL COST REFERENCE — NOT ASSESSED. All 60 one- through five-year horizon checks remain null under the locked validation protocol. No Alberta coefficient, model choice or error band is transferred to another province.',
+    ],
+  ];
+  noteBlock(canadaExpansion.getRange('D11:J14'));
+  canadaExpansion.getRange('D16:J20').merge();
+  canadaExpansion.getRange('D16').values = [
+    [
+      'POWER + DIGEST — SOURCE CONTRACT ONLY. Ontario energy, Quebec peak demand and B.C. plan actions remain separate quantities. The digest can flag review candidates but cannot change the graph, scenarios, baselines, workbook publication basis or Decision Mode.',
+    ],
+  ];
+  noteBlock(canadaExpansion.getRange('D16:J20'));
+
+  canadaExpansion.getRange('A23:G23').values = [
+    [
+      'Geography',
+      'Source ID',
+      'Raw records',
+      'Normalized',
+      'Reported cost',
+      'Complete schedule',
+      'Gate',
+    ],
+  ];
+  header(canadaExpansion.getRange('A23:G23'));
+  const projectRows = provincialProjects.source_diagnostics.map((item) => [
+    provinceLabel(item.geography_id),
+    item.source_id,
+    item.raw_record_count,
+    item.normalized_record_count,
+    item.reported_cost_record_count,
+    item.complete_schedule_record_count,
+    'RESEARCH ONLY',
+  ]);
+  canadaExpansion.getRange('A24:G26').values = projectRows;
+  canadaExpansion.getRange('C24:F26').format.numberFormat = '#,##0';
+  canadaExpansion.getRange('G24:G26').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+  };
+
+  const bcpiSummary = new Map();
+  for (const item of provincialCostBaseline.reference_class_results) {
+    const summary = bcpiSummary.get(item.geography_id) ?? {
+      geography_id: item.geography_id,
+      series: 0,
+      horizons: 0,
+      notAssessed: 0,
+      latestPeriod: item.latest_period_end,
+    };
+    summary.series += 1;
+    summary.horizons += item.horizons.length;
+    summary.notAssessed += item.horizons.filter(
+      (horizon) => horizon.status === 'not_assessed',
+    ).length;
+    bcpiSummary.set(item.geography_id, summary);
+  }
+  canadaExpansion.getRange('A29:G29').values = [
+    [
+      'Geography',
+      'Reference series',
+      'Horizon results',
+      'Not assessed',
+      'Latest quarter',
+      'Unit',
+      'Gate',
+    ],
+  ];
+  header(canadaExpansion.getRange('A29:G29'));
+  canadaExpansion.getRange('A30:G32').values = [...bcpiSummary.values()]
+    .sort((a, b) => a.geography_id.localeCompare(b.geography_id))
+    .map((item) => [
+      provinceLabel(item.geography_id),
+      item.series,
+      item.horizons,
+      item.notAssessed,
+      new Date(`${item.latestPeriod}T00:00:00Z`),
+      'Index, 2023=100',
+      'WITHHELD',
+    ]);
+  canadaExpansion.getRange('B30:D32').format.numberFormat = '#,##0';
+  canadaExpansion.getRange('E30:E32').format.numberFormat = 'yyyy-mm-dd';
+  canadaExpansion.getRange('G30:G32').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+  };
+
+  canadaExpansion.getRange('A35:G35').values = [
+    [
+      'Geography',
+      'Metric count',
+      'Quantity types',
+      'Review status',
+      'Comparison',
+      'Scenario calibration',
+      'Transmission requirement',
+    ],
+  ];
+  header(canadaExpansion.getRange('A35:G35'));
+  canadaExpansion.getRange('A36:G38').values = Object.entries(
+    provincialPowerPlanning.coverage,
+  )
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([geographyId, item]) => [
+      provinceLabel(geographyId),
+      item.metric_count,
+      item.quantity_types.map(labelize).join('; '),
+      provincialPowerPlanning.review_status,
+      'SOURCE-SPECIFIC',
+      'NO',
+      'NO',
+    ]);
+  canadaExpansion.getRange('B36:B38').format.numberFormat = '#,##0';
+  canadaExpansion.getRange('E36:G38').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+  };
+
+  const sourceById = new Map(
+    currentSourceRegistry.sources.map((item) => [item.source_id, item]),
+  );
+  const sourceRows = digestManifest.source_ids.map((sourceId) => {
+    const item = sourceById.get(sourceId);
+    return [sourceId, item?.geography ?? 'Unknown', item?.canonical_url ?? ''];
+  });
+  canadaExpansion.getRange('H23:J23').values = [
+    ['Digest source ID', 'Publisher geography', 'Canonical URL'],
+  ];
+  header(canadaExpansion.getRange('H23:J23'));
+  canadaExpansion.getRange('H24:J32').values = sourceRows;
+  canadaExpansion.getRange('H24:H32').format.font = {
+    name: 'Aptos Mono',
+    size: 8,
+    color: C.tealDark,
+  };
+  canadaExpansion.getRange('J24:J32').format.font = {
+    size: 8,
+    color: C.blueInput,
+  };
+
+  canadaExpansion.getRange('A41:J41').merge();
+  canadaExpansion.getRange('A41').values = [['Publication boundary']];
+  sectionHeader(canadaExpansion.getRange('A41:J41'), C.amber);
+  canadaExpansion.getRange('A42:J46').merge();
+  canadaExpansion.getRange('A42').values = [
+    [
+      'This sheet documents current research readiness, not provincial performance. It is deliberately outside the public release manifest. None of these intake artifacts can populate Decision Mode, create a provincial forecast, convert capital expenditure to transmission capacity, or change a model parameter until the relevant independent review and versioned release gates pass.',
+    ],
+  ];
+  canadaExpansion.getRange('A42:J46').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  canadaExpansion.getRange('A48:J48').merge();
+  canadaExpansion.getRange('A48').values = [
+    [
+      `Digest hash: ${digestManifest.markdown_sha256} · source registry hash: ${digestManifest.source_registry_sha256}`,
+    ],
+  ];
+  canadaExpansion.getRange('A48').format = {
+    font: { name: 'Aptos Mono', size: 8, color: C.muted },
+  };
+  canadaExpansion.freezePanes.freezeRows(4);
+  setWidths(
+    canadaExpansion,
+    {
+      A: 25,
+      B: 34,
+      C: 16,
+      D: 18,
+      E: 18,
+      F: 20,
+      G: 21,
+      H: 32,
+      I: 27,
+      J: 48,
+    },
+    48,
+  );
+}
+
 function buildSources() {
   titleBand(
     sources,
@@ -2656,8 +2990,12 @@ function buildReleaseChecks() {
     ['Cost-baseline gate rows reconcile to the model artifact', 'PASS'],
     ['Public cost projection remains unauthorized', 'PASS'],
     ['Default project-cost result fails closed with blank outputs', 'PASS'],
+    ['Provincial project exposure remains unauthorized', 'PASS'],
+    ['Provincial BCPI projections remain unauthorized', 'PASS'],
+    ['Provincial power profile remains unauthorized', 'PASS'],
+    ['Weekly digest cannot change the model automatically', 'PASS'],
   ];
-  checks.getRange('A16:C32').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C36').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -2758,22 +3096,34 @@ function buildReleaseChecks() {
       '=IF(AND(LEFT(\'Project Cost Check\'!B26,8)="WITHHELD",\'Project Cost Check\'!B29="",\'Project Cost Check\'!B30=""),"PASS","FAIL")',
     ],
   ];
-  checks.getRange('B16:B32').conditionalFormats.add('containsText', {
+  checks.getRange('B33').formulas = [
+    ['=IF(\'Canada Expansion\'!B8="NO","PASS","FAIL")'],
+  ];
+  checks.getRange('B34').formulas = [
+    ['=IF(\'Canada Expansion\'!B12="NO","PASS","FAIL")'],
+  ];
+  checks.getRange('B35').formulas = [
+    ['=IF(\'Canada Expansion\'!B16="NO","PASS","FAIL")'],
+  ];
+  checks.getRange('B36').formulas = [
+    ['=IF(\'Canada Expansion\'!B20="NO","PASS","FAIL")'],
+  ];
+  checks.getRange('B16:B36').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B32').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B36').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A35:D37').merge();
-  checks.getRange('A35').values = [
+  checks.getRange('A39:D41').merge();
+  checks.getRange('A39').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A35:D37'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 38);
+  noteBlock(checks.getRange('A39:D41'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 42);
 }
 
 function buildDashboard() {
@@ -3046,6 +3396,17 @@ function labelize(value) {
   return value
     .replaceAll('_', ' ')
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function provinceLabel(geographyId) {
+  return (
+    {
+      PR_24: 'Quebec',
+      PR_35: 'Ontario',
+      PR_48: 'Alberta',
+      PR_59: 'British Columbia',
+    }[geographyId] ?? geographyId
+  );
 }
 
 function tradeLabel(nodeId) {
