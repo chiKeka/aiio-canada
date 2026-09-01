@@ -58,6 +58,7 @@ npm run digest:build
 npm run digest:audit
 npm run program:audit
 npm run attribution:readiness
+npm run attribution:preflight
 npm run treatment:capex-screen
 npm run treatment:announcement-ledger
 npm run bcpi:normalize:reference-cmas

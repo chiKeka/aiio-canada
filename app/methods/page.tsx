@@ -16,6 +16,7 @@ import cmaReferenceBaseline from '@/data/model-runs/vancouver_toronto_montreal_b
 import regionalMacroControls from '@/data/model-runs/regional_macro_controls_canada_v0.1.json';
 import provinceLinkedBaseline from '@/data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json';
 import aiCapexLedger from '@/data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json';
+import panelPreflight from '@/data/model-runs/ai_attribution_panel_preflight_v0.1.json';
 
 const methodSteps = [
   [
@@ -91,6 +92,31 @@ export default function MethodsPage() {
               <p className="mt-2 text-sm leading-6 text-[#52645f]">{text}</p>
             </article>
           ))}
+        </div>
+      </section>
+      <section className="border-y border-[#b8cbd4] bg-[#edf3f5]">
+        <div className="mx-auto grid max-w-[1440px] gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[.8fr_1.2fr] lg:px-12">
+          <div>
+            <div className="flex items-center gap-2 text-[#365d6d]">
+              <GitBranch className="size-4" />
+              <span className="font-mono text-xs uppercase tracking-[0.14em]">E2 panel acquisition preflight</span>
+            </div>
+            <h2 className="mt-4 text-2xl font-medium tracking-[-0.025em]">Scope can be planned before evidence is eligible.</h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-[#526b76]">The preflight binds ten evidence receipts to five candidate CMAs and every locked treatment/outcome field. It creates no partial observations and runs no estimator.</p>
+          </div>
+          <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              ['Candidate CMAs', panelPreflight.candidate_scope.region_count],
+              ['Asset classes', panelPreflight.candidate_scope.asset_class_count],
+              ['Fields queued', panelPreflight.field_gap_summary.required_field_instance_count],
+              ['Eligible panel rows', panelPreflight.current_eligibility.assembled_panel_row_count],
+            ].map(([label, value]) => (
+              <div className="rounded-lg border border-[#c5d4da] bg-white p-4" key={label}>
+                <dt className="text-xs text-[#5d7078]">{label}</dt>
+                <dd className="mt-2 font-mono text-2xl text-[#234e5d]">{value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
       <section className="border-y border-[#dfb18d] bg-[#fff1e5]">
@@ -195,6 +221,7 @@ export default function MethodsPage() {
               'Historical index envelopes are descriptive; predictive and causal calibration remain gated.',
               'Historical project analogs preserve complete past trajectories; their dollar equivalents are stress tests, not forecasts or AI premiums.',
               'The AI-capex ledger tracks reported estimates and publisher stages without stage weighting; zero records currently authorize realized treatment onset or dose.',
+              'The panel preflight assigns all 27 authorizing field instances to acquisition tasks but assembles zero rows until every required treatment and outcome gate passes.',
             ].map((item) => (
               <div
                 className="flex gap-3 rounded-lg border border-white/10 bg-white/4 p-4 text-sm leading-5 text-[#d6e1e4]"

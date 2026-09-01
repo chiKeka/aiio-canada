@@ -243,8 +243,8 @@
   pointer-events: none;
   content: '';
   background-image:
-    linear-gradient(rgba(115, 255, 185, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(115, 255, 185, 0.055) 1px, transparent 1px);
+    linear-gradient(rgba(33, 88, 84, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(33, 88, 84, 0.055) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: linear-gradient(to bottom, black, transparent 92%);
 }

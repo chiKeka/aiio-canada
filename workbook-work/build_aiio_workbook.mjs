@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.24.0-dev';
+const workbookBuildVersion = '0.25.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -196,6 +196,17 @@ const attributionContract = JSON.parse(
       'data',
       'model',
       'ai_attribution_panel_contract_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const attributionPanelPreflight = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'ai_attribution_panel_preflight_v0.1.json',
     ),
     'utf8',
   ),
@@ -500,6 +511,7 @@ const provinceBridgeSheet = workbook.worksheets.add('Province Bridge');
 const projectCost = workbook.worksheets.add('Project Cost Check');
 const canadaExpansion = workbook.worksheets.add('Canada Expansion');
 const attributionGate = workbook.worksheets.add('Attribution Gate');
+const panelPreflightSheet = workbook.worksheets.add('Panel Preflight');
 const investmentControls = workbook.worksheets.add('Investment Controls');
 const regionalMacro = workbook.worksheets.add('Regional Macro');
 const procurementIntake = workbook.worksheets.add('Procurement Intake');
@@ -555,6 +567,7 @@ for (const sheet of [
   projectCost,
   canadaExpansion,
   attributionGate,
+  panelPreflightSheet,
   investmentControls,
   regionalMacro,
   procurementIntake,
@@ -596,6 +609,7 @@ buildProvinceBridge();
 buildProjectCostCheck();
 buildCanadaExpansion();
 buildAttributionGate();
+buildPanelPreflight();
 buildInvestmentControls();
 buildRegionalMacro();
 buildProcurementIntake();
@@ -650,9 +664,9 @@ console.log(inspectDashboard.ndjson);
 
 const inspectReadMe = await workbook.inspect({
   kind: 'table',
-  range: 'Read Me!A1:H56',
+  range: 'Read Me!A1:H57',
   include: 'values,formulas',
-  tableMaxRows: 56,
+  tableMaxRows: 57,
   tableMaxCols: 8,
 });
 console.log(inspectReadMe.ndjson);
@@ -668,12 +682,21 @@ console.log(inspectProjectCost.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D57',
+  range: 'Release Checks!A1:D58',
   include: 'values,formulas',
-  tableMaxRows: 54,
+  tableMaxRows: 58,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
+
+const inspectPanelPreflight = await workbook.inspect({
+  kind: 'table',
+  range: 'Panel Preflight!A1:J45',
+  include: 'values,formulas',
+  tableMaxRows: 45,
+  tableMaxCols: 10,
+});
+console.log(inspectPanelPreflight.ndjson);
 
 const inspectScenarioVariants = await workbook.inspect({
   kind: 'table',
@@ -828,7 +851,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H56',
+  'Read Me': 'A1:H57',
   Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -855,6 +878,7 @@ const previewRanges = {
   'Project Cost Check': 'A1:L38',
   'Canada Expansion': 'A1:J48',
   'Attribution Gate': 'A1:J48',
+  'Panel Preflight': 'A1:J45',
   'Investment Controls': 'A1:R28',
   'Regional Macro': 'A1:S28',
   'Procurement Intake': 'A1:X28',
@@ -863,7 +887,7 @@ const previewRanges = {
   'Quebec Revisions': 'A1:R38',
   'Quebec Vintages': 'A1:V42',
   Sources: 'A1:J42',
-  'Release Checks': 'A1:D57',
+  'Release Checks': 'A1:D58',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -928,7 +952,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H52').values = [
+  readme.getRange('A18:H53').values = [
     [
       '1',
       'Dashboard',
@@ -1279,30 +1303,40 @@ function buildReadMe() {
       '',
       '',
     ],
+    [
+      '36',
+      'Panel Preflight',
+      'Inspect the operational acquisition queue, candidate CMA scope, hash-locked evidence receipts and the zero-row estimation boundary.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
   ];
-  readme.getRange('A18:A52').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B52').format.font = { bold: true };
-  readme.getRange('C18:H52').merge(true);
-  readme.getRange('A54:H54').merge();
-  readme.getRange('A54').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A54:H54'), C.amber);
+  readme.getRange('A18:A53').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B53').format.font = { bold: true };
+  readme.getRange('C18:H53').merge(true);
   readme.getRange('A55:H55').merge();
-  readme.getRange('A55').values = [
+  readme.getRange('A55').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A55:H55'), C.amber);
+  readme.getRange('A56:H56').merge();
+  readme.getRange('A56').values = [
     [
       `WITHHELD FORECAST + UNCALIBRATED AI DIAGNOSTIC. Only 1 of 40 Alberta asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The CMA expansion adds 60 Vancouver, Toronto and Montréal horizon checks: 9 pass internally, 36 fail and 15 are not assessed. The Province Bridge transparently relabels 1,296 pre-2017 CMA-linked values as inferred, preserves 456 official provincial observations and reproduces the same nine internal British Columbia-linked passes; none is an official pre-2017 province observation or an authorized projection. The ${referenceCostReview.required_criteria.length}-criterion Alberta review packet is prepared but has no verdict, and both reviewer channels remain blocked. No forward project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only. The Historical Analog sheet adds ${historicalAnalogMatrix.reference_class_results.reduce((total, item) => total + item.grid.length, 0)} coherent-path schedule combinations and may translate an explicitly confirmed price-basis estimate only as a historical what-if; its markers are not probabilities, forecasts, recommended allowances or AI premiums. The NAICS 51 Sector Capex screen adds ${informationSectorCapex.observation_count} annual Canada/province cells and reports Alberta 2024 actual/revised construction capital of $458.6M, but ${informationSectorCapex.quality_flag_counts.suppressed_confidentiality} cells are suppressed and the broad industry cannot identify AI/data-centre treatment. The Regional Macro sheet adds ${regionalMacroReport.series_count} separate quarterly control series through ${regionalMacroReport.common_latest_period_end}; they are descriptive context, not a composite score, scenario calibration or AI effect. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
     ],
   ];
-  readme.getRange('A55:H55').format = {
+  readme.getRange('A56:H56').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A55').format.rowHeight = 260;
+  readme.getRange('A56').format.rowHeight = 280;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
-    56,
+    57,
   );
 }
 
@@ -5288,6 +5322,212 @@ function buildAttributionGate() {
   );
 }
 
+function buildPanelPreflight() {
+  titleBand(
+    panelPreflightSheet,
+    'AI-attribution panel acquisition preflight',
+    'Candidate scope, evidence receipts and field-complete acquisition queue · zero-row fail-closed boundary',
+    'J',
+  );
+
+  const cards = [
+    ['A5:B5', 'A6:B8', 'Candidate CMAs', '=COUNTA(A14:A18)'],
+    ['C5:D5', 'C6:D8', 'Potential treated', '=COUNTIF(D14:D18,"potential_treated")'],
+    ['E5:F5', 'E6:F8', 'Potential controls', '=COUNTIF(D14:D18,"potential_control")'],
+    ['G5:H5', 'G6:H8', 'Fields queued', '=SUM(E22:E25)'],
+    ['I5:J5', 'I6:J8', 'Assembled panel rows', `=${attributionPanelPreflight.current_eligibility.assembled_panel_row_count}`],
+  ];
+  for (const [labelRange, valueRange, label, formula] of cards) {
+    card(panelPreflightSheet, labelRange, valueRange, label, formula);
+  }
+  panelPreflightSheet.getRange('A10:J10').merge();
+  panelPreflightSheet.getRange('A10').values = [[
+    `Eligibility now: ${attributionPanelPreflight.current_eligibility.authorizing_treated_region_count} authorizing treated regions · ${attributionPanelPreflight.current_eligibility.eligible_control_region_count} eligible controls · ${attributionPanelPreflight.current_eligibility.eligible_asset_class_count} eligible asset classes · effect estimation ${attributionPanelPreflight.publication_boundary.effect_estimation_authorized ? 'AUTHORIZED' : 'NOT AUTHORIZED'}. Candidate scope never confers eligibility.`,
+  ]];
+  panelPreflightSheet.getRange('A10:J10').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  panelPreflightSheet.getRange('A10').format.rowHeight = 38;
+
+  panelPreflightSheet.getRange('A12:H12').merge();
+  panelPreflightSheet.getRange('A12').values = [['Candidate geography frame']];
+  sectionHeader(panelPreflightSheet.getRange('A12:H12'));
+  panelPreflightSheet.getRange('A13:D13').values = [[
+    'Geography ID',
+    'Geography',
+    'Province ID',
+    'Cohort role',
+  ]];
+  header(panelPreflightSheet.getRange('A13:D13'));
+  const candidateRegionRows = attributionPanelPreflight.candidate_scope.regions.map((region) => [
+    region.geography_id,
+    region.geography_label,
+    region.province_id,
+    region.cohort_role,
+  ]);
+  panelPreflightSheet.getRange('A14:D18').values = candidateRegionRows;
+  panelPreflightSheet.getRange('A14:D18').format = {
+    fill: C.white,
+    font: { color: C.ink, size: 9 },
+    borders: { insideHorizontal: { style: 'thin', color: C.line }, bottom: { style: 'thin', color: C.line } },
+  };
+  panelPreflightSheet.getRange('D14:D18').conditionalFormats.add('containsText', {
+    text: 'potential_treated',
+    format: { fill: C.amberLight, font: { color: '#8A4826', bold: true } },
+  });
+  panelPreflightSheet.getRange('D14:D18').conditionalFormats.add('containsText', {
+    text: 'potential_control',
+    format: { fill: '#EAF1F4', font: { color: '#365D6D', bold: true } },
+  });
+  const candidateTable = panelPreflightSheet.tables.add('A13:D18', true, 'PanelCandidateRegions');
+  candidateTable.style = 'TableStyleLight9';
+
+  panelPreflightSheet.getRange('F12:J12').merge();
+  panelPreflightSheet.getRange('F12').values = [['Candidate asset-class frame · not eligibility']];
+  sectionHeader(panelPreflightSheet.getRange('F12:J12'), C.teal);
+  panelPreflightSheet.getRange('F13:J18').merge();
+  panelPreflightSheet.getRange('F13').values = [[
+    `${attributionPanelPreflight.candidate_scope.asset_class_count} candidate classes: ${attributionPanelPreflight.candidate_scope.asset_classes.map(labelize).join('; ')}. The design minimum is ${attributionPanelPreflight.design_thresholds.minimum_asset_classes}; the current eligible count is ${attributionPanelPreflight.current_eligibility.eligible_asset_class_count}. ${attributionPanelPreflight.panel_assembly.reason}`,
+  ]];
+  noteBlock(panelPreflightSheet.getRange('F13:J18'));
+
+  panelPreflightSheet.getRange('A20:J20').merge();
+  panelPreflightSheet.getRange('A20').values = [['Operational acquisition queue']];
+  sectionHeader(panelPreflightSheet.getRange('A20:J20'));
+  panelPreflightSheet.getRange('A21:I21').values = [[
+    'Task ID',
+    'Priority',
+    'Domain',
+    'Required fields',
+    'Field count',
+    'Minimum geographies',
+    'Frequency',
+    'Current status',
+    'Completion rule / candidate sources',
+  ]];
+  header(panelPreflightSheet.getRange('A21:I21'));
+  const queueRows = attributionPanelPreflight.acquisition_queue.map((task) => [
+    task.task_id,
+    task.priority,
+    task.domain_id,
+    task.required_fields.join('; '),
+    task.required_fields.length,
+    task.minimum_geography_count,
+    task.minimum_frequency,
+    task.current_status,
+    `${task.completion_rule} Sources: ${task.candidate_source_ids.join('; ')}.`,
+  ]);
+  panelPreflightSheet.getRange('A22:I25').values = queueRows;
+  panelPreflightSheet.getRange('A22:I25').format = {
+    fill: C.white,
+    font: { color: C.ink, size: 8 },
+    wrapText: true,
+    verticalAlignment: 'top',
+    borders: { insideHorizontal: { style: 'thin', color: C.line }, bottom: { style: 'thin', color: C.line } },
+  };
+  panelPreflightSheet.getRange('A22:C25').format.font = { bold: true, color: C.ink, size: 8 };
+  panelPreflightSheet.getRange('H22:H25').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826', size: 8 },
+    wrapText: true,
+  };
+  panelPreflightSheet.getRange('A22:I25').format.rowHeight = 72;
+  const queueTable = panelPreflightSheet.tables.add('A21:I25', true, 'PanelAcquisitionQueue');
+  queueTable.style = 'TableStyleLight9';
+
+  panelPreflightSheet.getRange('A27:J27').merge();
+  panelPreflightSheet.getRange('A27').values = [['Hash-locked evidence receipts · none authorizing']];
+  sectionHeader(panelPreflightSheet.getRange('A27:J27'), C.teal);
+  panelPreflightSheet.getRange('A28:J28').values = [[
+    'Receipt ID',
+    'Domain',
+    'Geographies',
+    'Evidence status',
+    'Authorizing status',
+    'Variables',
+    'Source IDs',
+    'Assertions',
+    'Artifact path',
+    'Artifact SHA-256',
+  ]];
+  header(panelPreflightSheet.getRange('A28:J28'));
+  const receiptRows = attributionPanelPreflight.evidence_receipts.map((receipt) => [
+    receipt.receipt_id,
+    receipt.domain_id,
+    receipt.geography_ids.join('; '),
+    receipt.evidence_status,
+    receipt.authorizing_status,
+    receipt.available_variables.join('; '),
+    receipt.source_ids.join('; '),
+    `${receipt.assertion_count}/${receipt.assertion_count} ${receipt.assertions_passed ? 'PASS' : 'FAIL'}`,
+    receipt.artifact_path,
+    receipt.artifact_sha256,
+  ]);
+  panelPreflightSheet.getRange('A29:J38').values = receiptRows;
+  panelPreflightSheet.getRange('A29:J38').format = {
+    fill: C.white,
+    font: { color: C.ink, size: 8 },
+    wrapText: true,
+    verticalAlignment: 'top',
+    borders: { insideHorizontal: { style: 'thin', color: C.line }, bottom: { style: 'thin', color: C.line } },
+  };
+  panelPreflightSheet.getRange('A29:B38').format.font = { bold: true, color: C.ink, size: 8 };
+  panelPreflightSheet.getRange('E29:E38').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826', size: 8 },
+  };
+  panelPreflightSheet.getRange('H29:H38').conditionalFormats.add('containsText', {
+    text: 'PASS',
+    format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+  });
+  panelPreflightSheet.getRange('A29:J38').format.rowHeight = 58;
+  const receiptTable = panelPreflightSheet.tables.add('A28:J38', true, 'PanelEvidenceReceipts');
+  receiptTable.style = 'TableStyleLight9';
+
+  panelPreflightSheet.getRange('A40:J40').merge();
+  panelPreflightSheet.getRange('A40').values = [['PSPE and publication boundary']];
+  sectionHeader(panelPreflightSheet.getRange('A40:J40'), C.amber);
+  panelPreflightSheet.getRange('A41:J44').merge();
+  panelPreflightSheet.getRange('A41').values = [[
+    `${attributionPanelPreflight.pspe_role} Every ${attributionPanelPreflight.field_gap_summary.required_field_instance_count} locked field instance is assigned to an acquisition task, but ${attributionPanelPreflight.field_gap_summary.complete_authorizing_scope_count} authorizing scopes are complete and ${attributionPanelPreflight.current_eligibility.assembled_panel_row_count} panel rows are assembled. Cost escalation and schedule-delay effects remain null.`,
+  ]];
+  panelPreflightSheet.getRange('A41:J44').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  panelPreflightSheet.getRange('A45:J45').merge();
+  panelPreflightSheet.getRange('A45').values = [[
+    `Preflight ${attributionPanelPreflight.preflight_id} · contract ${attributionPanelPreflight.contract_id} · evidence status ${attributionPanelPreflight.evidence_status}`,
+  ]];
+  panelPreflightSheet.getRange('A45').format = {
+    font: { name: 'Aptos Mono', size: 8, color: C.muted },
+  };
+  panelPreflightSheet.freezePanes.freezeRows(4);
+  setWidths(
+    panelPreflightSheet,
+    {
+      A: 31,
+      B: 16,
+      C: 31,
+      D: 46,
+      E: 15,
+      F: 18,
+      G: 38,
+      H: 28,
+      I: 68,
+      J: 66,
+    },
+    45,
+  );
+}
+
 function buildInvestmentControls() {
   titleBand(
     investmentControls,
@@ -6996,8 +7236,9 @@ function buildReleaseChecks() {
     ['Province-linked BCPI bridge reconciles and remains non-authorizing', 'PASS'],
     ['Historical project analogs reconcile and remain non-forecasting', 'PASS'],
     ['AI-capex announcement ledger reconciles and remains non-authorizing', 'PASS'],
+    ['Attribution panel preflight reconciles and assembles zero ineligible rows', 'PASS'],
   ];
-  checks.getRange('A16:C52').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C53').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -7196,22 +7437,25 @@ function buildReleaseChecks() {
   checks.getRange('B52').formulas = [[
     '=IF(AND(COUNTIF(\'AI Projects\'!$AC$6:$AC$16,"PASS")=11,\'AI Projects\'!AA16="NO"),"PASS","FAIL")',
   ]];
-  checks.getRange('B16:B52').conditionalFormats.add('containsText', {
+  checks.getRange('B53').formulas = [[
+    '=IF(AND(\'Panel Preflight\'!A6=5,\'Panel Preflight\'!C6=2,\'Panel Preflight\'!E6=3,\'Panel Preflight\'!G6=27,\'Panel Preflight\'!I6=0,COUNTA(\'Panel Preflight\'!$A$22:$A$25)=4,COUNTA(\'Panel Preflight\'!$A$29:$A$38)=10,COUNTIF(\'Panel Preflight\'!$E$29:$E$38,"non_authorizing")=9,COUNTIF(\'Panel Preflight\'!$E$29:$E$38,"control_only")=1),"PASS","FAIL")',
+  ]];
+  checks.getRange('B16:B53').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B52').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B53').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A54:D56').merge();
-  checks.getRange('A54').values = [
+  checks.getRange('A55:D57').merge();
+  checks.getRange('A55').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A54:D56'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 57);
+  noteBlock(checks.getRange('A55:D57'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 58);
 }
 
 function buildDashboard() {

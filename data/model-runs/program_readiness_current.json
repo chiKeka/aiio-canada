@@ -235,9 +235,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.24.0-dev.xlsx",
-        "workbook_sha256=sha256:c090d96823c73f8937c9fa8d29c121f8208cf3d980a16ecb65c74fa8c084dcaf",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.24.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.25.0-dev.xlsx",
+        "workbook_sha256=sha256:199f3f4a144f0aafa5a1f3dfb88dd8c6d657bc71318f665a8663710e7a4209c4",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.25.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",
@@ -329,6 +329,20 @@
       "summary": "The E2 treatment/outcome panel contract and fail-closed identification-readiness pipeline are implemented."
     },
     {
+      "category": "research_design",
+      "check_id": "attribution_panel_acquisition_preflight",
+      "evidence": [
+        "data/model/ai_attribution_panel_contract_v0.1.json",
+        "data/model/ai_attribution_panel_acquisition_contract_v0.1.json",
+        "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
+        "research/src/aiio/panel_preflight.py",
+        "docs/methodology/ai-attribution-panel-acquisition.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The hash-locked E2 preflight covers five candidate regions, three public asset classes, ten evidence receipts and all 27 authorizing field instances while assembling zero ineligible panel rows."
+    },
+    {
       "category": "decision_grade_outputs",
       "check_id": "ai_attributable_cost_schedule_effect",
       "evidence": [
@@ -418,7 +432,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 26,
+    "pass": 27,
     "pending": 3
   },
   "structural_integrity": true

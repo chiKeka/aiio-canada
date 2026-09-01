@@ -184,6 +184,21 @@ realized construction evidence exists. Missing reported estimates are not zero,
 enabling power remains separate, and no probability or stage weighting is
 permitted.
 
+## AI-attribution acquisition preflight
+
+The acquisition contract defines `candidate_regions`, `target_asset_classes`,
+`evidence_receipts`, `acquisition_tasks` and `prohibited_shortcuts`. Every
+receipt requires `receipt_id`, `domain_id`, `geography_ids`, `source_ids`,
+`artifact_path`, `evidence_status`, `authorizing_status`,
+`available_variables` and exact artifact `assertions`.
+
+The preflight publishes `design_thresholds`, `candidate_scope`,
+`current_eligibility`, `field_gap_summary`, `scope_coverage`, hash-locked
+`evidence_receipts`, the `acquisition_queue`, `panel_assembly` and a fail-closed
+`publication_boundary`. Candidate regions and fields are planning scope only;
+eligible counts and assembled rows remain zero until authorizing evidence is
+verified.
+
 ## Information-sector construction-capex screen
 
 Required observation fields: `observation_id`, `geography_id`,

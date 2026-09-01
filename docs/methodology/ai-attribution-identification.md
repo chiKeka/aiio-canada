@@ -101,6 +101,13 @@ AI-construction treatment plus a reusable set of comparable estimate-to-outturn
 and baseline-to-actual outcomes. That is why E2 remains `not_assessed` rather
 than being estimated from announcements or isolated project histories.
 
+The operational acquisition preflight is documented in
+`docs/methodology/ai-attribution-panel-acquisition.md`. It maps ten hash-locked
+evidence receipts to five candidate CMAs, three public asset classes and all 27
+authorizing field instances. The candidate scope is sufficient for planning but
+not eligibility: the preflight assembles zero panel rows until treatment and
+outcome gates pass.
+
 The detailed CanadaBuys transformation, field-coverage counts and publication
 boundary are documented in
 `docs/methodology/canadabuys-procurement-outcome-intake.md`.

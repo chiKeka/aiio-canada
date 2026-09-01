@@ -49,6 +49,7 @@
     "program:audit": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-program-readiness",
     "program:audit:release": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-program-readiness --require-release-ready",
     "attribution:readiness": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-attribution-readiness data/model/ai_attribution_panel_contract_v0.1.json data/model-runs/ai_attribution_identification_readiness_v0.1.json",
+    "attribution:preflight": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-panel-acquisition-preflight data/model/ai_attribution_panel_contract_v0.1.json data/model/ai_attribution_panel_acquisition_contract_v0.1.json data/model-runs/ai_attribution_panel_preflight_v0.1.json",
     "fetch:canadabuys:tenders": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch CANADABUYS_TENDER_NOTICES_FY2026_2027",
     "fetch:canadabuys:awards": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch CANADABUYS_AWARD_NOTICES_FY2026_2027",
     "fetch:canadabuys:contracts": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch CANADABUYS_CONTRACT_HISTORY_FY2026_2027",

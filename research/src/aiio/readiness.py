@@ -1020,6 +1020,87 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    panel_acquisition_contract_path = (
+        root / "data/model/ai_attribution_panel_acquisition_contract_v0.1.json"
+    )
+    panel_preflight_path = (
+        root / "data/model-runs/ai_attribution_panel_preflight_v0.1.json"
+    )
+    panel_preflight = load_json_or_empty(panel_preflight_path)
+    panel_input_manifest = panel_preflight.get("input_manifest", {})
+    panel_candidate_scope = panel_preflight.get("candidate_scope", {})
+    panel_eligibility = panel_preflight.get("current_eligibility", {})
+    panel_field_gaps = panel_preflight.get("field_gap_summary", {})
+    panel_boundary = panel_preflight.get("publication_boundary", {})
+    panel_receipts = panel_preflight.get("evidence_receipts", [])
+    panel_artifact_manifest = panel_input_manifest.get(
+        "evidence_artifact_sha256", {}
+    )
+    panel_artifact_hashes_reconcile = bool(panel_artifact_manifest) and all(
+        (root / relative_path).is_file()
+        and expected_sha == sha256_file(root / relative_path).removeprefix("sha256:")
+        for relative_path, expected_sha in panel_artifact_manifest.items()
+    )
+    panel_preflight_ready = (
+        attribution_contract_path.exists()
+        and panel_acquisition_contract_path.exists()
+        and panel_preflight_path.exists()
+        and panel_input_manifest.get("attribution_contract_sha256")
+        == sha256_file(attribution_contract_path).removeprefix("sha256:")
+        and panel_input_manifest.get("acquisition_contract_sha256")
+        == sha256_file(panel_acquisition_contract_path).removeprefix("sha256:")
+        and panel_input_manifest.get("source_registry_sha256")
+        == sha256_file(root / "data/registry/sources.json").removeprefix("sha256:")
+        and panel_input_manifest.get("code_sha256")
+        == sha256_file(root / "research/src/aiio/panel_preflight.py").removeprefix(
+            "sha256:"
+        )
+        and panel_artifact_hashes_reconcile
+        and panel_candidate_scope.get("region_count") == 5
+        and panel_candidate_scope.get("potential_treated_region_count") == 2
+        and panel_candidate_scope.get("potential_control_region_count") == 3
+        and panel_candidate_scope.get("asset_class_count") == 3
+        and panel_candidate_scope.get("candidate_does_not_mean_eligible") is True
+        and panel_eligibility.get("authorizing_treated_region_count") == 0
+        and panel_eligibility.get("eligible_control_region_count") == 0
+        and panel_eligibility.get("eligible_asset_class_count") == 0
+        and panel_eligibility.get("assembled_panel_row_count") == 0
+        and panel_eligibility.get("estimator_run_authorized") is False
+        and panel_field_gaps.get("required_field_instance_count") == 27
+        and panel_field_gaps.get("acquisition_task_field_instance_count") == 27
+        and panel_field_gaps.get("uncovered_required_field_instance_count") == 0
+        and panel_field_gaps.get("complete_authorizing_scope_count") == 0
+        and len(panel_receipts) == 10
+        and all(item.get("assertions_passed") is True for item in panel_receipts)
+        and all(
+            item.get("authorizing_status") in {"non_authorizing", "control_only"}
+            for item in panel_receipts
+        )
+        and len(panel_preflight.get("acquisition_queue", [])) == 4
+        and panel_boundary.get("candidate_scope_publication_authorized") is True
+        and panel_boundary.get("evidence_gap_publication_authorized") is True
+        and panel_boundary.get("effect_estimation_authorized") is False
+        and panel_boundary.get("ai_attributable_cost_escalation_percent") is None
+        and panel_boundary.get("ai_attributable_cost_escalation_cad") is None
+        and panel_boundary.get("ai_attributable_schedule_delay_days") is None
+    )
+    record(
+        "attribution_panel_acquisition_preflight",
+        "research_design",
+        PASS if panel_preflight_ready else FAIL,
+        "The hash-locked E2 preflight covers five candidate regions, three public asset classes, ten evidence receipts and all 27 authorizing field instances while assembling zero ineligible panel rows."
+        if panel_preflight_ready
+        else "The E2 acquisition contract or evidence-receipt preflight is missing, stale, incomplete or unsafe.",
+        [
+            "data/model/ai_attribution_panel_contract_v0.1.json",
+            "data/model/ai_attribution_panel_acquisition_contract_v0.1.json",
+            "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
+            "research/src/aiio/panel_preflight.py",
+            "docs/methodology/ai-attribution-panel-acquisition.md",
+        ],
+        release_gate=True,
+    )
+
     ai_increment = alberta_baseline.get("ai_attributable_increment", {})
     ai_calibrated = ai_increment.get("status") == "calibrated"
     record(

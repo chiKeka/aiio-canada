@@ -11,20 +11,14 @@ export function ModeToggle({ compact = false }: { compact?: boolean }) {
   return (
     <nav
       aria-label="View mode"
-      className={`inline-flex rounded-full border p-0.5 ${
-        researchMode
-          ? 'border-white/15 bg-white/7'
-          : 'border-[#d9ddd8] bg-[#f0f0eb]'
-      }`}
+      className="inline-flex rounded-full border border-[#d9ddd8] bg-[#f0f0eb] p-0.5"
     >
       <Link
         aria-current={decisionMode ? 'page' : undefined}
         className={`rounded-full px-2.5 py-1.5 text-[11px] font-semibold transition-colors ${
           decisionMode
             ? 'bg-[#145f59] text-white'
-            : researchMode
-              ? 'text-[#a9b9bd] hover:text-white'
-              : 'text-[#526762] hover:text-[#173f40]'
+            : 'text-[#526762] hover:text-[#173f40]'
         }`}
         href="/"
       >
@@ -34,7 +28,7 @@ export function ModeToggle({ compact = false }: { compact?: boolean }) {
         aria-current={researchMode ? 'page' : undefined}
         className={`rounded-full px-2.5 py-1.5 text-[11px] font-semibold transition-colors ${
           researchMode
-            ? 'bg-[#73ffb9] text-[#06130f]'
+            ? 'bg-[#145f59] text-white'
             : 'text-[#526762] hover:text-[#173f40]'
         }`}
         href="/research"

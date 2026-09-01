@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/card';
 import releaseData from '@/public/data/latest.json';
 import attributionReadiness from '@/data/model-runs/ai_attribution_identification_readiness_v0.1.json';
+import panelPreflight from '@/data/model-runs/ai_attribution_panel_preflight_v0.1.json';
 import buildingInvestmentControls from '@/data/model-runs/building_investment_controls_canada_v0.1.json';
 import regionalMacroControls from '@/data/model-runs/regional_macro_controls_canada_v0.1.json';
 import procurementOutcomeFeasibility from '@/data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json';
@@ -156,30 +157,30 @@ export function ObservatoryDashboard() {
   );
 
   return (
-    <main className="min-h-screen overflow-hidden bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#071116]/95 text-white backdrop-blur-xl">
+    <main className="min-h-screen overflow-hidden bg-[#f7f8f6] text-[#17343d]">
+      <header className="sticky top-0 z-40 border-b border-[#e2e0d9] bg-[#faf9f5]/92 text-[#172f35] backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <Link className="group flex items-center gap-3" href="/research" aria-label="AIIO Canada research home">
-            <span className="grid size-9 place-items-center rounded-full border border-[#73ffb9]/35 bg-[#0d1c21] font-mono text-xs font-semibold text-[#73ffb9]">
+            <span className="grid size-9 place-items-center rounded-full border border-[#bdd5ce] bg-white font-mono text-xs font-semibold text-[#17665f] shadow-[0_1px_2px_rgba(13,43,54,0.05)]">
               AI
             </span>
             <span>
               <span className="block text-sm font-semibold tracking-[0.02em]">AIIO Canada</span>
-              <span className="hidden text-[9px] uppercase tracking-[0.16em] text-[#8ca0a5] sm:block">
+              <span className="hidden text-[9px] uppercase tracking-[0.16em] text-[#596b67] sm:block">
                 Infrastructure impact observatory
               </span>
             </span>
           </Link>
-          <nav className="hidden items-center gap-5 text-xs font-medium text-[#a9b9bd] md:flex" aria-label="Primary navigation">
-            <Link className="transition-colors hover:text-white" href="/evidence">Evidence</Link>
-            <Link className="transition-colors hover:text-white" href="/pressure">Pressure monitor</Link>
-            <Link className="transition-colors hover:text-white" href="/scenario">Scenario lab</Link>
-            <Link className="transition-colors hover:text-white" href="/methods">Methods</Link>
+          <nav className="hidden items-center gap-5 text-xs font-medium text-[#596b67] md:flex" aria-label="Primary navigation">
+            <Link className="transition-colors hover:text-[#0d2b36]" href="/evidence">Evidence</Link>
+            <Link className="transition-colors hover:text-[#0d2b36]" href="/pressure">Pressure monitor</Link>
+            <Link className="transition-colors hover:text-[#0d2b36]" href="/scenario">Scenario lab</Link>
+            <Link className="transition-colors hover:text-[#0d2b36]" href="/methods">Methods</Link>
           </nav>
           <div className="flex items-center gap-2">
             <ModeToggle compact />
             <Link
-              className="hidden h-8 items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 text-xs font-medium text-[#dce7e9] transition-colors hover:border-[#73ffb9]/45 hover:text-white sm:inline-flex"
+              className="hidden h-8 items-center gap-1.5 rounded-full border border-[#d5d9d4] bg-white px-3 text-xs font-medium text-[#294a49] shadow-[0_1px_2px_rgba(13,43,54,0.04)] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] sm:inline-flex"
               href="/evidence"
             >
               Evidence register <ChevronRight className="size-3.5" />
@@ -188,40 +189,40 @@ export function ObservatoryDashboard() {
         </div>
       </header>
 
-      <section id="top" className="relative border-b border-white/10 bg-[#071116] text-white">
+      <section id="top" className="relative border-b border-[#dfe5e1] bg-[#f4f8f7] text-[#0d2b36]">
         <div className="research-observatory-grid absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-[1440px] gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[minmax(0,1.2fr)_minmax(390px,.8fr)] lg:px-12 lg:py-20">
-          <div className="inline-flex items-center gap-2 border border-[#d88755]/55 bg-[#2a1c17] px-3 py-2 text-xs font-semibold text-[#f2b58a] lg:col-span-2">
+          <div className="inline-flex items-center gap-2 rounded-lg border border-[#e1b48e] bg-[#fff0e3] px-3 py-2 text-xs font-semibold text-[#8c4928] lg:col-span-2">
             <AlertTriangle className="size-4" /> Counterfactual structural diagnostic · not a finding or forecast
           </div>
           <div className="max-w-4xl">
             <div className="mb-7 flex flex-wrap items-center gap-2">
-              <Badge className="border-[#73ffb9]/30 bg-[#73ffb9]/10 text-[#9fffc9]">Alberta pilot</Badge>
-              <Badge variant="outline" className="border-white/20 bg-white/5 text-[#c5d1d4]">Release {releaseData.manifest.version}</Badge>
-              <span className="ml-1 inline-flex items-center gap-1.5 text-xs text-[#a7b8bc]">
-                <span className="size-1.5 rounded-full bg-[#73ffb9]" /> Canada expansion plan documented
+              <Badge className="border-[#a9cfc5] bg-[#dceee8] text-[#155d56]">Alberta pilot</Badge>
+              <Badge variant="outline" className="border-[#d7ddd8] bg-white text-[#52645f]">Release {releaseData.manifest.version}</Badge>
+              <span className="ml-1 inline-flex items-center gap-1.5 text-xs text-[#61736f]">
+                <span className="size-1.5 rounded-full bg-[#2f8f83]" /> Canada expansion plan documented
               </span>
             </div>
-            <p className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-[#73ffb9]">
+            <p className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-[#28766d]">
               Framing question
             </p>
-            <h1 className="max-w-[950px] text-balance font-heading text-[clamp(2.5rem,5.4vw,5.35rem)] font-normal leading-[0.98] tracking-[-0.055em] text-white">
+            <h1 className="max-w-[950px] text-balance font-heading text-[clamp(2.5rem,5.4vw,5.35rem)] font-normal leading-[0.98] tracking-[-0.055em] text-[#0d2b36]">
               Where could AI capital spending create <span className="research-signal-highlight">pressure</span> on public infrastructure delivery?
             </h1>
-            <p className="mt-7 max-w-2xl text-pretty text-base leading-7 text-[#b5c3c7] sm:text-lg">
+            <p className="mt-7 max-w-2xl text-pretty text-base leading-7 text-[#536764] sm:text-lg">
               An uncalibrated research prototype for testing possible mechanisms through labour, materials and project schedules—beginning in Alberta, then expanding across Canada. It does not measure realized effects.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Button size="lg" className="h-11 bg-white px-4 text-[#071116] hover:bg-[#dfe7e8]" onClick={() => document.querySelector('#scenario')?.scrollIntoView({ behavior: 'smooth' })}>
+              <Button size="lg" className="h-11 bg-[#145f59] px-4 text-white hover:bg-[#0f4f4a]" onClick={() => document.querySelector('#scenario')?.scrollIntoView({ behavior: 'smooth' })}>
                 Explore Alberta scenario <ArrowRight data-icon="inline-end" />
               </Button>
-              <Button size="lg" variant="outline" className="h-11 border-white/25 bg-transparent px-4 text-[#dce7e9] hover:border-[#73ffb9]/55 hover:bg-white/5 hover:text-white" onClick={() => document.querySelector('#method')?.scrollIntoView({ behavior: 'smooth' })}>
+              <Button size="lg" variant="outline" className="h-11 border-[#c6d3ce] bg-white px-4 text-[#294a49] hover:border-[#8fb8ae] hover:bg-[#eef5f2] hover:text-[#173f40]" onClick={() => document.querySelector('#method')?.scrollIntoView({ behavior: 'smooth' })}>
                 Read the research method
               </Button>
             </div>
           </div>
 
-          <Card id="scenario" className="self-end rounded-none border-[#cfd6d2] bg-[#fbfaf5] shadow-none ring-0">
+          <Card id="scenario" className="self-end rounded-xl border-[#cfd6d2] bg-[#fbfaf5] shadow-[0_18px_50px_rgba(13,43,54,0.06)] ring-0">
             <CardHeader className="border-b border-[#dde2dc] pb-4">
               <CardTitle className="flex items-center gap-2 text-[#102f39]">
                 <Sparkles className="size-4 text-[#c05f32]" /> Alberta counterfactual sandbox
@@ -406,6 +407,36 @@ export function ObservatoryDashboard() {
               </div>
             </article>
           </div>
+
+          <article className="mt-5 overflow-hidden rounded-xl border border-[#132f39] bg-[#0d252e] text-white">
+            <div className="grid gap-8 border-b border-white/10 p-6 lg:grid-cols-[minmax(0,.78fr)_minmax(520px,1.22fr)] lg:items-end sm:p-8">
+              <div>
+                <div className="flex items-center gap-2 text-[#83cbbf]"><GitBranch className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em]">Panel acquisition preflight · operational</p></div>
+                <h3 className="mt-3 text-2xl font-medium tracking-[-0.035em] sm:text-3xl">The candidate map is large enough. The evidence is not yet eligible.</h3>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#abc0c5]">Ten hash-locked evidence receipts are assigned to every treatment and outcome gap. Candidate regions are planning scope only; no partial row enters an estimator.</p>
+              </div>
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-5">
+                <ContractMetric inverted label="Candidate CMAs" value={panelPreflight.candidate_scope.region_count.toString()} />
+                <ContractMetric inverted label="Treated eligible" value={`${panelPreflight.current_eligibility.authorizing_treated_region_count} / ${panelPreflight.design_thresholds.minimum_treated_regions}`} />
+                <ContractMetric inverted label="Controls eligible" value={`${panelPreflight.current_eligibility.eligible_control_region_count} / ${panelPreflight.design_thresholds.minimum_control_regions_per_cohort}`} />
+                <ContractMetric inverted label="Fields queued" value={`${panelPreflight.field_gap_summary.acquisition_task_field_instance_count} / ${panelPreflight.field_gap_summary.required_field_instance_count}`} />
+                <ContractMetric inverted label="Panel rows" value={panelPreflight.current_eligibility.assembled_panel_row_count.toString()} />
+              </dl>
+            </div>
+            <div className="grid divide-y divide-white/10 sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
+              {panelPreflight.acquisition_queue.map((task) => (
+                <div className="p-5 sm:p-6" key={task.task_id}>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-[#f0b06c]">{task.priority}</span>
+                    <span className="text-[10px] uppercase tracking-[0.08em] text-[#7f979d]">{task.required_fields.length} fields</span>
+                  </div>
+                  <p className="mt-4 text-sm font-medium leading-5 text-[#edf4f5]">{task.task_id.replace('E2_', '').replaceAll('_', ' ')}</p>
+                  <p className="mt-2 text-xs leading-5 text-[#9db2b7]">{task.current_status.replaceAll('_', ' ')}</p>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-white/10 bg-white/4 px-6 py-4 text-xs leading-5 text-[#91a8ae]">{panelPreflight.pspe_role}</div>
+          </article>
 
           <div className="mt-5 grid gap-5 rounded-xl border border-[#b7d0c8] bg-[#e6f1ed] p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-6">
             <div>
@@ -618,6 +649,6 @@ function AttributionDomainCard({ label, role, sourceCount, status, summary }: { 
   );
 }
 
-function ContractMetric({ label, value }: { label: string; value: string }) {
-  return <div><dt className="font-mono text-[9px] uppercase tracking-[0.08em] text-[#4e625e]">{label}</dt><dd className="mt-1 text-sm font-semibold text-[#173941]">{value}</dd></div>;
+function ContractMetric({ inverted = false, label, value }: { inverted?: boolean; label: string; value: string }) {
+  return <div><dt className={`font-mono text-[9px] uppercase tracking-[0.08em] ${inverted ? 'text-[#9fb7bc]' : 'text-[#4e625e]'}`}>{label}</dt><dd className={`mt-1 text-sm font-semibold ${inverted ? 'text-white' : 'text-[#173941]'}`}>{value}</dd></div>;
 }
