@@ -18,6 +18,12 @@ from .adapters.statcan_census import (
     normalize_census_trade_employment,
 )
 from .adapters.statcan_investment import normalize_investment_controls
+from .adapters.canadabuys import (
+    AWARD_SOURCE_ID as CANADABUYS_AWARD_SOURCE_ID,
+    CONTRACT_SOURCE_ID as CANADABUYS_CONTRACT_SOURCE_ID,
+    TENDER_SOURCE_ID as CANADABUYS_TENDER_SOURCE_ID,
+    normalize_canadabuys_outcome_intake,
+)
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .adapters.provincial_projects import (
     BC_SOURCE_ID,
@@ -91,6 +97,14 @@ def main() -> None:
         help="normalize quarterly regional non-residential building-investment controls",
     )
     investment_parser.add_argument("zip_path", type=Path)
+
+    canadabuys_parser = subparsers.add_parser(
+        "normalize-canadabuys-outcomes",
+        help="build the fail-closed CanadaBuys construction procurement outcome-feasibility intake",
+    )
+    canadabuys_parser.add_argument("tender_path", type=Path)
+    canadabuys_parser.add_argument("award_path", type=Path)
+    canadabuys_parser.add_argument("contract_path", type=Path)
 
     subparsers.add_parser(
         "fetch-census-workforce",
@@ -342,6 +356,43 @@ def main() -> None:
                         "geography_count": len(
                             {item["geography_id"] for item in observations}
                         ),
+                    }
+                )
+            )
+        elif args.command == "normalize-canadabuys-outcomes":
+            input_paths = {
+                CANADABUYS_TENDER_SOURCE_ID: args.tender_path.resolve(),
+                CANADABUYS_AWARD_SOURCE_ID: args.award_path.resolve(),
+                CANADABUYS_CONTRACT_SOURCE_ID: args.contract_path.resolve(),
+            }
+            report = normalize_canadabuys_outcome_intake(
+                input_paths[CANADABUYS_TENDER_SOURCE_ID],
+                input_paths[CANADABUYS_AWARD_SOURCE_ID],
+                input_paths[CANADABUYS_CONTRACT_SOURCE_ID],
+                root
+                / "data"
+                / "processed"
+                / "canadabuys_construction_outcome_feasibility.csv",
+                root
+                / "data"
+                / "model-runs"
+                / "canadabuys_construction_outcome_feasibility_v0.1.json",
+                retrieval_manifest_paths={
+                    source_id: path.with_suffix(path.suffix + ".manifest.json")
+                    for source_id, path in input_paths.items()
+                },
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": report["model_id"],
+                        "construction_linkage_count": report[
+                            "construction_linkage_count"
+                        ],
+                        "public_project_cost_outcome_authorized": report[
+                            "publication_boundary"
+                        ]["public_project_cost_outcome_authorized"],
                     }
                 )
             )

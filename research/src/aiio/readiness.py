@@ -211,6 +211,50 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    procurement_output_path = (
+        root / "data/processed/canadabuys_construction_outcome_feasibility.csv"
+    )
+    procurement_report_path = (
+        root
+        / "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json"
+    )
+    procurement_report = load_json_or_empty(procurement_report_path)
+    procurement_rows = csv_row_count(procurement_output_path)
+    procurement_boundary = procurement_report.get("publication_boundary", {})
+    procurement_feasibility_ready = (
+        procurement_output_path.exists()
+        and procurement_report.get("output_sha256")
+        == sha256_file(procurement_output_path)
+        and procurement_report.get("construction_linkage_count") == procurement_rows
+        and procurement_rows > 0
+        and procurement_report.get("cma_geography_count") == 0
+        and procurement_report.get("field_availability", {}).get(
+            "compliant_bidder_count"
+        )
+        == 0
+        and procurement_boundary.get("public_project_cost_outcome_authorized")
+        is False
+        and procurement_boundary.get("public_project_schedule_outcome_authorized")
+        is False
+        and procurement_boundary.get("procurement_competition_outcome_authorized")
+        is False
+        and procurement_boundary.get("ai_attributable_effect_authorized") is False
+    )
+    record(
+        "federal_procurement_outcome_feasibility",
+        "evidence_pipeline",
+        PASS if procurement_feasibility_ready else FAIL,
+        "The CanadaBuys construction intake is hash-locked and proves useful procurement fields without authorizing project outcomes."
+        if procurement_feasibility_ready
+        else "The CanadaBuys feasibility artifact is missing, unreconciled or has an unsafe publication boundary.",
+        [
+            "data/processed/canadabuys_construction_outcome_feasibility.csv",
+            "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json",
+            "docs/methodology/canadabuys-procurement-outcome-intake.md",
+        ],
+        release_gate=True,
+    )
+
     provincial_paths = [
         "data/model-runs/public_projects_bc_on_qc_intake_v0.1.json",
         "data/model-runs/bcpi_material_cost_screen_provinces_v0.1.json",

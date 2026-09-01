@@ -117,11 +117,17 @@
       "status": "missing",
       "source_ids": [
         "CANADABUYS_PROCUREMENT_DATA",
+        "CANADABUYS_TENDER_NOTICES_FY2026_2027",
+        "CANADABUYS_AWARD_NOTICES_FY2026_2027",
+        "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
         "GC_PROACTIVE_CONTRACTS"
       ],
       "available_variables": [
-        "tender_dates",
-        "award_value_cad",
+        "tender_publication_and_close_dates",
+        "award_date",
+        "reported_award_and_contract_values_cad",
+        "contract_instrument_start_and_end_dates",
+        "contract_amendment_rows_for_selected_pspc_linkages",
         "contract_amendment_value_cad_for_selected_federal_records"
       ],
       "missing_variables": [
@@ -129,19 +135,23 @@
         "complete_approved_change_history",
         "consistent_asset_reference_class"
       ],
-      "limitation": "Procurement coverage and fields differ by publisher and cannot yet reconcile a common estimate-to-outturn outcome."
+      "limitation": "The current-fiscal-year federal feasibility intake links selected tender, award and contract records, but it has no stable physical-project ID, CMA geography, independent estimate price basis, complete approved-change history or physical completion and therefore cannot reconcile a common estimate-to-outturn outcome."
     },
     {
       "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
       "role": "authorizing_outcome",
       "status": "missing",
       "source_ids": [
-        "CANADABUYS_PROCUREMENT_DATA"
+        "CANADABUYS_PROCUREMENT_DATA",
+        "CANADABUYS_TENDER_NOTICES_FY2026_2027",
+        "CANADABUYS_AWARD_NOTICES_FY2026_2027",
+        "CANADABUYS_CONTRACT_HISTORY_FY2026_2027"
       ],
       "available_variables": [
-        "tender_open_date",
+        "tender_publication_date",
         "tender_close_date",
-        "award_date_for_selected_records"
+        "award_date_for_selected_records",
+        "contract_instrument_start_and_end_dates"
       ],
       "missing_variables": [
         "baseline_start_date_and_vintage",
@@ -149,7 +159,7 @@
         "actual_start_date",
         "actual_completion_date"
       ],
-      "limitation": "Tender timing is not physical project schedule performance."
+      "limitation": "Tender timing and procurement-instrument start/end dates are not baseline-to-actual physical project schedule performance."
     },
     {
       "domain_id": "REGIONAL_CONSTRUCTION_ACTIVITY_CONTROLS",

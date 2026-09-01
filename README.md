@@ -38,6 +38,7 @@ npm run research:validate
 npm run labour:normalize
 npm run labour:normalize:canada
 npm run investment:normalize:canada
+npm run procurement:normalize
 npm run bcpi:normalize:provinces
 npm run materials:screen
 npm run materials:screen:provinces

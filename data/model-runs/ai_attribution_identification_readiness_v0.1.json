@@ -3,7 +3,10 @@
   "candidate_source_ids": [
     "AESO_DATA_CENTRE_UPDATE_2025_09",
     "AESO_LARGE_LOAD_PROJECTS",
+    "CANADABUYS_AWARD_NOTICES_FY2026_2027",
+    "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
     "CANADABUYS_PROCUREMENT_DATA",
+    "CANADABUYS_TENDER_NOTICES_FY2026_2027",
     "EDMONTON_GENERAL_BUILDING_PERMITS",
     "GC_PROACTIVE_CONTRACTS",
     "STATCAN_BCPI_18100289",
@@ -12,7 +15,7 @@
     "STATCAN_JVWS_14100444"
   ],
   "contract_id": "AIIO_E2_ATTRIBUTION_PANEL_CONTRACT_0_1",
-  "contract_sha256": "sha256:0b2c69e0dc8e3d81bb3590098e132e2ee87eb2b51d6e124ac29025574f5ec2aa",
+  "contract_sha256": "sha256:78bb4d50f1723866c81e0495e451ad210c03d55cc0c3de010b83e211c0e5426d",
   "design": {
     "aggregation": "event_time_and_exposure_cohort",
     "anticipation_periods": 2,
@@ -52,12 +55,15 @@
     },
     {
       "available_variables": [
-        "tender_dates",
-        "award_value_cad",
+        "tender_publication_and_close_dates",
+        "award_date",
+        "reported_award_and_contract_values_cad",
+        "contract_instrument_start_and_end_dates",
+        "contract_amendment_rows_for_selected_pspc_linkages",
         "contract_amendment_value_cad_for_selected_federal_records"
       ],
       "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",
-      "limitation": "Procurement coverage and fields differ by publisher and cannot yet reconcile a common estimate-to-outturn outcome.",
+      "limitation": "The current-fiscal-year federal feasibility intake links selected tender, award and contract records, but it has no stable physical-project ID, CMA geography, independent estimate price basis, complete approved-change history or physical completion and therefore cannot reconcile a common estimate-to-outturn outcome.",
       "missing_variables": [
         "independent_estimate_with_price_basis",
         "complete_approved_change_history",
@@ -66,18 +72,22 @@
       "role": "authorizing_outcome",
       "source_ids": [
         "CANADABUYS_PROCUREMENT_DATA",
+        "CANADABUYS_TENDER_NOTICES_FY2026_2027",
+        "CANADABUYS_AWARD_NOTICES_FY2026_2027",
+        "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
         "GC_PROACTIVE_CONTRACTS"
       ],
       "status": "missing"
     },
     {
       "available_variables": [
-        "tender_open_date",
+        "tender_publication_date",
         "tender_close_date",
-        "award_date_for_selected_records"
+        "award_date_for_selected_records",
+        "contract_instrument_start_and_end_dates"
       ],
       "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
-      "limitation": "Tender timing is not physical project schedule performance.",
+      "limitation": "Tender timing and procurement-instrument start/end dates are not baseline-to-actual physical project schedule performance.",
       "missing_variables": [
         "baseline_start_date_and_vintage",
         "baseline_completion_date_and_vintage",
@@ -86,7 +96,10 @@
       ],
       "role": "authorizing_outcome",
       "source_ids": [
-        "CANADABUYS_PROCUREMENT_DATA"
+        "CANADABUYS_PROCUREMENT_DATA",
+        "CANADABUYS_TENDER_NOTICES_FY2026_2027",
+        "CANADABUYS_AWARD_NOTICES_FY2026_2027",
+        "CANADABUYS_CONTRACT_HISTORY_FY2026_2027"
       ],
       "status": "missing"
     },
@@ -262,10 +275,10 @@
       "summary": "Review cannot authorize an effect until the evidence and identification gates produce an eligible model package."
     }
   ],
-  "registered_source_count": 25,
+  "registered_source_count": 28,
   "run_id": "AIIO_E2_IDENTIFICATION_READINESS_0_1",
   "schema_version": "1.0.0",
-  "source_registry_sha256": "sha256:d606033e98e33dec3a7d4c0f958a44e7ae47c941bb7fef5739cd1ab50fd8e28a",
+  "source_registry_sha256": "sha256:9d9190771fc4703f2545c653701a15fde26d321bb6ea03f3bf11fbd9b4c19638",
   "treatment_contract": {
     "authorizing_measures": [
       "realized_construction_spend_cad",

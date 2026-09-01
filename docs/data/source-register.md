@@ -24,17 +24,23 @@ access methods must be revalidated at ingestion time.
 
 ## Causal-attribution feasibility sources
 
-Four additional sources are registered for the E2 identification workstream.
+Additional sources are registered for the E2 identification workstream.
 Statistics Canada table 34-10-0293-01 is now implemented as a content-hashed,
 quarterly regional building-investment control across 13 provinces/territories
-and 36 published CMAs or CMA parts. CanadaBuys tender/award/contract-history
-datasets, the federal proactive contract publication, and Edmonton's General
-Building Permits API remain candidates for procurement screening and permit-
-based proxy work. None currently supplies the
+and 36 published CMAs or CMA parts. Three separately registered 2026-2027
+CanadaBuys tender, award and contract-history files now feed a content-hashed,
+fail-closed construction-procurement feasibility screen. It proves that tender,
+award and contract dates can be partially linked while stable physical-project
+IDs, CMA geography, independent estimates, complete approved changes, physical
+completion and compliant bidder counts remain unavailable. The federal
+proactive contract publication and Edmonton's General Building Permits API
+remain candidates for amendment screening and permit-based proxy work. None
+currently supplies the
 combination of realized AI-construction spend or labour hours, independent
 project estimate with price basis, complete approved changes, and actual project
 completion required to authorize an AI-attributable effect. See
-`docs/methodology/ai-attribution-identification.md`.
+`docs/methodology/ai-attribution-identification.md` and
+`docs/methodology/canadabuys-procurement-outcome-intake.md`.
 
 ## Implemented provincial public-project intake
 

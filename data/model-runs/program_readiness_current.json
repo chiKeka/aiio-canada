@@ -21,11 +21,11 @@
       "check_id": "public_evidence_registry",
       "evidence": [
         "data/registry/sources.json",
-        "raw_manifest_count=17"
+        "raw_manifest_count=20"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The public-source registry validates with 25 unique sources."
+      "summary": "The public-source registry validates with 28 unique sources."
     },
     {
       "category": "analysis_engine",
@@ -82,6 +82,18 @@
       "release_gate": true,
       "status": "pass",
       "summary": "The quarterly regional building-investment control is hash-locked across 13 provinces/territories and 36 CMAs or CMA parts."
+    },
+    {
+      "category": "evidence_pipeline",
+      "check_id": "federal_procurement_outcome_feasibility",
+      "evidence": [
+        "data/processed/canadabuys_construction_outcome_feasibility.csv",
+        "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json",
+        "docs/methodology/canadabuys-procurement-outcome-intake.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The CanadaBuys construction intake is hash-locked and proves useful procurement fields without authorizing project outcomes."
     },
     {
       "category": "canada_expansion",
@@ -228,7 +240,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 12,
+    "pass": 13,
     "pending": 3
   },
   "structural_integrity": true

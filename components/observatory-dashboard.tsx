@@ -34,6 +34,7 @@ import {
 import releaseData from '@/public/data/latest.json';
 import attributionReadiness from '@/data/model-runs/ai_attribution_identification_readiness_v0.1.json';
 import buildingInvestmentControls from '@/data/model-runs/building_investment_controls_canada_v0.1.json';
+import procurementOutcomeFeasibility from '@/data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json';
 import { ModeToggle } from '@/components/mode-toggle';
 import { boundedDisplayScore } from '@/lib/decision-analysis';
 
@@ -93,7 +94,7 @@ const attributionDomainMeta = [
     id: 'PUBLIC_PROJECT_COST_OUTCOMES',
     label: 'Public cost outcome',
     role: 'Authorizing outcome',
-    summary: 'Requires a reconciled estimate price basis, award value and approved change history for a consistent asset reference class.',
+    summary: 'CanadaBuys tender, award and contract linkages are screened. A reconciled estimate price basis, approved change history and stable physical-project class are still missing.',
   },
   {
     id: 'PUBLIC_PROJECT_SCHEDULE_OUTCOMES',
@@ -409,6 +410,19 @@ export function ObservatoryDashboard() {
               <ContractMetric label="Observations" value={buildingInvestmentControls.observation_count.toLocaleString('en-CA')} />
               <ContractMetric label="Geographies" value={buildingInvestmentControls.geography_count.toString()} />
               <ContractMetric label="Quarters" value={buildingInvestmentControls.quarter_count.toString()} />
+            </dl>
+          </div>
+
+          <div className="mt-5 grid gap-5 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-5 lg:grid-cols-[minmax(0,.9fr)_minmax(520px,1.1fr)] lg:items-center sm:p-6">
+            <div>
+              <div className="flex items-center gap-2 text-[#96502d]"><AlertTriangle className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Procurement outcome feasibility · not authorizing</p></div>
+              <p className="mt-2 text-sm leading-6 text-[#765342]">{procurementOutcomeFeasibility.publication_boundary.reason}</p>
+            </div>
+            <dl className="grid grid-cols-2 gap-5 border-t border-[#e7c3a8] pt-5 sm:grid-cols-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+              <ContractMetric label="Construction linkages" value={procurementOutcomeFeasibility.construction_linkage_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Tender + award" value={procurementOutcomeFeasibility.linked_tender_award_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Tender + contract" value={procurementOutcomeFeasibility.linked_tender_contract_count.toLocaleString('en-CA')} />
+              <ContractMetric label="CMA locations" value={procurementOutcomeFeasibility.cma_geography_count.toString()} />
             </dl>
           </div>
 

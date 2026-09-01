@@ -51,3 +51,6 @@ CLAUDE.md
 /data/raw/statcan_ibc_34100293/*.zip
 /data/raw/statcan_census_occupation_98100449/*.json
 !/data/raw/statcan_census_occupation_98100449/*.json.manifest.json
+/data/raw/canadabuys_tender_notices_fy2026_2027/*.csv
+/data/raw/canadabuys_award_notices_fy2026_2027/*.csv
+/data/raw/canadabuys_contract_history_fy2026_2027/*.csv

@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.9.0-dev';
+const workbookBuildVersion = '0.10.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -211,6 +211,28 @@ const investmentControlRows = parseCsv(
     'utf8',
   ),
 );
+const procurementOutcomeReport = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'canadabuys_construction_outcome_feasibility_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const procurementOutcomeRows = parseCsv(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'processed',
+      'canadabuys_construction_outcome_feasibility.csv',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -235,6 +257,7 @@ const projectCost = workbook.worksheets.add('Project Cost Check');
 const canadaExpansion = workbook.worksheets.add('Canada Expansion');
 const attributionGate = workbook.worksheets.add('Attribution Gate');
 const investmentControls = workbook.worksheets.add('Investment Controls');
+const procurementIntake = workbook.worksheets.add('Procurement Intake');
 const sources = workbook.worksheets.add('Sources');
 const checks = workbook.worksheets.add('Release Checks');
 
@@ -277,6 +300,7 @@ for (const sheet of [
   canadaExpansion,
   attributionGate,
   investmentControls,
+  procurementIntake,
   sources,
   checks,
 ]) {
@@ -305,6 +329,7 @@ buildProjectCostCheck();
 buildCanadaExpansion();
 buildAttributionGate();
 buildInvestmentControls();
+buildProcurementIntake();
 buildSources();
 buildReleaseChecks();
 buildDashboard();
@@ -344,9 +369,9 @@ console.log(inspectDashboard.ndjson);
 
 const inspectReadMe = await workbook.inspect({
   kind: 'table',
-  range: 'Read Me!A1:H45',
+  range: 'Read Me!A1:H49',
   include: 'values,formulas',
-  tableMaxRows: 45,
+  tableMaxRows: 49,
   tableMaxCols: 8,
 });
 console.log(inspectReadMe.ndjson);
@@ -362,9 +387,9 @@ console.log(inspectProjectCost.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D42',
+  range: 'Release Checks!A1:D47',
   include: 'values,formulas',
-  tableMaxRows: 42,
+  tableMaxRows: 47,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
@@ -396,6 +421,15 @@ const inspectInvestmentControls = await workbook.inspect({
 });
 console.log(inspectInvestmentControls.ndjson);
 
+const inspectProcurementIntake = await workbook.inspect({
+  kind: 'table',
+  range: 'Procurement Intake!A1:X18',
+  include: 'values,formulas',
+  tableMaxRows: 18,
+  tableMaxCols: 24,
+});
+console.log(inspectProcurementIntake.ndjson);
+
 const errors = await workbook.inspect({
   kind: 'match',
   searchTerm: '#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A',
@@ -405,7 +439,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H48',
+  'Read Me': 'A1:H49',
   Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -426,8 +460,9 @@ const previewRanges = {
   'Canada Expansion': 'A1:J48',
   'Attribution Gate': 'A1:J48',
   'Investment Controls': 'A1:R28',
-  Sources: 'A1:J30',
-  'Release Checks': 'A1:D45',
+  'Procurement Intake': 'A1:X28',
+  Sources: 'A1:J34',
+  'Release Checks': 'A1:D47',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -492,7 +527,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H39').values = [
+  readme.getRange('A18:H40').values = [
     [
       '1',
       'Dashboard',
@@ -695,6 +730,16 @@ function buildReadMe() {
     ],
     [
       '21',
+      'Procurement Intake',
+      'Inspect the CanadaBuys construction linkage and the authorizing outcome fields that remain absent.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '22',
       'Sources',
       'Open the current research source register, distinguish release sources and check source vintages.',
       '',
@@ -704,7 +749,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '22',
+      '23',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -714,29 +759,29 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A39').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B39').format.font = { bold: true };
-  readme.getRange('C18:H39').merge(true);
-  readme.getRange('A41:H41').merge();
-  readme.getRange('A41').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A41:H41'), C.amber);
+  readme.getRange('A18:A40').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B40').format.font = { bold: true };
+  readme.getRange('C18:H40').merge(true);
   readme.getRange('A42:H42').merge();
-  readme.getRange('A42').values = [
+  readme.getRange('A42').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A42:H42'), C.amber);
+  readme.getRange('A43:H43').merge();
+  readme.getRange('A43').values = [
     [
-      'WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The attribution contract also lacks an authorizing realized AI-construction treatment plus reconciled public-project cost and schedule outcomes, so all AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.',
+      'WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The CanadaBuys intake proves that some procurement dates and values can be linked, but it supplies no stable physical-project ID, CMA geography, independent estimate, complete changes, physical completion or bidder count. The attribution contract still lacks an authorizing realized AI-construction treatment plus reconciled public-project cost and schedule outcomes, so all AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.',
     ],
   ];
-  readme.getRange('A42:H42').format = {
+  readme.getRange('A43:H43').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A42').format.rowHeight = 112;
+  readme.getRange('A43').format.rowHeight = 126;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
-    48,
+    49,
   );
 }
 
@@ -3414,6 +3459,184 @@ function buildInvestmentControls() {
   }
 }
 
+function buildProcurementIntake() {
+  titleBand(
+    procurementIntake,
+    'CanadaBuys construction procurement outcome-feasibility intake',
+    `Federal fiscal-year 2026-2027 files · as of ${procurementOutcomeReport.as_of_date} · research only`,
+    'X',
+  );
+
+  const summaryCards = [
+    ['A5:D5', 'A6:D6', 'Construction linkages', procurementOutcomeReport.construction_linkage_count],
+    ['E5:H5', 'E6:H6', 'Tender + award', procurementOutcomeReport.linked_tender_award_count],
+    ['I5:L5', 'I6:L6', 'Tender + contract', procurementOutcomeReport.linked_tender_contract_count],
+    [
+      'M5:P5',
+      'M6:P6',
+      'Positive award value',
+      procurementOutcomeReport.field_availability.reported_award_value_cad,
+    ],
+    [
+      'Q5:T5',
+      'Q6:T6',
+      'Single-province geography',
+      procurementOutcomeReport.single_province_geography_count,
+    ],
+    ['U5:X5', 'U6:X6', 'CMA geography', procurementOutcomeReport.cma_geography_count],
+  ];
+  for (const [labelRange, valueRange, label, value] of summaryCards) {
+    procurementIntake.getRange(labelRange).merge();
+    procurementIntake.getRange(labelRange.split(':')[0]).values = [[label]];
+    procurementIntake.getRange(labelRange).format = {
+      fill: C.tealLight,
+      font: { bold: true, color: C.tealDark, size: 9 },
+      horizontalAlignment: 'center',
+      verticalAlignment: 'center',
+      borders: { preset: 'outside', style: 'thin', color: '#B9CEC7' },
+    };
+    procurementIntake.getRange(valueRange).merge();
+    procurementIntake.getRange(valueRange.split(':')[0]).values = [[value]];
+    procurementIntake.getRange(valueRange).format = {
+      fill: C.white,
+      font: { bold: true, color: C.ink, size: 14 },
+      horizontalAlignment: 'center',
+      verticalAlignment: 'center',
+      borders: { preset: 'outside', style: 'thin', color: '#B9CEC7' },
+    };
+  }
+  procurementIntake.getRange('A6:X6').format.numberFormat = '#,##0';
+
+  procurementIntake.getRange('A8:X8').merge();
+  procurementIntake.getRange('A8').values = [
+    [
+      `PROCUREMENT FEASIBILITY ONLY. ${procurementOutcomeReport.publication_boundary.reason} Procurement-instrument dates are not physical construction dates. Generated linkage IDs are not physical-project IDs, and null authorizing outcome fields are not zero effects.`,
+    ],
+  ];
+  procurementIntake.getRange('A8:X8').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  procurementIntake.getRange('A8').format.rowHeight = 48;
+
+  const headers = [
+    'procurement_linkage_id',
+    'solicitation_number',
+    'title',
+    'geography_id',
+    'geography_label',
+    'geography_evidence_status',
+    'tender_publication_date',
+    'tender_close_date',
+    'tender_duration_days',
+    'award_record_count',
+    'award_date',
+    'reported_award_value_cad',
+    'contract_record_count',
+    'contract_amendment_row_count',
+    'reported_total_contract_value_cad',
+    'reported_contract_start_date',
+    'reported_contract_end_date',
+    'cost_outcome_status',
+    'schedule_outcome_status',
+    'competition_outcome_status',
+    'source_ids',
+    'source_evidence_status',
+    'evidence_status',
+    'quality_flags',
+  ];
+  procurementIntake.getRange('A10:X10').values = [headers];
+  header(procurementIntake.getRange('A10:X10'));
+  const rows = procurementOutcomeRows.map((row) => [
+    row.procurement_linkage_id,
+    row.solicitation_number,
+    row.title,
+    row.geography_id,
+    row.geography_label,
+    row.geography_evidence_status,
+    dateOrNull(row.tender_publication_date),
+    dateOrNull(row.tender_close_date),
+    numberOrNull(row.tender_duration_days),
+    numberOrNull(row.award_record_count),
+    dateOrNull(row.award_date),
+    numberOrNull(row.reported_award_value_cad),
+    numberOrNull(row.contract_record_count),
+    numberOrNull(row.contract_amendment_row_count),
+    numberOrNull(row.reported_total_contract_value_cad),
+    dateOrNull(row.reported_contract_start_date),
+    dateOrNull(row.reported_contract_end_date),
+    row.cost_outcome_status,
+    row.schedule_outcome_status,
+    row.competition_outcome_status,
+    row.source_ids,
+    row.source_evidence_status,
+    row.evidence_status,
+    row.quality_flags,
+  ]);
+  const lastRow = 10 + rows.length;
+  procurementIntake.getRange(`A11:X${lastRow}`).values = rows;
+  procurementIntake.getRange(`G11:H${lastRow}`).format.numberFormat = 'yyyy-mm-dd';
+  procurementIntake.getRange(`K11:K${lastRow}`).format.numberFormat = 'yyyy-mm-dd';
+  procurementIntake.getRange(`P11:Q${lastRow}`).format.numberFormat = 'yyyy-mm-dd';
+  procurementIntake.getRange(`L11:L${lastRow}`).format.numberFormat = '$#,##0';
+  procurementIntake.getRange(`O11:O${lastRow}`).format.numberFormat = '$#,##0';
+  procurementIntake.getRange(`A11:B${lastRow}`).format.font = {
+    name: 'Aptos Mono',
+    size: 8,
+    color: C.ink,
+  };
+  procurementIntake.getRange(`U11:W${lastRow}`).format.font = {
+    name: 'Aptos Mono',
+    size: 8,
+    color: C.tealDark,
+  };
+  procurementIntake.getRange(`R11:T${lastRow}`).format = {
+    fill: C.amberLight,
+    font: { color: '#8A4826', size: 8 },
+  };
+  const table = procurementIntake.tables.add(
+    `A10:X${lastRow}`,
+    true,
+    'ProcurementIntakeTable',
+  );
+  table.style = 'TableStyleMedium2';
+  procurementIntake.freezePanes.freezeRows(10);
+  procurementIntake.freezePanes.freezeColumns(3);
+  const widths = {
+    A: 28,
+    B: 24,
+    C: 54,
+    D: 15,
+    E: 28,
+    F: 25,
+    G: 16,
+    H: 16,
+    I: 16,
+    J: 15,
+    K: 16,
+    L: 20,
+    M: 17,
+    N: 19,
+    O: 24,
+    P: 17,
+    Q: 17,
+    R: 23,
+    S: 23,
+    T: 26,
+    U: 48,
+    V: 18,
+    W: 23,
+    X: 62,
+  };
+  for (const [column, width] of Object.entries(widths)) {
+    procurementIntake.getRange(`${column}1:${column}${lastRow}`).format.columnWidth =
+      width;
+  }
+}
+
 function buildSources() {
   titleBand(
     sources,
@@ -3550,8 +3773,9 @@ function buildReleaseChecks() {
     ['Weekly digest cannot change the model automatically', 'PASS'],
     ['AI-attributable effect remains unauthorized and null', 'PASS'],
     ['Regional investment-control panel reconciles to artifact', 'PASS'],
+    ['CanadaBuys procurement intake reconciles and remains non-authorizing', 'PASS'],
   ];
-  checks.getRange('A16:C38').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C39').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -3675,22 +3899,28 @@ function buildReleaseChecks() {
       `=IF(AND(ROWS('Investment Controls'!$A$11:$A$${investmentControlLastRow})=${investmentControlReport.observation_count},COUNTIF('Investment Controls'!$M$11:$M$${investmentControlLastRow},"observed")=${investmentControlReport.observation_count},COUNTIF('Investment Controls'!$N$11:$N$${investmentControlLastRow},"inferred")=${investmentControlReport.observation_count}),"PASS","FAIL")`,
     ],
   ];
-  checks.getRange('B16:B38').conditionalFormats.add('containsText', {
+  const procurementIntakeLastRow = 10 + procurementOutcomeRows.length;
+  checks.getRange('B39').formulas = [
+    [
+      `=IF(AND(ROWS('Procurement Intake'!$A$11:$A$${procurementIntakeLastRow})=${procurementOutcomeReport.construction_linkage_count},'Procurement Intake'!A6=${procurementOutcomeReport.construction_linkage_count},'Procurement Intake'!U6=0,COUNTIF('Procurement Intake'!$R$11:$R$${procurementIntakeLastRow},"missing_required_fields")=${procurementOutcomeReport.construction_linkage_count},COUNTIF('Procurement Intake'!$S$11:$S$${procurementIntakeLastRow},"missing_required_fields")=${procurementOutcomeReport.construction_linkage_count},COUNTIF('Procurement Intake'!$T$11:$T$${procurementIntakeLastRow},"missing_compliant_bidder_count")=${procurementOutcomeReport.construction_linkage_count}),"PASS","FAIL")`,
+    ],
+  ];
+  checks.getRange('B16:B39').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B38').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B39').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A39:D41').merge();
-  checks.getRange('A39').values = [
+  checks.getRange('A41:D43').merge();
+  checks.getRange('A41').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A39:D41'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 45);
+  noteBlock(checks.getRange('A41:D43'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 47);
 }
 
 function buildDashboard() {
@@ -3989,6 +4219,10 @@ function tradeLabel(nodeId) {
 
 function numberOrNull(value) {
   return value === '' ? null : Number(value);
+}
+
+function dateOrNull(value) {
+  return value === '' ? null : new Date(`${value}T00:00:00Z`);
 }
 
 function powerSourceUrl(sourceId) {
