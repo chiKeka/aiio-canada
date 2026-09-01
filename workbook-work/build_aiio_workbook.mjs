@@ -8,6 +8,7 @@ const projectRoot = path.resolve(scriptDir, '..');
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(scriptDir, 'previews');
+const workbookBuildVersion = '0.7.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -17,7 +18,18 @@ const release = JSON.parse(
 );
 const outputPath = path.join(
   outputDir,
-  `AIIO_Alberta_Pilot_${release.manifest.version}.xlsx`,
+  `AIIO_Alberta_Pilot_${workbookBuildVersion}.xlsx`,
+);
+const costBaseline = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'alberta_bcpi_reference_baseline_v0.1.json',
+    ),
+    'utf8',
+  ),
 );
 const bcpiRows = parseCsv(
   await fs.readFile(
@@ -127,6 +139,8 @@ const labourDiagnostic = workbook.worksheets.add('Labour Diagnostic');
 const materialScreen = workbook.worksheets.add('Material Screen');
 const projectExposure = workbook.worksheets.add('Project Exposure');
 const powerEvidence = workbook.worksheets.add('Power Evidence');
+const costBaselineSheet = workbook.worksheets.add('Cost Baseline');
+const projectCost = workbook.worksheets.add('Project Cost Check');
 const sources = workbook.worksheets.add('Sources');
 const checks = workbook.worksheets.add('Release Checks');
 
@@ -164,6 +178,8 @@ for (const sheet of [
   materialScreen,
   projectExposure,
   powerEvidence,
+  costBaselineSheet,
+  projectCost,
   sources,
   checks,
 ]) {
@@ -187,6 +203,8 @@ buildLabourDiagnostic();
 buildMaterialScreen();
 buildProjectExposure();
 buildPowerEvidence();
+buildCostBaseline();
+buildProjectCostCheck();
 buildSources();
 buildReleaseChecks();
 buildDashboard();
@@ -203,24 +221,50 @@ await workbook.comments.addThread(
   { cell: assumptions.getRange('C24') },
   'IT load is an independent power-case assumption. It is not derived from capital expenditure.',
 );
+await workbook.comments.addThread(
+  { cell: projectCost.getRange('B8') },
+  'Demonstration input only. Replace it with a project estimate stated in the exact price-basis quarter shown below.',
+);
+await workbook.comments.addThread(
+  { cell: projectCost.getRange('B9') },
+  'Version 0.1 requires the estimate price basis to match the latest observed baseline quarter. Rebasing is not yet implemented.',
+);
 
 await fs.mkdir(outputDir, { recursive: true });
 await fs.mkdir(previewDir, { recursive: true });
 
 const inspectDashboard = await workbook.inspect({
   kind: 'table',
-  range: 'Dashboard!A1:L44',
+  range: 'Dashboard!A1:L48',
   include: 'values,formulas',
-  tableMaxRows: 44,
+  tableMaxRows: 48,
   tableMaxCols: 12,
 });
 console.log(inspectDashboard.ndjson);
 
+const inspectReadMe = await workbook.inspect({
+  kind: 'table',
+  range: 'Read Me!A1:H45',
+  include: 'values,formulas',
+  tableMaxRows: 45,
+  tableMaxCols: 8,
+});
+console.log(inspectReadMe.ndjson);
+
+const inspectProjectCost = await workbook.inspect({
+  kind: 'table',
+  range: 'Project Cost Check!A1:L38',
+  include: 'values,formulas',
+  tableMaxRows: 38,
+  tableMaxCols: 12,
+});
+console.log(inspectProjectCost.ndjson);
+
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D34',
+  range: 'Release Checks!A1:D38',
   include: 'values,formulas',
-  tableMaxRows: 34,
+  tableMaxRows: 38,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
@@ -234,8 +278,8 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H42',
-  Dashboard: 'A1:L44',
+  'Read Me': 'A1:H45',
+  Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
   'Pressure Results': 'A1:L20',
@@ -250,8 +294,10 @@ const previewRanges = {
   'Material Screen': 'A1:R38',
   'Project Exposure': 'A1:Y24',
   'Power Evidence': 'A1:H28',
+  'Cost Baseline': 'A1:P54',
+  'Project Cost Check': 'A1:L38',
   Sources: 'A1:H17',
-  'Release Checks': 'A1:D34',
+  'Release Checks': 'A1:D38',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -277,7 +323,7 @@ function buildReadMe() {
   titleBand(
     readme,
     'AI Infrastructure Impact Observatory Canada',
-    `Alberta pilot workbook · Release ${release.manifest.version}`,
+    `Alberta pilot workbook ${workbookBuildVersion} · public release basis ${release.manifest.version}`,
     'H',
   );
   readme.getRange('A5:H5').merge();
@@ -286,14 +332,14 @@ function buildReadMe() {
   readme.getRange('A6:H8').merge();
   readme.getRange('A6').values = [
     [
-      'This workbook is an auditable publication component of AIIO Canada. It reproduces selected release outputs and exposes scenario assumptions with formulas. The evidence registry, analytical code and immutable release manifest remain the system of record.',
+      'This workbook is an auditable analysis component of AIIO Canada. It reproduces selected release outputs, exposes scenario assumptions and carries the internal cost-baseline validation layer. The evidence registry, analytical code and immutable artifacts remain the system of record. Cost outputs remain withheld until every required model and review gate passes.',
     ],
   ];
   noteBlock(readme.getRange('A6:H8'));
 
   readme.getRange('A10:B10').values = [['Evidence status', 'Meaning']];
   header(readme.getRange('A10:B10'));
-  readme.getRange('A11:B14').values = [
+  readme.getRange('A11:B15').values = [
     ['Observed', 'Directly reported by an identified public source.'],
     [
       'Inferred',
@@ -301,9 +347,13 @@ function buildReadMe() {
     ],
     ['Assumed', 'Selected parameter with rationale and sensitivity range.'],
     ['Scenario', 'Counterfactual input or output; not a forecast.'],
+    [
+      'Withheld',
+      'Calculated output is intentionally blank because a required gate did not pass.',
+    ],
   ];
-  readme.getRange('A11:A14').format.font = { bold: true };
-  readme.getRange('A11:B14').format.borders = {
+  readme.getRange('A11:A15').format.font = { bold: true };
+  readme.getRange('A11:B15').format.borders = {
     preset: 'inside',
     style: 'thin',
     color: C.line,
@@ -312,7 +362,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H34').values = [
+  readme.getRange('A18:H36').values = [
     [
       '1',
       'Dashboard',
@@ -465,6 +515,26 @@ function buildReadMe() {
     ],
     [
       '16',
+      'Cost Baseline',
+      'Inspect every asset, geography and horizon validation gate; failed projections stay blank.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '17',
+      'Project Cost Check',
+      'Enter a project and expenditure profile; outputs remain blank unless all gates pass.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '18',
       'Sources',
       'Open authoritative public URLs and check source vintages.',
       '',
@@ -474,7 +544,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '17',
+      '19',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -484,28 +554,29 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A34').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B34').format.font = { bold: true };
-  readme.getRange('C18:H34').merge(true);
-  readme.getRange('A36:H36').merge();
-  readme.getRange('A36').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A36:H36'), C.amber);
-  readme.getRange('A37:H41').merge();
-  readme.getRange('A37').values = [
+  readme.getRange('A18:A36').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B36').format.font = { bold: true };
+  readme.getRange('C18:H36').merge(true);
+  readme.getRange('A38:H38').merge();
+  readme.getRange('A38').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A38:H38'), C.amber);
+  readme.getRange('A39:H39').merge();
+  readme.getRange('A39').values = [
     [
-      'UNCALIBRATED STRUCTURAL DIAGNOSTIC. Pressure scores are not findings, forecasts, probabilities or percentages: 0.24 does not mean a 24% delay. The graph excludes 54% of scenario capex. AESO requests, executed contracts and connected load are distinct; additional transmission for the $50B case remains unknown. BCPI movements do not identify an AI effect. Project asset and sponsor labels are inferences, not ownership determinations. The labour recruitment screen combines current vacancies with a 2021 Census denominator and is not a current vacancy rate or spare-capacity measure.',
+      'WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case and every AI-attributable cost or schedule increment remain unknown.',
     ],
   ];
-  readme.getRange('A37:H41').format = {
+  readme.getRange('A39:H39').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
+  readme.getRange('A39').format.rowHeight = 96;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
-    42,
+    45,
   );
 }
 
@@ -2050,18 +2121,14 @@ function buildPowerEvidence() {
     borders: { preset: 'outside', style: 'thin', color: C.line },
   };
   powerEvidence.getRange('B5:B8').format.numberFormat = '#,##0.0';
-  powerEvidence
-    .getRange('B10')
-    .conditionalFormats.add('containsText', {
-      text: 'PASS',
-      format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
-    });
-  powerEvidence
-    .getRange('B10')
-    .conditionalFormats.add('containsText', {
-      text: 'FAIL',
-      format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
-    });
+  powerEvidence.getRange('B10').conditionalFormats.add('containsText', {
+    text: 'PASS',
+    format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+  });
+  powerEvidence.getRange('B10').conditionalFormats.add('containsText', {
+    text: 'FAIL',
+    format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
+  });
 
   powerEvidence.getRange('D5:H10').merge();
   powerEvidence.getRange('D5').values = [
@@ -2119,6 +2186,384 @@ function buildPowerEvidence() {
   );
 }
 
+function buildCostBaseline() {
+  titleBand(
+    costBaselineSheet,
+    'Validated market-reference cost baseline',
+    `Internal model artifact · as of ${costBaseline.as_of_date} · public projections withheld`,
+    'P',
+  );
+
+  costBaselineSheet.getRange('A5:B8').values = [
+    ['Baseline model ID', costBaseline.model_id],
+    [
+      'Public projection authorized',
+      costBaseline.publication_authorization.public_projection_authorized
+        ? 'YES'
+        : 'NO',
+    ],
+    [
+      'Horizon checks passed',
+      costBaseline.publication_summary.horizon_status_counts.gate_passed,
+    ],
+    [
+      'Total horizon checks',
+      costBaseline.publication_summary.horizon_result_count,
+    ],
+  ];
+  costBaselineSheet.getRange('A5:A8').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  costBaselineSheet.getRange('B5:B8').format = {
+    fill: C.soft,
+    borders: { preset: 'outside', style: 'thin', color: C.line },
+  };
+  costBaselineSheet.getRange('B6').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  costBaselineSheet.getRange('D5:P8').merge();
+  costBaselineSheet.getRange('D5').values = [
+    [
+      'FAIL-CLOSED RESULT. Only one of 40 reference-class horizon checks passes. All Calgary and Edmonton four- and five-year health and school projections are null. The one passing horizon is not publishable until the independent modelling review gate authorizes it. These are shared-market BCPI reference classes, not AI effects and not realized project-cost forecasts.',
+    ],
+  ];
+  costBaselineSheet.getRange('D5:P8').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529' },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  const baselineRows = costBaseline.reference_class_results.flatMap(
+    (reference) =>
+      reference.horizons.map((horizon) => [
+        reference.asset_class,
+        reference.asset_class_label,
+        reference.geography_id,
+        reference.geography_label,
+        horizon.horizon_years,
+        horizon.status,
+        horizon.selected_method,
+        horizon.validation_period?.selected_method_metrics
+          ?.mean_absolute_percentage_error ?? null,
+        horizon.validation_period?.selected_method_metrics
+          ?.mean_percentage_error ?? null,
+        horizon.validation_period?.empirical_interval_coverage_percent ?? null,
+        horizon.projected_cumulative_change_percent,
+        horizon.projected_index,
+        horizon.reason,
+        reference.latest_index,
+        reference.reference_indicator_id,
+        reference.mapping_status,
+      ]),
+  );
+  costBaselineSheet.getRange('A10:P10').values = [
+    [
+      'Asset class',
+      'Asset label',
+      'Geography ID',
+      'Geography',
+      'Horizon (years)',
+      'Gate status',
+      'Selected method',
+      'Validation MAPE (%)',
+      'Validation bias (%)',
+      'Interval coverage (%)',
+      'Projected change (%)',
+      'Projected index',
+      'Failure reason',
+      'Latest observed index',
+      'Reference indicator ID',
+      'Mapping status',
+    ],
+  ];
+  header(costBaselineSheet.getRange('A10:P10'));
+  const baselineEndRow = 10 + baselineRows.length;
+  costBaselineSheet.getRange(`A11:P${baselineEndRow}`).values = baselineRows;
+  costBaselineSheet.getRange(`E11:E${baselineEndRow}`).format.numberFormat =
+    '0';
+  costBaselineSheet.getRange(`H11:L${baselineEndRow}`).format.numberFormat =
+    '0.000';
+  costBaselineSheet.getRange(`N11:N${baselineEndRow}`).format.numberFormat =
+    '0.0';
+  costBaselineSheet
+    .getRange(`F11:F${baselineEndRow}`)
+    .conditionalFormats.add('containsText', {
+      text: 'gate_passed',
+      format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+    });
+  costBaselineSheet
+    .getRange(`F11:F${baselineEndRow}`)
+    .conditionalFormats.add('containsText', {
+      text: 'gate_failed',
+      format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
+    });
+  const baselineTable = costBaselineSheet.tables.add(
+    `A10:P${baselineEndRow}`,
+    true,
+    'CostBaselineGateTable',
+  );
+  baselineTable.style = 'TableStyleMedium2';
+  costBaselineSheet
+    .getRange(`A${baselineEndRow + 2}:P${baselineEndRow + 4}`)
+    .merge();
+  costBaselineSheet.getRange(`A${baselineEndRow + 2}`).values = [
+    [costBaseline.publication_authorization.reason],
+  ];
+  noteBlock(
+    costBaselineSheet.getRange(`A${baselineEndRow + 2}:P${baselineEndRow + 4}`),
+  );
+  costBaselineSheet.freezePanes.freezeRows(10);
+  costBaselineSheet.freezePanes.freezeColumns(4);
+  setWidths(
+    costBaselineSheet,
+    {
+      A: 22,
+      B: 22,
+      C: 15,
+      D: 18,
+      E: 14,
+      F: 16,
+      G: 24,
+      H: 18,
+      I: 18,
+      J: 19,
+      K: 19,
+      L: 17,
+      M: 34,
+      N: 19,
+      O: 46,
+      P: 16,
+    },
+    baselineEndRow + 4,
+  );
+}
+
+function buildProjectCostCheck() {
+  titleBand(
+    projectCost,
+    'Project cost decision check',
+    'Editable blue cells · schedule-weighted market reference · AI increment remains separate',
+    'L',
+  );
+  projectCost.getRange('A5:B9').values = [
+    ['Project name', 'Demonstration Calgary health project'],
+    ['Asset class', 'health_facilities'],
+    ['Geography ID', 'CMA_825'],
+    ['Current estimate (CAD)', 100000000],
+    ['Estimate price basis', costBaseline.as_of_date],
+  ];
+  projectCost.getRange('A5:A9').format.font = { bold: true, color: C.ink };
+  inputStyle(projectCost.getRange('B5:B9'));
+  projectCost.getRange('B8').format.numberFormat = '$#,##0';
+  projectCost.dataValidations.add({
+    range: 'B8',
+    rule: { type: 'decimal', operator: 'greaterThan', formula1: 0 },
+  });
+
+  projectCost.getRange('D5:L9').merge();
+  projectCost.getRange('D5').values = [
+    [
+      'DEMONSTRATION INPUT, NOT AN OBSERVED PROJECT. Enter a project estimate only when its price basis is known. Version 0.1 requires that basis to equal the latest observed baseline quarter. Each expenditure year is evaluated separately; the full estimate is never escalated by only the end-year index.',
+    ],
+  ];
+  noteBlock(projectCost.getRange('D5:L9'));
+
+  projectCost.getRange('A12:C12').values = [
+    ['Horizon year', 'Illustrative calendar year', 'Expenditure share'],
+  ];
+  header(projectCost.getRange('A12:C12'));
+  projectCost.getRange('A13:C18').values = [
+    [0, 2026, 0],
+    [1, 2027, 0.2],
+    [2, 2028, 0.2],
+    [3, 2029, 0.2],
+    [4, 2030, 0.2],
+    [5, 2031, 0.2],
+  ];
+  inputStyle(projectCost.getRange('C13:C18'));
+  projectCost.getRange('C13:C18').format.numberFormat = '0.0%';
+  projectCost.dataValidations.add({
+    range: 'C13:C18',
+    rule: { type: 'decimal', operator: 'between', formula1: 0, formula2: 1 },
+  });
+
+  projectCost.getRange('E12:L12').values = [
+    [
+      'Horizon',
+      'Share',
+      'Gate status',
+      'Reference index',
+      'Index factor',
+      'Weighted factor',
+      'Failure boundary',
+      'Evidence status',
+    ],
+  ];
+  header(projectCost.getRange('E12:L12'));
+  for (let index = 0; index < 6; index += 1) {
+    const row = 13 + index;
+    projectCost.getRange(`E${row}`).formulas = [[`=A${row}`]];
+    projectCost.getRange(`F${row}`).formulas = [[`=C${row}`]];
+    projectCost.getRange(`G${row}`).formulas = [
+      [
+        index === 0
+          ? `=IF(F${row}=0,"NOT USED","observed_origin")`
+          : `=IF(F${row}=0,"NOT USED",IF(COUNTIFS('Cost Baseline'!$A$11:$A$50,$B$6,'Cost Baseline'!$C$11:$C$50,$B$7,'Cost Baseline'!$E$11:$E$50,E${row},'Cost Baseline'!$F$11:$F$50,"gate_passed")=1,"gate_passed","WITHHELD"))`,
+      ],
+    ];
+    projectCost.getRange(`H${row}`).formulas = [
+      [
+        index === 0
+          ? `=IF(G${row}="observed_origin",SUMIFS('Cost Baseline'!$N$11:$N$50,'Cost Baseline'!$A$11:$A$50,$B$6,'Cost Baseline'!$C$11:$C$50,$B$7),"")`
+          : `=IF(G${row}="gate_passed",SUMIFS('Cost Baseline'!$L$11:$L$50,'Cost Baseline'!$A$11:$A$50,$B$6,'Cost Baseline'!$C$11:$C$50,$B$7,'Cost Baseline'!$E$11:$E$50,E${row}),"")`,
+      ],
+    ];
+    projectCost.getRange(`I${row}`).formulas = [
+      [
+        `=IF(H${row}="","",H${row}/SUMIFS('Cost Baseline'!$N$11:$N$50,'Cost Baseline'!$A$11:$A$50,$B$6,'Cost Baseline'!$C$11:$C$50,$B$7))`,
+      ],
+    ];
+    projectCost.getRange(`J${row}`).formulas = [
+      [`=IF(I${row}="","",F${row}*I${row})`],
+    ];
+    projectCost.getRange(`K${row}`).formulas = [
+      [
+        `=IF(G${row}="WITHHELD","Required horizon gate failed or is unavailable","")`,
+      ],
+    ];
+    projectCost.getRange(`L${row}`).formulas = [
+      [
+        `=IF(F${row}=0,"not_used",IF(G${row}="WITHHELD","withheld","reference_baseline"))`,
+      ],
+    ];
+  }
+  projectCost.getRange('F13:F18').format.numberFormat = '0.0%';
+  projectCost.getRange('H13:J18').format.numberFormat = '0.0000';
+  projectCost.getRange('G13:G18').conditionalFormats.add('containsText', {
+    text: 'WITHHELD',
+    format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
+  });
+
+  projectCost.getRange('A21:B21').values = [
+    ['Project calculation gate', 'Result'],
+  ];
+  header(projectCost.getRange('A21:B21'));
+  projectCost.getRange('A22:A30').values = [
+    ['Expenditure shares'],
+    ['Active expenditure horizons'],
+    ['Required horizon gates'],
+    ['Independent modelling review'],
+    ['Project result status'],
+    ['Schedule-weighted factor'],
+    ['Reference change'],
+    ['Reference estimate'],
+    ['Reference escalation'],
+  ];
+  projectCost.getRange('A22:A30').format.font = { bold: true, color: C.ink };
+  projectCost.getRange('B22').formulas = [
+    ['=IF(ABS(SUM(C13:C18)-1)<0.000001,"PASS","FAIL")'],
+  ];
+  projectCost.getRange('B23').formulas = [['=COUNTIF(C13:C18,">0")']];
+  projectCost.getRange('B24').formulas = [
+    ['=IF(COUNTIF(G13:G18,"WITHHELD")=0,"PASS","WITHHELD")'],
+  ];
+  projectCost.getRange('B25').values = [
+    [
+      costBaseline.publication_authorization.public_projection_authorized
+        ? 'AUTHORIZED'
+        : 'WITHHELD',
+    ],
+  ];
+  projectCost.getRange('B26').formulas = [
+    [
+      '=IF(B22<>"PASS","NOT ASSESSED — PROFILE INVALID",IF(B24<>"PASS","WITHHELD — REQUIRED HORIZON GATE FAILED",IF(B25<>"AUTHORIZED","WITHHELD — INDEPENDENT REVIEW","BASELINE ONLY")))',
+    ],
+  ];
+  projectCost.getRange('B27').formulas = [
+    ['=IF(B26="BASELINE ONLY",SUM(J13:J18),"")'],
+  ];
+  projectCost.getRange('B28').formulas = [
+    ['=IF(B26="BASELINE ONLY",B27-1,"")'],
+  ];
+  projectCost.getRange('B29').formulas = [
+    ['=IF(B26="BASELINE ONLY",B8*B27,"")'],
+  ];
+  projectCost.getRange('B30').formulas = [
+    ['=IF(B26="BASELINE ONLY",B29-B8,"")'],
+  ];
+  projectCost.getRange('B27').format.numberFormat = '0.0000';
+  projectCost.getRange('B28').format.numberFormat = '0.0%';
+  projectCost.getRange('B29:B30').format.numberFormat = '$#,##0';
+  projectCost.getRange('B22:B26').conditionalFormats.add('containsText', {
+    text: 'WITHHELD',
+    format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
+  });
+  projectCost.getRange('B22:B26').conditionalFormats.add('containsText', {
+    text: 'PASS',
+    format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+  });
+
+  projectCost.getRange('D21:L26').merge();
+  projectCost.getRange('D21').values = [
+    [
+      'EXPECTED DEFAULT RESULT: WITHHELD. The five-year Calgary health example requires horizons 1 through 5. Those horizons do not pass the predeclared validation gates, so the schedule-weighted project estimate remains blank. This protects decision makers from a precise-looking but unsupported escalation number.',
+    ],
+  ];
+  projectCost.getRange('D21:L26').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529' },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  projectCost.getRange('D28:L34').merge();
+  projectCost.getRange('D28').values = [
+    [
+      'AI-ATTRIBUTABLE INCREMENT: NOT CALIBRATED. Cost escalation %, escalation CAD and schedule delay remain blank. Graph pressure scores may explain mechanisms and bottlenecks, but they do not enter the market-reference calculation and cannot be converted into dollars or days without a separately validated attribution model.',
+    ],
+  ];
+  noteBlock(projectCost.getRange('D28:L34'));
+  projectCost.getRange('A33:B36').values = [
+    ['AI-attributable cost escalation', null],
+    ['AI-attributable escalation (CAD)', null],
+    ['AI-attributable schedule delay', null],
+    ['AI increment status', 'NOT CALIBRATED'],
+  ];
+  projectCost.getRange('A33:A36').format.font = { bold: true, color: C.ink };
+  projectCost.getRange('B33').format.numberFormat = '0.0%';
+  projectCost.getRange('B34').format.numberFormat = '$#,##0';
+  projectCost.getRange('B35').format.numberFormat = '0 "days"';
+  projectCost.getRange('B36').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  projectCost.freezePanes.freezeRows(4);
+  setWidths(
+    projectCost,
+    {
+      A: 26,
+      B: 30,
+      C: 19,
+      D: 4,
+      E: 12,
+      F: 12,
+      G: 20,
+      H: 18,
+      I: 15,
+      J: 18,
+      K: 34,
+      L: 20,
+    },
+    38,
+  );
+}
+
 function buildSources() {
   titleBand(
     sources,
@@ -2170,12 +2615,12 @@ function buildSources() {
 function buildReleaseChecks() {
   titleBand(
     checks,
-    'Release identity and reconciliation',
-    'Workbook results must reconcile to the same immutable public release',
+    'Workbook identity and reconciliation',
+    `Workbook ${workbookBuildVersion} · public release basis ${release.manifest.version}`,
     'D',
   );
   checks.getRange('A5:B13').values = [
-    ['Release version', release.manifest.version],
+    ['Public release basis', release.manifest.version],
     ['Release ID', release.manifest.release_id],
     ['Schema version', release.manifest.schema_version],
     ['Model version', release.manifest.model_version],
@@ -2208,8 +2653,11 @@ function buildReleaseChecks() {
     ['Material-screen rows reconcile to release', 'PASS'],
     ['Project-exposure rows reconcile to release', 'PASS'],
     ['Power evidence reconciles and transmission remains unknown', 'PASS'],
+    ['Cost-baseline gate rows reconcile to the model artifact', 'PASS'],
+    ['Public cost projection remains unauthorized', 'PASS'],
+    ['Default project-cost result fails closed with blank outputs', 'PASS'],
   ];
-  checks.getRange('A16:C29').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C32').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -2297,33 +2745,42 @@ function buildReleaseChecks() {
       `=IF(AND('Power Evidence'!B10="PASS",'Power Evidence'!B9="UNKNOWN"),"PASS","FAIL")`,
     ],
   ];
-  checks
-    .getRange('B16:B29')
-    .conditionalFormats.add('containsText', {
-      text: 'PASS',
-      format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
-    });
-  checks
-    .getRange('B16:B29')
-    .conditionalFormats.add('containsText', {
-      text: 'FAIL',
-      format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
-    });
-  checks.getRange('A32:D33').merge();
-  checks.getRange('A32').values = [
+  checks.getRange('B30').formulas = [
     [
-      'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, or if assumptions/scenarios are presented as observations.',
+      '=IF(AND(ROWS(\'Cost Baseline\'!$A$11:$A$50)=40,COUNTIF(\'Cost Baseline\'!$F$11:$F$50,"gate_passed")=1),"PASS","FAIL")',
     ],
   ];
-  noteBlock(checks.getRange('A32:D33'));
-  setWidths(checks, { A: 54, B: 61, C: 15, D: 18 }, 34);
+  checks.getRange('B31').formulas = [
+    ['=IF(\'Cost Baseline\'!B6="NO","PASS","FAIL")'],
+  ];
+  checks.getRange('B32').formulas = [
+    [
+      '=IF(AND(LEFT(\'Project Cost Check\'!B26,8)="WITHHELD",\'Project Cost Check\'!B29="",\'Project Cost Check\'!B30=""),"PASS","FAIL")',
+    ],
+  ];
+  checks.getRange('B16:B32').conditionalFormats.add('containsText', {
+    text: 'PASS',
+    format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+  });
+  checks.getRange('B16:B32').conditionalFormats.add('containsText', {
+    text: 'FAIL',
+    format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
+  });
+  checks.getRange('A35:D37').merge();
+  checks.getRange('A35').values = [
+    [
+      'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, or if a cost output appears while a required validation or independent-review gate is withheld.',
+    ],
+  ];
+  noteBlock(checks.getRange('A35:D37'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 38);
 }
 
 function buildDashboard() {
   titleBand(
     dashboard,
     'Alberta pilot dashboard',
-    `Observed pipeline + $50B counterfactual diagnostic · Release ${release.manifest.version}`,
+    `Observed pipeline + $50B counterfactual diagnostic · workbook ${workbookBuildVersion}`,
     'L',
   );
   card(
@@ -2435,24 +2892,46 @@ function buildDashboard() {
   flowChart.yAxis = { numberFormatCode: '$0.0', min: 0 };
   flowChart.setPosition('D25', 'L39');
 
-  dashboard.getRange('A41:L43').merge();
+  dashboard.getRange('A41:C42').merge();
   dashboard.getRange('A41').values = [
+    ['Four- to five-year project cost outlook'],
+  ];
+  dashboard.getRange('A41:C42').format = {
+    fill: C.amber,
+    font: { bold: true, color: C.white, size: 11 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    horizontalAlignment: 'center',
+  };
+  dashboard.getRange('D41:L42').merge();
+  dashboard.getRange('D41').formulas = [["='Project Cost Check'!B26"]];
+  dashboard.getRange('D41:L42').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826', size: 12 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    horizontalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  dashboard.getRange('A44:L47').merge();
+  dashboard.getRange('A44').values = [
     [
-      'UNCALIBRATED STRUCTURAL DIAGNOSTIC: project capex is an observed announcement pipeline with inferred classification. Pressure scores are not findings, percentages or delay estimates; 54% of scenario capex is excluded. AESO requests, contracts and connected load are distinct; additional transmission for the $50B case remains unknown. BCPI component movements are shared-market baselines, not AI-attributed effects. The recruitment screen is cross-vintage and not a current vacancy rate.',
+      'WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC: only 1 of 40 reference-class horizon checks passes, and no public project-cost projection is authorized. Four- and five-year Alberta health and school results remain blank. Pressure scores are mechanisms, not percentages or delay estimates. Additional transmission for the $50B case and every AI-attributable cost or schedule increment remain unknown.',
     ],
   ];
-  dashboard.getRange('A41:L43').format = {
+  dashboard.getRange('A44:L47').format = {
     fill: C.amberLight,
     font: { color: '#7B4529', size: 10 },
     wrapText: true,
     verticalAlignment: 'center',
     borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
   };
-  dashboard.getRange('A44:L44').merge();
-  dashboard.getRange('A44').values = [
+  dashboard.getRange('A48:L48').merge();
+  dashboard.getRange('A48').values = [
     [`Release hash: ${release.manifest.input_manifest_hash}`],
   ];
-  dashboard.getRange('A44').format = {
+  dashboard.getRange('A48').format = {
     font: { name: 'Aptos Mono', size: 8, color: C.muted },
     horizontalAlignment: 'left',
   };
@@ -2473,7 +2952,7 @@ function buildDashboard() {
       K: 15,
       L: 15,
     },
-    44,
+    48,
   );
 }
 
