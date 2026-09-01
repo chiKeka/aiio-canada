@@ -93,3 +93,20 @@ contracts, forecasts, or realized demand. The current page reports executed
 contracts under the 1,200 MW Phase 1 limit. AESO's statement that no new
 transmission reinforcement was required is restricted to that interim scope and
 cannot be generalized to the $50 billion counterfactual.
+
+## Implemented provincial power-planning source contract
+
+Five official Ontario, British Columbia and Quebec power-planning artifacts are
+now registered, retrieved and content-hash locked. The Ontario 2026 Annual
+Planning Outlook workbook supplies exact scenario energy, seasonal peak and
+remaining-needs values; the associated demand module supplies data-centre
+energy endpoints. Quebec's regulator-filed 2025 supply-plan update supplies
+electricity-sales, winter-peak and data-centre peak forecasts, with a later
+Hydro-Quebec announcement retained as a separate approximate outlook. The B.C.
+public 2025 IRP summary supplies selected energy, generation and transmission
+actions but no comparable numeric data-centre load path.
+
+The normalized contract keeps energy, peak, remaining need and planned supply
+action as separate quantities. It prohibits pooling Ontario data-centre TWh
+with Quebec data-centre MW, or interpreting B.C. plan actions as spare capacity.
+See `docs/methodology/provincial-power-planning-contract.md`.

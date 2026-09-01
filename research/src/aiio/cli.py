@@ -34,6 +34,7 @@ from .digest import build_digest
 from .labour import run_labour_recruitment_pressure
 from .materials import run_material_cost_screen, run_provincial_material_cost_screen
 from .power_evidence import run_power_evidence_screen
+from .power_planning import run_provincial_power_planning_contract
 from .project_cost import run_project_reference_cost
 from .public_projects import run_public_project_exposure
 from .registry import load_registry
@@ -158,6 +159,14 @@ def main() -> None:
     power_evidence_parser.add_argument("interim_html_path", type=Path)
     power_evidence_parser.add_argument("output_json_path", type=Path)
     power_evidence_parser.add_argument("output_csv_path", type=Path)
+
+    provincial_power_parser = subparsers.add_parser(
+        "run-provincial-power-planning",
+        help="validate the Ontario, B.C. and Quebec power-planning source contract",
+    )
+    provincial_power_parser.add_argument("extract_path", type=Path)
+    provincial_power_parser.add_argument("output_json_path", type=Path)
+    provincial_power_parser.add_argument("output_csv_path", type=Path)
 
     subparsers.add_parser(
         "fetch-major-projects",
@@ -482,6 +491,25 @@ def main() -> None:
                         "status": "passed",
                         "model_id": output["model_id"],
                         "metric_count": len(output["metrics"]),
+                    }
+                )
+            )
+        elif args.command == "run-provincial-power-planning":
+            output = run_provincial_power_planning_contract(
+                args.extract_path.resolve(),
+                root,
+                args.output_json_path.resolve(),
+                args.output_csv_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "metric_count": output["metric_count"],
+                        "publication_authorized": output["publication_boundary"][
+                            "provincial_power_profile_authorized"
+                        ],
                     }
                 )
             )

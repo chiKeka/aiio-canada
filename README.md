@@ -43,6 +43,7 @@ npm run materials:screen:provinces
 npm run projects:exposure
 npm run projects:normalize:provinces
 npm run power:evidence
+npm run power:planning:provinces
 npm run model:run
 npm run power:run
 npm run research:test
