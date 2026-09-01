@@ -61,6 +61,8 @@ npm run attribution:readiness
 npm run treatment:capex-screen
 npm run bcpi:normalize:reference-cmas
 npm run cost:baseline:cmas
+npm run cost:backcast:provinces
+npm run cost:review:province-bridge
 npm run cost:historical-envelope
 npm run cost:review-package
 npm run model:run

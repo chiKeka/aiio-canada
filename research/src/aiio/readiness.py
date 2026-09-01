@@ -1001,20 +1001,168 @@ def audit_program_readiness(
         release_gate=True,
     )
 
-    provincial_baseline = load_json_or_empty(
-        root / "data/model-runs/bc_on_qc_bcpi_reference_baseline_v0.1.json"
+    province_linked_csv_path = (
+        root / "data/processed/bcpi_province_linked_history_bc_on_qc.csv"
     )
-    province_projection_authorized = provincial_baseline.get(
-        "publication_authorization", {}
-    ).get("public_projection_authorized") is True
+    province_linked_path = (
+        root
+        / "data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json"
+    )
+    province_linked = load_json_or_empty(province_linked_path)
+    province_linked_boundary = province_linked.get("publication_authorization", {})
+    province_linked_diagnostics = province_linked.get("backcast_method", {}).get(
+        "diagnostics", []
+    )
+    province_linked_code_manifest = province_linked.get("code_manifest", {})
+    expected_province_linked_code_manifest = {
+        "calibration_sha256": sha256_file(
+            root / "research/src/aiio/calibration.py"
+        ).removeprefix("sha256:"),
+        "province_backcast_sha256": sha256_file(
+            root / "research/src/aiio/provincial_backcast.py"
+        ).removeprefix("sha256:"),
+    }
+    expected_province_linked_code_sha = hashlib.sha256(
+        json.dumps(
+            expected_province_linked_code_manifest,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    province_linked_ready = (
+        province_linked_csv_path.exists()
+        and province_linked_path.exists()
+        and province_linked.get("backcast_id")
+        == "AIIO_CA_BC_ON_QC_PROVINCE_LINKED_BACKCAST_0_1"
+        and province_linked.get("backcast_output_sha256")
+        == sha256_file(province_linked_csv_path).removeprefix("sha256:")
+        and province_linked_code_manifest == expected_province_linked_code_manifest
+        and province_linked.get("code_sha256")
+        == expected_province_linked_code_sha
+        and len(province_linked_diagnostics) == 12
+        and all(item.get("status") == "pass" for item in province_linked_diagnostics)
+        and all(
+            item.get("overlap_mape_percent", 100) <= 3.0
+            for item in province_linked_diagnostics
+        )
+        and province_linked.get("publication_summary", {}).get(
+            "horizon_status_counts"
+        )
+        == {"gate_failed": 36, "gate_passed": 9, "not_assessed": 15}
+        and province_linked_boundary.get(
+            "province_linked_backcast_authorized_for_research_display"
+        )
+        is True
+        and province_linked_boundary.get("public_projection_authorized") is False
+        and province_linked_boundary.get("project_cost_translation_authorized")
+        is False
+        and province_linked_boundary.get("ai_attributable_effect_authorized")
+        is False
+    )
+    record(
+        "province_linked_reference_backcast",
+        "canada_expansion",
+        PASS if province_linked_ready else FAIL,
+        "The BC, Ontario and Quebec pre-2017 reference bridge is hash-locked, labels 1,296 inferred CMA-linked observations and keeps every projection withheld."
+        if province_linked_ready
+        else "The province-linked BCPI bridge is missing, stale, outside its overlap threshold or has an unsafe publication boundary.",
+        [
+            "data/processed/bcpi_province_linked_history_bc_on_qc.csv",
+            "data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json",
+            "research/src/aiio/provincial_backcast.py",
+            "docs/methodology/province-linked-bcpi-backcast.md",
+        ],
+        release_gate=True,
+    )
+
+    province_linked_review_path = (
+        root
+        / "data/model-runs/bc_on_qc_province_linked_review_package_v0.1.json"
+    )
+    province_linked_review = load_json_or_empty(province_linked_review_path)
+    province_linked_review_manifest = province_linked_review.get(
+        "input_manifest", []
+    )
+    province_linked_review_manifest_ok = (
+        isinstance(province_linked_review_manifest, list)
+        and len(province_linked_review_manifest) == 10
+    )
+    if province_linked_review_manifest_ok:
+        for item in province_linked_review_manifest:
+            try:
+                relative_path = Path(item["path"])
+                resolved_path = (root / relative_path).resolve()
+                resolved_path.relative_to(root)
+                entry_ok = (
+                    not relative_path.is_absolute()
+                    and resolved_path.is_file()
+                    and item.get("sha256") == sha256_file(resolved_path)
+                )
+            except (KeyError, TypeError, ValueError, OSError):
+                entry_ok = False
+            if not entry_ok:
+                province_linked_review_manifest_ok = False
+                break
+    province_linked_review_boundary = province_linked_review.get(
+        "publication_boundary", {}
+    )
+    province_linked_review_ready = (
+        province_linked_review_path.exists()
+        and province_linked_review.get("package_id")
+        == "AIIO_CA_PROVINCE_LINKED_BCPI_REVIEW_PACKAGE_0_1"
+        and province_linked_review.get("review_status")
+        == "pending_independent_review"
+        and province_linked_review_manifest_ok
+        and province_linked_review.get("model_artifact_sha256")
+        == sha256_file(province_linked_path)
+        and len(province_linked_review.get("required_criteria", [])) == 10
+        and province_linked_review.get("facts_to_reconcile", {}).get(
+            "total_observation_count"
+        )
+        == 1752
+        and province_linked_review.get("facts_to_reconcile", {}).get(
+            "inferred_observation_count"
+        )
+        == 1296
+        and province_linked_review_boundary.get("independent_review_complete")
+        is False
+        and province_linked_review_boundary.get("public_projection_authorized")
+        is False
+        and province_linked_review_boundary.get(
+            "project_cost_translation_authorized"
+        )
+        is False
+        and province_linked_review_boundary.get("ai_attributable_effect_authorized")
+        is False
+    )
+    record(
+        "province_linked_backcast_review_instrument",
+        "governance",
+        PASS if province_linked_review_ready else FAIL,
+        "The province-linked BCPI packet hash-locks ten inputs and ten method criteria while granting no projection, project-cost or AI-effect authority."
+        if province_linked_review_ready
+        else "The province-linked review packet is missing, stale or has an unsafe authorization boundary.",
+        [
+            "data/model-runs/bc_on_qc_province_linked_review_package_v0.1.json",
+            "docs/reviews/2026-09-01-province-linked-bcpi-review-prompt.md",
+            "research/src/aiio/provincial_backcast_review.py",
+        ],
+        release_gate=True,
+    )
+
+    province_projection_authorized = province_linked_boundary.get(
+        "public_projection_authorized"
+    ) is True
     record(
         "provincial_decision_models",
         "decision_grade_outputs",
         PASS if province_projection_authorized else PENDING,
         "Comparable provincial decision models are independently authorized."
         if province_projection_authorized
-        else "BC, Ontario and Quebec province-level evidence remains too short and null. A separate CMA artifact does not substitute for provincial decision models.",
-        ["data/model-runs/bc_on_qc_bcpi_reference_baseline_v0.1.json"],
+        else "The province-linked historical bridge now supports internal validation, but it remains an inferred CMA-linked proxy and is withheld pending independent method review.",
+        [
+            "data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json"
+        ],
         release_gate=True,
     )
 

@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.21.0-dev';
+const workbookBuildVersion = '0.22.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -437,6 +437,17 @@ const cmaReferenceBaseline = JSON.parse(
     'utf8',
   ),
 );
+const provinceLinkedBaseline = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'bc_on_qc_province_linked_reference_baseline_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -462,6 +473,7 @@ const historicalCostSheet = workbook.worksheets.add('Historical Envelope');
 const referenceReviewSheet = workbook.worksheets.add('Reference Review');
 const sectorCapexSheet = workbook.worksheets.add('Sector Capex');
 const cmaReferenceSheet = workbook.worksheets.add('CMA Reference');
+const provinceBridgeSheet = workbook.worksheets.add('Province Bridge');
 const projectCost = workbook.worksheets.add('Project Cost Check');
 const canadaExpansion = workbook.worksheets.add('Canada Expansion');
 const attributionGate = workbook.worksheets.add('Attribution Gate');
@@ -515,6 +527,7 @@ for (const sheet of [
   referenceReviewSheet,
   sectorCapexSheet,
   cmaReferenceSheet,
+  provinceBridgeSheet,
   projectCost,
   canadaExpansion,
   attributionGate,
@@ -554,6 +567,7 @@ buildHistoricalCostEnvelope();
 buildReferenceReview();
 buildSectorCapex();
 buildCmaReference();
+buildProvinceBridge();
 buildProjectCostCheck();
 buildCanadaExpansion();
 buildAttributionGate();
@@ -603,9 +617,9 @@ console.log(inspectDashboard.ndjson);
 
 const inspectReadMe = await workbook.inspect({
   kind: 'table',
-  range: 'Read Me!A1:H55',
+  range: 'Read Me!A1:H56',
   include: 'values,formulas',
-  tableMaxRows: 54,
+  tableMaxRows: 56,
   tableMaxCols: 8,
 });
 console.log(inspectReadMe.ndjson);
@@ -623,7 +637,7 @@ const inspectChecks = await workbook.inspect({
   kind: 'table',
   range: 'Release Checks!A1:D56',
   include: 'values,formulas',
-  tableMaxRows: 53,
+  tableMaxRows: 54,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
@@ -672,6 +686,15 @@ const inspectCmaReference = await workbook.inspect({
   tableMaxCols: 23,
 });
 console.log(inspectCmaReference.ndjson);
+
+const inspectProvinceBridge = await workbook.inspect({
+  kind: 'table',
+  range: 'Province Bridge!A1:W32',
+  include: 'values,formulas',
+  tableMaxRows: 32,
+  tableMaxCols: 23,
+});
+console.log(inspectProvinceBridge.ndjson);
 
 const inspectCanadaExpansion = await workbook.inspect({
   kind: 'table',
@@ -763,7 +786,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H55',
+  'Read Me': 'A1:H56',
   Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -785,6 +808,7 @@ const previewRanges = {
   'Reference Review': 'A1:J40',
   'Sector Capex': 'A1:T45',
   'CMA Reference': 'A1:W32',
+  'Province Bridge': 'A1:W32',
   'Project Cost Check': 'A1:L38',
   'Canada Expansion': 'A1:J48',
   'Attribution Gate': 'A1:J48',
@@ -861,7 +885,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H50').values = [
+  readme.getRange('A18:H51').values = [
     [
       '1',
       'Dashboard',
@@ -1192,30 +1216,40 @@ function buildReadMe() {
       '',
       '',
     ],
-  ];
-  readme.getRange('A18:A50').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B50').format.font = { bold: true };
-  readme.getRange('C18:H50').merge(true);
-  readme.getRange('A52:H52').merge();
-  readme.getRange('A52').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A52:H52'), C.amber);
-  readme.getRange('A53:H53').merge();
-  readme.getRange('A53').values = [
     [
-      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 Alberta asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The CMA expansion adds 60 Vancouver, Toronto and Montréal horizon checks: 9 pass internally, 36 fail and 15 are not assessed. All nine passes are Vancouver results, but every value remains withheld pending independent review and no CMA result is province-wide evidence. The ${referenceCostReview.required_criteria.length}-criterion Alberta review packet is prepared but has no verdict, and both reviewer channels remain blocked. No public project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only; its quantiles are not forecasts, probabilities or project allowances. The NAICS 51 Sector Capex screen adds ${informationSectorCapex.observation_count} annual Canada/province cells and reports Alberta 2024 actual/revised construction capital of $458.6M, but ${informationSectorCapex.quality_flag_counts.suppressed_confidentiality} cells are suppressed and the broad industry cannot identify AI/data-centre treatment. The Regional Macro sheet adds ${regionalMacroReport.series_count} separate quarterly control series through ${regionalMacroReport.common_latest_period_end}; they are descriptive context, not a composite score, scenario calibration or AI effect. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
+      '34',
+      'Province Bridge',
+      'Inspect the CMA-linked pre-2017 provincial history, overlap diagnostics and still-withheld horizon validations.',
+      '',
+      '',
+      '',
+      '',
+      '',
     ],
   ];
-  readme.getRange('A53:H53').format = {
+  readme.getRange('A18:A51').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B51').format.font = { bold: true };
+  readme.getRange('C18:H51').merge(true);
+  readme.getRange('A53:H53').merge();
+  readme.getRange('A53').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A53:H53'), C.amber);
+  readme.getRange('A54:H54').merge();
+  readme.getRange('A54').values = [
+    [
+      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 Alberta asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The CMA expansion adds 60 Vancouver, Toronto and Montréal horizon checks: 9 pass internally, 36 fail and 15 are not assessed. The Province Bridge transparently relabels 1,296 pre-2017 CMA-linked values as inferred, preserves 456 official provincial observations and reproduces the same nine internal British Columbia-linked passes; none is an official pre-2017 province observation or an authorized projection. The ${referenceCostReview.required_criteria.length}-criterion Alberta review packet is prepared but has no verdict, and both reviewer channels remain blocked. No public project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only; its quantiles are not forecasts, probabilities or project allowances. The NAICS 51 Sector Capex screen adds ${informationSectorCapex.observation_count} annual Canada/province cells and reports Alberta 2024 actual/revised construction capital of $458.6M, but ${informationSectorCapex.quality_flag_counts.suppressed_confidentiality} cells are suppressed and the broad industry cannot identify AI/data-centre treatment. The Regional Macro sheet adds ${regionalMacroReport.series_count} separate quarterly control series through ${regionalMacroReport.common_latest_period_end}; they are descriptive context, not a composite score, scenario calibration or AI effect. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
+    ],
+  ];
+  readme.getRange('A54:H54').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A53').format.rowHeight = 230;
+  readme.getRange('A54').format.rowHeight = 245;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
-    55,
+    56,
   );
 }
 
@@ -3816,6 +3850,246 @@ function buildCmaReference() {
   );
 }
 
+function buildProvinceBridge() {
+  titleBand(
+    provinceBridgeSheet,
+    'British Columbia, Ontario and Quebec province-linked history',
+    'Official province observations from 2017 · CMA-linked inferred history before 2017 · all projections withheld',
+    'W',
+  );
+  const diagnostics = provinceLinkedBaseline.backcast_method.diagnostics;
+  const horizonRows = provinceLinkedBaseline.reference_class_results.flatMap(
+    (result) =>
+      result.horizons.map((horizon) => {
+        const failedGates = Object.entries(horizon.gates ?? {})
+          .filter(([, passed]) => !passed)
+          .map(([gate]) => gate)
+          .join(' | ');
+        return [
+          result.geography_id,
+          result.geography_label,
+          labelize(result.asset_class),
+          result.reference_class_label,
+          result.observation_count,
+          new Date(`${result.first_period_end}T00:00:00Z`),
+          new Date(`${result.latest_period_end}T00:00:00Z`),
+          result.latest_index,
+          horizon.horizon_years,
+          horizon.status,
+          horizon.selected_method ?? '',
+          horizon.projected_cumulative_change_percent,
+          horizon.empirical_error_band_low_change_percent,
+          horizon.empirical_error_band_high_change_percent,
+          horizon.calibration_period?.origin_count ?? 0,
+          horizon.validation_period?.origin_count ?? 0,
+          horizon.validation_period?.selected_method_metrics
+            ?.mean_absolute_percentage_error ?? null,
+          horizon.validation_period?.selected_method_metrics
+            ?.mean_percentage_error ?? null,
+          horizon.validation_period?.empirical_interval_coverage_percent ?? null,
+          failedGates || (horizon.status === 'gate_passed' ? 'none' : horizon.reason),
+          provinceLinkedBaseline.publication_authorization
+            .public_projection_authorized
+            ? 'YES'
+            : 'NO',
+          provinceLinkedBaseline.source_id,
+          'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901',
+        ];
+      }),
+  );
+  const diagnosticsStart = 14;
+  const diagnosticsEnd = diagnosticsStart + diagnostics.length - 1;
+  const horizonHeaderRow = diagnosticsEnd + 3;
+  const horizonStart = horizonHeaderRow + 1;
+  const horizonEnd = horizonStart + horizonRows.length - 1;
+  const totalObservations = provinceLinkedBaseline.reference_class_results.reduce(
+    (total, result) => total + result.observation_count,
+    0,
+  );
+  const inferredObservations = diagnostics.reduce(
+    (total, item) => total + item.backcast_observation_count,
+    0,
+  );
+  const officialObservations = totalObservations - inferredObservations;
+
+  provinceBridgeSheet.getRange('A5:B10').values = [
+    ['Model ID', provinceLinkedBaseline.model_id],
+    ['Total linked observations', totalObservations],
+    ['Inferred pre-2017 observations', inferredObservations],
+    ['Official observations', officialObservations],
+    ['Reference series', provinceLinkedBaseline.publication_summary.reference_series_count],
+    ['Gate-passing horizons', provinceLinkedBaseline.publication_summary.horizon_status_counts.gate_passed],
+  ];
+  provinceBridgeSheet.getRange('A5:A10').format.font = { bold: true, color: C.ink };
+  provinceBridgeSheet.getRange('B5:B10').format = {
+    fill: C.soft,
+    borders: { preset: 'outside', style: 'thin', color: C.line },
+  };
+  provinceBridgeSheet.getRange('B6:B10').format.numberFormat = '#,##0';
+
+  provinceBridgeSheet.getRange('D5:E10').values = [
+    ['Overlap diagnostics', diagnostics.length],
+    ['Maximum overlap MAPE', Math.max(...diagnostics.map((item) => item.overlap_mape_percent)) / 100],
+    ['Public projection authorized', provinceLinkedBaseline.publication_authorization.public_projection_authorized ? 'YES' : 'NO'],
+    ['Research display authorized', provinceLinkedBaseline.publication_authorization.province_linked_backcast_authorized_for_research_display ? 'YES' : 'NO'],
+    ['Release state', provinceLinkedBaseline.release_state],
+    ['Independent review', 'pending'],
+  ];
+  provinceBridgeSheet.getRange('D5:D10').format.font = { bold: true, color: C.ink };
+  provinceBridgeSheet.getRange('E5:E10').format = {
+    fill: C.amberLight,
+    font: { color: '#8A4826', bold: true },
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  provinceBridgeSheet.getRange('E6').format.numberFormat = '0.00%';
+
+  provinceBridgeSheet.getRange('G5:W10').merge();
+  provinceBridgeSheet.getRange('G5').values = [[
+    'RESEARCH DISPLAY ONLY. The pre-2017 bridge scales Montréal, Toronto or Vancouver to the first official provincial index level. Every inferred row is explicitly labelled and retains the reference CMA DGUID. The overlap screen confirms close tracking after the anchor, not historical province-wide representativeness. Nine British Columbia-linked horizons pass internally; Ontario and Quebec remain gate-failed, municipal-operations histories remain too short, and no project-cost or AI-effect result is authorized.',
+  ]];
+  provinceBridgeSheet.getRange('G5:W10').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529' },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  provinceBridgeSheet.getRange('A12:J12').merge();
+  provinceBridgeSheet.getRange('A12').values = [['Backcast overlap diagnostics']];
+  sectionHeader(provinceBridgeSheet.getRange('A12:J12'));
+  provinceBridgeSheet.getRange('A13:J13').values = [[
+    'Province ID',
+    'Reference CMA ID',
+    'Indicator ID',
+    'Anchor quarter',
+    'Scale factor',
+    'Overlap count',
+    'Overlap MAPE',
+    'Max absolute overlap error',
+    'Backcast observations',
+    'Status',
+  ]];
+  header(provinceBridgeSheet.getRange('A13:J13'));
+  provinceBridgeSheet.getRange(`A${diagnosticsStart}:J${diagnosticsEnd}`).values = diagnostics.map((item) => [
+    item.province_id,
+    item.reference_cma_id,
+    item.indicator_id,
+    new Date(`${item.anchor_period_end}T00:00:00Z`),
+    item.anchor_scale_factor,
+    item.overlap_observation_count,
+    item.overlap_mape_percent / 100,
+    item.overlap_max_absolute_error_percent / 100,
+    item.backcast_observation_count,
+    item.status.toUpperCase(),
+  ]);
+  provinceBridgeSheet.getRange(`D${diagnosticsStart}:D${diagnosticsEnd}`).format.numberFormat = 'yyyy-mm-dd';
+  provinceBridgeSheet.getRange(`E${diagnosticsStart}:E${diagnosticsEnd}`).format.numberFormat = '0.000000';
+  provinceBridgeSheet.getRange(`F${diagnosticsStart}:F${diagnosticsEnd}`).format.numberFormat = '0';
+  provinceBridgeSheet.getRange(`G${diagnosticsStart}:H${diagnosticsEnd}`).format.numberFormat = '0.00%';
+  provinceBridgeSheet.getRange(`I${diagnosticsStart}:I${diagnosticsEnd}`).format.numberFormat = '#,##0';
+  provinceBridgeSheet.getRange(`J${diagnosticsStart}:J${diagnosticsEnd}`).conditionalFormats.add('containsText', {
+    text: 'PASS',
+    format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+  });
+  const diagnosticTable = provinceBridgeSheet.tables.add(
+    `A13:J${diagnosticsEnd}`,
+    true,
+    'ProvinceBridgeDiagnosticTable',
+  );
+  diagnosticTable.style = 'TableStyleMedium2';
+
+  provinceBridgeSheet.getRange(`A${horizonHeaderRow}:W${horizonHeaderRow}`).values = [[
+    'Geography ID',
+    'Geography',
+    'Asset class',
+    'Reference class',
+    'Observations',
+    'First quarter',
+    'Latest quarter',
+    'Latest index',
+    'Horizon (years)',
+    'Validation status',
+    'Selected method',
+    'Projected change (%)',
+    'Band low (%)',
+    'Band high (%)',
+    'Calibration origins',
+    'Validation origins',
+    'Validation MAPE (%)',
+    'Validation bias (%)',
+    'Interval coverage (%)',
+    'Failed gate(s)',
+    'Public projection authorized',
+    'Source ID',
+    'Source URL',
+  ]];
+  header(provinceBridgeSheet.getRange(`A${horizonHeaderRow}:W${horizonHeaderRow}`));
+  provinceBridgeSheet.getRange(`A${horizonStart}:W${horizonEnd}`).values = horizonRows;
+  provinceBridgeSheet.getRange(`E${horizonStart}:E${horizonEnd}`).format.numberFormat = '0';
+  provinceBridgeSheet.getRange(`F${horizonStart}:G${horizonEnd}`).format.numberFormat = 'yyyy-mm-dd';
+  provinceBridgeSheet.getRange(`H${horizonStart}:H${horizonEnd}`).format.numberFormat = '0.0';
+  provinceBridgeSheet.getRange(`I${horizonStart}:I${horizonEnd}`).format.numberFormat = '0';
+  provinceBridgeSheet.getRange(`L${horizonStart}:S${horizonEnd}`).format.numberFormat = '0.0';
+  provinceBridgeSheet.getRange(`J${horizonStart}:J${horizonEnd}`).conditionalFormats.add('containsText', {
+    text: 'gate_passed',
+    format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+  });
+  provinceBridgeSheet.getRange(`J${horizonStart}:J${horizonEnd}`).conditionalFormats.add('containsText', {
+    text: 'gate_failed',
+    format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
+  });
+  provinceBridgeSheet.getRange(`J${horizonStart}:J${horizonEnd}`).conditionalFormats.add('containsText', {
+    text: 'not_assessed',
+    format: { fill: C.amberLight, font: { color: '#8A4826', bold: true } },
+  });
+  const horizonTable = provinceBridgeSheet.tables.add(
+    `A${horizonHeaderRow}:W${horizonEnd}`,
+    true,
+    'ProvinceBridgeHorizonTable',
+  );
+  horizonTable.style = 'TableStyleMedium2';
+
+  const noteStart = horizonEnd + 2;
+  const noteEnd = noteStart + 2;
+  provinceBridgeSheet.getRange(`A${noteStart}:W${noteEnd}`).merge();
+  provinceBridgeSheet.getRange(`A${noteStart}`).values = [[
+    'The 1,752-row combined observation file is the auditable model input: 1,296 pre-2017 inferred rows and 456 untouched official rows. Blank projection and interval cells are intentional when a horizon fails or is not assessed. The bridge improves validation history but cannot convert a CMA reference into an official historical provincial index.',
+  ]];
+  noteBlock(provinceBridgeSheet.getRange(`A${noteStart}:W${noteEnd}`));
+  provinceBridgeSheet.freezePanes.freezeRows(horizonHeaderRow);
+  provinceBridgeSheet.freezePanes.freezeColumns(4);
+  setWidths(
+    provinceBridgeSheet,
+    {
+      A: 14,
+      B: 22,
+      C: 39,
+      D: 39,
+      E: 14,
+      F: 14,
+      G: 16,
+      H: 18,
+      I: 18,
+      J: 18,
+      K: 27,
+      L: 18,
+      M: 15,
+      N: 15,
+      O: 18,
+      P: 18,
+      Q: 19,
+      R: 18,
+      S: 19,
+      T: 52,
+      U: 22,
+      V: 34,
+      W: 52,
+    },
+    noteEnd,
+  );
+}
+
 function buildProjectCostCheck() {
   titleBand(
     projectCost,
@@ -6288,8 +6562,9 @@ function buildReleaseChecks() {
     ['Information-sector capex screen reconciles and remains non-authorizing', 'PASS'],
     ['CMA reference-cost expansion reconciles and remains withheld', 'PASS'],
     ['Regional macro controls reconcile and remain descriptive only', 'PASS'],
+    ['Province-linked BCPI bridge reconciles and remains non-authorizing', 'PASS'],
   ];
-  checks.getRange('A16:C49').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C50').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -6479,21 +6754,24 @@ function buildReleaseChecks() {
       `=IF(AND(ROWS('Regional Macro'!$A$17:$A$${regionalMacroLastRow})=${regionalMacroReport.observation_count},COUNTIF('Regional Macro'!$N$17:$N$${regionalMacroLastRow},"observed")=${regionalMacroReport.observation_count},COUNTIF('Regional Macro'!$O$17:$O$${regionalMacroLastRow},"observed")=494,COUNTIF('Regional Macro'!$O$17:$O$${regionalMacroLastRow},"inferred")=2622),"PASS","FAIL")`,
     ],
   ];
-  checks.getRange('B16:B49').conditionalFormats.add('containsText', {
+  checks.getRange('B50').formulas = [[
+    '=IF(AND(\'Province Bridge\'!B6=1752,\'Province Bridge\'!B7=1296,\'Province Bridge\'!B8=456,\'Province Bridge\'!B9=12,\'Province Bridge\'!B10=9,\'Province Bridge\'!E5=12,\'Province Bridge\'!E6<3%,\'Province Bridge\'!E7="NO",\'Province Bridge\'!E8="YES",\'Province Bridge\'!E9="baseline_only",\'Province Bridge\'!E10="pending",ROWS(\'Province Bridge\'!$A$29:$A$88)=60,COUNTIF(\'Province Bridge\'!$J$29:$J$88,"gate_passed")=9,COUNTIF(\'Province Bridge\'!$J$29:$J$88,"gate_failed")=36,COUNTIF(\'Province Bridge\'!$J$29:$J$88,"not_assessed")=15,COUNTIF(\'Province Bridge\'!$J$14:$J$25,"PASS")=12,COUNTIF(\'Province Bridge\'!$U$29:$U$88,"NO")=60),"PASS","FAIL")',
+  ]];
+  checks.getRange('B16:B50').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B49').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B50').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A51:D53').merge();
-  checks.getRange('A51').values = [
+  checks.getRange('A52:D54').merge();
+  checks.getRange('A52').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A51:D53'));
+  noteBlock(checks.getRange('A52:D54'));
   setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 56);
 }
 

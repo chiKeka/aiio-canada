@@ -93,6 +93,23 @@ validation errors, interval coverage, gate results and projected fields. A
 series remain distinct from CMA series; coefficients and model selections are
 not transferred across geographies.
 
+## Province-linked BCPI historical bridge
+
+The province-linked research artifact uses the reference-class series schema
+above. Official provincial observations retain `evidence_status=observed`.
+Pre-2017 bridge rows require `evidence_status=inferred`, the reference CMA
+`statcan_dguid`, `transformation_id`, and quality flags containing
+`province_linked_cma_backcast` and
+`not_official_provincial_observation`.
+
+Required model additions: `backcast_id`, `source_input_manifest`,
+`backcast_output_sha256`, `code_manifest`, `backcast_method`, and a
+`publication_authorization` object that separately controls research display,
+public projection, project-cost translation and AI attribution. Each diagnostic
+requires province, named reference CMA, indicator, anchor quarter, scale
+factor, overlap count, overlap MAPE, maximum absolute overlap error, backcast
+count and pass/fail status.
+
 The Alberta reference-cost independent-review package requires `package_id`,
 `model_artifact_sha256`, a role-labelled and hash-locked `input_manifest`,
 `facts_to_reconcile`, ten `required_criteria`, `reviewer_instructions`,

@@ -4,13 +4,13 @@
   "independent_review": {
     "grok": {
       "status": "blocked",
-      "reason": "The deterministic E1 review packet is ready, but the Grok CLI cannot initialize its local device context; no verdict has been produced.",
-      "evidence": "docs/reviews/2026-09-01-reference-cost-review-execution.md"
+      "reason": "The deterministic E1 and province-linked review packets are ready. The local Grok attempt was blocked first by sandbox network/session access and the required escalated external transmission was not authorized; no verdict has been produced.",
+      "evidence": "docs/reviews/2026-09-01-province-linked-bcpi-review-execution.md"
     },
     "claude": {
       "status": "blocked",
-      "reason": "The deterministic E1 review packet is ready, but the Claude CLI reports no authenticated session; no verdict has been produced.",
-      "evidence": "docs/reviews/2026-09-01-reference-cost-review-execution.md"
+      "reason": "The deterministic E1 and province-linked review packets are ready, but Claude Code 2.1.252 reports no authenticated session; no verdict has been produced.",
+      "evidence": "docs/reviews/2026-09-01-province-linked-bcpi-review-execution.md"
     }
   },
   "deployment": {

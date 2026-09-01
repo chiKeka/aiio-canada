@@ -1,4 +1,4 @@
-import { Building2, BriefcaseBusiness, Database, ExternalLink, ShieldCheck, TrendingUp } from 'lucide-react';
+import { Building2, BriefcaseBusiness, Database, ExternalLink, Layers3, ShieldCheck, TrendingUp } from 'lucide-react';
 
 import { EvidenceExplorer } from '@/components/evidence-explorer';
 import { LabourMarketExplorer, type NationalLabourAvailability, type NationalLabourPressure, type NationalWorkforceStock } from '@/components/labour-market-explorer';
@@ -7,6 +7,7 @@ import { EvidencePill, PageIntro, SiteFooter, SiteHeader } from '@/components/si
 import releaseData from '@/public/data/latest.json';
 import informationSectorCapex from '@/data/model-runs/information_sector_construction_capex_screen_v0.1.json';
 import cmaReferenceBaseline from '@/data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json';
+import provinceLinkedBaseline from '@/data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json';
 
 export default function EvidencePage() {
   const pipeline = releaseData.baseline.ai_project_pipeline;
@@ -52,6 +53,7 @@ export default function EvidencePage() {
       <RegionalMacroExplorer />
       <InformationSectorCapexPanel />
       <CmaReferenceCostPanel />
+      <ProvinceLinkedBackcastPanel />
       <section className="border-t border-[#d5ddd8] bg-[#e9ebe5]">
         <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
           <div className="mb-6 flex items-center gap-2"><Database className="size-4 text-[#24746c]" /><h2 className="text-xl font-medium">Registered public sources</h2></div>
@@ -68,6 +70,62 @@ export default function EvidencePage() {
       </section>
       <SiteFooter />
     </main>
+  );
+}
+
+function ProvinceLinkedBackcastPanel() {
+  const provinces = ['PR_59', 'PR_35', 'PR_24'].map((geographyId) => {
+    const results = provinceLinkedBaseline.reference_class_results.filter(
+      (item) => item.geography_id === geographyId,
+    );
+    const diagnostics = provinceLinkedBaseline.backcast_method.diagnostics.filter(
+      (item) => item.province_id === geographyId,
+    );
+    let passedHorizons = 0;
+    for (const result of results) {
+      const horizons = result.horizons as readonly { status: string }[];
+      for (const horizon of horizons) {
+        if (horizon.status === 'gate_passed') passedHorizons += 1;
+      }
+    }
+    return {
+      geographyId,
+      geographyLabel: results[0]?.geography_label ?? geographyId,
+      passedHorizons,
+      maximumOverlapMape: Math.max(
+        ...diagnostics.map((item) => item.overlap_mape_percent),
+      ),
+      inferredObservations: diagnostics.reduce(
+        (total, item) => total + item.backcast_observation_count,
+        0,
+      ),
+    };
+  });
+  return (
+    <section className="border-t border-[#d5ddd8] bg-[#f3efe7]">
+      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
+        <div className="flex items-center gap-2 text-[#8a5b38]">
+          <Layers3 className="size-4" />
+          <h2 className="text-xl font-medium">Province-linked historical reference bridge</h2>
+        </div>
+        <p className="mt-3 max-w-4xl text-sm leading-6 text-[#665f55]">
+          Official provincial BCPI observations are preserved from 2017 onward. Earlier institutional, school and office histories are inferred by scaling Montréal, Toronto or Vancouver to the first official provincial quarter. The bridge extends model-validation history without presenting CMA values as official provincial observations.
+        </p>
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
+          {provinces.map((item) => (
+            <article className="rounded-xl border border-[#d8cbbd] bg-[#fffdfa] p-5" key={item.geographyId}>
+              <p className="text-xs font-medium text-[#665f55]">{item.geographyLabel}</p>
+              <p className="mt-3 font-mono text-2xl font-semibold text-[#17343d]">{item.passedHorizons} / 20</p>
+              <p className="mt-1 text-xs leading-5 text-[#71695f]">internally gate-passing horizons · {item.inferredObservations} pre-2017 inferred observations</p>
+              <p className="mt-4 border-t border-[#e5ddd3] pt-3 font-mono text-[10px] uppercase tracking-[0.08em] text-[#76583f]">max overlap MAPE {item.maximumOverlapMape.toFixed(2)}%</p>
+            </article>
+          ))}
+        </div>
+        <div className="mt-5 rounded-xl border border-[#d8a47d] bg-[#fff0e4] p-4 text-sm leading-6 text-[#7b5138]">
+          Research display only. Nine horizons pass the unchanged internal forecast gates, all in British Columbia-linked reference classes. Ontario and Quebec remain gate-failed, the municipal-operations series remains too short, and no result is authorized for public projection, project-cost translation or AI attribution.
+        </div>
+      </div>
+    </section>
   );
 }
 

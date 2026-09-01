@@ -222,9 +222,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.21.0-dev.xlsx",
-        "workbook_sha256=sha256:884d2c5980b12acdea44beaa500880454ae0def2cfaa7eb67b8970e91d7872f7",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.21.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.22.0-dev.xlsx",
+        "workbook_sha256=sha256:7ae03416cc494c90c0a4d6814329dccc446d919911fed365e4399c79eff52e3a",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.22.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",
@@ -327,14 +327,39 @@
       "summary": "The Vancouver, Toronto and Montr\u00e9al CMA baseline is hash-locked; nine Vancouver horizons pass internally while every result remains withheld pending review."
     },
     {
+      "category": "canada_expansion",
+      "check_id": "province_linked_reference_backcast",
+      "evidence": [
+        "data/processed/bcpi_province_linked_history_bc_on_qc.csv",
+        "data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json",
+        "research/src/aiio/provincial_backcast.py",
+        "docs/methodology/province-linked-bcpi-backcast.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The BC, Ontario and Quebec pre-2017 reference bridge is hash-locked, labels 1,296 inferred CMA-linked observations and keeps every projection withheld."
+    },
+    {
+      "category": "governance",
+      "check_id": "province_linked_backcast_review_instrument",
+      "evidence": [
+        "data/model-runs/bc_on_qc_province_linked_review_package_v0.1.json",
+        "docs/reviews/2026-09-01-province-linked-bcpi-review-prompt.md",
+        "research/src/aiio/provincial_backcast_review.py"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The province-linked BCPI packet hash-locks ten inputs and ten method criteria while granting no projection, project-cost or AI-effect authority."
+    },
+    {
       "category": "decision_grade_outputs",
       "check_id": "provincial_decision_models",
       "evidence": [
-        "data/model-runs/bc_on_qc_bcpi_reference_baseline_v0.1.json"
+        "data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json"
       ],
       "release_gate": true,
       "status": "pending",
-      "summary": "BC, Ontario and Quebec province-level evidence remains too short and null. A separate CMA artifact does not substitute for provincial decision models."
+      "summary": "The province-linked historical bridge now supports internal validation, but it remains an inferred CMA-linked proxy and is withheld pending independent method review."
     },
     {
       "category": "governance",
@@ -367,7 +392,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 22,
+    "pass": 24,
     "pending": 3
   },
   "structural_integrity": true

@@ -57,6 +57,11 @@ from .calibration import (
     run_reference_class_baseline,
 )
 from .cma_calibration import run_cma_reference_class_baseline
+from .provincial_backcast import run_province_linked_reference_backcast
+from .provincial_backcast_review import (
+    build_province_linked_review_package,
+    validate_province_linked_review_verdict,
+)
 from .attribution import build_attribution_readiness
 from .digest import build_digest, validate_digest_cadence
 from .historical_envelope import run_historical_reference_envelope
@@ -283,6 +288,29 @@ def main() -> None:
     )
     cma_cost_baseline_parser.add_argument("bcpi_path", type=Path)
     cma_cost_baseline_parser.add_argument("output_path", type=Path)
+
+    province_linked_parser = subparsers.add_parser(
+        "run-province-linked-reference-backcast",
+        help="build and validate a CMA-linked pre-2017 provincial BCPI reference history",
+    )
+    province_linked_parser.add_argument("province_bcpi_path", type=Path)
+    province_linked_parser.add_argument("cma_bcpi_path", type=Path)
+    province_linked_parser.add_argument("output_csv_path", type=Path)
+    province_linked_parser.add_argument("output_json_path", type=Path)
+
+    province_linked_review_parser = subparsers.add_parser(
+        "build-province-linked-review",
+        help="build the deterministic independent-review packet for the province-linked BCPI bridge",
+    )
+    province_linked_review_parser.add_argument("output_json_path", type=Path)
+    province_linked_review_parser.add_argument("output_prompt_path", type=Path)
+
+    province_linked_verdict_parser = subparsers.add_parser(
+        "validate-province-linked-verdict",
+        help="validate a province-linked BCPI review verdict without mutating authorization",
+    )
+    province_linked_verdict_parser.add_argument("package_path", type=Path)
+    province_linked_verdict_parser.add_argument("verdict_path", type=Path)
 
     project_cost_parser = subparsers.add_parser(
         "run-project-reference-cost",
@@ -1100,6 +1128,46 @@ def main() -> None:
                     }
                 )
             )
+        elif args.command == "run-province-linked-reference-backcast":
+            output = run_province_linked_reference_backcast(
+                args.province_bcpi_path.resolve(),
+                args.cma_bcpi_path.resolve(),
+                args.output_csv_path.resolve(),
+                args.output_json_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "release_state": output["release_state"],
+                        "reference_class_count": len(
+                            output["reference_class_results"]
+                        ),
+                    }
+                )
+            )
+        elif args.command == "build-province-linked-review":
+            output = build_province_linked_review_package(
+                root,
+                args.output_json_path.resolve(),
+                args.output_prompt_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "package_id": output["package_id"],
+                        "review_status": output["review_status"],
+                        "criterion_count": len(output["required_criteria"]),
+                    }
+                )
+            )
+        elif args.command == "validate-province-linked-verdict":
+            output = validate_province_linked_review_verdict(
+                args.package_path.resolve(), args.verdict_path.resolve()
+            )
+            print(json.dumps(output))
         elif args.command == "run-historical-cost-envelope":
             output = run_historical_reference_envelope(
                 args.bcpi_path.resolve(),

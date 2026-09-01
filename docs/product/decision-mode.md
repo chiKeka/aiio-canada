@@ -86,6 +86,12 @@ does not edit the model artifact, governance state or public release. A
 prepared packet, an authenticated reviewer tool or a prose approval cannot
 unlock Decision Mode.
 
+The British Columbia, Ontario and Quebec province-linked historical bridge is
+also Research Mode evidence only. Its pre-2017 values are inferred from named
+CMA reference markets and may support validation research, but they must not be
+shown as official provincial observations or used for a project-cost result
+until the backcast and modelling review gate is independently passed.
+
 ## Analysis channels
 
 The product distinguishes five channels:

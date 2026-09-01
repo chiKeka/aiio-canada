@@ -56,6 +56,14 @@ separate series. The panel covers 82 jurisdiction-indicator series from 2017 Q1
 through the latest common quarter and deliberately does not publish a composite
 score. See `docs/methodology/regional-macro-controls.md`.
 
+The locked BCPI vintage now also supports a province-linked historical
+research bridge for British Columbia, Ontario and Quebec. Official provincial
+values remain untouched from 2017 Q1; earlier institutional, school and office
+values are transparently inferred from Vancouver, Toronto and Montréal using a
+single-level anchor and an overlap screen. The result is not an official
+provincial series and remains outside Decision Mode. See
+`docs/methodology/province-linked-bcpi-backcast.md`.
+
 The 2024 Ontario Auditor General performance audit is now a registered,
 content-hash-locked outcome source. Its fail-closed intake preserves two named
 completed projects: Lakeridge Gardens Long-Term Care Home and Highway 427

@@ -73,17 +73,17 @@ const provincialCoverage = [
   {
     province: 'British Columbia',
     role: 'Expansion intake',
-    layers: ['Source locked', 'Reference ready', 'Common signal', 'Source contract'],
+    layers: ['Source locked', 'Linked proxy', 'Common signal', 'Source contract'],
   },
   {
     province: 'Ontario',
     role: 'Expansion intake',
-    layers: ['Source locked', 'Reference ready', 'Common signal', 'Source contract'],
+    layers: ['Source locked', 'Linked proxy', 'Common signal', 'Source contract'],
   },
   {
     province: 'Quebec',
     role: 'Expansion intake',
-    layers: ['Source locked', 'Reference ready', 'Common signal', 'Source contract'],
+    layers: ['Source locked', 'Linked proxy', 'Common signal', 'Source contract'],
   },
 ];
 

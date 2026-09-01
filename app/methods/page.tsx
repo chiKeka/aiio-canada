@@ -13,6 +13,7 @@ import programGates from '@/data/governance/program-gates.json';
 import informationSectorCapex from '@/data/model-runs/information_sector_construction_capex_screen_v0.1.json';
 import cmaReferenceBaseline from '@/data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json';
 import regionalMacroControls from '@/data/model-runs/regional_macro_controls_canada_v0.1.json';
+import provinceLinkedBaseline from '@/data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json';
 
 const methodSteps = [
   [
@@ -64,6 +65,7 @@ export default function MethodsPage() {
     ...informationSectorCapex.limitations,
     ...cmaReferenceBaseline.limitations,
     ...regionalMacroControls.limitations,
+    ...provinceLinkedBaseline.limitations,
   ];
   return (
     <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">
