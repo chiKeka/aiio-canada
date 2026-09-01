@@ -23,6 +23,7 @@ import auditedProjectOutcomes from '@/data/model-runs/oago_audited_project_outco
 import quebecFullArchive from '@/data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json';
 import quebecProjectRevisions from '@/data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json';
 import regionalMacroControls from '@/data/model-runs/regional_macro_controls_canada_v0.1.json';
+import sourceRegistry from '@/data/registry/sources.json';
 
 const COMPONENT_LABELS: Record<string, string> = {
   concrete: 'Concrete', electrical_systems: 'Electrical systems', hvac: 'HVAC',
@@ -170,6 +171,10 @@ function ExecutiveDecisionBrief({ analysis, budgetMillions, duration, projectNam
   const labourSignal = labour
     ? `${LABOUR_LABELS[labour.trade_node_id] ?? labour.trade_node_id}: ${labour.vacancies_per_1_000_2021_employed?.toFixed(1)}/1k employed`
     : 'No complete matching trade diagnostic';
+  const sourceEntries = analysis.sourceIds.map((sourceId) => {
+    const source = sourceRegistry.sources.find((item) => item.source_id === sourceId);
+    return source ? { ...source, sourceId } : { sourceId, title: sourceId, publisher: 'Registry entry unavailable', canonical_url: '' };
+  });
   return <section className="aiio-panel-elevated overflow-hidden" id="executive-decision-brief">
     <div className="border-b border-[#d8dfda] bg-[#12333d] px-5 py-5 text-white sm:px-7">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
@@ -222,8 +227,18 @@ function ExecutiveDecisionBrief({ analysis, budgetMillions, duration, projectNam
           <p className="mt-2">Release: {releaseData.manifest.version}</p>
           <p>Scenario: {analysis.scenarioId}</p>
           <p>Analysis date: {analysis.analysisDate}</p>
-          <p className="mt-2 break-all">Sources: {analysis.sourceIds.join(' · ')}</p>
+          <p className="mt-2">Source count: {sourceEntries.length}</p>
         </div>
+      </div>
+      <div className="mt-5 border-t border-[#dce2dd] pt-5">
+        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-[#28766d]">Evidence trail</p>
+        <p className="mt-1 text-[10px] leading-4 text-[#596a66]">Canonical public links from the versioned AIIO source registry. A source supports only the claim type and geography declared in the model.</p>
+        <ol className="mt-3 grid gap-2 sm:grid-cols-2">
+          {sourceEntries.map((source) => <li className="rounded-lg border border-[#d8dfda] bg-[#f8f8f4] p-3" key={source.sourceId}>
+            {source.canonical_url ? <a className="text-xs font-medium leading-5 text-[#155d56] underline decoration-[#8dbab1] underline-offset-2 hover:text-[#0f4743]" href={source.canonical_url} rel="noreferrer" target="_blank">{source.title}</a> : <p className="text-xs font-medium leading-5 text-[#7b4a35]">{source.title}</p>}
+            <p className="mt-1 text-[9px] leading-4 text-[#596a66]">{source.publisher} · <span className="font-mono">{source.sourceId}</span></p>
+          </li>)}
+        </ol>
       </div>
     </div>
   </section>;
