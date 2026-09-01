@@ -31,6 +31,18 @@
     },
     {
       "category": "evidence_pipeline",
+      "check_id": "canada_cross_domain_coverage",
+      "evidence": [
+        "data/model-runs/canada_cross_domain_coverage_v0.1.json",
+        "research/src/aiio/canada_coverage.py",
+        "docs/expansion/canada-cross-domain-coverage.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "All 13 provinces and territories have an explicit seven-domain coverage and missingness inventory without authorizing comparison or calibration."
+    },
+    {
+      "category": "evidence_pipeline",
       "check_id": "public_evidence_registry",
       "evidence": [
         "data/registry/sources.json",
@@ -249,12 +261,12 @@
       "check_id": "research_surface_provenance",
       "evidence": [
         "public/data/research-surface.json",
-        "artifact_manifest_sha256=sha256:81c20bf3c033062a35e0f8b50f10110e852a304f60926d9e84cca75bfa4ff199",
+        "artifact_manifest_sha256=sha256:c66007f386a4e2d9716c06690758aaccbfb3fe052af1d7c022147b1be342fd1b",
         "research/src/aiio/research_surface.py"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The evolving research website reconciles 24 hash-locked artifacts above the frozen release without promoting them."
+      "summary": "The evolving research website reconciles 25 hash-locked artifacts above the frozen release without promoting them."
     },
     {
       "category": "product",
@@ -471,7 +483,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 30,
+    "pass": 31,
     "pending": 3
   },
   "structural_integrity": true

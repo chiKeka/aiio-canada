@@ -44,6 +44,7 @@ import auditedProjectOutcomes from '@/data/model-runs/oago_audited_project_outco
 import quebecProjectRevisions from '@/data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json';
 import quebecFullArchive from '@/data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json';
 import quebecParserReview from '@/data/model-runs/quebec_pqi_parser_review_package_v0.1.json';
+import canadaCoverage from '@/data/model-runs/canada_cross_domain_coverage_v0.1.json';
 import { ModeToggle } from '@/components/mode-toggle';
 import { boundedDisplayScore } from '@/lib/decision-analysis';
 
@@ -67,30 +68,15 @@ const researchLayers = [
   },
 ];
 
-const provincialCoverage = [
-  {
-    province: 'Alberta',
-    role: 'Published pilot',
-    layers: ['Pilot release', 'Pilot release', 'Pilot release', 'Observed screen'],
-  },
-  {
-    province: 'British Columbia',
-    role: 'Expansion intake',
-    layers: ['Source locked', 'Linked proxy', 'Common signal', 'Source contract'],
-  },
-  {
-    province: 'Ontario',
-    role: 'Expansion intake',
-    layers: ['Source locked', 'Linked proxy', 'Common signal', 'Source contract'],
-  },
-  {
-    province: 'Quebec',
-    role: 'Expansion intake',
-    layers: ['Source locked', 'Linked proxy', 'Common signal', 'Source contract'],
-  },
-];
-
-const coverageColumns = ['Public projects', 'Cost reference', 'Trade labour', 'Power planning'];
+const coverageColumns = [
+  ['labour', 'Labour'],
+  ['materials', 'Materials'],
+  ['building_investment', 'Investment'],
+  ['regional_macro', 'Macro'],
+  ['public_projects', 'Projects'],
+  ['power_planning', 'Power'],
+  ['information_sector_capex', 'Sector capex'],
+] as const;
 
 const treatmentGateLabels: Record<string, string> = {
   ai_or_data_centre_specific: 'AI / data centre',
@@ -557,26 +543,26 @@ export function ObservatoryDashboard() {
                 <thead>
                   <tr className="border-b border-[#d8ddd8] bg-[#e7ebe6] font-mono text-[10px] uppercase tracking-[0.1em] text-[#405652]">
                     <th className="px-5 py-4 font-semibold" scope="col">Province</th>
-                    {coverageColumns.map((column) => <th className="px-4 py-4 font-semibold" key={column} scope="col">{column}</th>)}
+                    {coverageColumns.map(([domain, label]) => <th className="px-4 py-4 font-semibold" key={domain} scope="col">{label}</th>)}
                   </tr>
                 </thead>
                 <tbody>
-                  {provincialCoverage.map((row) => (
-                    <tr className="border-b border-[#e0e4df] last:border-0" key={row.province}>
+                  {canadaCoverage.geographies.map((row) => (
+                    <tr className="border-b border-[#e0e4df] last:border-0" key={row.geography_id}>
                       <th className="px-5 py-5" scope="row">
-                        <span className="block text-sm font-semibold text-[#153941]">{row.province}</span>
-                        <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.08em] text-[#536662]">{row.role}</span>
+                        <span className="block text-sm font-semibold text-[#153941]">{row.geography_label}</span>
+                        <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.08em] text-[#536662]">{row.geography_id === 'PR_48' ? 'Alberta pilot' : 'Coverage inventory'}</span>
                       </th>
-                      {row.layers.map((status, index) => <td className="px-4 py-5" key={`${row.province}-${coverageColumns[index]}`}><CoverageStatus status={status} /></td>)}
+                      {coverageColumns.map(([domain]) => <td className="px-4 py-5" key={`${row.geography_id}-${domain}`}><CoverageStatus status={row.domains[domain].status} /></td>)}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-[#d8ddd8] bg-white px-5 py-4 font-mono text-[9px] uppercase tracking-[0.07em] text-[#60716d]">
-              <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-[#2f8f83]" /> Published pilot layer</span>
-              <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-[#6b8798]" /> Common national/provincial signal</span>
-              <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-[#d66b35]" /> Locked intake · review pending</span>
+              <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-[#2f8f83]" /> Available</span>
+              <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-[#6b8798]" /> Available with published gaps</span>
+              <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-[#d66b35]" /> Not available · not imputed</span>
             </div>
           </div>
 
@@ -629,14 +615,15 @@ function FlowArrow() {
 }
 
 function CoverageStatus({ status }: { status: string }) {
-  const pilot = status === 'Pilot release' || status === 'Observed screen';
-  const common = status === 'Reference ready' || status === 'Common signal';
-  const tone = pilot
+  const available = status === 'available';
+  const incomplete = status === 'available_with_missingness';
+  const tone = available
     ? 'border-[#9bc7bd] bg-[#e5f2ee] text-[#17645d]'
-    : common
+    : incomplete
       ? 'border-[#b6c8d0] bg-[#edf2f4] text-[#456574]'
       : 'border-[#e0b18f] bg-[#fff0e4] text-[#96502d]';
-  return <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.06em] ${tone}`}><span className="size-1.5 rounded-full bg-current opacity-70" />{status}</span>;
+  const label = available ? 'Available' : incomplete ? 'With gaps' : 'Not available';
+  return <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.06em] ${tone}`}><span className="size-1.5 rounded-full bg-current opacity-70" />{label}</span>;
 }
 
 function AttributionDomainCard({ label, role, sourceCount, status, summary }: { label: string; role: string; sourceCount: number; status: string; summary: string }) {

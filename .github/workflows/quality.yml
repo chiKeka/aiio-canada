@@ -49,6 +49,12 @@ jobs:
       - name: Verify PSPE method lineage is deterministic
         run: git diff --exit-code -- data/model-runs/pspe_method_lineage_v0.1.json
 
+      - name: Rebuild Canada cross-domain coverage
+        run: npm run canada:coverage
+
+      - name: Verify Canada coverage is deterministic
+        run: git diff --exit-code -- data/model-runs/canada_cross_domain_coverage_v0.1.json
+
       - name: Rebuild research-surface provenance manifest
         run: npm run research-surface:build
 

@@ -14,6 +14,7 @@ ARTIFACTS = [
     ("frozen_release_manifest", "public/data/manifest.json", "governance"),
     ("program_gates", "data/governance/program-gates.json", "governance"),
     ("pspe_method_lineage", "data/model-runs/pspe_method_lineage_v0.1.json", "method_lineage"),
+    ("canada_cross_domain_coverage", "data/model-runs/canada_cross_domain_coverage_v0.1.json", "coverage_inventory"),
     ("alberta_graph", "data/model/alberta_graph_v0.2.json", "assumption"),
     ("scenario_suite", "data/model-runs/alberta_50b_scenario_suite_v0.1.json", "scenario"),
     ("historical_envelope", "data/model-runs/alberta_bcpi_historical_envelope_v0.1.json", "observed_descriptive"),

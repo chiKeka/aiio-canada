@@ -22,6 +22,8 @@ Add British Columbia, Ontario and Quebec because they provide contrasting power 
 
 Cross-province comparisons are prohibited until definitions, periods, units and project-stage classifications reconcile.
 
+The current 13-geography, seven-domain availability and missingness contract is documented in [`canada-cross-domain-coverage.md`](canada-cross-domain-coverage.md) and reproduced by `npm run canada:coverage`.
+
 **Current common-spine status:** quarterly job-vacancy and offered-wage
 observations for the six graph-relevant occupations now cover every province and
 territory under one deterministic adapter. This establishes a common labour

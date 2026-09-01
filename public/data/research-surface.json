@@ -1,6 +1,6 @@
 {
-  "artifact_count": 24,
-  "artifact_manifest_sha256": "sha256:81c20bf3c033062a35e0f8b50f10110e852a304f60926d9e84cca75bfa4ff199",
+  "artifact_count": 25,
+  "artifact_manifest_sha256": "sha256:c66007f386a4e2d9716c06690758aaccbfb3fe052af1d7c022147b1be342fd1b",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -25,6 +25,12 @@
       "evidence_role": "method_lineage",
       "path": "data/model-runs/pspe_method_lineage_v0.1.json",
       "sha256": "sha256:0e4c434eb182005935c5da92c1f4af2c4e62c8c11862e0e46d5afb2780336559"
+    },
+    {
+      "artifact_id": "canada_cross_domain_coverage",
+      "evidence_role": "coverage_inventory",
+      "path": "data/model-runs/canada_cross_domain_coverage_v0.1.json",
+      "sha256": "sha256:263a3e543203c9fd03b945972d509b4106505e414736e36ebf8ef4ac93f0d7af"
     },
     {
       "artifact_id": "alberta_graph",

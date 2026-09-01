@@ -56,6 +56,7 @@ from .calibration import (
     PROVINCIAL_REFERENCE_MODEL_ID,
     run_reference_class_baseline,
 )
+from .canada_coverage import build_canada_cross_domain_coverage
 from .cma_calibration import run_cma_reference_class_baseline
 from .provincial_backcast import run_province_linked_reference_backcast
 from .provincial_backcast_review import (
@@ -408,6 +409,16 @@ def main() -> None:
     )
     research_surface_parser.add_argument(
         "--output", type=Path, default=Path("public/data/research-surface.json")
+    )
+
+    canada_coverage_parser = subparsers.add_parser(
+        "build-canada-cross-domain-coverage",
+        help="build the fail-closed province and territory evidence coverage inventory",
+    )
+    canada_coverage_parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("data/model-runs/canada_cross_domain_coverage_v0.1.json"),
     )
 
     pspe_lineage_parser = subparsers.add_parser(
@@ -1421,6 +1432,19 @@ def main() -> None:
                     }
                 )
             )
+        elif args.command == "build-canada-cross-domain-coverage":
+            output_path = (
+                args.output if args.output.is_absolute() else root / args.output
+            ).resolve()
+            report = build_canada_cross_domain_coverage(root, output_path)
+            print(json.dumps({
+                "status": "passed",
+                "output": str(output_path),
+                "model_id": report["model_id"],
+                "geography_count": report["geography_count"],
+                "domain_count": report["domain_count"],
+                "matrix_cell_count": report["matrix_cell_count"],
+            }))
         elif args.command == "build-pspe-method-lineage":
             contract_path = (
                 args.contract_path if args.contract_path.is_absolute() else root / args.contract_path

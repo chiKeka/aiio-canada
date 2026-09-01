@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from .adapters.statcan import PROVINCE_DGUID_TO_GEOGRAPHY_ID
+from .canada_coverage import validate_canada_cross_domain_coverage
 from .digest import validate_digest_cadence
 from .model_review import PACKAGE_ID as REFERENCE_COST_REVIEW_PACKAGE_ID
 from .model_review import REVIEW_CRITERIA as REFERENCE_COST_REVIEW_CRITERIA
@@ -150,6 +151,42 @@ def audit_program_readiness(
             "data/model-runs/pspe_method_lineage_v0.1.json",
             "docs/methodology/pspe-source-lineage.md",
             "research/src/aiio/pspe_lineage.py",
+        ],
+        release_gate=True,
+    )
+
+    canada_coverage_path = root / "data/model-runs/canada_cross_domain_coverage_v0.1.json"
+    try:
+        canada_coverage = validate_canada_cross_domain_coverage(root, canada_coverage_path)
+        boundary = canada_coverage["publication_boundary"]
+        canada_coverage_ok = (
+            canada_coverage.get("geography_count") == 13
+            and canada_coverage.get("domain_count") == 7
+            and canada_coverage.get("matrix_cell_count") == 91
+            and boundary.get("status") == "coverage_inventory_only"
+            and boundary.get("cross_province_comparison_authorized") is False
+            and boundary.get("province_model_calibration_authorized") is False
+            and boundary.get("missingness_imputed") is False
+            and boundary.get("ai_attributable_effect_authorized") is False
+        )
+        canada_coverage_status = PASS if canada_coverage_ok else FAIL
+        canada_coverage_summary = (
+            "All 13 provinces and territories have an explicit seven-domain coverage and missingness inventory without authorizing comparison or calibration."
+            if canada_coverage_ok
+            else "The Canada coverage inventory has an unsafe or incomplete publication boundary."
+        )
+    except (OSError, json.JSONDecodeError, ValidationError) as exc:
+        canada_coverage_status = FAIL
+        canada_coverage_summary = f"The Canada coverage inventory is missing or stale: {exc}"
+    record(
+        "canada_cross_domain_coverage",
+        "evidence_pipeline",
+        canada_coverage_status,
+        canada_coverage_summary,
+        [
+            "data/model-runs/canada_cross_domain_coverage_v0.1.json",
+            "research/src/aiio/canada_coverage.py",
+            "docs/expansion/canada-cross-domain-coverage.md",
         ],
         release_gate=True,
     )
