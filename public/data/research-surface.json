@@ -1,6 +1,6 @@
 {
-  "artifact_count": 23,
-  "artifact_manifest_sha256": "sha256:a574575ce043ecf4102f43962b02c59229ad273237c683abb536047deb0871d0",
+  "artifact_count": 24,
+  "artifact_manifest_sha256": "sha256:81c20bf3c033062a35e0f8b50f10110e852a304f60926d9e84cca75bfa4ff199",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -19,6 +19,12 @@
       "evidence_role": "governance",
       "path": "data/governance/program-gates.json",
       "sha256": "sha256:d31caea34f6a4bef4676ad899242dc6045192f9c737b23ebb26d27adebadef5d"
+    },
+    {
+      "artifact_id": "pspe_method_lineage",
+      "evidence_role": "method_lineage",
+      "path": "data/model-runs/pspe_method_lineage_v0.1.json",
+      "sha256": "sha256:0e4c434eb182005935c5da92c1f4af2c4e62c8c11862e0e46d5afb2780336559"
     },
     {
       "artifact_id": "alberta_graph",
@@ -48,7 +54,7 @@
       "artifact_id": "reference_review",
       "evidence_role": "governance",
       "path": "data/model-runs/alberta_reference_cost_review_package_v0.1.json",
-      "sha256": "sha256:9aac1025fdd1235017abca9e79fbeba6c9330fc7bc368095bbd29fbfdada54bf"
+      "sha256": "sha256:92d94cd26c980e5da2666b696be099dcfc6484bf0229be9b4ef87da16207d926"
     },
     {
       "artifact_id": "information_sector_capex",

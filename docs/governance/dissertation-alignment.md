@@ -6,6 +6,12 @@ The MMPM Dissertation Guide 2026 and the earlier supervisor-topic note are sourc
 
 The earlier supervisor-topic note concerns African megaproject and governance options. It establishes useful context about the researcher's experience and preference for public secondary data, but it does not define AIIO Canada's question, cases or claims.
 
+The local PSPE mathematics curriculum is available as methodological source
+material, but the implementation repository it references was not located.
+AIIO therefore records a hash-locked concept-to-implementation lineage and
+describes its graph engine as an independent bounded adaptation, not a code
+fork or reproduced source model.
+
 ## Alignment with the dissertation guide
 
 AIIO Canada is designed to support an extended, reproducible analysis using public secondary research to answer a defined major-programme question. The Alberta pilot deliberately narrows the first empirical case while retaining a Canada-ready schema.
@@ -42,4 +48,3 @@ The Observatory is a research instrument and publication surface, not the disser
 3. explain what the evidence shows and does not show;
 4. connect findings to major-programme-management theory; and
 5. disclose and cite AI assistance in the manner required by the guide.
-

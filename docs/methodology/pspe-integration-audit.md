@@ -2,7 +2,27 @@
 
 ## Role in AIIO Canada
 
-The dissertation’s graph-based program simulation method is the analysis engine, not a complete Observatory architecture. AIIO Canada adapts its graph schema and propagation concepts while adding source provenance, scenario governance, calibration, temporal resolution and public explainability.
+The dissertation’s graph-based programme-simulation method is the conceptual
+starting point for the analysis engine, not a complete Observatory
+architecture. AIIO Canada independently implements a bounded adaptation of its
+documented graph and propagation concepts while adding source provenance,
+scenario governance, calibration, temporal resolution and public
+explainability.
+
+## Source-lineage status
+
+The local MMPM material contains `PSPE_Math_Curriculum.md`, hash-identified in
+`data/model/pspe_method_lineage_contract_v0.1.json`. It describes the intended
+six-layer architecture and the recurrence
+`Impact(v,t+1) = Σ w(u,v)·Impact(u,t)·(1−α(v))`. The referenced PSPE source files
+`graph_schema.py`, `propagation.py`, `s3_metrics.py` and `sd_bridge.py` were not
+located in the supplied folder or indexed local filesystem.
+
+Accordingly, AIIO does not claim a code fork, exact reproduction or verified
+behavioural equivalence to an unavailable PSPE repository. The generated
+lineage report hash-locks five specific concept-to-AIIO mappings and the tests
+that support each claim. If the original repository becomes available, it must
+enter a separate comparison review before this status changes.
 
 ## Reusable concepts
 
@@ -16,7 +36,12 @@ The dissertation’s graph-based program simulation method is the analysis engin
 ## Known limitations that must not be inherited
 
 1. **Dense-graph compression.** Conventional centrality measures converge in dense networks and can cease to discriminate important nodes. AIIO will emphasize mechanism-specific flow, exposure and bottleneck measures.
-2. **Degenerate cascade-origin ranking.** An archived HS2 workflow row-normalized propagation and then ranked origins by conserved total mass, producing equivalent scores. AIIO will test origin metrics on synthetic graphs and will not rank nodes using this construction.
+2. **Degenerate cascade-origin ranking.** Prior methodological notes describe
+   an HS2 workflow that row-normalized propagation and then ranked origins by
+   conserved total mass, producing equivalent scores. The underlying repository
+   is not locally available for independent code verification. AIIO therefore
+   does not reproduce or use that ranking construction and tests its own graph
+   invariants on synthetic graphs.
 3. **Edge semantics changed across prototypes.** Valence, threat and influence were used differently. AIIO defines one edge ontology and migrates explicitly.
 4. **Positive and negative effects were sometimes pooled.** Netting can hide simultaneous upside and downside. AIIO retains positive, negative and absolute pathways separately.
 5. **Absorption dominates results.** Damping is a material assumption, so it requires domain-specific ranges, sensitivity plots and disclosure.

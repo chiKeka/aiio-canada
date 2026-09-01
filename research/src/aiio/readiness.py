@@ -15,6 +15,7 @@ from .model_review import PACKAGE_ID as REFERENCE_COST_REVIEW_PACKAGE_ID
 from .model_review import REVIEW_CRITERIA as REFERENCE_COST_REVIEW_CRITERIA
 from .registry import load_registry
 from .research_surface import validate_research_surface_manifest
+from .pspe_lineage import validate_pspe_method_lineage
 from .schemas import ValidationError
 
 
@@ -109,6 +110,47 @@ def audit_program_readiness(
         if not charter_missing and framing_present
         else "The formal research program documentation is incomplete.",
         charter_paths if not charter_missing else charter_missing,
+        release_gate=True,
+    )
+
+    pspe_contract_path = root / "data/model/pspe_method_lineage_contract_v0.1.json"
+    pspe_report_path = root / "data/model-runs/pspe_method_lineage_v0.1.json"
+    try:
+        pspe_lineage = validate_pspe_method_lineage(
+            root, pspe_contract_path, pspe_report_path
+        )
+        pspe_boundary = pspe_lineage["publication_boundary"]
+        pspe_ok = (
+            pspe_lineage.get("lineage_status")
+            == "adaptation_from_available_method_notes"
+            and pspe_lineage.get("mapping_count") == 5
+            and pspe_lineage.get("source_repository_availability", {}).get("status")
+            == "not_located"
+            and pspe_boundary.get("source_code_reproduction_claim_authorized") is False
+            and pspe_boundary.get("implemented_layer_claim_limited_to_mappings") is True
+            and pspe_boundary.get("unimplemented_pspe_layers_claimed") is False
+            and pspe_boundary.get("graph_score_monetization_authorized") is False
+        )
+        pspe_status = PASS if pspe_ok else FAIL
+        pspe_summary = (
+            "Five PSPE concept-to-AIIO mappings are hash-locked as independent adaptations, while the unavailable source repository and unimplemented layers remain explicit."
+            if pspe_ok
+            else "The PSPE source-lineage boundary is incomplete or unsafe."
+        )
+    except (OSError, json.JSONDecodeError, ValidationError) as exc:
+        pspe_status = FAIL
+        pspe_summary = f"The PSPE method-lineage report is missing or stale: {exc}"
+    record(
+        "pspe_method_lineage",
+        "research_design",
+        pspe_status,
+        pspe_summary,
+        [
+            "data/model/pspe_method_lineage_contract_v0.1.json",
+            "data/model-runs/pspe_method_lineage_v0.1.json",
+            "docs/methodology/pspe-source-lineage.md",
+            "research/src/aiio/pspe_lineage.py",
+        ],
         release_gate=True,
     )
 

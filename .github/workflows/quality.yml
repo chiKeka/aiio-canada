@@ -43,6 +43,12 @@ jobs:
       - name: Verify digest artifacts are deterministic
         run: git diff --exit-code -- data/digests
 
+      - name: Rebuild PSPE method-lineage report
+        run: npm run pspe:lineage
+
+      - name: Verify PSPE method lineage is deterministic
+        run: git diff --exit-code -- data/model-runs/pspe_method_lineage_v0.1.json
+
       - name: Rebuild research-surface provenance manifest
         run: npm run research-surface:build
 

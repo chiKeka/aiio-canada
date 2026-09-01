@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "contract_id": "AIIO_PSPE_METHOD_LINEAGE_CONTRACT_0_1",
+  "source_material": {
+    "title": "PSPE Math Curriculum — From High-School Maths to Building the Engine",
+    "local_locator": "MMPM Research Agent/PSPE_Math_Curriculum.md",
+    "distribution_status": "local_only_not_redistributed",
+    "sha256": "sha256:f997ebaaab70d14c74f9595b82b804a3f647084db10f34c91d8e60cd944d57e4",
+    "byte_size": 29482
+  },
+  "source_repository_availability": {
+    "status": "not_located",
+    "searched_filenames": [
+      "graph_schema.py",
+      "propagation.py",
+      "s3_metrics.py",
+      "sd_bridge.py"
+    ],
+    "interpretation": "The available curriculum describes the intended PSPE layers and a propagation recurrence, but the referenced implementation repository is not available for code-level comparison."
+  },
+  "mappings": [
+    {
+      "mapping_id": "PSPE_MAP_TYPED_DIRECTED_GRAPH",
+      "source_concept": "Layer 1 typed weighted directed graph",
+      "aiio_implementation": "research/src/aiio/graph.py",
+      "aiio_contract": "data/model/alberta_graph_v0.2.json",
+      "validation_tests": ["research/tests/test_graph.py"],
+      "adaptation_status": "independent_implementation"
+    },
+    {
+      "mapping_id": "PSPE_MAP_DAMPED_PROPAGATION",
+      "source_concept": "Layer 2 impact propagation with damping or absorption",
+      "aiio_implementation": "research/src/aiio/graph.py",
+      "aiio_contract": "data/model/alberta_graph_v0.2.json",
+      "validation_tests": ["research/tests/test_graph.py"],
+      "adaptation_status": "independent_implementation"
+    },
+    {
+      "mapping_id": "PSPE_MAP_TEMPORAL_PATHS",
+      "source_concept": "Temporal stocks, flows and propagation over time",
+      "aiio_implementation": "research/src/aiio/graph.py",
+      "aiio_contract": "data/scenarios/alberta_50b_counterfactual_v0.2.json",
+      "validation_tests": ["research/tests/test_graph.py"],
+      "adaptation_status": "bounded_discrete_time_subset"
+    },
+    {
+      "mapping_id": "PSPE_MAP_S3_STRESS_TEST",
+      "source_concept": "S3 interpretation through scoping, scaffolding and sensing",
+      "aiio_implementation": "research/src/aiio/scenario_suite.py",
+      "aiio_contract": "data/model/alberta_50b_scenario_suite_contract_v0.1.json",
+      "validation_tests": ["research/tests/test_scenario_suite.py"],
+      "adaptation_status": "scenario_sensitivity_adaptation"
+    },
+    {
+      "mapping_id": "PSPE_MAP_REFERENCE_CLASS",
+      "source_concept": "Layer 5 reference-class calibration",
+      "aiio_implementation": "research/src/aiio/calibration.py",
+      "aiio_contract": "data/model-runs/alberta_bcpi_reference_baseline_v0.1.json",
+      "validation_tests": [
+        "research/tests/test_calibration.py",
+        "research/tests/test_calibration_artifact.py"
+      ],
+      "adaptation_status": "independent_fail_closed_implementation"
+    }
+  ],
+  "non_claims": [
+    "AIIO does not claim to reproduce or fork unavailable PSPE source code.",
+    "AIIO does not use conserved-mass origin ranking or centrality as a causal estimator.",
+    "AIIO does not claim the curriculum's Bayesian, ODE, curvature or probability layers are implemented.",
+    "AIIO graph scores remain dimensionless and are not project cost, schedule delay, probability or observed effect."
+  ]
+}

@@ -83,6 +83,7 @@ from .public_projects import run_public_project_exposure
 from .registry import load_registry
 from .readiness import audit_program_readiness, require_release_ready
 from .research_surface import build_research_surface_manifest
+from .pspe_lineage import build_pspe_method_lineage
 from .retrieval import retrieve
 from .schemas import ValidationError
 from .scenario import run_scenario
@@ -407,6 +408,19 @@ def main() -> None:
     )
     research_surface_parser.add_argument(
         "--output", type=Path, default=Path("public/data/research-surface.json")
+    )
+
+    pspe_lineage_parser = subparsers.add_parser(
+        "build-pspe-method-lineage",
+        help="hash-lock the available PSPE method notes and their bounded AIIO adaptations",
+    )
+    pspe_lineage_parser.add_argument(
+        "contract_path", type=Path,
+        nargs="?", default=Path("data/model/pspe_method_lineage_contract_v0.1.json")
+    )
+    pspe_lineage_parser.add_argument(
+        "output_path", type=Path,
+        nargs="?", default=Path("data/model-runs/pspe_method_lineage_v0.1.json")
     )
 
     digest_audit_parser = subparsers.add_parser(
@@ -1404,6 +1418,25 @@ def main() -> None:
                         "output": str(output_path),
                         "surface_id": manifest["surface_id"],
                         "artifact_count": manifest["artifact_count"],
+                    }
+                )
+            )
+        elif args.command == "build-pspe-method-lineage":
+            contract_path = (
+                args.contract_path if args.contract_path.is_absolute() else root / args.contract_path
+            ).resolve()
+            output_path = (
+                args.output_path if args.output_path.is_absolute() else root / args.output_path
+            ).resolve()
+            report = build_pspe_method_lineage(root, contract_path, output_path)
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "output": str(output_path),
+                        "model_id": report["model_id"],
+                        "mapping_count": report["mapping_count"],
+                        "lineage_status": report["lineage_status"],
                     }
                 )
             )

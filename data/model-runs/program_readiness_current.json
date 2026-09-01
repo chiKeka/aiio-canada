@@ -17,6 +17,19 @@
       "summary": "The named research program, framing question, governance boundary and PSPE integration are documented."
     },
     {
+      "category": "research_design",
+      "check_id": "pspe_method_lineage",
+      "evidence": [
+        "data/model/pspe_method_lineage_contract_v0.1.json",
+        "data/model-runs/pspe_method_lineage_v0.1.json",
+        "docs/methodology/pspe-source-lineage.md",
+        "research/src/aiio/pspe_lineage.py"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "Five PSPE concept-to-AIIO mappings are hash-locked as independent adaptations, while the unavailable source repository and unimplemented layers remain explicit."
+    },
+    {
       "category": "evidence_pipeline",
       "check_id": "public_evidence_registry",
       "evidence": [
@@ -236,12 +249,12 @@
       "check_id": "research_surface_provenance",
       "evidence": [
         "public/data/research-surface.json",
-        "artifact_manifest_sha256=sha256:a574575ce043ecf4102f43962b02c59229ad273237c683abb536047deb0871d0",
+        "artifact_manifest_sha256=sha256:81c20bf3c033062a35e0f8b50f10110e852a304f60926d9e84cca75bfa4ff199",
         "research/src/aiio/research_surface.py"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The evolving research website reconciles 23 hash-locked artifacts above the frozen release without promoting them."
+      "summary": "The evolving research website reconciles 24 hash-locked artifacts above the frozen release without promoting them."
     },
     {
       "category": "product",
@@ -458,7 +471,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 29,
+    "pass": 30,
     "pending": 3
   },
   "structural_integrity": true

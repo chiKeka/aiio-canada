@@ -57,6 +57,7 @@ npm run power:planning:provinces
 npm run digest:build
 npm run digest:audit
 npm run research-surface:build
+npm run pspe:lineage
 npm run program:audit
 npm run attribution:readiness
 npm run attribution:preflight

@@ -62,7 +62,7 @@
     {
       "path": "docs/methodology/pspe-integration-audit.md",
       "role": "pspe_boundary_audit",
-      "sha256": "sha256:dacb1fe3a377a34899a28181bf7dc7fbcd4ad1d55f884ce47dc9eb774aa8eafa"
+      "sha256": "sha256:c8f66b9df7706d2fcdda83e68c753fa2582344cdec8592a237eab1eee59ed7e1"
     },
     {
       "path": "docs/product/decision-mode.md",

@@ -17,6 +17,7 @@ import regionalMacroControls from '@/data/model-runs/regional_macro_controls_can
 import provinceLinkedBaseline from '@/data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json';
 import aiCapexLedger from '@/data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json';
 import panelPreflight from '@/data/model-runs/ai_attribution_panel_preflight_v0.1.json';
+import pspeLineage from '@/data/model-runs/pspe_method_lineage_v0.1.json';
 
 const methodSteps = [
   [
@@ -204,16 +205,22 @@ export default function MethodsPage() {
               Signed paths with explicit limits.
             </h2>
             <p className="mt-4 text-sm leading-6 text-[#a9bcc2]">
-              The dissertation method contributes directed graph propagation,
-              damping and path interpretation. AIIO adds evidence lineage,
-              frozen edge semantics, temporal lags, retained states, scenario
-              isolation and release controls.
+              The available PSPE curriculum contributes the documented concepts
+              of directed graph propagation, damping and path interpretation.
+              AIIO independently implements five bounded mappings and adds
+              evidence lineage, frozen edge semantics, temporal lags, retained
+              states, scenario isolation and release controls.
             </p>
+            <dl className="mt-6 grid grid-cols-3 gap-2">
+              <div className="rounded-lg border border-white/10 bg-white/4 p-3"><dt className="text-[9px] text-[#9fb6bc]">Mapped concepts</dt><dd className="mt-1 font-mono text-xl text-[#8dd2c7]">{pspeLineage.mapping_count}</dd></div>
+              <div className="rounded-lg border border-white/10 bg-white/4 p-3"><dt className="text-[9px] text-[#9fb6bc]">Source receipt</dt><dd className="mt-1 font-mono text-xs text-[#8dd2c7]">hash-locked</dd></div>
+              <div className="rounded-lg border border-white/10 bg-white/4 p-3"><dt className="text-[9px] text-[#9fb6bc]">Source repo</dt><dd className="mt-1 font-mono text-xs text-[#e6b58f]">not located</dd></div>
+            </dl>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {[
               'Dense-graph centrality is not used as a proxy for importance.',
-              'The archived conserved-mass origin ranking is excluded.',
+              'Prior notes describe a conserved-mass origin ranking; its unavailable source code is not claimed as verified, reproduced or used.',
               'Positive and negative paths are retained separately.',
               'Absorption and retention receive explicit sensitivity tests.',
               'Raw pressure is transformed as raw ÷ (1 + raw) for bounded public display only.',
@@ -222,6 +229,7 @@ export default function MethodsPage() {
               'Historical project analogs preserve complete past trajectories; their dollar equivalents are stress tests, not forecasts or AI premiums.',
               'The AI-capex ledger tracks reported estimates and publisher stages without stage weighting; zero records currently authorize realized treatment onset or dose.',
               'The panel preflight assigns all 27 authorizing field instances to acquisition tasks but assembles zero rows until every required treatment and outcome gate passes.',
+              'Bayesian, continuous-time ODE, curvature and other later PSPE curriculum layers are not claimed as implemented.',
             ].map((item) => (
               <div
                 className="flex gap-3 rounded-lg border border-white/10 bg-white/4 p-4 text-sm leading-5 text-[#d6e1e4]"
