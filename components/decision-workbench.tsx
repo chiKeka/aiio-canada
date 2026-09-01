@@ -40,20 +40,21 @@ export function DecisionWorkbench() {
   );
 
   return (
-    <main className="min-h-screen bg-[#f3f1e9] text-[#17343d]">
+    <main className="min-h-screen bg-[#f7f6f1] text-[#17343d]">
       <SiteHeader />
-      <section className="border-b border-[#cad6cf] bg-[#0c2b37] text-white">
-        <div className="mx-auto grid max-w-[1440px] gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[1fr_auto] lg:px-12 lg:py-10">
+      <section className="relative overflow-hidden border-b border-[#e0dfd8] bg-[#faf9f5]">
+        <div className="observatory-grid absolute inset-0 opacity-55" aria-hidden="true" />
+        <div className="relative mx-auto grid max-w-[1440px] gap-7 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_360px] lg:px-12 lg:py-14">
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <Badge className="border-[#8fd5c9]/30 bg-[#153f4b] text-[#bfe9e1]">Executive decision workspace</Badge>
-              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#91adb5]">Alberta pilot · release {releaseData.manifest.version}</span>
+              <Badge className="border-[#b8d4cc] bg-[#e6f1ed] text-[#155d56]">Executive decision workspace</Badge>
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#6a7b77]">Alberta pilot · release {releaseData.manifest.version}</span>
             </div>
-            <h1 className="max-w-4xl text-balance text-3xl font-medium tracking-[-0.04em] sm:text-5xl">What do we know—and what must we resolve—before this project goes to market?</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#b5c8cd] sm:text-base">Define a capital project, separate observed market conditions from the Alberta $50B counterfactual, inspect relevant model paths, and turn evidence gaps into decision gates.</p>
+            <h1 className="max-w-4xl text-balance text-4xl font-normal leading-[1.04] tracking-[-0.05em] text-[#112f37] sm:text-6xl">What do we <span className="editorial-highlight">know</span>—and what must we resolve—before this project goes to market?</h1>
+            <p className="mt-5 max-w-3xl text-sm leading-6 text-[#596d69] sm:text-base">Define a capital project, separate observed market conditions from the Alberta $50B counterfactual, inspect relevant model paths, and turn evidence gaps into decision gates.</p>
           </div>
-          <div className="self-end rounded-xl border border-[#d5a071]/40 bg-[#352f2a]/50 px-4 py-3 text-xs leading-5 text-[#f1c59e] lg:max-w-sm">
-            <span className="font-semibold text-[#ffd8b8]">Decision boundary:</span> AI-attributable cost escalation remains unquantified. No number on this page is an AI cost forecast for the project.
+          <div className="self-end rounded-[10px] border border-[#dfb38f] bg-white px-5 py-4 text-xs leading-5 text-[#774a35] shadow-[0_12px_36px_rgba(40,50,45,.06)]">
+            <span className="font-semibold text-[#984b27]">Decision boundary:</span> AI-attributable cost escalation remains unquantified. No number on this page is an AI cost forecast for the project.
           </div>
         </div>
       </section>
@@ -68,7 +69,7 @@ export function DecisionWorkbench() {
             setStartYear={setStartYear} startYear={startYear}
           />
           <div className="space-y-5">
-            <section className="rounded-xl border border-[#cbd5cf] bg-[#fbfaf5] p-5 sm:p-7">
+            <section className="rounded-[10px] border border-[#d8dcd7] bg-white p-5 shadow-[0_18px_52px_rgba(22,55,55,.07)] sm:p-7">
               <div className="flex flex-col justify-between gap-4 border-b border-[#dce2dd] pb-5 md:flex-row md:items-start">
                 <div>
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#28766d]">Decision boundary brief</p>
@@ -118,7 +119,7 @@ function ProjectForm({ assetId, budgetMillions, duration, metroId, projectName, 
   setDuration: (value: number) => void; setMetroId: (value: MetroId) => void;
   setProjectName: (value: string) => void; setStartYear: (value: number) => void; startYear: number;
 }) {
-  return <aside className="self-start rounded-xl border border-[#cbd5cf] bg-[#fbfaf5] p-5 shadow-[0_16px_45px_rgba(20,53,59,.06)] xl:sticky xl:top-24">
+  return <aside className="self-start rounded-[10px] border border-[#d8dcd7] bg-white p-5 shadow-[0_18px_52px_rgba(22,55,55,.07)] xl:sticky xl:top-24">
     <div className="flex items-center justify-between"><div><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#28766d]">Project definition</p><h2 className="mt-1 text-lg font-medium">Your capital decision</h2></div><Building2 className="size-5 text-[#2b776e]" /></div>
     <div className="mt-6 space-y-5">
       <Field label="Project name"><Input className="h-10 bg-white" onChange={(event) => setProjectName(event.target.value)} value={projectName} /></Field>
@@ -175,7 +176,7 @@ function DecisionActions({ analysis }: { analysis: Analysis }) {
     { timing: 'Before procurement packaging', title: 'Validate utility dependencies', text: 'Confirm connection scope, enabling works and schedule interfaces. The current evidence cannot infer project-specific transmission or distribution needs.' },
     { timing: 'At each estimate gate', title: 'Re-run the dated evidence screen', text: `Refresh the ${METROS[analysis.metroId]} material, labour and public-project signals through ${analysis.scenarioWindowYears.length ? formatYears(analysis.scenarioWindowYears) : 'the applicable delivery window'}.` },
   ];
-  return <section className="bg-[#f3f1e9]"><div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
+  return <section className="bg-[#f7f6f1]"><div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
     <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr]"><div><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#28766d]">Decision actions</p><h2 className="mt-3 text-3xl font-medium tracking-[-0.035em]">Turn evidence into a gate, not a guess.</h2><p className="mt-4 max-w-md text-sm leading-6 text-[#5c706b]">The evidence can change diligence and sequencing today. It cannot yet produce an AI-specific dollar contingency.</p><div className="mt-6 grid gap-2 text-xs"><CoverageRow label="Observed market screen" status="Available" /><CoverageRow label="Structural pathway" status="Assumed · low confidence" /><CoverageRow label="Project cost translation" status="Calibration pending" warning /><CoverageRow label="Regional macro spillover" status="Research stream pending" warning /></div></div>
       <ol className="grid gap-3 sm:grid-cols-2">{actions.map((action, index) => <li className="rounded-xl border border-[#ced8d1] bg-[#fbfaf5] p-5" key={action.title}><div className="flex items-center justify-between gap-3"><span className="font-mono text-[10px] font-semibold text-[#28766d]">0{index + 1}</span><span className="rounded-full bg-[#e5efeb] px-2 py-1 text-[9px] font-medium text-[#285d58]">{action.timing}</span></div><h3 className="mt-5 font-medium">{action.title}</h3><p className="mt-2 text-xs leading-5 text-[#62736f]">{action.text}</p></li>)}</ol>
     </div>

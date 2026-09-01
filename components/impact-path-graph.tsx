@@ -128,7 +128,7 @@ export function ImpactPathGraph({
               className="min-w-[920px]"
               viewBox="0 0 1030 520"
             >
-              <title id="impact-graph-title">Dependency graph for {assetLabel}</title>
+              <title id="impact-graph-title">{`Dependency graph for ${assetLabel}`}</title>
               <defs>
                 <marker
                   id="impact-arrow"

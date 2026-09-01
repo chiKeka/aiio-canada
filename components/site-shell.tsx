@@ -5,22 +5,22 @@ import { ModeToggle } from '@/components/mode-toggle';
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0a2431]/95 text-white backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-[#e2e0d9] bg-[#faf9f5]/95 text-[#172f35] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
         <Link className="flex items-center gap-3" href="/" aria-label="AIIO Canada home">
-          <span className="grid size-9 place-items-center rounded-full border border-[#8fd5c9]/40 bg-[#123746] font-mono text-xs font-semibold text-[#b7ebe2]">AI</span>
-          <span><span className="block text-sm font-semibold tracking-[0.02em]">AIIO Canada</span><span className="hidden text-[10px] uppercase tracking-[0.15em] text-[#9eb3bc] sm:block">Infrastructure impact observatory</span></span>
+          <span className="grid size-9 place-items-center rounded-full border border-[#bdd5ce] bg-white font-mono text-xs font-semibold text-[#17665f] shadow-[0_1px_2px_rgba(18,53,52,.06)]">AI</span>
+          <span><span className="block text-sm font-semibold tracking-[-0.01em]">AIIO Canada</span><span className="hidden text-[9px] uppercase tracking-[0.16em] text-[#536864] sm:block">Infrastructure impact observatory</span></span>
         </Link>
-        <nav className="hidden items-center gap-4 text-xs font-medium text-[#c8d6dc] md:flex" aria-label="Primary navigation">
-          <Link className="hover:text-white" href="/evidence">Evidence</Link>
-          <Link className="hover:text-white" href="/pressure">Pressure</Link>
-          <Link className="hover:text-white" href="/scenario">Scenario lab</Link>
-          <Link className="hover:text-white" href="/methods">Methods</Link>
-          <Link className="hover:text-white" href="/digest">Digest</Link>
+        <nav className="hidden items-center gap-5 text-xs font-medium text-[#62716e] md:flex" aria-label="Primary navigation">
+          <Link className="transition-colors hover:text-[#143f42]" href="/evidence">Evidence</Link>
+          <Link className="transition-colors hover:text-[#143f42]" href="/pressure">Pressure</Link>
+          <Link className="transition-colors hover:text-[#143f42]" href="/scenario">Scenario lab</Link>
+          <Link className="transition-colors hover:text-[#143f42]" href="/methods">Methods</Link>
+          <Link className="transition-colors hover:text-[#143f42]" href="/digest">Digest</Link>
         </nav>
         <div className="flex items-center gap-2">
           <ModeToggle compact />
-          <Link className="hidden h-8 items-center gap-1.5 rounded-lg border border-[#8fd5c9]/35 bg-[#143d4c] px-3 text-xs font-medium hover:bg-[#1b4d5e] sm:inline-flex" href="/downloads">
+          <Link className="hidden h-8 items-center gap-1.5 rounded-full border border-[#d5d9d4] bg-white px-3 text-xs font-medium text-[#294a49] shadow-[0_1px_2px_rgba(18,53,52,.05)] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] sm:inline-flex" href="/downloads">
             Downloads <ChevronRight className="size-3.5" />
           </Link>
         </div>
@@ -42,7 +42,7 @@ export function SiteFooter() {
 
 export function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
   return (
-    <section className="border-b border-[#d5ddd8] bg-[#f5f3ec]">
+    <section className="border-b border-[#e2e0d9] bg-[#faf9f5]">
       <div className="observatory-grid mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-[#28766d]">{eyebrow}</p>
         <h1 className="mt-4 max-w-4xl text-balance text-4xl font-medium tracking-[-0.045em] text-[#0d2b36] sm:text-6xl">{title}</h1>

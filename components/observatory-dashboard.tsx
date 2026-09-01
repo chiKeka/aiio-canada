@@ -89,29 +89,29 @@ export function ObservatoryDashboard() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0a2431]/95 text-white backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-[#e2e0d9] bg-[#faf9f5]/95 text-[#172f35] backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <Link className="group flex items-center gap-3" href="/research" aria-label="AIIO Canada research home">
-            <span className="grid size-9 place-items-center rounded-full border border-[#8fd5c9]/40 bg-[#123746] font-mono text-xs font-semibold text-[#b7ebe2]">
+            <span className="grid size-9 place-items-center rounded-full border border-[#bdd5ce] bg-white font-mono text-xs font-semibold text-[#17665f] shadow-[0_1px_2px_rgba(18,53,52,.06)]">
               AI
             </span>
             <span>
               <span className="block text-sm font-semibold tracking-[0.02em]">AIIO Canada</span>
-              <span className="hidden text-[10px] uppercase tracking-[0.15em] text-[#9eb3bc] sm:block">
+              <span className="hidden text-[9px] uppercase tracking-[0.16em] text-[#536864] sm:block">
                 Infrastructure impact observatory
               </span>
             </span>
           </Link>
-          <nav className="hidden items-center gap-4 text-xs font-medium text-[#c8d6dc] md:flex" aria-label="Primary navigation">
-            <Link className="transition-colors hover:text-white" href="/evidence">Evidence</Link>
-            <Link className="transition-colors hover:text-white" href="/pressure">Pressure monitor</Link>
-            <Link className="transition-colors hover:text-white" href="/scenario">Scenario lab</Link>
-            <Link className="transition-colors hover:text-white" href="/methods">Methods</Link>
+          <nav className="hidden items-center gap-5 text-xs font-medium text-[#62716e] md:flex" aria-label="Primary navigation">
+            <Link className="transition-colors hover:text-[#143f42]" href="/evidence">Evidence</Link>
+            <Link className="transition-colors hover:text-[#143f42]" href="/pressure">Pressure monitor</Link>
+            <Link className="transition-colors hover:text-[#143f42]" href="/scenario">Scenario lab</Link>
+            <Link className="transition-colors hover:text-[#143f42]" href="/methods">Methods</Link>
           </nav>
           <div className="flex items-center gap-2">
             <ModeToggle compact />
             <Link
-              className="hidden h-8 items-center gap-1.5 rounded-lg border border-[#8fd5c9]/35 bg-[#143d4c] px-3 text-xs font-medium text-white transition-colors hover:bg-[#1b4d5e] sm:inline-flex"
+              className="hidden h-8 items-center gap-1.5 rounded-full border border-[#d5d9d4] bg-white px-3 text-xs font-medium text-[#294a49] shadow-[0_1px_2px_rgba(18,53,52,.05)] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] sm:inline-flex"
               href="/evidence"
             >
               Evidence register <ChevronRight className="size-3.5" />
@@ -120,7 +120,7 @@ export function ObservatoryDashboard() {
         </div>
       </header>
 
-      <section id="top" className="relative border-b border-[#d8ded9] bg-[#f5f3ec]">
+      <section id="top" className="relative border-b border-[#e2e0d9] bg-[#faf9f5]">
         <div className="observatory-grid absolute inset-0 opacity-65" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-[1440px] gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[minmax(0,1.2fr)_minmax(390px,.8fr)] lg:px-12 lg:py-20">
           <div className="inline-flex items-center gap-2 rounded-lg border border-[#d7a47f] bg-[#fff0e4] px-3 py-2 text-xs font-semibold text-[#8d421e] lg:col-span-2">
@@ -137,8 +137,8 @@ export function ObservatoryDashboard() {
             <p className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-[#30786e]">
               Framing question
             </p>
-            <h1 className="max-w-[950px] text-balance font-heading text-[clamp(2.5rem,5.4vw,5.35rem)] font-medium leading-[0.96] tracking-[-0.055em] text-[#0c2935]">
-              Where could AI capital spending create pressure on public infrastructure delivery?
+            <h1 className="max-w-[950px] text-balance font-heading text-[clamp(2.5rem,5.4vw,5.35rem)] font-normal leading-[0.98] tracking-[-0.055em] text-[#0c2935]">
+              Where could AI capital spending create <span className="editorial-highlight">pressure</span> on public infrastructure delivery?
             </h1>
             <p className="mt-7 max-w-2xl text-pretty text-base leading-7 text-[#49605f] sm:text-lg">
               An uncalibrated research prototype for testing possible mechanisms through labour, materials and project schedules—beginning in Alberta, then expanding across Canada. It does not measure realized effects.
