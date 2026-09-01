@@ -59,6 +59,48 @@ def select_latest_workbook(paths: list[Path]) -> Path | None:
     return max(paths, key=version_key) if paths else None
 
 
+def validate_workbook_receipt(root: Path, workbook_path: Path) -> dict[str, Any]:
+    root = root.resolve()
+    workbook_path = workbook_path.resolve()
+    workbook_path.relative_to(root)
+    inspect_path = workbook_path.with_suffix(workbook_path.suffix + ".inspect.ndjson")
+    receipt_path = workbook_path.with_suffix(workbook_path.suffix + ".receipt.json")
+    receipt = load_json_or_empty(receipt_path)
+    required = {
+        "receipt_id": "AIIO_CANADA_WORKBOOK_BUILD_RECEIPT_0_1",
+        "workbook_path": str(workbook_path.relative_to(root)),
+        "inspection_path": str(inspect_path.relative_to(root)),
+        "builder_path": "workbook-work/build_aiio_workbook.mjs",
+        "canada_coverage_path": "data/model-runs/canada_cross_domain_coverage_v0.1.json",
+        "worksheet_count": 39,
+        "required_worksheet": "Canada Coverage",
+        "coverage_reconciliation_check_cell": "Release Checks!B55",
+        "coverage_reconciliation_status": "PASS",
+        "formula_error_match_count": 0,
+    }
+    if any(receipt.get(key) != value for key, value in required.items()):
+        raise ValidationError("workbook receipt contract is missing or stale")
+    builder_path = root / required["builder_path"]
+    coverage_path = root / required["canada_coverage_path"]
+    for path, field in (
+        (workbook_path, "workbook_sha256"),
+        (inspect_path, "inspection_sha256"),
+        (builder_path, "builder_sha256"),
+        (coverage_path, "canada_coverage_sha256"),
+    ):
+        if not path.is_file() or receipt.get(field) != sha256_file(path):
+            raise ValidationError(f"workbook receipt hash mismatch: {field}")
+    boundary = receipt.get("publication_boundary", {})
+    if boundary != {
+        "is_frozen_public_release": False,
+        "research_workbook_only": True,
+        "cross_province_comparison_authorized": False,
+        "ai_attributable_effect_authorized": False,
+    }:
+        raise ValidationError("workbook receipt publication boundary is unsafe")
+    return receipt
+
+
 def audit_program_readiness(
     root: Path,
     *,
@@ -861,19 +903,25 @@ def audit_program_readiness(
         if workbook_path is None:
             raise AssertionError("workbook candidate selection unexpectedly returned none")
         inspect_path = workbook_path.with_suffix(workbook_path.suffix + ".inspect.ndjson")
-        workbook_ok = inspect_path.exists()
+        receipt_path = workbook_path.with_suffix(workbook_path.suffix + ".receipt.json")
+        try:
+            validate_workbook_receipt(root, workbook_path)
+            workbook_ok = True
+        except (OSError, ValueError, ValidationError):
+            workbook_ok = False
         workbook_evidence = [
             str(workbook_path.relative_to(root)),
             f"workbook_sha256={sha256_file(workbook_path)}",
             str(inspect_path.relative_to(root)) if inspect_path.exists() else "inspection_sidecar_missing",
+            str(receipt_path.relative_to(root)) if receipt_path.exists() else "workbook_receipt_missing",
         ]
     record(
         "auditable_workbook_component",
         "product",
         PASS if workbook_ok else FAIL,
-        "The Canada development workbook and its formula/structure inspection receipt are present."
+        "The Canada development workbook, inspection and build receipt hash-lock the builder and coverage artifact with a passing reconciliation."
         if workbook_ok
-        else "The Canada development workbook or inspection receipt is missing.",
+        else "The Canada development workbook, inspection or hash-locked build receipt is missing or stale.",
         workbook_evidence or ["outputs/.../AIIO_Canada_Research_*.xlsx"],
         release_gate=True,
     )

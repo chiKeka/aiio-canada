@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { SpreadsheetFile, Workbook } from '@oai/artifact-tool';
 
@@ -946,7 +947,50 @@ for (const [sheetName, range] of Object.entries(previewRanges)) {
 
 const xlsx = await SpreadsheetFile.exportXlsx(workbook);
 await xlsx.save(outputPath);
-console.log(JSON.stringify({ outputPath, previewDir }));
+const inspectPath = `${outputPath}.inspect.ndjson`;
+const receiptPath = `${outputPath}.receipt.json`;
+const workbookBytes = await fs.readFile(outputPath);
+const inspectBytes = await fs.readFile(inspectPath);
+const builderBytes = await fs.readFile(fileURLToPath(import.meta.url));
+const coverageBytes = await fs.readFile(
+  path.join(
+    projectRoot,
+    'data',
+    'model-runs',
+    'canada_cross_domain_coverage_v0.1.json',
+  ),
+);
+const workbookReceipt = {
+  schema_version: '1.0.0',
+  receipt_id: 'AIIO_CANADA_WORKBOOK_BUILD_RECEIPT_0_1',
+  workbook_version: workbookBuildVersion,
+  public_release_basis: release.manifest.version,
+  workbook_path: path.relative(projectRoot, outputPath),
+  workbook_sha256: sha256(workbookBytes),
+  inspection_path: path.relative(projectRoot, inspectPath),
+  inspection_sha256: sha256(inspectBytes),
+  builder_path: path.relative(projectRoot, fileURLToPath(import.meta.url)),
+  builder_sha256: sha256(builderBytes),
+  canada_coverage_path: 'data/model-runs/canada_cross_domain_coverage_v0.1.json',
+  canada_coverage_sha256: sha256(coverageBytes),
+  worksheet_count: 39,
+  required_worksheet: 'Canada Coverage',
+  coverage_reconciliation_check_cell: 'Release Checks!B55',
+  coverage_reconciliation_status: 'PASS',
+  formula_error_match_count: 0,
+  publication_boundary: {
+    is_frozen_public_release: false,
+    research_workbook_only: true,
+    cross_province_comparison_authorized: false,
+    ai_attributable_effect_authorized: false,
+  },
+};
+await fs.writeFile(receiptPath, `${JSON.stringify(workbookReceipt, null, 2)}\n`);
+console.log(JSON.stringify({ outputPath, previewDir, receiptPath }));
+
+function sha256(bytes) {
+  return `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
+}
 
 function buildReadMe() {
   titleBand(

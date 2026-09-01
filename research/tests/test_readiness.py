@@ -17,6 +17,7 @@ from aiio.readiness import (
     select_latest_workbook,
     sha256_file,
     summarize_readiness,
+    validate_workbook_receipt,
 )
 from aiio.schemas import ValidationError
 
@@ -64,6 +65,48 @@ class ReadinessTests(unittest.TestCase):
             self.root / "AIIO_Canada_Research_0.12.0-dev.xlsx",
         ]
         self.assertEqual(select_latest_workbook(candidates), candidates[2])
+
+    def test_workbook_receipt_hash_locks_builder_inspection_and_coverage(self) -> None:
+        workbook = self.root / "outputs/run/AIIO_Canada_Research_0.27.0-dev.xlsx"
+        inspection = workbook.with_suffix(".xlsx.inspect.ndjson")
+        receipt_path = workbook.with_suffix(".xlsx.receipt.json")
+        builder = self.root / "workbook-work/build_aiio_workbook.mjs"
+        coverage = self.root / "data/model-runs/canada_cross_domain_coverage_v0.1.json"
+        for path, content in (
+            (workbook, b"workbook"),
+            (inspection, b"inspection"),
+            (builder, b"builder"),
+            (coverage, b"coverage"),
+        ):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+        receipt = {
+            "receipt_id": "AIIO_CANADA_WORKBOOK_BUILD_RECEIPT_0_1",
+            "workbook_path": str(workbook.relative_to(self.root)),
+            "workbook_sha256": sha256_file(workbook),
+            "inspection_path": str(inspection.relative_to(self.root)),
+            "inspection_sha256": sha256_file(inspection),
+            "builder_path": "workbook-work/build_aiio_workbook.mjs",
+            "builder_sha256": sha256_file(builder),
+            "canada_coverage_path": "data/model-runs/canada_cross_domain_coverage_v0.1.json",
+            "canada_coverage_sha256": sha256_file(coverage),
+            "worksheet_count": 39,
+            "required_worksheet": "Canada Coverage",
+            "coverage_reconciliation_check_cell": "Release Checks!B55",
+            "coverage_reconciliation_status": "PASS",
+            "formula_error_match_count": 0,
+            "publication_boundary": {
+                "is_frozen_public_release": False,
+                "research_workbook_only": True,
+                "cross_province_comparison_authorized": False,
+                "ai_attributable_effect_authorized": False,
+            },
+        }
+        receipt_path.write_text(json.dumps(receipt))
+        self.assertEqual(validate_workbook_receipt(self.root, workbook), receipt)
+        coverage.write_bytes(b"tampered")
+        with self.assertRaisesRegex(ValidationError, "canada_coverage_sha256"):
+            validate_workbook_receipt(self.root, workbook)
 
     def write_digest_fixture(self) -> None:
         items_dir = self.root / "data/digests/items"

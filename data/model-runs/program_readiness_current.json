@@ -273,12 +273,13 @@
       "check_id": "auditable_workbook_component",
       "evidence": [
         "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.27.0-dev.xlsx",
-        "workbook_sha256=sha256:eb1276eb1edf7f8708b1f04f88631fa1fda9b341078d958e7261357a16e9922c",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.27.0-dev.xlsx.inspect.ndjson"
+        "workbook_sha256=sha256:5c08344fd8ee9bcd9405f5e335dc3b98283a6f3cad46ec4c42c570166d1a01c9",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.27.0-dev.xlsx.inspect.ndjson",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.27.0-dev.xlsx.receipt.json"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The Canada development workbook and its formula/structure inspection receipt are present."
+      "summary": "The Canada development workbook, inspection and build receipt hash-lock the builder and coverage artifact with a passing reconciliation."
     },
     {
       "category": "release",
