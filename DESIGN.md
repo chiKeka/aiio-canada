@@ -6,7 +6,7 @@
 
 AIIO Canada is a dual-use public research program and executive decision tool. The interface must let an Assistant Deputy Minister, Treasury Board analyst, infrastructure planner, researcher, or investor understand the current decision boundary in seconds and inspect the evidence in depth without changing products.
 
-The visual system combines useful patterns identified through [Refero Styles](https://styles.refero.design/): the calm editorial restraint of Seline Analytics, Ventriloc's warm-paper data-observatory voice, Together AI's research-console hierarchy, the focused mission-control structure of Harness.io, and the strict semantic use of bright data colours in Impilo. AIIO does not reproduce any one reference. Its own voice is public-sector, evidence-led, Canadian, and deliberately sober.
+The visual system combines useful patterns identified through [Refero Styles](https://styles.refero.design/): the calm editorial restraint of Seline Analytics, Ventriloc's warm-paper data-observatory voice, Clearbit's surface-tint and hairline discipline, Together AI's research-console hierarchy, the focused mission-control structure of Harness.io, and the strict semantic use of bright data colours in Impilo. AIIO does not reproduce any one reference. Its own voice is public-sector, evidence-led, Canadian, and deliberately sober.
 
 ### Reference translation
 
@@ -94,7 +94,7 @@ The public-method surface. It answers: “Where did this come from, how was it t
 - Card padding: `20–28px`.
 - Card radius: `10–12px`.
 - Pills: full radius, reserved for compact status, mode, or filter controls.
-- Use hairline borders as the main separator. A single focal card per viewport may use a soft shadow.
+- Use hairline borders and surface tint as the main separators. Resting cards do not use decorative shadows; elevation is reserved for transient menus and overlays.
 
 ## Surface hierarchy
 

@@ -80,7 +80,7 @@ export function DecisionWorkbench() {
             setStartYear={setStartYear} startYear={startYear}
           />
           <div className="space-y-5">
-            <section className="rounded-[10px] border border-[#d8dcd7] bg-white p-5 shadow-[0_18px_52px_rgba(22,55,55,.07)] sm:p-7">
+            <section className="rounded-xl border border-[#d8dcd7] bg-white p-5 sm:p-7">
               <div className="flex flex-col justify-between gap-4 border-b border-[#dce2dd] pb-5 md:flex-row md:items-start">
                 <div>
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#28766d]">Decision boundary brief</p>
@@ -183,7 +183,7 @@ function ProjectForm({ assetId, budgetMillions, duration, metroId, projectName, 
   setDuration: (value: number) => void; setMetroId: (value: MetroId) => void;
   setProjectName: (value: string) => void; setStartYear: (value: number) => void; startYear: number;
 }) {
-  return <aside className="self-start rounded-[10px] border border-[#d8dcd7] bg-white p-5 shadow-[0_18px_52px_rgba(22,55,55,.07)] xl:sticky xl:top-24">
+  return <aside className="self-start rounded-xl border border-[#d8dcd7] bg-white p-5 xl:sticky xl:top-24">
     <div className="flex items-center justify-between"><div><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#28766d]">Project definition</p><h2 className="mt-1 text-lg font-medium">Your capital decision</h2></div><Building2 className="size-5 text-[#2b776e]" /></div>
     <div className="mt-6 space-y-5">
       <Field label="Project name"><Input className="h-10 bg-white" onChange={(event) => setProjectName(event.target.value)} value={projectName} /></Field>

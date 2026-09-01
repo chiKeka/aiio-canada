@@ -16,7 +16,7 @@ export function SiteHeader() {
           href="/"
           aria-label="AIIO Canada home"
         >
-          <span className="grid size-9 place-items-center rounded-full border border-[#bdd5ce] bg-white font-mono text-xs font-semibold text-[#17665f] shadow-[0_1px_2px_rgba(18,53,52,.06)]">
+          <span className="grid size-9 place-items-center rounded-full border border-[#bdd5ce] bg-white font-mono text-xs font-semibold text-[#17665f]">
             AI
           </span>
           <span>
@@ -34,7 +34,7 @@ export function SiteHeader() {
             <ModeToggle compact />
           </div>
           <Link
-            className="hidden h-8 items-center gap-1.5 rounded-full border border-[#d5d9d4] bg-white px-3 text-xs font-medium text-[#294a49] shadow-[0_1px_2px_rgba(18,53,52,.05)] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] xl:inline-flex"
+            className="hidden h-8 items-center gap-1.5 rounded-full border border-[#d5d9d4] bg-white px-3 text-xs font-medium text-[#294a49] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] xl:inline-flex"
             href="/downloads"
           >
             Downloads <ChevronRight className="size-3.5" />

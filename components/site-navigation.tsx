@@ -76,7 +76,7 @@ export function MobileNavigation() {
     <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger
         aria-label="Open site navigation"
-        className="inline-flex size-10 items-center justify-center rounded-full border border-[#d5d9d4] bg-white text-[#294a49] shadow-[0_1px_2px_rgba(18,53,52,.05)] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] xl:hidden"
+        className="inline-flex size-10 items-center justify-center rounded-full border border-[#d5d9d4] bg-white text-[#294a49] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] xl:hidden"
       >
         <Menu className="size-4" />
       </SheetTrigger>

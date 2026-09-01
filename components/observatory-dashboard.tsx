@@ -377,7 +377,7 @@ export function ObservatoryDashboard() {
               ))}
             </div>
 
-            <article className="rounded-xl border border-[#cdd5d0] bg-white p-6 shadow-[0_16px_45px_rgba(21,55,55,.06)] sm:p-7">
+            <article className="rounded-xl border border-[#cdd5d0] bg-white p-6 sm:p-7">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#536662]">Preregistered analysis contract</p>
@@ -491,7 +491,7 @@ export function ObservatoryDashboard() {
             <p className="max-w-lg text-sm leading-6 text-[#5b6d69]">This matrix shows research readiness, not provincial performance. Expansion-source records remain outside Decision Mode until their validation and review gates pass.</p>
           </div>
 
-          <div className="mt-9 overflow-hidden rounded-xl border border-[#cdd5d0] bg-[#fbfaf5] shadow-[0_16px_45px_rgba(21,55,55,.06)]">
+          <div className="mt-9 overflow-hidden rounded-xl border border-[#cdd5d0] bg-[#fbfaf5]">
             <p className="border-b border-[#d8ddd8] bg-white px-4 py-3 font-mono text-[9px] uppercase tracking-[0.08em] text-[#687a75] sm:hidden">Swipe horizontally to inspect all evidence layers</p>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[820px] border-collapse text-left">

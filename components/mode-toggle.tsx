@@ -21,7 +21,7 @@ export function ModeToggle({ compact = false }: { compact?: boolean }) {
         aria-current={decisionMode ? 'page' : undefined}
         className={`rounded-full px-2.5 py-1.5 text-[11px] font-semibold transition-colors ${
           decisionMode
-            ? 'bg-[#145f59] text-white shadow-[0_1px_2px_rgba(18,53,52,.14)]'
+            ? 'bg-[#145f59] text-white'
             : researchMode
               ? 'text-[#a9b9bd] hover:text-white'
               : 'text-[#526762] hover:text-[#173f40]'
@@ -34,7 +34,7 @@ export function ModeToggle({ compact = false }: { compact?: boolean }) {
         aria-current={researchMode ? 'page' : undefined}
         className={`rounded-full px-2.5 py-1.5 text-[11px] font-semibold transition-colors ${
           researchMode
-            ? 'bg-[#73ffb9] text-[#06130f] shadow-[0_1px_2px_rgba(0,0,0,.2)]'
+            ? 'bg-[#73ffb9] text-[#06130f]'
             : 'text-[#526762] hover:text-[#173f40]'
         }`}
         href="/research"
