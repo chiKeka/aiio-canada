@@ -18,7 +18,7 @@ import {
   Zap,
 } from 'lucide-react';
 
-import { SiteFooter, SiteHeader } from '@/components/site-shell';
+import { SiteHeader } from '@/components/site-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,26 +37,26 @@ const views: { id: View; label: string; icon: typeof Gauge }[] = [
 const tour = [
   {
     kicker: '01 · Define',
-    title: 'Start with the capital decision.',
-    body: 'Set the asset, market, value and delivery window. The observatory uses those choices to select relevant evidence and declared graph pathways.',
+    title: 'Shape the decision.',
+    body: 'Asset · market · value · window',
     visual: 'project',
   },
   {
     kicker: '02 · Observe',
-    title: 'Read dated market signals separately.',
-    body: 'Construction prices, labour diagnostics, public-project overlap and power-system signals remain distinct. No single indicator stands in for the system.',
+    title: 'Scan four signals.',
+    body: 'Materials · labour · delivery · power',
     visual: 'signals',
   },
   {
     kicker: '03 · Trace',
-    title: 'Follow the mechanism through the graph.',
-    body: 'The graph links investment to trades, components and delivery exposure. These links are inspectable assumptions—not measured causal effects.',
+    title: 'Trace the mechanism.',
+    body: 'Investment → constraints → project exposure',
     visual: 'graph',
   },
   {
     kicker: '04 · Decide',
-    title: 'Leave with gates, not false precision.',
-    body: 'Use the evidence to target market testing, utility coordination and estimate refreshes. AI-attributable escalation remains withheld until calibrated and independently reviewed.',
+    title: 'Act on gates.',
+    body: 'Test market · coordinate utilities · refresh estimate',
     visual: 'decision',
   },
 ] as const;
@@ -90,8 +90,8 @@ export function ExecutiveCockpit() {
             <div className="flex items-center gap-3">
               <Badge className="border-[#54c9bb]/35 bg-[#54c9bb]/12 text-[#8be0d3]">Alberta pilot</Badge>
               <div>
-                <p className="text-lg font-medium tracking-[-0.025em]">Executive impact cockpit</p>
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[#8ea7ad]">Release {releaseData.manifest.version} · observed ≠ inferred ≠ assumed</p>
+                <p className="text-lg font-medium tracking-[-0.025em]">Executive cockpit</p>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[#8ea7ad]">{releaseData.manifest.version} · evidence first</p>
               </div>
             </div>
             <nav className="flex w-full gap-1 rounded-xl border border-white/10 bg-black/20 p-1 xl:w-auto" aria-label="Executive dashboard views">
@@ -111,7 +111,7 @@ export function ExecutiveCockpit() {
           <div className="mt-4 grid min-h-0 flex-1 gap-4 lg:grid-cols-[270px_minmax(0,1fr)]">
             <aside className="rounded-2xl border border-white/10 bg-[#0d2933]/88 p-4 shadow-2xl shadow-black/20 backdrop-blur">
               <div className="flex items-center justify-between">
-                <div><p className="text-[9px] uppercase tracking-[0.15em] text-[#72cfc3]">Project controls</p><h1 className="mt-1 text-base font-medium">Shape the decision</h1></div>
+                <div><p className="text-[9px] uppercase tracking-[0.15em] text-[#72cfc3]">Project</p><h1 className="mt-1 text-base font-medium">Shape the decision</h1></div>
                 <Building2 className="size-5 text-[#72cfc3]" />
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
@@ -124,7 +124,7 @@ export function ExecutiveCockpit() {
                 <Control label={`Delivery window · ${duration} years`}><input aria-label="Delivery duration" className="scenario-range mt-2 w-full" max="10" min="2" onChange={(e) => setDuration(Number(e.target.value))} type="range" value={duration} /></Control>
               </div>
               <div className="mt-4 rounded-xl border border-[#ee9665]/30 bg-[#ee9665]/10 p-3">
-                <div className="flex gap-2"><CircleAlert className="mt-0.5 size-4 shrink-0 text-[#ffab78]" /><p className="text-[10px] leading-4 text-[#efc4aa]">AI-attributable cost and delay remain unquantified. The cockpit identifies diligence priorities, not an AI premium.</p></div>
+                <div className="flex items-center gap-2"><CircleAlert className="size-4 shrink-0 text-[#ffab78]" /><p className="text-[10px] font-medium uppercase tracking-[0.08em] text-[#efc4aa]">AI cost + delay unquantified</p></div>
               </div>
             </aside>
 
@@ -140,7 +140,6 @@ export function ExecutiveCockpit() {
           </div>
         </div>
       </section>
-      <SiteFooter />
     </main>
   );
 }
@@ -155,7 +154,7 @@ function CockpitView({ analysis, budgetMillions, completeLabour, leadingMaterial
   return <div className="grid h-full min-h-0 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,.55fr)]">
     <section className="flex min-h-[570px] flex-col rounded-2xl border border-white/10 bg-[#0d2933]/88 p-5 shadow-2xl shadow-black/20 backdrop-blur lg:min-h-0">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div><p className="text-[9px] uppercase tracking-[0.16em] text-[#72cfc3]">Live decision map</p><h2 className="mt-1 text-2xl font-medium tracking-[-0.035em]">Where pressure could reach this project</h2></div>
+        <div><p className="text-[9px] uppercase tracking-[0.16em] text-[#72cfc3]">Live map</p><h2 className="mt-1 text-2xl font-medium tracking-[-0.035em]">Impact path</h2></div>
         <div className="text-right"><p className="font-mono text-xl text-[#dff7f1]">${budgetMillions.toLocaleString()}M</p><p className="text-[9px] uppercase tracking-[0.1em] text-[#8fa8ae]">{analysis.asset.label}</p></div>
       </div>
       <ImpactMap analysis={analysis} />
@@ -169,15 +168,15 @@ function CockpitView({ analysis, budgetMillions, completeLabour, leadingMaterial
     <section className="grid min-h-0 gap-4 sm:grid-cols-2 xl:grid-cols-1 xl:grid-rows-[auto_1fr_auto]">
       <div className="rounded-2xl border border-[#62cdbf]/25 bg-[#123840] p-5">
         <div className="flex items-center justify-between"><p className="text-[9px] uppercase tracking-[0.14em] text-[#80d7cc]">Executive readout</p><Sparkles className="size-4 text-[#80d7cc]" /></div>
-        <p className="mt-4 text-xl font-medium leading-7">Proceed with gated diligence, not a blanket AI escalation allowance.</p>
-        <div className="mt-4 flex items-center gap-2 text-[10px] text-[#a9bec2]"><Check className="size-3.5 text-[#70d3c5]" /> Evidence supports targeted market testing</div>
+        <p className="mt-4 text-3xl font-medium leading-none tracking-[-0.04em]">Gated diligence.</p>
+        <div className="mt-4 flex items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-[#a9bec2]"><Check className="size-3.5 text-[#70d3c5]" /> No blanket AI premium</div>
       </div>
       <div className="rounded-2xl border border-white/10 bg-[#0d2933]/88 p-5">
         <p className="text-[9px] uppercase tracking-[0.14em] text-[#8fa8ae]">Delivery window</p>
         <Timeline start={analysis.scenarioWindowStart} end={analysis.scenarioWindowEnd} projectStart={analysis.endYear - analysis.scenarioWindowYears.length + 1} projectEnd={analysis.endYear} intersection={analysis.scenarioWindowYears} />
-        <p className="mt-4 text-xs leading-5 text-[#a8bcc1]">{analysis.scenarioWindowYears.length} project years intersect the 2027–2036 counterfactual input window.</p>
+        <p className="mt-4 font-mono text-xs text-[#a8bcc1]">{analysis.scenarioWindowYears.length} intersecting years</p>
       </div>
-      <Link className="group flex items-center justify-between rounded-2xl border border-[#ef9664]/30 bg-[#ef9664]/10 p-4 text-sm text-[#ffd0b4] transition hover:bg-[#ef9664]/15" href="/research"><span>Open methodology and audit trail</span><ArrowRight className="size-4 transition group-hover:translate-x-1" /></Link>
+      <Link className="group flex items-center justify-between rounded-2xl border border-[#ef9664]/30 bg-[#ef9664]/10 p-4 text-sm text-[#ffd0b4] transition hover:bg-[#ef9664]/15" href="/research"><span>Method + audit</span><ArrowRight className="size-4 transition group-hover:translate-x-1" /></Link>
     </section>
   </div>;
 }
@@ -208,7 +207,7 @@ function Walkthrough({ analysis, budgetMillions, setTourStep, tourStep }: { anal
       <div className="flex flex-col justify-center border-b border-white/10 p-7 lg:border-b-0 lg:border-r">
         <p className="text-[10px] uppercase tracking-[0.18em] text-[#72cfc3]">{step.kicker}</p>
         <h2 className="mt-4 text-4xl font-medium leading-[1.05] tracking-[-0.045em]">{step.title}</h2>
-        <p className="mt-5 max-w-lg text-sm leading-6 text-[#a9bcc1]">{step.body}</p>
+        <p className="mt-5 font-mono text-xs uppercase tracking-[0.1em] text-[#a9bcc1]">{step.body}</p>
         <div className="mt-8 flex gap-2"><Button className="border border-white/10 bg-white/5 text-white hover:bg-white/10" disabled={tourStep === 0} onClick={() => setTourStep(Math.max(0, tourStep - 1))}><ChevronLeft /> Back</Button><Button className="bg-[#dff7f1] text-[#113b3b] hover:bg-white" disabled={tourStep === tour.length - 1} onClick={() => setTourStep(Math.min(tour.length - 1, tourStep + 1))}>Next <ChevronRight /></Button></div>
       </div>
       <TourVisual analysis={analysis} budgetMillions={budgetMillions} kind={step.visual} />
@@ -219,7 +218,7 @@ function Walkthrough({ analysis, budgetMillions, setTourStep, tourStep }: { anal
 function TourVisual({ analysis, budgetMillions, kind }: { analysis: ReturnType<typeof buildDecisionAnalysis>; budgetMillions: number; kind: typeof tour[number]['visual'] }) {
   if (kind === 'graph') return <div className="flex min-h-[360px] items-center p-6"><ImpactMap analysis={analysis} /></div>;
   if (kind === 'signals') return <div className="grid content-center gap-3 p-6 sm:grid-cols-2">{analysis.materials.slice(0, 4).map((row) => <div className="rounded-2xl border border-white/10 bg-[#081f28] p-5" key={row.indicator_id}><div className="flex items-center justify-between"><Factory className="size-4 text-[#72cfc3]" /><span className="font-mono text-xl text-[#dff7f1]">{signed(row.year_over_year_percent_change)}</span></div><p className="mt-7 text-xs text-[#a9bcc1]">{row.component.replaceAll('_', ' ')}</p><Bar value={Math.abs(row.year_over_year_percent_change)} /></div>)}</div>;
-  if (kind === 'decision') return <div className="flex items-center justify-center p-8"><div className="relative grid size-72 place-items-center rounded-full border border-[#6ad6c8]/25 bg-[#0a222b]"><div className="absolute inset-5 rounded-full border border-dashed border-[#6ad6c8]/25" /><div className="relative max-w-[190px] text-center"><CircleAlert className="mx-auto size-7 text-[#ff9d66]" /><p className="mt-4 text-2xl font-medium">AI premium withheld</p><p className="mt-3 text-xs leading-5 text-[#a9bcc1]">Use four gated diligence actions instead of false precision.</p></div></div></div>;
+  if (kind === 'decision') return <div className="flex items-center justify-center p-8"><div className="relative grid size-72 place-items-center rounded-full border border-[#6ad6c8]/25 bg-[#0a222b]"><div className="absolute inset-5 rounded-full border border-dashed border-[#6ad6c8]/25" /><div className="relative max-w-[190px] text-center"><CircleAlert className="mx-auto size-7 text-[#ff9d66]" /><p className="mt-4 text-2xl font-medium">AI premium withheld</p><p className="mt-3 font-mono text-[9px] uppercase tracking-[0.12em] text-[#a9bcc1]">4 diligence gates</p></div></div></div>;
   return <div className="flex items-center justify-center p-8"><div className="grid w-full max-w-lg gap-3 sm:grid-cols-2"><BigNumber label="Capital decision" value={`$${budgetMillions.toLocaleString()}M`} /><BigNumber label="Delivery" value={`${analysis.endYear - (analysis.endYear - analysis.scenarioWindowYears.length + 1) + 1 || 0} yrs`} /><BigNumber label="Region" value={METROS[analysis.metroId].replace(' region', '')} /><BigNumber label="Asset" value={analysis.asset.label.split(' or ')[0]} /></div></div>;
 }
 
@@ -231,8 +230,8 @@ function EvidenceView({ analysis, completeLabour, requestedGw }: { analysis: Ret
     { icon: Zap, label: 'Power', value: `${requestedGw.toFixed(1)} GW`, note: 'requested—not connected—load' },
   ];
   return <section className="grid h-full min-h-[610px] gap-4 lg:min-h-0 lg:grid-cols-[1.1fr_.9fr]">
-    <div className="rounded-2xl border border-white/10 bg-[#0d2933]/90 p-5"><p className="text-[9px] uppercase tracking-[0.15em] text-[#72cfc3]">Four-channel evidence lens</p><h2 className="mt-2 text-2xl font-medium">Signals stay separate until the model earns a bridge.</h2><div className="mt-5 grid gap-3 sm:grid-cols-2">{channels.map(({ icon: Icon, label, note, value }) => <article className="rounded-2xl border border-white/10 bg-[#081f28] p-5" key={label}><div className="flex items-center justify-between"><Icon className="size-5 text-[#72cfc3]" /><span className="font-mono text-3xl text-[#dff7f1]">{value}</span></div><p className="mt-8 text-sm font-medium">{label}</p><p className="mt-1 text-[10px] text-[#829ca2]">{note}</p></article>)}</div></div>
-    <div className="flex flex-col rounded-2xl border border-white/10 bg-[#0d2933]/90 p-5"><p className="text-[9px] uppercase tracking-[0.15em] text-[#72cfc3]">Evidence maturity</p><div className="mt-5 space-y-5"><Maturity label="Observed market context" value={92} tone="teal" /><Maturity label="Historical stress tests" value={72} tone="blue" /><Maturity label="Graph mechanism" value={38} tone="amber" /><Maturity label="AI-attributable effect" value={4} tone="orange" /></div><div className="mt-auto rounded-xl border border-[#ff9d66]/25 bg-[#ff9d66]/8 p-4 text-xs leading-5 text-[#efc4aa]">Graphic lengths describe evidence maturity in this interface, not statistical confidence or probability.</div></div>
+    <div className="rounded-2xl border border-white/10 bg-[#0d2933]/90 p-5"><p className="text-[9px] uppercase tracking-[0.15em] text-[#72cfc3]">Evidence lens</p><h2 className="mt-2 text-2xl font-medium">Four signals. No forced composite.</h2><div className="mt-5 grid gap-3 sm:grid-cols-2">{channels.map(({ icon: Icon, label, note, value }) => <article className="rounded-2xl border border-white/10 bg-[#081f28] p-5" key={label} title={note}><div className="flex items-center justify-between"><Icon className="size-5 text-[#72cfc3]" /><span className="font-mono text-3xl text-[#dff7f1]">{value}</span></div><p className="mt-8 text-[10px] font-medium uppercase tracking-[0.1em] text-[#a9bcc1]">{label}</p></article>)}</div></div>
+    <div className="flex flex-col rounded-2xl border border-white/10 bg-[#0d2933]/90 p-5"><p className="text-[9px] uppercase tracking-[0.15em] text-[#72cfc3]">Evidence maturity</p><div className="mt-5 space-y-5"><Maturity label="Observed market" value={92} tone="teal" /><Maturity label="Historical analog" value={72} tone="blue" /><Maturity label="Graph mechanism" value={38} tone="amber" /><Maturity label="AI effect" value={4} tone="orange" /></div><div className="mt-auto rounded-xl border border-[#ff9d66]/25 bg-[#ff9d66]/8 p-4 font-mono text-[9px] uppercase tracking-[0.1em] text-[#efc4aa]">Maturity · not probability</div></div>
   </section>;
 }
 
