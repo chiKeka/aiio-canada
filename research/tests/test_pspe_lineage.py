@@ -30,7 +30,15 @@ class PspeMethodLineageTests(unittest.TestCase):
             "adaptation_from_available_method_notes",
         )
         self.assertEqual(
-            committed["source_repository_availability"]["status"], "not_located"
+            committed["source_repository_availability"]["status"],
+            "method_repository_located_engine_source_not_located",
+        )
+        self.assertEqual(
+            committed["source_repository_availability"]["commit"],
+            "3e63c7aaca03ec96d148f77e55aea40f2b64e40d",
+        )
+        self.assertEqual(
+            len(committed["source_repository_availability"]["method_artifacts"]), 5
         )
         boundary = committed["publication_boundary"]
         self.assertFalse(boundary["source_code_reproduction_claim_authorized"])
@@ -51,7 +59,7 @@ class PspeMethodLineageTests(unittest.TestCase):
 
     def test_rejects_promoted_source_repository_claim(self) -> None:
         contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
-        contract["source_repository_availability"]["status"] = "available"
+        contract["source_repository_availability"]["status"] = "engine_source_available"
         with tempfile.TemporaryDirectory() as directory:
             contract_path = Path(directory) / "contract.json"
             output_path = Path(directory) / "output.json"

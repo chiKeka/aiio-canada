@@ -26,8 +26,37 @@ def build_pspe_method_lineage(
     if source.get("distribution_status") != "local_only_not_redistributed":
         raise ValidationError("PSPE source material must retain its local-only boundary")
     availability = contract.get("source_repository_availability", {})
-    if availability.get("status") != "not_located":
+    if availability.get("status") != "method_repository_located_engine_source_not_located":
         raise ValidationError("PSPE repository availability must reflect verified local state")
+    commit = availability.get("commit")
+    if not isinstance(commit, str) or len(commit) != 40 or any(
+        char not in "0123456789abcdef" for char in commit
+    ):
+        raise ValidationError("PSPE method repository receipt requires a Git commit")
+    if availability.get("worktree_status_at_receipt") != "clean":
+        raise ValidationError("PSPE method repository receipt must disclose a clean worktree")
+    method_artifacts = availability.get("method_artifacts")
+    if not isinstance(method_artifacts, list) or len(method_artifacts) < 5:
+        raise ValidationError("PSPE method repository receipt is incomplete")
+    if any(
+        not isinstance(item, dict)
+        or not isinstance(item.get("path"), str)
+        or not isinstance(item.get("sha256"), str)
+        or not item["sha256"].startswith("sha256:")
+        or not isinstance(item.get("byte_size"), int)
+        or item["byte_size"] <= 0
+        for item in method_artifacts
+    ):
+        raise ValidationError("PSPE method repository artifact receipt is invalid")
+    curriculum_receipts = [
+        item for item in method_artifacts if item["path"] == "CURRICULUM.md"
+    ]
+    if len(curriculum_receipts) != 1 or curriculum_receipts[0]["sha256"] != source.get("sha256"):
+        raise ValidationError("PSPE curriculum receipt does not reconcile to method repository")
+    if availability.get("searched_engine_filenames") != [
+        "graph_schema.py", "propagation.py", "s3_metrics.py", "sd_bridge.py"
+    ]:
+        raise ValidationError("PSPE engine-source search receipt is incomplete")
     mappings = contract.get("mappings")
     if not isinstance(mappings, list) or not mappings:
         raise ValidationError("PSPE lineage requires at least one method mapping")

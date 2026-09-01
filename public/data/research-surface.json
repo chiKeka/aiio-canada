@@ -1,6 +1,6 @@
 {
   "artifact_count": 25,
-  "artifact_manifest_sha256": "sha256:c66007f386a4e2d9716c06690758aaccbfb3fe052af1d7c022147b1be342fd1b",
+  "artifact_manifest_sha256": "sha256:7a3e0094025f29223704fbb7dddbcf68066d6d34e1e73cfa98106ce546401353",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -24,7 +24,7 @@
       "artifact_id": "pspe_method_lineage",
       "evidence_role": "method_lineage",
       "path": "data/model-runs/pspe_method_lineage_v0.1.json",
-      "sha256": "sha256:0e4c434eb182005935c5da92c1f4af2c4e62c8c11862e0e46d5afb2780336559"
+      "sha256": "sha256:504cf2997a3cce457a345e2ab84fe93eb7002ec6ae054ce8119afb68df61d218"
     },
     {
       "artifact_id": "canada_cross_domain_coverage",
@@ -60,7 +60,7 @@
       "artifact_id": "reference_review",
       "evidence_role": "governance",
       "path": "data/model-runs/alberta_reference_cost_review_package_v0.1.json",
-      "sha256": "sha256:92d94cd26c980e5da2666b696be099dcfc6484bf0229be9b4ef87da16207d926"
+      "sha256": "sha256:14c61c2a56923d65db164415da8d6a16b60290ceda048215a39d6474f8725404"
     },
     {
       "artifact_id": "information_sector_capex",

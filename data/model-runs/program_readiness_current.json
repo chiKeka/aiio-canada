@@ -27,7 +27,7 @@
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "Five PSPE concept-to-AIIO mappings are hash-locked as independent adaptations, while the unavailable source repository and unimplemented layers remain explicit."
+      "summary": "Five PSPE concept-to-AIIO mappings are hash-locked against the local Git-backed method repository, while the separate unavailable engine source and unimplemented layers remain explicit."
     },
     {
       "category": "evidence_pipeline",
@@ -261,7 +261,7 @@
       "check_id": "research_surface_provenance",
       "evidence": [
         "public/data/research-surface.json",
-        "artifact_manifest_sha256=sha256:c66007f386a4e2d9716c06690758aaccbfb3fe052af1d7c022147b1be342fd1b",
+        "artifact_manifest_sha256=sha256:7a3e0094025f29223704fbb7dddbcf68066d6d34e1e73cfa98106ce546401353",
         "research/src/aiio/research_surface.py"
       ],
       "release_gate": true,

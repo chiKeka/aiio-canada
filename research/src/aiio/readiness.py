@@ -168,7 +168,15 @@ def audit_program_readiness(
             == "adaptation_from_available_method_notes"
             and pspe_lineage.get("mapping_count") == 5
             and pspe_lineage.get("source_repository_availability", {}).get("status")
-            == "not_located"
+            == "method_repository_located_engine_source_not_located"
+            and pspe_lineage.get("source_repository_availability", {}).get("commit")
+            == "3e63c7aaca03ec96d148f77e55aea40f2b64e40d"
+            and len(
+                pspe_lineage.get("source_repository_availability", {}).get(
+                    "method_artifacts", []
+                )
+            )
+            == 5
             and pspe_boundary.get("source_code_reproduction_claim_authorized") is False
             and pspe_boundary.get("implemented_layer_claim_limited_to_mappings") is True
             and pspe_boundary.get("unimplemented_pspe_layers_claimed") is False
@@ -176,7 +184,7 @@ def audit_program_readiness(
         )
         pspe_status = PASS if pspe_ok else FAIL
         pspe_summary = (
-            "Five PSPE concept-to-AIIO mappings are hash-locked as independent adaptations, while the unavailable source repository and unimplemented layers remain explicit."
+            "Five PSPE concept-to-AIIO mappings are hash-locked against the local Git-backed method repository, while the separate unavailable engine source and unimplemented layers remain explicit."
             if pspe_ok
             else "The PSPE source-lineage boundary is incomplete or unsafe."
         )

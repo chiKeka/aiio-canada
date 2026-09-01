@@ -11,15 +11,19 @@ explainability.
 
 ## Source-lineage status
 
-The local MMPM material contains `PSPE_Math_Curriculum.md`, hash-identified in
-`data/model/pspe_method_lineage_contract_v0.1.json`. It describes the intended
-six-layer architecture and the recurrence
+The local MMPM material contains a Git-backed `math_lab` repository at commit
+`3e63c7aaca03ec96d148f77e55aea40f2b64e40d`. Its curriculum, foundations
+notebook and concept notes are hash-receipted in
+`data/model/pspe_method_lineage_contract_v0.1.json`. The curriculum describes
+the intended six-layer architecture and the recurrence
 `Impact(v,t+1) = Σ w(u,v)·Impact(u,t)·(1−α(v))`. The referenced PSPE source files
 `graph_schema.py`, `propagation.py`, `s3_metrics.py` and `sd_bridge.py` were not
-located in the supplied folder or indexed local filesystem.
+located in this method repository or the supplied folder. The repository itself
+states that the engine lives separately in the private
+`chiKeka/pspe-s3-framework` repository.
 
 Accordingly, AIIO does not claim a code fork, exact reproduction or verified
-behavioural equivalence to an unavailable PSPE repository. The generated
+behavioural equivalence to unavailable PSPE engine source. The generated
 lineage report hash-locks five specific concept-to-AIIO mappings and the tests
 that support each claim. If the original repository becomes available, it must
 enter a separate comparison review before this status changes.
@@ -38,8 +42,8 @@ enter a separate comparison review before this status changes.
 1. **Dense-graph compression.** Conventional centrality measures converge in dense networks and can cease to discriminate important nodes. AIIO will emphasize mechanism-specific flow, exposure and bottleneck measures.
 2. **Degenerate cascade-origin ranking.** Prior methodological notes describe
    an HS2 workflow that row-normalized propagation and then ranked origins by
-   conserved total mass, producing equivalent scores. The underlying repository
-   is not locally available for independent code verification. AIIO therefore
+   conserved total mass, producing equivalent scores. The underlying engine
+   source is not locally available for independent code verification. AIIO therefore
    does not reproduce or use that ranking construction and tests its own graph
    invariants on synthetic graphs.
 3. **Edge semantics changed across prototypes.** Valence, threat and influence were used differently. AIIO defines one edge ontology and migrates explicitly.

@@ -3,8 +3,12 @@
 ## Finding
 
 The available local source material supports a conceptual-method inheritance
-claim but not a code-reproduction claim. The PSPE mathematics curriculum is
-present and hash-receipted. The implementation files it names were not located.
+claim but not a code-reproduction claim. A clean Git-backed `math_lab`
+repository is present at commit
+`3e63c7aaca03ec96d148f77e55aea40f2b64e40d`; its curriculum, foundations
+notebook and concept notes are hash-receipted. The repository identifies a
+separate private PSPE engine repository, but the implementation files named by
+the curriculum were not located locally.
 
 ## Reproducible mapping
 
@@ -18,9 +22,9 @@ concepts to current AIIO contracts, implementations and tests:
 4. S3-informed scenario stress testing; and
 5. fail-closed reference-class calibration.
 
-Each AIIO mapping is an independent implementation. Hashes prove which AIIO
-files support the mapping; they do not prove equivalence to unavailable source
-code.
+Each AIIO mapping is an independent implementation. Hashes prove which local
+method artifacts informed the mapping and which AIIO files support it; they do
+not prove equivalence to unavailable engine source code.
 
 ## Non-inheritance boundary
 
@@ -32,7 +36,7 @@ estimators.
 
 ## Change control
 
-If the original repository is later supplied, record its immutable commit and
-file hashes, compare algorithms and defaults, rerun invariant and golden tests,
-and issue a new lineage version. Do not overwrite this receipt or retroactively
-describe the current engine as a fork.
+If the separate engine repository is later supplied, record its immutable
+commit and file hashes, compare algorithms and defaults, rerun invariant and
+golden tests, and issue a new lineage version. Do not overwrite this receipt or
+retroactively describe the current engine as a fork.

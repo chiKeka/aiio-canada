@@ -205,22 +205,22 @@ export default function MethodsPage() {
               Signed paths with explicit limits.
             </h2>
             <p className="mt-4 text-sm leading-6 text-[#a9bcc2]">
-              The available PSPE curriculum contributes the documented concepts
-              of directed graph propagation, damping and path interpretation.
-              AIIO independently implements five bounded mappings and adds
+              The local Git-backed PSPE mathematics repository contributes the
+              documented concepts of directed graph propagation, damping and
+              path interpretation. AIIO independently implements five bounded mappings and adds
               evidence lineage, frozen edge semantics, temporal lags, retained
               states, scenario isolation and release controls.
             </p>
             <dl className="mt-6 grid grid-cols-3 gap-2">
               <div className="rounded-lg border border-white/10 bg-white/4 p-3"><dt className="text-[9px] text-[#9fb6bc]">Mapped concepts</dt><dd className="mt-1 font-mono text-xl text-[#8dd2c7]">{pspeLineage.mapping_count}</dd></div>
               <div className="rounded-lg border border-white/10 bg-white/4 p-3"><dt className="text-[9px] text-[#9fb6bc]">Source receipt</dt><dd className="mt-1 font-mono text-xs text-[#8dd2c7]">hash-locked</dd></div>
-              <div className="rounded-lg border border-white/10 bg-white/4 p-3"><dt className="text-[9px] text-[#9fb6bc]">Source repo</dt><dd className="mt-1 font-mono text-xs text-[#e6b58f]">not located</dd></div>
+              <div className="rounded-lg border border-white/10 bg-white/4 p-3"><dt className="text-[9px] text-[#9fb6bc]">Method repo</dt><dd className="mt-1 font-mono text-xs text-[#8dd2c7]">commit locked</dd></div>
             </dl>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {[
               'Dense-graph centrality is not used as a proxy for importance.',
-              'Prior notes describe a conserved-mass origin ranking; its unavailable source code is not claimed as verified, reproduced or used.',
+              'Prior notes describe a conserved-mass origin ranking; the separate engine source is unavailable and is not claimed as verified, reproduced or used.',
               'Positive and negative paths are retained separately.',
               'Absorption and retention receive explicit sensitivity tests.',
               'Raw pressure is transformed as raw ÷ (1 + raw) for bounded public display only.',
