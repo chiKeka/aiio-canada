@@ -6,7 +6,17 @@
 
 AIIO Canada is a dual-use public research program and executive decision tool. The interface must let an Assistant Deputy Minister, Treasury Board analyst, infrastructure planner, researcher, or investor understand the current decision boundary in seconds and inspect the evidence in depth without changing products.
 
-The visual system combines three useful patterns identified through [Refero Styles](https://styles.refero.design/): the calm editorial restraint of Seline Analytics, the focused mission-control hierarchy of Harness.io, and the strict semantic use of bright data colours in Impilo. AIIO does not reproduce any one reference. Its own voice is public-sector, evidence-led, Canadian, and deliberately sober.
+The visual system combines useful patterns identified through [Refero Styles](https://styles.refero.design/): the calm editorial restraint of Seline Analytics, Ventriloc's warm-paper data-observatory voice, Together AI's research-console hierarchy, the focused mission-control structure of Harness.io, and the strict semantic use of bright data colours in Impilo. AIIO does not reproduce any one reference. Its own voice is public-sector, evidence-led, Canadian, and deliberately sober.
+
+### Reference translation
+
+| Reference pattern | AIIO translation | Boundary |
+| --- | --- | --- |
+| Quiet editorial analytics | Warm paper, light-weight display type, generous whitespace and hairline structure in Decision Mode | No borrowed brand palette, mascot or signature composition |
+| Editorial data observatory | Monospace evidence labels and one restrained amber signal for unresolved gates | Amber must remain semantic, never ornamental |
+| Research console | Compact methodological metadata, low-elevation category cards and explicit active/missing states in Research Mode | No decorative pastel dashboard wall; each surface must encode a research role |
+| Mission-control surface | One midnight section for graph pathways and system propagation | Do not scatter dark cards through the briefing surface |
+| Clinical semantic colour | Observed, inferred, assumed and scenario states retain distinct labels and tones | Colour never substitutes for status text |
 
 ## Product modes
 
@@ -121,6 +131,10 @@ Each evidence claim carries one of: `observed`, `inferred`, `assumed`, or `scena
 
 The most important result card. It states what the tool can and cannot support, the relevant date and release, and the next defensible action. When a value is withheld, the explanation and failed gate replace the value.
 
+### Identification gate console
+
+Research Mode shows the causal-estimation contract as a staged gate: treatment, outcome, controls, panel assembly, diagnostics and review. Available controls may be shown as ready, but they must never visually outweigh a missing authorizing treatment or outcome. A withheld effect is rendered as a deliberate publication state with null values—not as zero, an empty chart or a disabled forecast card.
+
 ### Dependency graph
 
 The graph lives on the midnight canvas. Nodes use pale semantic fills for recognizability, active paths glow in cyan, inactive paths recede, and the selected-node inspector explains weights, lags, absorption, and evidence status. The accessible path list is always available.
@@ -167,4 +181,3 @@ The graph lives on the midnight canvas. Nodes use pale semantic fills for recogn
 - Do not use generic green/red “good/bad” semantics for market pressure.
 - Do not hide methodological caveats in a footer or tooltip.
 - Do not copy a Refero reference’s brand palette, mascot, typography, or signature treatment.
-

@@ -32,6 +32,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import releaseData from '@/public/data/latest.json';
+import attributionReadiness from '@/data/model-runs/ai_attribution_identification_readiness_v0.1.json';
+import buildingInvestmentControls from '@/data/model-runs/building_investment_controls_canada_v0.1.json';
 import { ModeToggle } from '@/components/mode-toggle';
 import { boundedDisplayScore } from '@/lib/decision-analysis';
 
@@ -79,6 +81,38 @@ const provincialCoverage = [
 ];
 
 const coverageColumns = ['Public projects', 'Cost reference', 'Trade labour', 'Power planning'];
+
+const attributionDomainMeta = [
+  {
+    id: 'REALIZED_AI_CONSTRUCTION_TREATMENT',
+    label: 'AI construction treatment',
+    role: 'Authorizing treatment',
+    summary: 'Requires realized construction spend or construction labour hours. Announced capex, requested MW and permits remain proxies.',
+  },
+  {
+    id: 'PUBLIC_PROJECT_COST_OUTCOMES',
+    label: 'Public cost outcome',
+    role: 'Authorizing outcome',
+    summary: 'Requires a reconciled estimate price basis, award value and approved change history for a consistent asset reference class.',
+  },
+  {
+    id: 'PUBLIC_PROJECT_SCHEDULE_OUTCOMES',
+    label: 'Public schedule outcome',
+    role: 'Authorizing outcome',
+    summary: 'Requires baseline and actual start and completion dates, with the schedule-baseline vintage preserved.',
+  },
+  {
+    id: 'REGIONAL_CONSTRUCTION_ACTIVITY_CONTROLS',
+    label: 'Regional activity controls',
+    role: 'Control domain',
+    summary: 'Quarterly building investment and construction prices are available as controls, not as an AI treatment or public-project outcome.',
+  },
+];
+
+const attributionDomains = attributionDomainMeta.map((meta) => ({
+  ...meta,
+  domain: attributionReadiness.domain_status.find((domain) => domain.domain_id === meta.id),
+}));
 
 export function ObservatoryDashboard() {
   const [capex, setCapex] = useState(50);
@@ -306,6 +340,87 @@ export function ObservatoryDashboard() {
         </div>
       </section>
 
+      <section id="identification-gate" className="border-y border-[#d7ddd8] bg-[#faf9f5]">
+        <div className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,.78fr)_minmax(520px,1.22fr)] lg:items-end">
+            <div>
+              <p className="font-mono text-xs font-semibold uppercase tracking-[0.15em] text-[#28766d]">Causal identification gate</p>
+              <h2 className="mt-4 max-w-2xl text-balance text-3xl font-medium tracking-[-0.045em] text-[#0d2b36] sm:text-5xl">
+                The model may explain pressure before it may claim an AI effect.
+              </h2>
+            </div>
+            <div className="border-l-2 border-[#d66b35] pl-5">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#96502d]">Current publication state · withheld</p>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5c6965]">
+                {attributionReadiness.publication_authorization.reason} Cost escalation and schedule-delay fields remain null—not zero.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-10 grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(380px,.75fr)]">
+            <div className="grid gap-3 sm:grid-cols-2" aria-label="Causal attribution evidence domains">
+              {attributionDomains.map(({ domain, id, label, role, summary }) => (
+                <AttributionDomainCard
+                  key={id}
+                  label={label}
+                  role={role}
+                  sourceCount={domain?.source_ids.length ?? 0}
+                  status={domain?.status ?? 'not_assessed'}
+                  summary={summary}
+                />
+              ))}
+            </div>
+
+            <article className="rounded-xl border border-[#cdd5d0] bg-white p-6 shadow-[0_16px_45px_rgba(21,55,55,.06)] sm:p-7">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#536662]">Preregistered analysis contract</p>
+                  <h3 className="mt-2 text-xl font-medium tracking-[-0.025em] text-[#14323d]">Staggered group-time effect design</h3>
+                </div>
+                <Badge variant="outline" className="border-[#d8a98e] bg-[#fff3e8] text-[#994a25]">Not assessed</Badge>
+              </div>
+
+              <dl className="mt-7 grid grid-cols-2 gap-x-5 gap-y-6 border-y border-[#e1e4df] py-6">
+                <ContractMetric label="Pre-treatment history" value={`${attributionReadiness.design.minimum_pre_treatment_quarters} quarters`} />
+                <ContractMetric label="Post-treatment history" value={`${attributionReadiness.design.minimum_post_treatment_quarters} quarters`} />
+                <ContractMetric label="Treated regions" value={`At least ${attributionReadiness.design.minimum_treated_regions}`} />
+                <ContractMetric label="Controls per cohort" value={`At least ${attributionReadiness.design.minimum_control_regions_per_cohort}`} />
+              </dl>
+
+              <div className="mt-6 space-y-4">
+                <div>
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-[#62736f]">Diagnostics required</p>
+                  <p className="mt-2 text-sm leading-6 text-[#556864]">Pre-trend equivalence, placebo dates, a negative-control outcome, and leave-one-region and leave-one-event sensitivity.</p>
+                </div>
+                <div className="rounded-lg bg-[#eef1ed] p-4">
+                  <p className="text-sm font-medium text-[#173941]">Graph boundary</p>
+                  <p className="mt-1 text-xs leading-5 text-[#5d6f6b]">{attributionReadiness.graph_role}</p>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div className="mt-5 grid gap-5 rounded-xl border border-[#b7d0c8] bg-[#e6f1ed] p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-6">
+            <div>
+              <div className="flex items-center gap-2 text-[#17645d]"><CircleCheck className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Regional control panel ready</p></div>
+              <p className="mt-2 text-sm leading-6 text-[#4f6964]">Statistics Canada building-investment observations now provide a common quarterly activity control across Canada. They do not authorize an AI-attributable estimate.</p>
+            </div>
+            <dl className="grid grid-cols-3 gap-5 border-t border-[#bcd2cb] pt-5 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
+              <ContractMetric label="Observations" value={buildingInvestmentControls.observation_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Geographies" value={buildingInvestmentControls.geography_count.toString()} />
+              <ContractMetric label="Quarters" value={buildingInvestmentControls.quarter_count.toString()} />
+            </dl>
+          </div>
+
+          <div className="mt-7 flex flex-wrap items-center gap-4 text-xs text-[#60716d]">
+            <span className="font-mono">Contract {attributionReadiness.contract_id}</span>
+            <span aria-hidden="true">·</span>
+            <span>As of {buildingInvestmentControls.as_of_date}</span>
+            <Link className="font-medium text-[#17645d] underline decoration-[#8fbeb4] underline-offset-4 hover:text-[#0d4844]" href="/methods">Inspect the full methodology</Link>
+          </div>
+        </div>
+      </section>
+
       <section id="canada-coverage" className="border-y border-[#d7ddd8] bg-[#f0efe8]">
         <div className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
@@ -404,4 +519,25 @@ function CoverageStatus({ status }: { status: string }) {
       ? 'border-[#b6c8d0] bg-[#edf2f4] text-[#456574]'
       : 'border-[#e0b18f] bg-[#fff0e4] text-[#96502d]';
   return <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.06em] ${tone}`}><span className="size-1.5 rounded-full bg-current opacity-70" />{status}</span>;
+}
+
+function AttributionDomainCard({ label, role, sourceCount, status, summary }: { label: string; role: string; sourceCount: number; status: string; summary: string }) {
+  const available = status === 'available';
+  return (
+    <article className={`rounded-xl border p-5 sm:p-6 ${available ? 'border-[#a9cbbf] bg-[#e5f1ed]' : 'border-[#dfb18f] bg-[#fff0e4]'}`}>
+      <div className="flex items-start justify-between gap-3">
+        <p className={`font-mono text-[10px] font-semibold uppercase tracking-[0.1em] ${available ? 'text-[#17645d]' : 'text-[#96502d]'}`}>{role}</p>
+        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.07em] ${available ? 'border-[#82b5a9] bg-white/65 text-[#17645d]' : 'border-[#d9a37d] bg-white/55 text-[#96502d]'}`}>
+          {available ? <CircleCheck className="size-3" /> : <LockKeyhole className="size-3" />}{status.replaceAll('_', ' ')}
+        </span>
+      </div>
+      <h3 className="mt-5 text-lg font-medium tracking-[-0.02em] text-[#14323d]">{label}</h3>
+      <p className="mt-2 text-sm leading-6 text-[#5b6d69]">{summary}</p>
+      <p className="mt-5 border-t border-current/15 pt-3 font-mono text-[9px] uppercase tracking-[0.08em] text-[#4e625e]">{sourceCount} registry-bound source{sourceCount === 1 ? '' : 's'}</p>
+    </article>
+  );
+}
+
+function ContractMetric({ label, value }: { label: string; value: string }) {
+  return <div><dt className="font-mono text-[9px] uppercase tracking-[0.08em] text-[#4e625e]">{label}</dt><dd className="mt-1 text-sm font-semibold text-[#173941]">{value}</dd></div>;
 }
