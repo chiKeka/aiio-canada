@@ -6,7 +6,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from aiio.calibration import run_reference_class_baseline
+from aiio.calibration import (
+    PROVINCIAL_REFERENCE_GEOGRAPHY_LABELS,
+    PROVINCIAL_REFERENCE_LIMITATIONS,
+    PROVINCIAL_REFERENCE_MODEL_ID,
+    run_reference_class_baseline,
+)
 from aiio.project_cost import build_project_reference_cost
 
 
@@ -95,6 +100,54 @@ class CalibrationArtifactTests(unittest.TestCase):
             result["market_reference_baseline"][
                 "schedule_weighted_estimate_cad"
             ]
+        )
+
+    def test_provincial_reference_expansion_is_locked_and_not_assessed(self) -> None:
+        source = ROOT / "data/processed/bcpi_reference_bc_on_qc.csv"
+        committed = (
+            ROOT
+            / "data/model-runs/bc_on_qc_bcpi_reference_baseline_v0.1.json"
+        )
+        self.assertEqual(
+            hashlib.sha256(source.read_bytes()).hexdigest(),
+            "8d6f2bce624176f736d68ac40f87fc5a3e78aec68d7ad0493ee26b3cfba60a5e",
+        )
+        self.assertEqual(
+            hashlib.sha256(committed.read_bytes()).hexdigest(),
+            "866b7f7aca6cf12e6184a5417048036ded318a369c53f039e815e5c99c4aac0b",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            regenerated_path = Path(directory) / "provincial-baseline.json"
+            run_reference_class_baseline(
+                source,
+                regenerated_path,
+                geography_labels=PROVINCIAL_REFERENCE_GEOGRAPHY_LABELS,
+                model_id=PROVINCIAL_REFERENCE_MODEL_ID,
+                limitations=PROVINCIAL_REFERENCE_LIMITATIONS,
+            )
+            regenerated = json.loads(
+                regenerated_path.read_text(encoding="utf-8")
+            )
+        expected = json.loads(committed.read_text(encoding="utf-8"))
+        self.assertEqual(regenerated, expected)
+        self.assertEqual(expected["release_state"], "not_assessed")
+        self.assertEqual(
+            expected["publication_summary"]["horizon_status_counts"],
+            {"not_assessed": 60},
+        )
+        self.assertEqual(
+            {
+                item["geography_id"]
+                for item in expected["reference_class_results"]
+            },
+            set(PROVINCIAL_REFERENCE_GEOGRAPHY_LABELS),
+        )
+        self.assertTrue(
+            all(
+                horizon["projected_index"] is None
+                for item in expected["reference_class_results"]
+                for horizon in item["horizons"]
+            )
         )
 
 

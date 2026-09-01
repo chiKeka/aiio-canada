@@ -47,10 +47,11 @@ class ReferenceBaselineTests(unittest.TestCase):
         observation_count: int = 100,
         quarterly_growth: float = 1.005,
         omit_offset: int | None = None,
+        geography_labels: dict[str, str] = GEOGRAPHY_LABELS,
     ) -> None:
         rows = []
         for definition in REFERENCE_CLASSES.values():
-            for geography_id in GEOGRAPHY_LABELS:
+            for geography_id in geography_labels:
                 for offset in range(observation_count):
                     if offset == omit_offset:
                         continue
@@ -133,6 +134,38 @@ class ReferenceBaselineTests(unittest.TestCase):
 
         self.assertEqual(written, result)
         self.assertEqual(len(written["input_sha256"]), 64)
+
+    def test_custom_provincial_scope_does_not_transfer_alberta_geographies(self) -> None:
+        provincial_geographies = {
+            "PR_24": "Quebec",
+            "PR_35": "Ontario",
+            "PR_59": "British Columbia",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "bcpi.csv"
+            self.write_history(
+                source,
+                observation_count=38,
+                geography_labels=provincial_geographies,
+            )
+            result = build_reference_class_baseline(
+                source,
+                geography_labels=provincial_geographies,
+                model_id="PROVINCIAL_TEST",
+                limitations=["Province-specific test limitation."],
+            )
+
+        self.assertEqual(result["model_id"], "PROVINCIAL_TEST")
+        self.assertEqual(len(result["reference_class_results"]), 12)
+        self.assertEqual(
+            {
+                item["geography_id"]
+                for item in result["reference_class_results"]
+            },
+            set(provincial_geographies),
+        )
+        self.assertEqual(result["release_state"], "not_assessed")
+        self.assertEqual(result["limitations"], ["Province-specific test limitation."])
 
 
 if __name__ == "__main__":

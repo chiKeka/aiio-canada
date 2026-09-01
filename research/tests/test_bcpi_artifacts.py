@@ -3,8 +3,11 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import tempfile
 import unittest
 from pathlib import Path
+
+from aiio.adapters.statcan import normalize_bcpi_reference_provinces
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -56,6 +59,19 @@ class ProvincialBcpiArtifactTests(unittest.TestCase):
         self.assertTrue(
             all(not label.startswith("CMA_") for label in screen["geography_scope"])
         )
+
+    def test_provincial_reference_extract_reproduces_from_locked_raw_vintage(self) -> None:
+        raw_path = (
+            ROOT
+            / "data/raw/statcan_bcpi_18100289/2026-08-31_d0d11fda82bf.zip"
+        )
+        committed = ROOT / "data/processed/bcpi_reference_bc_on_qc.csv"
+        with tempfile.TemporaryDirectory() as directory:
+            regenerated = Path(directory) / "reference.csv"
+            observations = normalize_bcpi_reference_provinces(raw_path, regenerated)
+            regenerated_bytes = regenerated.read_bytes()
+        self.assertEqual(len(observations), 456)
+        self.assertEqual(regenerated_bytes, committed.read_bytes())
 
 
 if __name__ == "__main__":

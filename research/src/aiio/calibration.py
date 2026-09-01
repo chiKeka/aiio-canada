@@ -29,6 +29,19 @@ GEOGRAPHY_LABELS = {
     "CMA_825": "Calgary CMA",
     "CMA_835": "Edmonton CMA",
 }
+PROVINCIAL_REFERENCE_MODEL_ID = "AIIO_CA_BC_ON_QC_BCPI_REFERENCE_BASELINE_0_1"
+PROVINCIAL_REFERENCE_GEOGRAPHY_LABELS = {
+    "PR_24": "Quebec",
+    "PR_35": "Ontario",
+    "PR_59": "British Columbia",
+}
+PROVINCIAL_REFERENCE_LIMITATIONS = [
+    "BCPI measures contractor bid-price change for model buildings, not the realized cost of a particular project.",
+    "Province-level model-building indexes do not substitute for local project-market conditions.",
+    "The published provincial history begins in 2017 and may be too short for the locked rolling-origin validation partitions.",
+    "Empirical error bands are historical forecast-error ranges, not confidence intervals or probability guarantees.",
+    "The baseline contains no AI-attributable effect and no Alberta coefficient is transferred across provinces.",
+]
 
 REFERENCE_CLASSES = {
     "health_facilities": {
@@ -349,6 +362,9 @@ def build_reference_class_baseline(
     bcpi_path: Path,
     *,
     horizons_years: Iterable[int] = range(1, 6),
+    geography_labels: dict[str, str] | None = None,
+    model_id: str = MODEL_ID,
+    limitations: list[str] | None = None,
 ) -> dict[str, Any]:
     horizon_list = sorted(set(horizons_years))
     if not horizon_list or any(year < 1 or year > 10 for year in horizon_list):
@@ -357,6 +373,11 @@ def build_reference_class_baseline(
         source_rows = list(csv.DictReader(handle))
     if not source_rows:
         raise ValidationError("BCPI baseline cannot use an empty input")
+    active_geography_labels = (
+        GEOGRAPHY_LABELS if geography_labels is None else geography_labels
+    )
+    if not active_geography_labels:
+        raise ValidationError("baseline requires at least one geography")
 
     eligible_indicators = {
         definition["indicator_id"] for definition in REFERENCE_CLASSES.values()
@@ -365,14 +386,14 @@ def build_reference_class_baseline(
     for row in source_rows:
         if (
             row["indicator_id"] in eligible_indicators
-            and row["geography_id"] in GEOGRAPHY_LABELS
+            and row["geography_id"] in active_geography_labels
         ):
             grouped[(row["indicator_id"], row["geography_id"])].append(row)
 
     expected_keys = {
         (definition["indicator_id"], geography_id)
         for definition in REFERENCE_CLASSES.values()
-        for geography_id in GEOGRAPHY_LABELS
+        for geography_id in active_geography_labels
     }
     if set(grouped) != expected_keys:
         missing = sorted(expected_keys - set(grouped))
@@ -383,7 +404,7 @@ def build_reference_class_baseline(
 
     outputs = []
     for asset_class, definition in REFERENCE_CLASSES.items():
-        for geography_id, geography_label in GEOGRAPHY_LABELS.items():
+        for geography_id, geography_label in active_geography_labels.items():
             rows = grouped[(definition["indicator_id"], geography_id)]
             periods, values = _validate_series(rows)
             horizons = [
@@ -420,17 +441,18 @@ def build_reference_class_baseline(
     for output in outputs:
         for horizon in output["horizons"]:
             horizon_status_counts[horizon["status"]] += 1
+    any_horizon_passed = any(
+        item["release_state"] == "baseline_only" for item in outputs
+    )
     return {
         "schema_version": "1.0.0",
-        "model_id": MODEL_ID,
+        "model_id": model_id,
         "source_id": SOURCE_ID,
         "input_sha256": input_hash,
         "as_of_date": as_of_date,
         "evidence_status": "observed_series_with_held_out_model_validation",
         "release_state": (
-            "baseline_only"
-            if any(item["release_state"] == "baseline_only" for item in outputs)
-            else "not_assessed"
+            "baseline_only" if any_horizon_passed else "not_assessed"
         ),
         "publication_authorization": {
             "status": "withheld_pending_independent_modelling_review",
@@ -449,9 +471,16 @@ def build_reference_class_baseline(
             "horizon_result_count": sum(horizon_status_counts.values()),
             "horizon_status_counts": dict(sorted(horizon_status_counts.items())),
             "warning": (
-                "A baseline_only release state means at least one reference-series "
-                "horizon passed. Each requested asset, geography and horizon must be "
-                "checked individually; failed values remain null."
+                (
+                    "A baseline_only release state means at least one reference-series "
+                    "horizon passed. Each requested asset, geography and horizon must be "
+                    "checked individually; failed values remain null."
+                )
+                if any_horizon_passed
+                else (
+                    "No reference-series horizon has enough validated evidence for a "
+                    "projection. Every project-cost output remains null."
+                )
             ),
         },
         "configuration": {
@@ -500,13 +529,17 @@ def build_reference_class_baseline(
             "Mechanism and exposure ranking only; graph pressure scores are not inputs "
             "to the reference-index projection."
         ),
-        "limitations": [
-            "BCPI measures contractor bid-price change for model buildings, not the realized cost of a particular project.",
-            "Calgary and Edmonton CMA results are not province-wide substitutes.",
-            "Empirical error bands are historical forecast-error ranges, not confidence intervals or probability guarantees.",
-            "A project-cost translation requires a known estimate price basis and a declared expenditure profile.",
-            "The baseline contains no AI-attributable effect and must not be added to a graph pressure score.",
-        ],
+        "limitations": (
+            limitations
+            if limitations is not None
+            else [
+                "BCPI measures contractor bid-price change for model buildings, not the realized cost of a particular project.",
+                "Calgary and Edmonton CMA results are not province-wide substitutes.",
+                "Empirical error bands are historical forecast-error ranges, not confidence intervals or probability guarantees.",
+                "A project-cost translation requires a known estimate price basis and a declared expenditure profile.",
+                "The baseline contains no AI-attributable effect and must not be added to a graph pressure score.",
+            ]
+        ),
     }
 
 
@@ -515,9 +548,16 @@ def run_reference_class_baseline(
     output_path: Path,
     *,
     horizons_years: Iterable[int] = range(1, 6),
+    geography_labels: dict[str, str] | None = None,
+    model_id: str = MODEL_ID,
+    limitations: list[str] | None = None,
 ) -> dict[str, Any]:
     result = build_reference_class_baseline(
-        bcpi_path, horizons_years=horizons_years
+        bcpi_path,
+        horizons_years=horizons_years,
+        geography_labels=geography_labels,
+        model_id=model_id,
+        limitations=limitations,
     )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")

@@ -77,6 +77,22 @@ source table; missing jurisdictions are not filled with national or CMA values.
 
 BCPI levels are observed; changes are inferred arithmetic transformations. Building archetypes are proxies and cannot be described as data-centre prices, physical availability, or AI-caused effects.
 
+## Reference-class cost baseline
+
+Required series fields: `indicator_id`, `geography_id`, `geography_label`,
+`period_start`, `period_end`, `value`, `unit`, `source_id`, `evidence_status`,
+`transformation_id`, `quality_flags`.
+
+Required model fields: `model_id`, `input_sha256`, `as_of_date`,
+`reference_class_results`, `horizon_status_counts`, `publication_authorization`,
+`ai_attributable_increment`, `graph_role`, `limitations`.
+
+Each horizon records the locked rolling-origin partition sizes, selected method,
+validation errors, interval coverage, gate results and projected fields. A
+`gate_failed` or `not_assessed` horizon has null projected values. Provincial
+series remain distinct from CMA series; coefficients and model selections are
+not transferred across geographies.
+
 ## Public-project exposure
 
 Required fields: `project_id`, `asset_class`, `asset_class_evidence_status`, `sponsor_signal`, `sponsor_signal_evidence_status`, `estimated_cost_cad`, `start_year`, `end_year`, `schedule_overlap_status`, `overlap_years`, `annualized_cost_cad_if_complete`, `indicative_cost_allocated_to_window_cad`, `source_id`, `source_evidence_status`.

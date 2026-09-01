@@ -41,6 +41,16 @@ are evidence baselines, not cross-province model calibration or AI-attributed
 effects. Stable `PR_*` geography identifiers, rather than display labels, are
 the cross-dataset join keys.
 
+The first reference-class expansion run now preserves the four eligible public-
+building composites for British Columbia, Ontario and Quebec. Each of the 12
+province/asset reference series contains 38 quarterly observations from 2017 Q1
+through 2026 Q2. Under the locked Alberta protocol this is not enough history:
+all 60 one- through five-year horizon checks are `not_assessed`, and every
+projection remains null. The program does not transfer Calgary or Edmonton
+coefficients to fill this gap. Provincial Decision Mode therefore remains
+blocked pending a separately justified shorter-history protocol or additional
+eligible historical data.
+
 ### Phase 2 — national coverage
 
 Extend the remaining evidence domains to every province and territory. Statistics Canada series provide the common national spine; provincial and municipal sources add project, procurement, utility and workforce detail. Missingness is published rather than silently imputed.

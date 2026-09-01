@@ -34,6 +34,15 @@ Road, rail, airport, water, wastewater, grid and other non-building projects are
 protocol are added. Calgary and Edmonton results are not province-wide
 substitutes.
 
+The British Columbia, Ontario and Quebec expansion uses the same four reference
+classes and preserves province-level `PR_*` identifiers. The current Statistics
+Canada provincial series begin in 2017. With 38 observations, they do not supply
+the predeclared calibration and validation partitions: the available rolling
+origins range from 15 at one year to zero at five years, before the required
+15/10 partition split. All 60 provincial horizons are therefore
+`not_assessed`. No Alberta model selection, error band or coefficient is
+transferred to another province.
+
 ### E2 — AI-attributable incremental effect
 
 The second estimand is the difference between the public-project outcome under

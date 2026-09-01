@@ -9,9 +9,11 @@ from pathlib import Path
 
 from aiio.adapters.statcan import (
     BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID,
+    BCPI_REFERENCE_PROVINCE_DGUID_TO_GEOGRAPHY_ID,
     PROVINCE_DGUID_TO_GEOGRAPHY_ID,
     TRADE_NOC_TO_NODE,
     normalize_bcpi_provinces,
+    normalize_bcpi_reference_provinces,
     normalize_jvws_alberta,
     normalize_jvws_canada,
     quarter_bounds,
@@ -158,6 +160,73 @@ class SchemaTests(unittest.TestCase):
                 archive.writestr("18100289.csv", header + "\n".join(rows) + "\n")
             with self.assertRaisesRegex(ValidationError, "source province coverage changed"):
                 normalize_bcpi_provinces(archive_path, root / "output.csv")
+
+    def test_bcpi_reference_province_normalizer_keeps_target_scope(self) -> None:
+        header = (
+            '"REF_DATE","GEO","DGUID","Type of building","Division",'
+            '"UOM","VALUE","STATUS","SYMBOL"\n'
+        )
+        buildings = (
+            "Institutional buildings [62213]",
+            "School",
+            "Office building [62212]",
+            "Bus depot with maintenance and repair facilities",
+        )
+        rows = []
+        for dguid in BCPI_REFERENCE_PROVINCE_DGUID_TO_GEOGRAPHY_ID:
+            for building in buildings:
+                rows.append(
+                    f'"2026-Q2","Province {dguid}","{dguid}",'
+                    f'"{building}","Division composite",'
+                    '"Index, 2023=100","110.0","",""'
+                )
+        rows.append(
+            '"2026-Q2","Alberta","2021A000248",'
+            '"School","Division composite","Index, 2023=100",'
+            '"112.0","",""'
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive_path = root / "bcpi.zip"
+            output_path = root / "reference.csv"
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("18100289.csv", header + "\n".join(rows) + "\n")
+            observations = normalize_bcpi_reference_provinces(
+                archive_path, output_path
+            )
+            output = output_path.read_text(encoding="utf-8")
+        self.assertEqual(len(observations), 12)
+        self.assertEqual(
+            {item.geography_id for item in observations},
+            set(BCPI_REFERENCE_PROVINCE_DGUID_TO_GEOGRAPHY_ID.values()),
+        )
+        self.assertNotIn("2021A000248", output)
+        self.assertIn(
+            "TR_STATCAN_BCPI_BC_ON_QC_REFERENCE_CLASSES_1_0_0", output
+        )
+
+    def test_bcpi_reference_province_normalizer_requires_every_class(self) -> None:
+        header = (
+            '"REF_DATE","GEO","DGUID","Type of building","Division",'
+            '"UOM","VALUE","STATUS","SYMBOL"\n'
+        )
+        rows = [
+            f'"2026-Q2","Province {dguid}","{dguid}",'
+            '"School","Division composite","Index, 2023=100",'
+            '"110.0","",""'
+            for dguid in BCPI_REFERENCE_PROVINCE_DGUID_TO_GEOGRAPHY_ID
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive_path = root / "bcpi.zip"
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("18100289.csv", header + "\n".join(rows) + "\n")
+            with self.assertRaisesRegex(
+                ValidationError, "reference-class coverage changed"
+            ):
+                normalize_bcpi_reference_provinces(
+                    archive_path, root / "output.csv"
+                )
 
     def test_jvws_normalizer_preserves_suppression_and_trade_mapping(self) -> None:
         header = (

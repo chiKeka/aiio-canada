@@ -9,6 +9,7 @@ from pathlib import Path
 from .adapters.statcan import (
     normalize_bcpi_alberta,
     normalize_bcpi_provinces,
+    normalize_bcpi_reference_provinces,
     normalize_jvws_alberta,
     normalize_jvws_canada,
 )
@@ -17,7 +18,12 @@ from .adapters.statcan_census import (
     normalize_census_trade_employment,
 )
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
-from .calibration import run_reference_class_baseline
+from .calibration import (
+    PROVINCIAL_REFERENCE_GEOGRAPHY_LABELS,
+    PROVINCIAL_REFERENCE_LIMITATIONS,
+    PROVINCIAL_REFERENCE_MODEL_ID,
+    run_reference_class_baseline,
+)
 from .digest import build_digest
 from .labour import run_labour_recruitment_pressure
 from .materials import run_material_cost_screen, run_provincial_material_cost_screen
@@ -50,6 +56,12 @@ def main() -> None:
         help="normalize selected province-level BCPI material observations",
     )
     bcpi_canada_parser.add_argument("zip_path", type=Path)
+
+    bcpi_reference_provinces_parser = subparsers.add_parser(
+        "normalize-bcpi-reference-provinces",
+        help="normalize BC, Ontario and Quebec public-building BCPI reference classes",
+    )
+    bcpi_reference_provinces_parser.add_argument("zip_path", type=Path)
 
     labour_parser = subparsers.add_parser(
         "normalize-jvws",
@@ -114,6 +126,13 @@ def main() -> None:
     )
     cost_baseline_parser.add_argument("bcpi_path", type=Path)
     cost_baseline_parser.add_argument("output_path", type=Path)
+
+    provincial_cost_baseline_parser = subparsers.add_parser(
+        "run-cost-baseline-provinces",
+        help="run the held-out BC, Ontario and Quebec BCPI reference baseline",
+    )
+    provincial_cost_baseline_parser.add_argument("bcpi_path", type=Path)
+    provincial_cost_baseline_parser.add_argument("output_path", type=Path)
 
     project_cost_parser = subparsers.add_parser(
         "run-project-reference-cost",
@@ -203,6 +222,25 @@ def main() -> None:
             observations = normalize_bcpi_provinces(
                 args.zip_path.resolve(),
                 root / "data" / "processed" / "bcpi_material_provinces.csv",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "observation_count": len(observations),
+                        "geography_count": len(
+                            {item.geography_id for item in observations}
+                        ),
+                    }
+                )
+            )
+        elif args.command == "normalize-bcpi-reference-provinces":
+            observations = normalize_bcpi_reference_provinces(
+                args.zip_path.resolve(),
+                root
+                / "data"
+                / "processed"
+                / "bcpi_reference_bc_on_qc.csv",
             )
             print(
                 json.dumps(
@@ -333,6 +371,26 @@ def main() -> None:
             output = run_reference_class_baseline(
                 args.bcpi_path.resolve(),
                 args.output_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "release_state": output["release_state"],
+                        "reference_class_count": len(
+                            output["reference_class_results"]
+                        ),
+                    }
+                )
+            )
+        elif args.command == "run-cost-baseline-provinces":
+            output = run_reference_class_baseline(
+                args.bcpi_path.resolve(),
+                args.output_path.resolve(),
+                geography_labels=PROVINCIAL_REFERENCE_GEOGRAPHY_LABELS,
+                model_id=PROVINCIAL_REFERENCE_MODEL_ID,
+                limitations=PROVINCIAL_REFERENCE_LIMITATIONS,
             )
             print(
                 json.dumps(

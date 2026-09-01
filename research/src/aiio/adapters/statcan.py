@@ -43,6 +43,9 @@ JVWS_STATISTICS = {"Job vacancies", "Average offered hourly wage"}
 JVWS_ALBERTA_TRANSFORMATION_ID = "TR_STATCAN_JVWS_AB_NOC_1_0_0"
 JVWS_CANADA_TRANSFORMATION_ID = "TR_STATCAN_JVWS_CA_PROVINCES_NOC_1_0_0"
 BCPI_PROVINCIAL_TRANSFORMATION_ID = "TR_STATCAN_BCPI_CA_PROVINCES_MATERIALS_1_0_0"
+BCPI_REFERENCE_PROVINCIAL_TRANSFORMATION_ID = (
+    "TR_STATCAN_BCPI_BC_ON_QC_REFERENCE_CLASSES_1_0_0"
+)
 BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID = {
     key: PROVINCE_DGUID_TO_GEOGRAPHY_ID[key]
     for key in (
@@ -56,6 +59,20 @@ BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID = {
         "2021A000248",
         "2021A000259",
     )
+}
+BCPI_REFERENCE_PROVINCE_DGUID_TO_GEOGRAPHY_ID = {
+    "2021A000224": "PR_24",
+    "2021A000235": "PR_35",
+    "2021A000259": "PR_59",
+}
+BCPI_REFERENCE_INDICATOR_IDS = {
+    "BCPI_INSTITUTIONAL_BUILDINGS_62213_DIVISION_COMPOSITE",
+    "BCPI_SCHOOL_DIVISION_COMPOSITE",
+    "BCPI_OFFICE_BUILDING_62212_DIVISION_COMPOSITE",
+    (
+        "BCPI_BUS_DEPOT_WITH_MAINTENANCE_AND_REPAIR_FACILITIES_"
+        "DIVISION_COMPOSITE"
+    ),
 }
 
 
@@ -256,6 +273,171 @@ def normalize_bcpi_provinces(
         raise ValidationError(
             "BCPI provincial material scope changed; expected "
             f"{sorted(expected_geographies)}, found {sorted(actual_geographies)}"
+        )
+    observations.sort(
+        key=lambda item: (
+            item[0].geography_id,
+            item[0].indicator_id,
+            item[0].period_end,
+        )
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fields = (
+        "observation_id",
+        "indicator_id",
+        "geography_id",
+        "geography_label",
+        "statcan_dguid",
+        "value",
+        "unit",
+        "period_start",
+        "period_end",
+        "source_id",
+        "evidence_status",
+        "as_of_date",
+        "transformation_id",
+        "quality_flags",
+    )
+    with output_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        for item, dimensions in observations:
+            writer.writerow(
+                {
+                    **item.__dict__,
+                    **dimensions,
+                    "evidence_status": item.evidence_status.value,
+                    "quality_flags": "|".join(item.quality_flags),
+                }
+            )
+    return [item for item, _ in observations]
+
+
+def normalize_bcpi_reference_provinces(
+    zip_path: Path, output_path: Path
+) -> list[ObservationRecord]:
+    """Normalize public-building reference classes for BC, Ontario and Quebec.
+
+    This is a province-preserving expansion input. It never substitutes an
+    Alberta CMA series or a Canada aggregate for a provincial observation.
+    """
+    with zipfile.ZipFile(zip_path) as archive:
+        csv_names = [
+            name
+            for name in archive.namelist()
+            if name.endswith(".csv") and "MetaData" not in name
+        ]
+        if len(csv_names) != 1:
+            raise ValidationError(f"expected one BCPI data CSV, found {csv_names}")
+        with closing(archive.open(csv_names[0])) as binary_handle:
+            with TextIOWrapper(
+                binary_handle, encoding="utf-8-sig", newline=""
+            ) as text_handle:
+                reader = csv.DictReader(text_handle)
+                required = {
+                    "REF_DATE",
+                    "GEO",
+                    "DGUID",
+                    "Type of building",
+                    "Division",
+                    "UOM",
+                    "VALUE",
+                    "STATUS",
+                    "SYMBOL",
+                }
+                if not reader.fieldnames or not required.issubset(reader.fieldnames):
+                    raise ValidationError(
+                        "BCPI schema changed; missing "
+                        f"{sorted(required - set(reader.fieldnames or []))}"
+                    )
+                observations: list[tuple[ObservationRecord, dict[str, str]]] = []
+                series_keys: set[tuple[str, str]] = set()
+                for raw in reader:
+                    statcan_dguid = raw["DGUID"].strip()
+                    if (
+                        statcan_dguid
+                        not in BCPI_REFERENCE_PROVINCE_DGUID_TO_GEOGRAPHY_ID
+                    ):
+                        continue
+                    building = raw["Type of building"].strip()
+                    division = raw["Division"].strip()
+                    indicator_id = f"BCPI_{slug(building)}_{slug(division)}"
+                    if indicator_id not in BCPI_REFERENCE_INDICATOR_IDS:
+                        continue
+                    period_start, period_end = quarter_bounds(raw["REF_DATE"].strip())
+                    value_text = raw["VALUE"].strip()
+                    quality_flags = tuple(
+                        flag
+                        for flag in (
+                            f"status:{raw['STATUS'].strip()}"
+                            if raw["STATUS"].strip()
+                            else "",
+                            f"symbol:{raw['SYMBOL'].strip()}"
+                            if raw["SYMBOL"].strip()
+                            else "",
+                            "value_missing_or_suppressed" if not value_text else "",
+                        )
+                        if flag
+                    )
+                    geography_id = (
+                        BCPI_REFERENCE_PROVINCE_DGUID_TO_GEOGRAPHY_ID[
+                            statcan_dguid
+                        ]
+                    )
+                    identity = "|".join(
+                        (
+                            raw["REF_DATE"].strip(),
+                            statcan_dguid,
+                            building,
+                            division,
+                            raw["UOM"].strip(),
+                        )
+                    )
+                    observation = ObservationRecord(
+                        observation_id=(
+                            "OBS_BCPI_"
+                            f"{hashlib.sha256(identity.encode()).hexdigest()[:20].upper()}"
+                        ),
+                        indicator_id=indicator_id,
+                        value=float(value_text) if value_text else None,
+                        unit=raw["UOM"].strip(),
+                        geography_id=geography_id,
+                        period_start=period_start,
+                        period_end=period_end,
+                        source_id="STATCAN_BCPI_18100289",
+                        evidence_status=EvidenceStatus.OBSERVED,
+                        as_of_date=period_end,
+                        transformation_id=(
+                            BCPI_REFERENCE_PROVINCIAL_TRANSFORMATION_ID
+                        ),
+                        quality_flags=quality_flags,
+                    )
+                    observation.validate()
+                    observations.append(
+                        (
+                            observation,
+                            {
+                                "geography_label": raw["GEO"]
+                                .replace("\xa0", " ")
+                                .strip(),
+                                "statcan_dguid": statcan_dguid,
+                            },
+                        )
+                    )
+                    series_keys.add((indicator_id, geography_id))
+
+    expected_series_keys = {
+        (indicator_id, geography_id)
+        for indicator_id in BCPI_REFERENCE_INDICATOR_IDS
+        for geography_id in (
+            BCPI_REFERENCE_PROVINCE_DGUID_TO_GEOGRAPHY_ID.values()
+        )
+    }
+    if series_keys != expected_series_keys:
+        raise ValidationError(
+            "BCPI provincial reference-class coverage changed; missing="
+            f"{sorted(expected_series_keys - series_keys)}, unexpected="
+            f"{sorted(series_keys - expected_series_keys)}"
         )
     observations.sort(
         key=lambda item: (
