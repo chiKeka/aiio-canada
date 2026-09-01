@@ -44,6 +44,8 @@ npm run projects:exposure
 npm run projects:normalize:provinces
 npm run power:evidence
 npm run power:planning:provinces
+npm run digest:build
+npm run digest:audit
 npm run model:run
 npm run power:run
 npm run research:test
@@ -52,6 +54,11 @@ npm run release:verify
 ```
 
 Research architecture and protocols live in `docs/`. The public application lives in `app/` and `components/`, with its evidence-led product language and visual rules in [`DESIGN.md`](DESIGN.md). Data, model, workbook and digest packages are added as the build advances.
+
+The digest protocol is documented in
+[`docs/methodology/weekly-evidence-digest.md`](docs/methodology/weekly-evidence-digest.md).
+Edition dates use UTC, every source reference must match the source registry,
+and the cadence audit fails when the latest intake is more than eight days old.
 
 The committed labour extracts contain graph-relevant NOC vacancy and
 offered-wage observations from Statistics Canada table 14-10-0444-01. One file

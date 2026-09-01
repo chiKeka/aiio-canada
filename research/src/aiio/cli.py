@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 from dataclasses import asdict
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 from .adapters.statcan import (
@@ -30,7 +30,7 @@ from .calibration import (
     PROVINCIAL_REFERENCE_MODEL_ID,
     run_reference_class_baseline,
 )
-from .digest import build_digest
+from .digest import build_digest, validate_digest_cadence
 from .labour import run_labour_recruitment_pressure
 from .materials import run_material_cost_screen, run_provincial_material_cost_screen
 from .power_evidence import run_power_evidence_screen
@@ -46,6 +46,7 @@ from .release import build_publication_artifacts, build_release, verify_manifest
 
 
 def main() -> None:
+    utc_today = datetime.now(UTC).date().isoformat()
     parser = argparse.ArgumentParser(prog="aiio", description="AIIO Canada research pipeline")
     parser.add_argument("--root", type=Path, default=Path.cwd(), help="repository root")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -190,7 +191,14 @@ def main() -> None:
 
     digest_parser = subparsers.add_parser("build-digest", help="render a reviewed weekly evidence digest")
     digest_parser.add_argument("items_path", type=Path)
-    digest_parser.add_argument("--date", default=date.today().isoformat())
+    digest_parser.add_argument("--date", default=utc_today)
+
+    digest_audit_parser = subparsers.add_parser(
+        "audit-digest-cadence",
+        help="fail when the latest dated digest intake is older than the weekly tolerance",
+    )
+    digest_audit_parser.add_argument("--as-of", default=utc_today)
+    digest_audit_parser.add_argument("--max-age-days", type=int, default=8)
 
     scenario_parser = subparsers.add_parser(
         "run-scenario", help="run a versioned graph scenario and write auditable JSON output"
@@ -516,8 +524,29 @@ def main() -> None:
         elif args.command == "build-digest":
             edition_date = date.fromisoformat(args.date)
             output = root / "data" / "digests" / f"{edition_date.isoformat()}.md"
-            build_digest(args.items_path.resolve(), output, edition_date)
-            print(json.dumps({"status": "passed", "output": str(output)}))
+            manifest = build_digest(
+                args.items_path.resolve(),
+                output,
+                edition_date,
+                source_registry_path=root / "data" / "registry" / "sources.json",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "output": str(output),
+                        "manifest": str(output.with_suffix(".manifest.json")),
+                        "digest_id": manifest["digest_id"],
+                    }
+                )
+            )
+        elif args.command == "audit-digest-cadence":
+            result = validate_digest_cadence(
+                root / "data" / "digests" / "items",
+                as_of_date=date.fromisoformat(args.as_of),
+                max_age_days=args.max_age_days,
+            )
+            print(json.dumps(result))
         elif args.command == "run-scenario":
             output = run_scenario(
                 args.graph_path.resolve(),

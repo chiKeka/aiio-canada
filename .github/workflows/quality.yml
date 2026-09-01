@@ -37,6 +37,12 @@ jobs:
       - name: Validate evidence registry
         run: npm run research:validate
 
+      - name: Rebuild current evidence digest
+        run: npm run digest:build
+
+      - name: Verify digest artifacts are deterministic
+        run: git diff --exit-code -- data/digests
+
       - name: Test graph, scenarios, schemas, and release controls
         run: npm run research:test
 
