@@ -5,12 +5,9 @@ import { AlertTriangle, GitBranch, Zap } from 'lucide-react';
 
 import { EvidencePill } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
+import { boundedDisplayScore } from '@/lib/decision-analysis';
 
 type PowerCase = 'low' | 'central' | 'high';
-
-function boundedDisplayScore(rawScore: number) {
-  return rawScore / (1 + rawScore);
-}
 
 export function ScenarioLab() {
   const [capex, setCapex] = useState(50);

@@ -1,5 +1,5 @@
-import { ObservatoryDashboard } from '@/components/observatory-dashboard';
+import { DecisionWorkbench } from '@/components/decision-workbench';
 
 export default function Home() {
-  return <ObservatoryDashboard />;
+  return <DecisionWorkbench />;
 }

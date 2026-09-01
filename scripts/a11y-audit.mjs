@@ -3,7 +3,16 @@ import { chromium } from 'playwright-core';
 
 const baseUrl = process.env.AIIO_BASE_URL ?? 'http://127.0.0.1:3002';
 const executablePath = process.env.CHROME_EXECUTABLE ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const routes = ['/', '/evidence', '/pressure', '/scenario', '/methods', '/digest', '/downloads'];
+const routes = [
+  '/',
+  '/research',
+  '/evidence',
+  '/pressure',
+  '/scenario',
+  '/methods',
+  '/digest',
+  '/downloads',
+];
 const blockingImpacts = new Set(['serious', 'critical']);
 
 const browser = await chromium.launch({ executablePath, headless: true });

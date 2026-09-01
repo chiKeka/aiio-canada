@@ -30,12 +30,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import releaseData from '@/public/data/latest.json';
+import { ModeToggle } from '@/components/mode-toggle';
+import { boundedDisplayScore } from '@/lib/decision-analysis';
 
 const tradeTones = ['bg-[#d66b35]', 'bg-[#e6a64c]', 'bg-[#2f8f83]', 'bg-[#6b8798]'];
-
-function boundedDisplayScore(rawScore: number) {
-  return rawScore / (1 + rawScore);
-}
 
 const researchLayers = [
   {
@@ -93,7 +91,7 @@ export function ObservatoryDashboard() {
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0a2431]/95 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
-          <a className="group flex items-center gap-3" href="#top" aria-label="AIIO Canada home">
+          <Link className="group flex items-center gap-3" href="/research" aria-label="AIIO Canada research home">
             <span className="grid size-9 place-items-center rounded-full border border-[#8fd5c9]/40 bg-[#123746] font-mono text-xs font-semibold text-[#b7ebe2]">
               AI
             </span>
@@ -103,19 +101,22 @@ export function ObservatoryDashboard() {
                 Infrastructure impact observatory
               </span>
             </span>
-          </a>
-          <nav className="hidden items-center gap-7 text-xs font-medium text-[#c8d6dc] lg:flex" aria-label="Primary navigation">
+          </Link>
+          <nav className="hidden items-center gap-4 text-xs font-medium text-[#c8d6dc] md:flex" aria-label="Primary navigation">
             <Link className="transition-colors hover:text-white" href="/evidence">Evidence</Link>
             <Link className="transition-colors hover:text-white" href="/pressure">Pressure monitor</Link>
             <Link className="transition-colors hover:text-white" href="/scenario">Scenario lab</Link>
             <Link className="transition-colors hover:text-white" href="/methods">Methods</Link>
           </nav>
-          <Link
-            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#8fd5c9]/35 bg-[#143d4c] px-3 text-xs font-medium text-white transition-colors hover:bg-[#1b4d5e]"
-            href="/evidence"
-          >
-            Evidence register <ChevronRight className="size-3.5" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <ModeToggle compact />
+            <Link
+              className="hidden h-8 items-center gap-1.5 rounded-lg border border-[#8fd5c9]/35 bg-[#143d4c] px-3 text-xs font-medium text-white transition-colors hover:bg-[#1b4d5e] sm:inline-flex"
+              href="/evidence"
+            >
+              Evidence register <ChevronRight className="size-3.5" />
+            </Link>
+          </div>
         </div>
       </header>
 

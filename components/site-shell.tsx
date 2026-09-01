@@ -1,6 +1,8 @@
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
+import { ModeToggle } from '@/components/mode-toggle';
+
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0a2431]/95 text-white backdrop-blur-xl">
@@ -9,16 +11,19 @@ export function SiteHeader() {
           <span className="grid size-9 place-items-center rounded-full border border-[#8fd5c9]/40 bg-[#123746] font-mono text-xs font-semibold text-[#b7ebe2]">AI</span>
           <span><span className="block text-sm font-semibold tracking-[0.02em]">AIIO Canada</span><span className="hidden text-[10px] uppercase tracking-[0.15em] text-[#9eb3bc] sm:block">Infrastructure impact observatory</span></span>
         </Link>
-        <nav className="hidden items-center gap-6 text-xs font-medium text-[#c8d6dc] md:flex" aria-label="Primary navigation">
+        <nav className="hidden items-center gap-4 text-xs font-medium text-[#c8d6dc] md:flex" aria-label="Primary navigation">
           <Link className="hover:text-white" href="/evidence">Evidence</Link>
           <Link className="hover:text-white" href="/pressure">Pressure</Link>
           <Link className="hover:text-white" href="/scenario">Scenario lab</Link>
           <Link className="hover:text-white" href="/methods">Methods</Link>
           <Link className="hover:text-white" href="/digest">Digest</Link>
         </nav>
-        <Link className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#8fd5c9]/35 bg-[#143d4c] px-3 text-xs font-medium hover:bg-[#1b4d5e]" href="/downloads">
-          Downloads <ChevronRight className="size-3.5" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <ModeToggle compact />
+          <Link className="hidden h-8 items-center gap-1.5 rounded-lg border border-[#8fd5c9]/35 bg-[#143d4c] px-3 text-xs font-medium hover:bg-[#1b4d5e] sm:inline-flex" href="/downloads">
+            Downloads <ChevronRight className="size-3.5" />
+          </Link>
+        </div>
       </div>
     </header>
   );
