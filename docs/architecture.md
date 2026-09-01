@@ -64,6 +64,13 @@ proxies, and it separates tender timing from physical schedule outcomes. The
 protocol is documented in
 [`docs/methodology/ai-attribution-identification.md`](methodology/ai-attribution-identification.md).
 
+The Quebec project-dashboard intake adds a source-faithful candidate panel of
+authorized cost and completion-month revisions. Stable publisher lifecycle IDs,
+field-dictionary anchors, event arithmetic and revision-chain endpoints are
+hash-checked before a record can enter the panel. Authorized revisions are not
+final outturns, and the current single-province snapshot cannot supply a causal
+AI effect or a transferable Alberta cost factor.
+
 ### 5. Graph model
 
 Nodes represent shocks, resources, materials, cost signals and public-delivery delay pressure. Directed typed edges encode mechanisms. Each edge records sign, magnitude range, lag, absorption, supporting evidence, confidence, author, version and assumption ID. Resource, material, signal and outcome nodes may retain part of a pressure state into later years using an explicit low/central/high retention factor. The engine reports signed totals and the paths that produced them.
@@ -93,10 +100,12 @@ All outputs read an immutable release manifest containing input hashes, code ver
 3. Labour geography/NOC coverage, missingness, zero-filler and cross-vintage formula checks.
 4. Material-series coverage and aligned-period checks.
 5. Public-project classification, schedule-missingness and cost-allocation checks.
-6. Power source-hash, requested-load ordering and Phase 1 reconciliation checks.
-7. Graph DAG, self-loop, validity, retention and edge-metadata checks.
-8. Scenario identity, sign, lag, mass-bound, additivity, sensitivity, deterministic and golden-run tests.
-9. Workbook-to-release reconciliation.
-10. Accessibility and public-language review.
-11. Independent methodological review and documented disposition.
-12. AI-attributable cost and schedule fields remain null unless the separate identification gate passes.
+6. Quebec field-dictionary anchors, lifecycle-ID uniqueness, revision arithmetic,
+   endpoint reconciliation and fail-closed publication checks.
+7. Power source-hash, requested-load ordering and Phase 1 reconciliation checks.
+8. Graph DAG, self-loop, validity, retention and edge-metadata checks.
+9. Scenario identity, sign, lag, mass-bound, additivity, sensitivity, deterministic and golden-run tests.
+10. Workbook-to-release reconciliation.
+11. Accessibility and public-language review.
+12. Independent methodological review and documented disposition.
+13. AI-attributable cost and schedule fields remain null unless the separate identification gate passes.

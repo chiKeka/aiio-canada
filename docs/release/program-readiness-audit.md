@@ -26,8 +26,9 @@ command before publication.
 
 The audit checks the named research program, source registry and raw manifests,
 Alberta graph/scenario engine, Alberta evidence spine, Canada labour coverage,
-BC/Ontario/Quebec evidence intakes, weekly digest hashes and cadence, dual-mode
-website, workbook inspection receipt, frozen public release integrity,
+BC/Ontario/Quebec evidence intakes, the hash-reconciled Quebec authorized-revision
+candidate panel, weekly digest hashes and cadence, dual-mode website, workbook
+inspection receipt, frozen public release integrity,
 decision-grade calibration, independent review and publication state.
 
 External review and deployment states live in

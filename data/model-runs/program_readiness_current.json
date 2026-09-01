@@ -21,11 +21,11 @@
       "check_id": "public_evidence_registry",
       "evidence": [
         "data/registry/sources.json",
-        "raw_manifest_count=22"
+        "raw_manifest_count=23"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The public-source registry validates with 29 unique sources."
+      "summary": "The public-source registry validates with 30 unique sources."
     },
     {
       "category": "analysis_engine",
@@ -109,6 +109,19 @@
       "summary": "The BC, Ontario and Quebec project, cost and power intakes are reproducible and remain research-only."
     },
     {
+      "category": "evidence_pipeline",
+      "check_id": "quebec_authorized_revision_panel",
+      "evidence": [
+        "data/processed/quebec_pqi_authorized_project_revisions.csv",
+        "data/processed/quebec_pqi_authorized_revision_events.csv",
+        "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json",
+        "docs/methodology/quebec-authorized-project-revisions.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The Quebec lifecycle panel is hash-reconciled, preserves stable project IDs and authorized revision chains, and remains research-only."
+    },
+    {
       "category": "living_program",
       "check_id": "weekly_evidence_operation",
       "evidence": [
@@ -147,9 +160,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.12.0-dev.xlsx",
-        "workbook_sha256=sha256:a5cdebd0f8d068a7401fa09cb712be742721ee83651d3784732f70354dd26773",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.12.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.13.0-dev.xlsx",
+        "workbook_sha256=sha256:680469970c686c6683ed5efba31ca4cbbd87485b8f3977f63a8fbe20de4c1ed6",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.13.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",
@@ -240,7 +253,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 13,
+    "pass": 14,
     "pending": 3
   },
   "structural_integrity": true

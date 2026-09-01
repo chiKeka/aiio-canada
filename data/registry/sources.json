@@ -183,6 +183,24 @@
       "notes": "Current dashboard contains 649 PQI projects of $20 million or more. Data before November 2020 covered projects of $50 million or more. Published total cost and contribution values are in millions of Canadian dollars; blanks remain missing."
     },
     {
+      "source_id": "QUEBEC_PQI_DATA_DICTIONARY",
+      "title": "Quebec infrastructure project dashboard field descriptions",
+      "publisher": "Secrétariat du Conseil du trésor du Québec",
+      "canonical_url": "https://www.donneesquebec.ca/recherche/dataset/67d85a7a-10af-4af0-b4da-abc64cfd735a",
+      "retrieval_url": "https://www.donneesquebec.ca/recherche/dataset/67d85a7a-10af-4af0-b4da-abc64cfd735a/resource/d94c4be0-7ac6-46e6-86f4-5c40c9a6d47a/download/description-des-champs.pdf",
+      "source_type": "data_dictionary_pdf",
+      "domain": "public_project_outcomes",
+      "geography": "Quebec",
+      "as_of_date": "2026-08-20",
+      "last_verified": "2026-09-01",
+      "licence_note": "Creative Commons Attribution 4.0 through Données Québec; attribute the Secrétariat du Conseil du trésor and dataset.",
+      "access_method": "pdf",
+      "update_frequency": "methodology_document",
+      "evidence_status": "observed",
+      "status": "active",
+      "notes": "The document defines suivi_modifications as the presentation of changes authorized during the project lifecycle and their effective dates. Its own publication date is not encoded; the as-of date aligns it to the current dashboard resource used by AIIO."
+    },
+    {
       "source_id": "ALBERTA_MAJOR_PROJECTS_METHOD",
       "title": "Alberta Major Projects methodology",
       "publisher": "Government of Alberta",

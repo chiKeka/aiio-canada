@@ -335,6 +335,62 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    quebec_summary_path = (
+        root / "data/processed/quebec_pqi_authorized_project_revisions.csv"
+    )
+    quebec_event_path = root / "data/processed/quebec_pqi_authorized_revision_events.csv"
+    quebec_report_path = (
+        root / "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json"
+    )
+    quebec_report = load_json_or_empty(quebec_report_path)
+    quebec_coverage = quebec_report.get("coverage_summary", {})
+    quebec_boundary = quebec_report.get("publication_boundary", {})
+    quebec_summary_rows = csv_row_count(quebec_summary_path)
+    quebec_event_rows = csv_row_count(quebec_event_path)
+    quebec_revision_panel_ready = (
+        quebec_summary_path.exists()
+        and quebec_event_path.exists()
+        and quebec_report.get("outputs", {}).get("summary_csv_sha256")
+        == sha256_file(quebec_summary_path)
+        and quebec_report.get("outputs", {}).get("event_csv_sha256")
+        == sha256_file(quebec_event_path)
+        and quebec_coverage.get("source_project_count") == quebec_summary_rows
+        and quebec_coverage.get("stable_lifecycle_project_id_count")
+        == quebec_summary_rows
+        and quebec_coverage.get("authorized_cost_revision_event_count", 0)
+        + quebec_coverage.get("authorized_schedule_revision_event_count", 0)
+        == quebec_event_rows
+        and quebec_coverage.get("cost_revision_chain_reconciled_project_count", 0)
+        > 0
+        and quebec_coverage.get(
+            "schedule_revision_chain_reconciled_project_count", 0
+        )
+        > 0
+        and quebec_boundary.get("authorized_revision_reference_panel_authorized")
+        is False
+        and quebec_boundary.get("public_project_cost_outcome_authorized") is False
+        and quebec_boundary.get("public_project_schedule_outcome_authorized")
+        is False
+        and quebec_boundary.get("ai_attributable_effect_authorized") is False
+    )
+    record(
+        "quebec_authorized_revision_panel",
+        "evidence_pipeline",
+        PASS if quebec_revision_panel_ready else FAIL,
+        (
+            "The Quebec lifecycle panel is hash-reconciled, preserves stable project IDs and authorized revision chains, and remains research-only."
+            if quebec_revision_panel_ready
+            else "The Quebec authorized-revision panel is missing, unreconciled or has an unsafe publication boundary."
+        ),
+        [
+            "data/processed/quebec_pqi_authorized_project_revisions.csv",
+            "data/processed/quebec_pqi_authorized_revision_events.csv",
+            "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json",
+            "docs/methodology/quebec-authorized-project-revisions.md",
+        ],
+        release_gate=True,
+    )
+
     digest_status, digest_summary, digest_evidence = audit_digest_artifacts(
         root, as_of_date=as_of_date
     )

@@ -37,6 +37,7 @@ import buildingInvestmentControls from '@/data/model-runs/building_investment_co
 import procurementOutcomeFeasibility from '@/data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json';
 import edmontonPermitProxy from '@/data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json';
 import auditedProjectOutcomes from '@/data/model-runs/oago_audited_project_outcomes_v0.1.json';
+import quebecProjectRevisions from '@/data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json';
 import { ModeToggle } from '@/components/mode-toggle';
 import { boundedDisplayScore } from '@/lib/decision-analysis';
 
@@ -96,13 +97,13 @@ const attributionDomainMeta = [
     id: 'PUBLIC_PROJECT_COST_OUTCOMES',
     label: 'Public cost outcome',
     role: 'Authorizing outcome',
-    summary: `CanadaBuys linkages are screened and ${auditedProjectOutcomes.coverage_summary.named_completed_project_count} audited named cases are preserved. Only ${auditedProjectOutcomes.coverage_summary.completed_total_cost_case_count} has a completed total-cost comparison; price basis, complete changes and a reusable class panel remain missing.`,
+    summary: `CanadaBuys linkages and ${auditedProjectOutcomes.coverage_summary.named_completed_project_count} audited named cases remain incomplete. Quebec now contributes ${quebecProjectRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost revision chains, making this a candidate domain—but price basis, final outturn and multi-region coverage remain missing.`,
   },
   {
     id: 'PUBLIC_PROJECT_SCHEDULE_OUTCOMES',
     label: 'Public schedule outcome',
     role: 'Authorizing outcome',
-    summary: `The audited intake supplies ${auditedProjectOutcomes.coverage_summary.exact_day_substantial_completion_pair_count} exact-day planned/actual completion pair. Complete baseline and actual start/completion histories with reusable regional coverage are still required.`,
+    summary: `The audited intake supplies ${auditedProjectOutcomes.coverage_summary.exact_day_substantial_completion_pair_count} exact-day planned/actual pair. Quebec adds ${quebecProjectRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} reconciled month-precision authorized completion chains, but exact actual start/completion histories and multi-region coverage remain missing.`,
   },
   {
     id: 'REGIONAL_CONSTRUCTION_ACTIVITY_CONTROLS',
@@ -428,6 +429,19 @@ export function ObservatoryDashboard() {
             </dl>
           </div>
 
+          <div className="mt-5 grid gap-5 rounded-xl border border-[#9fb9c5] bg-[#eaf1f4] p-5 lg:grid-cols-[minmax(0,.9fr)_minmax(520px,1.1fr)] lg:items-center sm:p-6">
+            <div>
+              <div className="flex items-center gap-2 text-[#365d6d]"><GitBranch className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Quebec authorized revision panel · candidate</p></div>
+              <p className="mt-2 text-sm leading-6 text-[#526b76]">The official lifecycle history now yields chain-reconciled authorized cost and completion-month revisions under stable publisher project IDs. It is a research candidate, not a final-outturn reference class or an AI effect.</p>
+            </div>
+            <dl className="grid grid-cols-2 gap-5 border-t border-[#bdced5] pt-5 sm:grid-cols-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+              <ContractMetric label="Stable project IDs" value={quebecProjectRevisions.coverage_summary.stable_lifecycle_project_id_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Cost chains" value={quebecProjectRevisions.coverage_summary.cost_revision_chain_reconciled_project_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Schedule chains" value={quebecProjectRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Joint chains" value={quebecProjectRevisions.coverage_summary.joint_reconciled_revision_project_count.toLocaleString('en-CA')} />
+            </dl>
+          </div>
+
           <div className="mt-5 grid gap-5 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-5 lg:grid-cols-[minmax(0,.9fr)_minmax(520px,1.1fr)] lg:items-center sm:p-6">
             <div>
               <div className="flex items-center gap-2 text-[#96502d]"><AlertTriangle className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Procurement outcome feasibility · not authorizing</p></div>
@@ -565,12 +579,19 @@ function CoverageStatus({ status }: { status: string }) {
 
 function AttributionDomainCard({ label, role, sourceCount, status, summary }: { label: string; role: string; sourceCount: number; status: string; summary: string }) {
   const available = status === 'available';
+  const candidate = status === 'candidate';
+  const panelTone = available
+    ? 'border-[#a9cbbf] bg-[#e5f1ed]'
+    : candidate
+      ? 'border-[#9fb9c5] bg-[#eaf1f4]'
+      : 'border-[#dfb18f] bg-[#fff0e4]';
+  const textTone = available ? 'text-[#17645d]' : candidate ? 'text-[#365d6d]' : 'text-[#96502d]';
   return (
-    <article className={`rounded-xl border p-5 sm:p-6 ${available ? 'border-[#a9cbbf] bg-[#e5f1ed]' : 'border-[#dfb18f] bg-[#fff0e4]'}`}>
+    <article className={`rounded-xl border p-5 sm:p-6 ${panelTone}`}>
       <div className="flex items-start justify-between gap-3">
-        <p className={`font-mono text-[10px] font-semibold uppercase tracking-[0.1em] ${available ? 'text-[#17645d]' : 'text-[#96502d]'}`}>{role}</p>
-        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.07em] ${available ? 'border-[#82b5a9] bg-white/65 text-[#17645d]' : 'border-[#d9a37d] bg-white/55 text-[#96502d]'}`}>
-          {available ? <CircleCheck className="size-3" /> : <LockKeyhole className="size-3" />}{status.replaceAll('_', ' ')}
+        <p className={`font-mono text-[10px] font-semibold uppercase tracking-[0.1em] ${textTone}`}>{role}</p>
+        <span className={`inline-flex items-center gap-1.5 rounded-full border bg-white/60 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.07em] ${available ? 'border-[#82b5a9] text-[#17645d]' : candidate ? 'border-[#8daab7] text-[#365d6d]' : 'border-[#d9a37d] text-[#96502d]'}`}>
+          {available ? <CircleCheck className="size-3" /> : candidate ? <BookOpen className="size-3" /> : <LockKeyhole className="size-3" />}{status.replaceAll('_', ' ')}
         </span>
       </div>
       <h3 className="mt-5 text-lg font-medium tracking-[-0.02em] text-[#14323d]">{label}</h3>

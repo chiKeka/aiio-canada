@@ -46,6 +46,7 @@
     "permits:fetch": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch-edmonton-permits",
     "permits:normalize": "PYTHONPATH=research/src python3 -m aiio.cli --root . normalize-edmonton-permits data/raw/edmonton_general_building_permits/2026-09-01_f4da956ae985.json",
     "outcomes:audit:normalize": "PYTHONPATH=research/src python3 -m aiio.cli --root . normalize-audited-project-outcomes data/manual/oago_selected_infrastructure_outcomes_2024.json data/raw/oago_selected_infrastructure_projects_2024/2026-09-01_88cdf8a0966d.pdf",
+    "outcomes:quebec:normalize": "PYTHONPATH=research/src python3 -m aiio.cli --root . normalize-quebec-authorized-revisions data/raw/quebec_pqi_project_dashboard/2026-09-01_a437f7ba9a74.csv data/raw/quebec_pqi_data_dictionary/2026-09-01_86c6c1ab940b.pdf",
     "model:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-scenario data/model/alberta_graph_v0.2.json data/scenarios/alberta_50b_counterfactual_v0.2.json data/model-runs/alberta_50b_counterfactual_v0.2.json",
     "power:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-power-overlay data/scenarios/alberta_power_overlay_v0.1.json data/model-runs/alberta_power_overlay_v0.1.json",
     "workbook:build": "node workbook-work/build_aiio_workbook.mjs",

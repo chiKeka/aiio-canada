@@ -174,6 +174,29 @@ actual completion dates have day precision. A source category in
 reference cases do not become an outcome panel, and missing price-basis dates,
 change histories or start dates remain null.
 
+## Quebec authorized project revisions
+
+The project-summary table requires `project_id`, `source_record_id`,
+`project_name`, `geography_id`, `asset_class`, `stage_source_text`,
+`planning_authorization_month`, `realization_authorization_month`,
+`actual_completion_fiscal_year`, `cost_revision_event_count`,
+`cost_revision_chain_reconciles`, `reported_current_authorized_cost_cad`,
+`baseline_authorized_cost_cad`, `current_authorized_cost_cad`,
+`authorized_cost_variance_cad`, `authorized_cost_variance_percent`,
+`schedule_revision_event_count`, `schedule_revision_chain_reconciles`,
+`reported_current_completion_month`, `baseline_completion_month`,
+`current_completion_month`, `authorized_schedule_change_months`,
+`stable_lifecycle_project_id`, `dashboard_lifecycle_history_published`,
+publication flags, `source_id` and `quality_flags`.
+
+The event table requires `revision_event_id`, `project_id`, `event_type`,
+`effective_month`, `from_value`, `to_value`, `change_value`, `unit`,
+`direction_source_text`, `arithmetic_reconciles`, `source_text_sha256`,
+`source_id` and `evidence_status`. Cost values are CAD; completion changes are
+calendar months. Source history text is not silently rewritten: every parsed
+event carries a SHA-256 trace. A failed chain remains visible but cannot populate
+the gated baseline/current comparison fields.
+
 ## Conventions
 
 - Currency is CAD and carries a price year.

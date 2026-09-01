@@ -117,14 +117,16 @@
     {
       "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",
       "role": "authorizing_outcome",
-      "status": "missing",
+      "status": "candidate",
       "source_ids": [
         "CANADABUYS_PROCUREMENT_DATA",
         "CANADABUYS_TENDER_NOTICES_FY2026_2027",
         "CANADABUYS_AWARD_NOTICES_FY2026_2027",
         "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
         "GC_PROACTIVE_CONTRACTS",
-        "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024"
+        "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
+        "QUEBEC_PQI_PROJECT_DASHBOARD",
+        "QUEBEC_PQI_DATA_DICTIONARY"
       ],
       "available_variables": [
         "tender_publication_and_close_dates",
@@ -136,25 +138,34 @@
         "audited_named_project_baseline_cost_cad",
         "audited_named_project_latest_or_completed_total_cost_cad",
         "source_reported_cost_variance_percent",
-        "known_approved_budget_revision"
+        "known_approved_budget_revision",
+        "publisher_stable_lifecycle_project_id",
+        "authorized_cost_revision_effective_month",
+        "baseline_and_current_authorized_cost_cad_for_reconciled_chains",
+        "authorized_cost_variance_cad_and_fraction",
+        "common_inferred_public_asset_class"
       ],
       "missing_variables": [
         "independent_estimate_with_price_basis",
         "complete_approved_change_history",
-        "consistent_asset_reference_class"
+        "consistent_publisher_asset_reference_class",
+        "final_cost_outturn",
+        "multi_region_revision_panel"
       ],
-      "limitation": "The federal feasibility intake still cannot reconcile a common estimate-to-outturn outcome. The Ontario Auditor General source adds two named audited references, including one completed total-cost comparison and one estimated cost still under dispute, but neither publishes an estimate price-basis date, complete approved-change history, publisher-stable project ID or reusable asset reference-class panel."
+      "limitation": "The federal feasibility intake still cannot reconcile a common estimate-to-outturn outcome. The Ontario Auditor General source adds two named audited references. The Quebec dashboard now supplies stable lifecycle IDs and 141 parser-reconciled authorized-cost revision chains across common inferred asset classes, but these are authorized parameters rather than final outturns, omit estimate price-basis dates, come from one current-vintage survivor snapshot and remain pending independent parser review."
     },
     {
       "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
       "role": "authorizing_outcome",
-      "status": "missing",
+      "status": "candidate",
       "source_ids": [
         "CANADABUYS_PROCUREMENT_DATA",
         "CANADABUYS_TENDER_NOTICES_FY2026_2027",
         "CANADABUYS_AWARD_NOTICES_FY2026_2027",
         "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
-        "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024"
+        "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
+        "QUEBEC_PQI_PROJECT_DASHBOARD",
+        "QUEBEC_PQI_DATA_DICTIONARY"
       ],
       "available_variables": [
         "tender_publication_date",
@@ -164,15 +175,21 @@
         "audited_named_project_baseline_substantial_completion_date",
         "audited_named_project_actual_substantial_completion_date",
         "source_reported_schedule_delay_classification",
-        "inferred_calendar_day_difference_when_both_dates_are_exact"
+        "inferred_calendar_day_difference_when_both_dates_are_exact",
+        "publisher_stable_lifecycle_project_id",
+        "authorized_completion_revision_effective_month",
+        "baseline_and_current_completion_month_for_reconciled_chains",
+        "authorized_schedule_change_months",
+        "fiscal_year_completion_marker"
       ],
       "missing_variables": [
         "baseline_start_date_and_vintage",
         "baseline_completion_date_and_vintage",
         "actual_start_date",
-        "actual_completion_date"
+        "actual_completion_date_at_day_precision",
+        "multi_region_schedule_panel"
       ],
-      "limitation": "Tender timing and procurement-instrument start/end dates are not physical schedule outcomes. The Ontario audit adds two named planned-to-actual substantial-completion references, but only Highway 427 has exact day precision for both completion dates; neither case supplies a complete exact baseline-start/actual-start pair or a reusable regional panel."
+      "limitation": "Tender timing and procurement-instrument start/end dates are not physical schedule outcomes. The Ontario audit adds two named planned-to-actual substantial-completion references. The Quebec dashboard adds 168 parser-reconciled month-precision authorized completion-revision chains and 87 fiscal-year completion markers, but does not supply exact baseline/actual start and completion dates, a multi-region panel or independent parser review."
     },
     {
       "domain_id": "REGIONAL_CONSTRUCTION_ACTIVITY_CONTROLS",

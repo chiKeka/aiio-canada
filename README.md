@@ -40,6 +40,7 @@ npm run labour:normalize:canada
 npm run investment:normalize:canada
 npm run procurement:normalize
 npm run outcomes:audit:normalize
+npm run outcomes:quebec:normalize
 npm run bcpi:normalize:provinces
 npm run materials:screen
 npm run materials:screen:provinces

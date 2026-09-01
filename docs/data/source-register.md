@@ -66,6 +66,16 @@ Three official provincial inventories now share a source-preserving schema:
 - Ontario: [Ontario Builds: key infrastructure projects](https://data.ontario.ca/en/dataset/ontario-builds-key-infrastructure-projects), English all-project CSV dated 2026-06-12. The publisher calls this a sample of key projects; it is not treated as a complete capital plan. The source has no publisher project identifier, so AIIO derives a deterministic vintage-record hash and flags it.
 - Quebec: the [public infrastructure project dashboard](https://www.tresor.gouv.qc.ca/infrastructures-publiques/tableau-de-bord), CSV dated 2026-08-20. Current coverage is limited to Plan québécois des infrastructures projects of at least $20 million; pre-November 2020 vintages used a $50 million threshold.
 
+The Quebec dashboard's separate official field-description PDF is registered as
+`QUEBEC_PQI_DATA_DICTIONARY` and hash-locked alongside the CSV. It defines
+`no_projet` as a lifecycle-stable identifier, `cout_total` as total authorized
+cost and `suivi_modifications` as authorized lifecycle changes with effective
+dates. AIIO uses those definitions to build a research-only revision panel with
+141 reconciled cost chains and 168 reconciled completion-month chains. The
+panel remains non-authorizing because it is a current-vintage survivor snapshot,
+authorized cost is not final outturn, estimate price-basis dates are absent and
+independent parser review is pending.
+
 The normalized file retains publisher category, type, stage, location, funding signal, cost status and original schedule text. Asset classes are explicit inferences. British Columbia and Quebec costs are converted from millions of Canadian dollars; Ontario zero budget values are treated as unavailable because the dataset uses them as placeholders. Missing values remain null.
 
 The intake is not yet a pooled exposure model. Source thresholds, completeness, vintages and schedule fields differ materially: Ontario and Quebec do not publish a comparable construction start period for most records. The machine report therefore sets `public_project_exposure_authorized` to `false` until a source-specific comparability design and schedule strategy pass review.

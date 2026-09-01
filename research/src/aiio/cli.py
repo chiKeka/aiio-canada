@@ -30,6 +30,10 @@ from .adapters.edmonton_permits import (
     normalize_edmonton_permit_proxy,
 )
 from .audited_outcomes import run_audited_project_outcomes
+from .quebec_revisions import (
+    DICTIONARY_SOURCE_ID as QUEBEC_DICTIONARY_SOURCE_ID,
+    run_quebec_authorized_revisions,
+)
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .adapters.provincial_projects import (
     BC_SOURCE_ID,
@@ -129,6 +133,13 @@ def main() -> None:
     )
     audited_outcomes_parser.add_argument("manual_extract_path", type=Path)
     audited_outcomes_parser.add_argument("source_pdf_path", type=Path)
+
+    quebec_revisions_parser = subparsers.add_parser(
+        "normalize-quebec-authorized-revisions",
+        help="build a fail-closed panel of Quebec authorized cost and completion revisions",
+    )
+    quebec_revisions_parser.add_argument("dashboard_csv_path", type=Path)
+    quebec_revisions_parser.add_argument("dictionary_pdf_path", type=Path)
 
     subparsers.add_parser(
         "fetch-census-workforce",
@@ -502,6 +513,49 @@ def main() -> None:
                         "public_project_schedule_outcome_authorized": report[
                             "publication_boundary"
                         ]["public_project_schedule_outcome_authorized"],
+                    }
+                )
+            )
+        elif args.command == "normalize-quebec-authorized-revisions":
+            source_records = {
+                source.source_id: source for source in load_registry(registry_path)
+            }
+            required_source_ids = (QUEBEC_SOURCE_ID, QUEBEC_DICTIONARY_SOURCE_ID)
+            missing_source_ids = [
+                source_id
+                for source_id in required_source_ids
+                if source_id not in source_records
+            ]
+            if missing_source_ids:
+                raise ValidationError(
+                    "Quebec revision sources are missing from the registry: "
+                    + ", ".join(missing_source_ids)
+                )
+            report = run_quebec_authorized_revisions(
+                args.dashboard_csv_path.resolve(),
+                args.dictionary_pdf_path.resolve(),
+                root
+                / "data"
+                / "model-runs"
+                / "quebec_pqi_authorized_project_revisions_v0.1.json",
+                root
+                / "data"
+                / "processed"
+                / "quebec_pqi_authorized_project_revisions.csv",
+                root
+                / "data"
+                / "processed"
+                / "quebec_pqi_authorized_revision_events.csv",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": report["model_id"],
+                        **report["coverage_summary"],
+                        "authorized_revision_reference_panel_authorized": report[
+                            "publication_boundary"
+                        ]["authorized_revision_reference_panel_authorized"],
                     }
                 )
             )
