@@ -285,7 +285,7 @@ function PublicProjectExposurePanel({
                   indicatively allocated to window
                 </span>
               </p>
-              <p className="mt-2 text-[10px] text-[#6c7c77]">
+              <p className="mt-2 text-[10px] text-[#52645f]">
                 {item.unresolved_sponsor_signal_count} sponsor signals
                 unresolved · {item.reported_cost_project_count} records report
                 cost
@@ -302,7 +302,7 @@ function ExposureMetric({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="font-mono text-lg font-semibold text-[#173f46]">{value}</p>
-      <p className="mt-1 text-[10px] text-[#6a7a76]">{label}</p>
+      <p className="mt-1 text-[10px] text-[#52645f]">{label}</p>
     </div>
   );
 }

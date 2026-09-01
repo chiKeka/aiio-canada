@@ -2,15 +2,15 @@
   "artifacts": [
     {
       "path": "public/data/latest.json",
-      "sha256": "78e4623d7d9e6945751994b17cdf36964dd088aef14307796b30ca8846ec750a"
+      "sha256": "e711a1ba922650c569128afff4685a05e26daa76a2e03cfcd6f7cff4e06b0380"
     },
     {
       "path": "public/data/manifest.json",
-      "sha256": "5af101e28bfb82099cc113e2a54463ae60e4329bab45894f9cd6a6772e5e1b37"
+      "sha256": "da7d44695e82b17bc662e1fa518db583a603564d6bade8849ca490877b9cbd79"
     },
     {
-      "path": "public/downloads/AIIO_Alberta_Pilot_0.5.0-dev.xlsx",
-      "sha256": "37b63499e49474a0e0ba1e27750cc2b022492d342d2c906e4e91dd5facf8533e"
+      "path": "public/downloads/AIIO_Alberta_Pilot_0.6.0-dev.xlsx",
+      "sha256": "843f0e9330b6a2af780d063cb6d10b704ae1ead3218b30f58e05e125f7641757"
     },
     {
       "path": "public/downloads/alberta_ai_projects.csv",
@@ -31,11 +31,23 @@
     {
       "path": "public/downloads/labour_workforce_stock_canada.csv",
       "sha256": "ddaeab6d7eff569738d3e3dac3576dbdd57890f0e0a06d3cc1c98bb202557a89"
+    },
+    {
+      "path": "public/downloads/bcpi_material_cost_screen_alberta.csv",
+      "sha256": "383210a67f771f3c0e63f1e415dc07601c7a6326382ec54736ce5eedf2bfbbaf"
+    },
+    {
+      "path": "public/downloads/public_project_exposure_alberta.csv",
+      "sha256": "748550be78361f31562bd64f494f3f9ff51be398c5877ae65e1404434d8f707d"
+    },
+    {
+      "path": "public/downloads/power_evidence_alberta.csv",
+      "sha256": "d2be44444fe3a85f3d26120722f1e4926781c0dd76e42a5fa9f67afa53728945"
     }
   ],
-  "code_commit": "c4749145575ff5c95ddd508b22c8be48384cddb9",
-  "input_manifest_hash": "sha256:d308d8d18e9bc10e2a93ea498ec10b049f34eb4098034ea4ba9ffe9704da9365",
-  "release_id": "AIIO_RELEASE_0_5_0_DEV",
-  "release_version": "0.5.0-dev",
+  "code_commit": "8763641e9a52ff45ea88bfc466d34c6c09d80217",
+  "input_manifest_hash": "sha256:7a1e84582cd841210af505afd2ae4cc1cbfb79533a59980e3546823d278dff97",
+  "release_id": "AIIO_RELEASE_0_6_0_DEV",
+  "release_version": "0.6.0-dev",
   "schema_version": "1.2.0"
 }
