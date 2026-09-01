@@ -13,6 +13,7 @@ ARTIFACTS = [
     ("frozen_release_bundle", "public/data/latest.json", "frozen_release"),
     ("frozen_release_manifest", "public/data/manifest.json", "governance"),
     ("program_gates", "data/governance/program-gates.json", "governance"),
+    ("executive_monthly_escalation", "data/model-runs/executive_monthly_escalation_current.json", "withheld_model_output"),
     ("source_registry", "data/registry/sources.json", "source_provenance"),
     ("pspe_method_lineage", "data/model-runs/pspe_method_lineage_v0.1.json", "method_lineage"),
     ("canada_cross_domain_coverage", "data/model-runs/canada_cross_domain_coverage_v0.1.json", "coverage_inventory"),

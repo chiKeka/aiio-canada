@@ -261,12 +261,12 @@
       "check_id": "research_surface_provenance",
       "evidence": [
         "public/data/research-surface.json",
-        "artifact_manifest_sha256=sha256:1423ef3399c3ffdf199e5b3985f69849e0306bfd8afb9618ea190c7b858add01",
+        "artifact_manifest_sha256=sha256:8d4fb27bf006296118eea6b647eced7c0d0941f31c4ce85c97f784bb87ed255b",
         "research/src/aiio/research_surface.py"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The evolving research website reconciles 26 hash-locked artifacts above the frozen release without promoting them."
+      "summary": "The evolving research website reconciles 27 hash-locked artifacts above the frozen release without promoting them."
     },
     {
       "category": "product",

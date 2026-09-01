@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
+  Activity,
   ArrowRight,
   Building2,
   Check,
@@ -23,12 +24,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
+import { MonthlyEscalationOutlook, type MonthlyEscalationCalibration } from '@/components/monthly-escalation-outlook';
 import { ASSETS, buildDecisionAnalysis, METROS, type AssetId, type MetroId } from '@/lib/decision-analysis';
+import monthlyCalibration from '@/data/model-runs/executive_monthly_escalation_current.json';
 import releaseData from '@/public/data/latest.json';
 
-type View = 'cockpit' | 'walkthrough' | 'evidence';
+type View = 'outlook' | 'cockpit' | 'walkthrough' | 'evidence';
 
 const views: { id: View; label: string; icon: typeof Gauge }[] = [
+  { id: 'outlook', label: 'Monthly outlook', icon: Activity },
   { id: 'cockpit', label: 'Decision cockpit', icon: Gauge },
   { id: 'walkthrough', label: 'Guided story', icon: Route },
   { id: 'evidence', label: 'Evidence lens', icon: Layers3 },
@@ -62,7 +66,7 @@ const tour = [
 ] as const;
 
 export function ExecutiveCockpit() {
-  const [view, setView] = useState<View>('cockpit');
+  const [view, setView] = useState<View>('outlook');
   const [tourStep, setTourStep] = useState(0);
   const [assetId, setAssetId] = useState<AssetId>('hospital');
   const [metroId, setMetroId] = useState<MetroId>('CMA_835');
@@ -129,7 +133,9 @@ export function ExecutiveCockpit() {
             </aside>
 
             <div className="min-h-0">
-              {view === 'cockpit' ? (
+              {view === 'outlook' ? (
+                <MonthlyEscalationOutlook calibration={monthlyCalibration as MonthlyEscalationCalibration} durationYears={duration} projectStart={startYear} />
+              ) : view === 'cockpit' ? (
                 <CockpitView analysis={analysis} budgetMillions={budgetMillions} completeLabour={completeLabour} leadingMaterial={leadingMaterial} requestedGw={requestedGw} />
               ) : view === 'walkthrough' ? (
                 <Walkthrough analysis={analysis} budgetMillions={budgetMillions} setTourStep={setTourStep} tourStep={tourStep} />

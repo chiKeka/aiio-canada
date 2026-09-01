@@ -1,6 +1,6 @@
 {
-  "artifact_count": 26,
-  "artifact_manifest_sha256": "sha256:1423ef3399c3ffdf199e5b3985f69849e0306bfd8afb9618ea190c7b858add01",
+  "artifact_count": 27,
+  "artifact_manifest_sha256": "sha256:8d4fb27bf006296118eea6b647eced7c0d0941f31c4ce85c97f784bb87ed255b",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -19,6 +19,12 @@
       "evidence_role": "governance",
       "path": "data/governance/program-gates.json",
       "sha256": "sha256:0e2162499164246b644718132a096ead9d5f34f32850c27e5dd05acdf53bd486"
+    },
+    {
+      "artifact_id": "executive_monthly_escalation",
+      "evidence_role": "withheld_model_output",
+      "path": "data/model-runs/executive_monthly_escalation_current.json",
+      "sha256": "sha256:add335d85e5e344f5df94d4a3226050aced806fdc019feea13fa3d503ccf3411"
     },
     {
       "artifact_id": "source_registry",
