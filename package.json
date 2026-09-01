@@ -43,6 +43,8 @@
     "fetch:canadabuys:awards": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch CANADABUYS_AWARD_NOTICES_FY2026_2027",
     "fetch:canadabuys:contracts": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
     "procurement:normalize": "PYTHONPATH=research/src python3 -m aiio.cli --root . normalize-canadabuys-outcomes data/raw/canadabuys_tender_notices_fy2026_2027/2026-09-01_ca772f0fa471.csv data/raw/canadabuys_award_notices_fy2026_2027/2026-09-01_8b4ec53917a8.csv data/raw/canadabuys_contract_history_fy2026_2027/2026-09-01_2a298379fd98.csv",
+    "permits:fetch": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch-edmonton-permits",
+    "permits:normalize": "PYTHONPATH=research/src python3 -m aiio.cli --root . normalize-edmonton-permits data/raw/edmonton_general_building_permits/2026-09-01_f4da956ae985.json",
     "model:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-scenario data/model/alberta_graph_v0.2.json data/scenarios/alberta_50b_counterfactual_v0.2.json data/model-runs/alberta_50b_counterfactual_v0.2.json",
     "power:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-power-overlay data/scenarios/alberta_power_overlay_v0.1.json data/model-runs/alberta_power_overlay_v0.1.json",
     "workbook:build": "node workbook-work/build_aiio_workbook.mjs",

@@ -24,6 +24,11 @@ from .adapters.canadabuys import (
     TENDER_SOURCE_ID as CANADABUYS_TENDER_SOURCE_ID,
     normalize_canadabuys_outcome_intake,
 )
+from .adapters.edmonton_permits import (
+    SOURCE_ID as EDMONTON_PERMIT_SOURCE_ID,
+    fetch_edmonton_permit_candidates,
+    normalize_edmonton_permit_proxy,
+)
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .adapters.provincial_projects import (
     BC_SOURCE_ID,
@@ -105,6 +110,17 @@ def main() -> None:
     canadabuys_parser.add_argument("tender_path", type=Path)
     canadabuys_parser.add_argument("award_path", type=Path)
     canadabuys_parser.add_argument("contract_path", type=Path)
+
+    subparsers.add_parser(
+        "fetch-edmonton-permits",
+        help="retrieve a field-minimized broad screen from the Edmonton building-permit API",
+    )
+
+    edmonton_permits_parser = subparsers.add_parser(
+        "normalize-edmonton-permits",
+        help="build the fail-closed Edmonton data-centre permit activity proxy",
+    )
+    edmonton_permits_parser.add_argument("raw_path", type=Path)
 
     subparsers.add_parser(
         "fetch-census-workforce",
@@ -393,6 +409,53 @@ def main() -> None:
                         "public_project_cost_outcome_authorized": report[
                             "publication_boundary"
                         ]["public_project_cost_outcome_authorized"],
+                    }
+                )
+            )
+        elif args.command == "fetch-edmonton-permits":
+            source_records = {
+                source.source_id: source for source in load_registry(registry_path)
+            }
+            if EDMONTON_PERMIT_SOURCE_ID not in source_records:
+                raise ValidationError("Edmonton permit source is missing from the registry")
+            record = fetch_edmonton_permit_candidates(root / "data" / "raw")
+            print(json.dumps(record, indent=2, sort_keys=True))
+        elif args.command == "normalize-edmonton-permits":
+            source_records = {
+                source.source_id: source for source in load_registry(registry_path)
+            }
+            if EDMONTON_PERMIT_SOURCE_ID not in source_records:
+                raise ValidationError("Edmonton permit source is missing from the registry")
+            raw_path = args.raw_path.resolve()
+            report = normalize_edmonton_permit_proxy(
+                raw_path,
+                root
+                / "data"
+                / "processed"
+                / "edmonton_data_centre_permit_proxy.csv",
+                root
+                / "data"
+                / "model-runs"
+                / "edmonton_data_centre_permit_proxy_v0.1.json",
+                source_as_of_date=source_records[
+                    EDMONTON_PERMIT_SOURCE_ID
+                ].as_of_date,
+                retrieval_manifest_path=raw_path.with_suffix(
+                    raw_path.suffix + ".manifest.json"
+                ),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": report["model_id"],
+                        "broad_screen_row_count": report["broad_screen_row_count"],
+                        "data_centre_candidate_count": report[
+                            "data_centre_candidate_count"
+                        ],
+                        "realized_ai_construction_treatment_authorized": report[
+                            "publication_boundary"
+                        ]["realized_ai_construction_treatment_authorized"],
                     }
                 )
             )

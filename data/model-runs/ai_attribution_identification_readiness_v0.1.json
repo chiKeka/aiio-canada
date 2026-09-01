@@ -15,7 +15,7 @@
     "STATCAN_JVWS_14100444"
   ],
   "contract_id": "AIIO_E2_ATTRIBUTION_PANEL_CONTRACT_0_1",
-  "contract_sha256": "sha256:78bb4d50f1723866c81e0495e451ad210c03d55cc0c3de010b83e211c0e5426d",
+  "contract_sha256": "sha256:c3e6e6db334ce8ff904af299b3d9236059cc8ce97adbeec07182ade63e0f6b11",
   "design": {
     "aggregation": "event_time_and_exposure_cohort",
     "anticipation_periods": 2,
@@ -38,10 +38,13 @@
     {
       "available_variables": [
         "permitted_construction_value_cad_proxy",
+        "issued_building_permit_date",
+        "inferred_data_centre_keyword_candidate",
+        "occupancy_granted_date_trend_proxy",
         "requested_and_contracted_load_mw"
       ],
       "domain_id": "REALIZED_AI_CONSTRUCTION_TREATMENT",
-      "limitation": "Current public sources expose intentions, connection states and proxies, not a consistent realized construction input across regions.",
+      "limitation": "The implemented Edmonton screen identifies 17 explicit data-centre permit candidates from 85 broad records, but finds no explicit AI references and no candidate occupancy dates. Permit values, occupancy trend fields and large-load connection states remain proxies rather than a consistent realized construction input across regions.",
       "missing_variables": [
         "realized_construction_spend_cad",
         "data_centre_construction_labour_hours"

@@ -35,6 +35,7 @@ import releaseData from '@/public/data/latest.json';
 import attributionReadiness from '@/data/model-runs/ai_attribution_identification_readiness_v0.1.json';
 import buildingInvestmentControls from '@/data/model-runs/building_investment_controls_canada_v0.1.json';
 import procurementOutcomeFeasibility from '@/data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json';
+import edmontonPermitProxy from '@/data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json';
 import { ModeToggle } from '@/components/mode-toggle';
 import { boundedDisplayScore } from '@/lib/decision-analysis';
 
@@ -88,7 +89,7 @@ const attributionDomainMeta = [
     id: 'REALIZED_AI_CONSTRUCTION_TREATMENT',
     label: 'AI construction treatment',
     role: 'Authorizing treatment',
-    summary: 'Requires realized construction spend or construction labour hours. Announced capex, requested MW and permits remain proxies.',
+    summary: `The Edmonton screen identifies ${edmontonPermitProxy.data_centre_candidate_count} permit candidates, but no explicit AI references or candidate occupancy dates. Realized spend or construction labour hours are still required.`,
   },
   {
     id: 'PUBLIC_PROJECT_COST_OUTCOMES',
@@ -410,6 +411,19 @@ export function ObservatoryDashboard() {
               <ContractMetric label="Observations" value={buildingInvestmentControls.observation_count.toLocaleString('en-CA')} />
               <ContractMetric label="Geographies" value={buildingInvestmentControls.geography_count.toString()} />
               <ContractMetric label="Quarters" value={buildingInvestmentControls.quarter_count.toString()} />
+            </dl>
+          </div>
+
+          <div className="mt-5 grid gap-5 rounded-xl border border-[#b8cbd4] bg-[#edf3f5] p-5 lg:grid-cols-[minmax(0,.9fr)_minmax(520px,1.1fr)] lg:items-center sm:p-6">
+            <div>
+              <div className="flex items-center gap-2 text-[#456574]"><Building2 className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Municipal permit treatment proxy · not authorizing</p></div>
+              <p className="mt-2 text-sm leading-6 text-[#526b76]">{edmontonPermitProxy.publication_boundary.reason}</p>
+            </div>
+            <dl className="grid grid-cols-2 gap-5 border-t border-[#c5d4da] pt-5 sm:grid-cols-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+              <ContractMetric label="Broad screen" value={edmontonPermitProxy.broad_screen_row_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Data-centre candidates" value={edmontonPermitProxy.data_centre_candidate_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Explicit AI references" value={edmontonPermitProxy.explicit_ai_reference_count.toString()} />
+              <ContractMetric label="Candidate occupancy dates" value={edmontonPermitProxy.data_centre_candidate_occupancy_date_available_count.toString()} />
             </dl>
           </div>
 

@@ -21,7 +21,7 @@
       "check_id": "public_evidence_registry",
       "evidence": [
         "data/registry/sources.json",
-        "raw_manifest_count=20"
+        "raw_manifest_count=21"
       ],
       "release_gate": true,
       "status": "pass",

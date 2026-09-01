@@ -103,13 +103,16 @@
       ],
       "available_variables": [
         "permitted_construction_value_cad_proxy",
+        "issued_building_permit_date",
+        "inferred_data_centre_keyword_candidate",
+        "occupancy_granted_date_trend_proxy",
         "requested_and_contracted_load_mw"
       ],
       "missing_variables": [
         "realized_construction_spend_cad",
         "data_centre_construction_labour_hours"
       ],
-      "limitation": "Current public sources expose intentions, connection states and proxies, not a consistent realized construction input across regions."
+      "limitation": "The implemented Edmonton screen identifies 17 explicit data-centre permit candidates from 85 broad records, but finds no explicit AI references and no candidate occupancy dates. Permit values, occupancy trend fields and large-load connection states remain proxies rather than a consistent realized construction input across regions."
     },
     {
       "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",

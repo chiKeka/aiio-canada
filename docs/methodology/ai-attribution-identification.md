@@ -86,7 +86,7 @@ latest published project status.
 | Regional building activity | [Statistics Canada table 34-10-0293-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410029301) | Monthly residential/non-residential building investment for provinces and selected CMAs | Implemented quarterly control; excludes engineering construction and is not AI-specific |
 | Federal procurement | [CanadaBuys procurement and contracting data](https://canadabuys.canada.ca/en/procurement-and-contracting-data) | Tender, award and PSPC contract-history files | Implemented 2026-2027 feasibility intake: 358 construction linkages, but no stable physical-project ID, CMA geography, independent estimate, complete approved changes, physical completion or bidder count |
 | Federal contracts/amendments | [Open Government proactive contract publications](https://open.canada.ca/data/en/dataset/d8f85d91-7dec-4fd1-8055-483b77225d8b) | Award and amendment records for federal reporting entities | Unaudited disclosure; does not consistently supply independent estimate or completion |
-| Municipal permits | [Edmonton General Building Permits](https://data.edmonton.ca/Urban-Planning-Economy/General-Building-Permits/24uj-dj8v) | Permit date, description, building/work type and reported construction value | Construction intention/proxy, not realized spend or hours |
+| Municipal permits | [Edmonton General Building Permits](https://data.edmonton.ca/Urban-Planning-Economy/General-Building-Permits/24uj-dj8v) | Implemented field-minimized screen: issue date, building/work type, reported construction-value estimate and occupancy trend field | 85 broad records produce 17 explicit data-centre candidates, 0 explicit AI references and 0 candidate occupancy dates; still not realized spend or hours |
 | Alberta large loads | [AESO connection project reporting](https://www.aeso.ca/grid/transmission-projects/) and the registered large-load sources | Requested/contracted load, project stage and selected energization information | MW states are distinct and do not measure construction resource use |
 | Labour and prices | Existing Statistics Canada JVWS, Census and BCPI adapters | Vacancy, offered-wage, workforce-stock and price controls | Different vintages/designs remain explicit; none identify E2 by themselves |
 
@@ -98,6 +98,9 @@ estimate-to-outturn and baseline-to-actual outcomes. That is why E2 remains
 The detailed CanadaBuys transformation, field-coverage counts and publication
 boundary are documented in
 `docs/methodology/canadabuys-procurement-outcome-intake.md`.
+The municipal permit retrieval, classifier and non-authorizing boundary are
+documented in
+`docs/methodology/edmonton-data-centre-permit-proxy.md`.
 
 ## Minimum identification gates
 

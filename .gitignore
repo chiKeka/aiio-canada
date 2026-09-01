@@ -54,3 +54,5 @@ CLAUDE.md
 /data/raw/canadabuys_tender_notices_fy2026_2027/*.csv
 /data/raw/canadabuys_award_notices_fy2026_2027/*.csv
 /data/raw/canadabuys_contract_history_fy2026_2027/*.csv
+/data/raw/edmonton_general_building_permits/*.json
+!/data/raw/edmonton_general_building_permits/*.json.manifest.json

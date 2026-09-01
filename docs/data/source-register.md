@@ -33,14 +33,19 @@ fail-closed construction-procurement feasibility screen. It proves that tender,
 award and contract dates can be partially linked while stable physical-project
 IDs, CMA geography, independent estimates, complete approved changes, physical
 completion and compliant bidder counts remain unavailable. The federal
-proactive contract publication and Edmonton's General Building Permits API
-remain candidates for amendment screening and permit-based proxy work. None
-currently supplies the
+proactive contract publication remains a candidate for amendment screening.
+Edmonton's General Building Permits API now feeds a content-hashed,
+field-minimized permit proxy: 85 broad keyword records resolve to 17 explicit
+data-centre candidates, 62 generic server references and 6 excluded substring
+false positives. None of the data-centre candidates contains an explicit AI
+reference or an occupancy-granted trend date. No current source supplies the
 combination of realized AI-construction spend or labour hours, independent
 project estimate with price basis, complete approved changes, and actual project
 completion required to authorize an AI-attributable effect. See
 `docs/methodology/ai-attribution-identification.md` and
 `docs/methodology/canadabuys-procurement-outcome-intake.md`.
+The Edmonton permit implementation is documented in
+`docs/methodology/edmonton-data-centre-permit-proxy.md`.
 
 ## Implemented provincial public-project intake
 

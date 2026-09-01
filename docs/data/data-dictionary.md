@@ -134,6 +134,24 @@ constant dollars remain separate series. Province/territory and CMA identifiers
 remain separate; named CMA parts are not silently merged. The quarterly sum is
 inferred from observed monthly investment values and is a regional control only.
 
+## Municipal data-centre permit proxy
+
+Required fields: `permit_proxy_id`, `source_row_id`, `issue_date`, `issue_year`,
+`job_category`, `building_type`, `work_type`, `classification`,
+`candidate_status`, `matched_terms`,
+`reported_estimated_construction_value_cad`, `construction_value_status`,
+`floor_area_sq_ft`, `occupancy_granted_date`, `occupancy_date_status`,
+`description_sha256`, `ai_specificity_status`,
+`realized_construction_status`, `source_id`, `source_evidence_status`,
+`classification_evidence_status`, `transformation_id`, `quality_flags`.
+
+Permit issue date, category, type and reported values are observed source fields.
+Keyword classification is inferred. Exact address, legal description,
+coordinates, neighbourhood and job description are excluded from the processed
+artifact. A reported construction value is a permit estimate, not realized
+spend. An occupancy-granted date is a limited-coverage trend proxy, not legal
+occupancy confirmation or verified construction completion.
+
 ## Conventions
 
 - Currency is CAD and carries a price year.

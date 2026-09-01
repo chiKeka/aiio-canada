@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.10.0-dev';
+const workbookBuildVersion = '0.11.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -233,6 +233,28 @@ const procurementOutcomeRows = parseCsv(
     'utf8',
   ),
 );
+const permitProxyReport = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'edmonton_data_centre_permit_proxy_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const permitProxyRows = parseCsv(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'processed',
+      'edmonton_data_centre_permit_proxy.csv',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -258,6 +280,7 @@ const canadaExpansion = workbook.worksheets.add('Canada Expansion');
 const attributionGate = workbook.worksheets.add('Attribution Gate');
 const investmentControls = workbook.worksheets.add('Investment Controls');
 const procurementIntake = workbook.worksheets.add('Procurement Intake');
+const permitProxy = workbook.worksheets.add('Permit Proxy');
 const sources = workbook.worksheets.add('Sources');
 const checks = workbook.worksheets.add('Release Checks');
 
@@ -301,6 +324,7 @@ for (const sheet of [
   attributionGate,
   investmentControls,
   procurementIntake,
+  permitProxy,
   sources,
   checks,
 ]) {
@@ -330,6 +354,7 @@ buildCanadaExpansion();
 buildAttributionGate();
 buildInvestmentControls();
 buildProcurementIntake();
+buildPermitProxy();
 buildSources();
 buildReleaseChecks();
 buildDashboard();
@@ -369,9 +394,9 @@ console.log(inspectDashboard.ndjson);
 
 const inspectReadMe = await workbook.inspect({
   kind: 'table',
-  range: 'Read Me!A1:H49',
+  range: 'Read Me!A1:H50',
   include: 'values,formulas',
-  tableMaxRows: 49,
+  tableMaxRows: 50,
   tableMaxCols: 8,
 });
 console.log(inspectReadMe.ndjson);
@@ -430,6 +455,15 @@ const inspectProcurementIntake = await workbook.inspect({
 });
 console.log(inspectProcurementIntake.ndjson);
 
+const inspectPermitProxy = await workbook.inspect({
+  kind: 'table',
+  range: 'Permit Proxy!A1:M42',
+  include: 'values,formulas',
+  tableMaxRows: 42,
+  tableMaxCols: 13,
+});
+console.log(inspectPermitProxy.ndjson);
+
 const errors = await workbook.inspect({
   kind: 'match',
   searchTerm: '#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A',
@@ -439,7 +473,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H49',
+  'Read Me': 'A1:H50',
   Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -461,6 +495,7 @@ const previewRanges = {
   'Attribution Gate': 'A1:J48',
   'Investment Controls': 'A1:R28',
   'Procurement Intake': 'A1:X28',
+  'Permit Proxy': 'A1:M42',
   Sources: 'A1:J34',
   'Release Checks': 'A1:D47',
 };
@@ -527,7 +562,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H40').values = [
+  readme.getRange('A18:H41').values = [
     [
       '1',
       'Dashboard',
@@ -740,6 +775,16 @@ function buildReadMe() {
     ],
     [
       '22',
+      'Permit Proxy',
+      'Inspect Edmonton permit activity, conservative keyword classifications and the non-authorizing treatment boundary.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '23',
       'Sources',
       'Open the current research source register, distinguish release sources and check source vintages.',
       '',
@@ -749,7 +794,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '23',
+      '24',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -759,25 +804,25 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A40').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B40').format.font = { bold: true };
-  readme.getRange('C18:H40').merge(true);
-  readme.getRange('A42:H42').merge();
-  readme.getRange('A42').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A42:H42'), C.amber);
+  readme.getRange('A18:A41').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B41').format.font = { bold: true };
+  readme.getRange('C18:H41').merge(true);
   readme.getRange('A43:H43').merge();
-  readme.getRange('A43').values = [
+  readme.getRange('A43').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A43:H43'), C.amber);
+  readme.getRange('A44:H44').merge();
+  readme.getRange('A44').values = [
     [
-      'WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The CanadaBuys intake proves that some procurement dates and values can be linked, but it supplies no stable physical-project ID, CMA geography, independent estimate, complete changes, physical completion or bidder count. The attribution contract still lacks an authorizing realized AI-construction treatment plus reconciled public-project cost and schedule outcomes, so all AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.',
+      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. CanadaBuys supplies no stable physical-project ID, CMA geography, independent estimate, complete changes, physical completion or bidder count. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
     ],
   ];
-  readme.getRange('A43:H43').format = {
+  readme.getRange('A44:H44').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A43').format.rowHeight = 126;
+  readme.getRange('A44').format.rowHeight = 126;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
@@ -3095,7 +3140,7 @@ function buildAttributionGate() {
   attributionGate.getRange('D6:J13').merge();
   attributionGate.getRange('D6').values = [
     [
-      `${attributionReadiness.publication_authorization.reason} Announced capex, requested connection load, demand forecasts, scenario capex and graph pressure scores are prohibited as authorizing treatment measures. The graph remains a mechanism and bottleneck map; it does not supply the counterfactual or identify the treatment effect.`,
+      `${attributionReadiness.publication_authorization.reason} The Edmonton permit screen contributes ${permitProxyReport.data_centre_candidate_count} inferred data-centre candidates, but it contains ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates. Its reported permit estimates are not realized spend. Announced capex, requested connection load, demand forecasts, scenario capex and graph pressure scores are prohibited as authorizing treatment measures. The graph remains a mechanism and bottleneck map; it does not supply the counterfactual or identify the treatment effect.`,
     ],
   ];
   attributionGate.getRange('D6:J13').format = {
@@ -3282,7 +3327,7 @@ function buildAttributionGate() {
   attributionGate.getRange('A48:J48').merge();
   attributionGate.getRange('A48').values = [
     [
-      `Contract hash: ${attributionReadiness.contract_sha256} · regional control output hash: ${investmentControlReport.output_sha256}`,
+      `Contract hash: ${attributionReadiness.contract_sha256} · regional control output hash: ${investmentControlReport.output_sha256} · permit proxy output hash: ${permitProxyReport.output_sha256}`,
     ],
   ];
   attributionGate.getRange('A48').format = {
@@ -3637,6 +3682,224 @@ function buildProcurementIntake() {
   }
 }
 
+function buildPermitProxy() {
+  titleBand(
+    permitProxy,
+    'Edmonton data-centre permit activity proxy',
+    `City of Edmonton issued-permit screen · ${permitProxyReport.period_start} to ${permitProxyReport.period_end} · research only`,
+    'M',
+  );
+
+  const summaryCards = [
+    ['A5:B5', 'A6:B6', 'Broad keyword screen', permitProxyReport.broad_screen_row_count],
+    ['C5:D5', 'C6:D6', 'Data-centre candidates', permitProxyReport.data_centre_candidate_count],
+    ['E5:F5', 'E6:F6', 'Candidates since 2018', permitProxyReport.data_centre_candidate_count_since_2018],
+    ['G5:H5', 'G6:H6', 'Explicit AI references', permitProxyReport.explicit_ai_reference_count],
+    ['I5:J5', 'I6:J6', 'Candidate occupancy dates', permitProxyReport.data_centre_candidate_occupancy_date_available_count],
+    [
+      'K5:M5',
+      'K6:M6',
+      'Reported permit estimate proxy',
+      permitProxyReport.data_centre_candidate_reported_value_total_cad_proxy,
+    ],
+  ];
+  for (const [labelRange, valueRange, label, value] of summaryCards) {
+    permitProxy.getRange(labelRange).merge();
+    permitProxy.getRange(labelRange.split(':')[0]).values = [[label]];
+    permitProxy.getRange(labelRange).format = {
+      fill: C.tealLight,
+      font: { bold: true, color: C.tealDark, size: 9 },
+      horizontalAlignment: 'center',
+      verticalAlignment: 'center',
+      borders: { preset: 'outside', style: 'thin', color: '#B9CEC7' },
+    };
+    permitProxy.getRange(valueRange).merge();
+    permitProxy.getRange(valueRange.split(':')[0]).values = [[value]];
+    permitProxy.getRange(valueRange).format = {
+      fill: C.white,
+      font: { bold: true, color: C.ink, size: 16 },
+      horizontalAlignment: 'center',
+      verticalAlignment: 'center',
+      borders: { preset: 'outside', style: 'thin', color: '#B9CEC7' },
+    };
+  }
+  permitProxy.getRange('A6:J6').format.numberFormat = '#,##0';
+  permitProxy.getRange('K6:M6').format.numberFormat = '$#,##0';
+
+  permitProxy.getRange('A8:M8').merge();
+  permitProxy.getRange('A8').values = [
+    [
+      `NON-AUTHORIZING MUNICIPAL ACTIVITY PROXY. ${permitProxyReport.publication_boundary.reason} The CAD ${permitProxyReport.data_centre_candidate_reported_value_total_cad_proxy.toLocaleString('en-CA')} aggregate includes one demolition candidate; the non-demolition candidate aggregate is CAD ${permitProxyReport.data_centre_candidate_non_demolition_reported_value_total_cad_proxy.toLocaleString('en-CA')}. Neither is AI capex.`,
+    ],
+  ];
+  permitProxy.getRange('A8:M8').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  permitProxy.getRange('A8').format.rowHeight = 62;
+
+  const classificationCards = [
+    [
+      'A10:D10',
+      'A11:D11',
+      'Explicit data-centre reference',
+      permitProxyReport.classification_counts.explicit_data_centre_reference,
+    ],
+    [
+      'E10:H10',
+      'E11:H11',
+      'Server reference only',
+      permitProxyReport.classification_counts.server_reference_only,
+    ],
+    [
+      'I10:M10',
+      'I11:M11',
+      'Broad-query substring false positive',
+      permitProxyReport.classification_counts.broad_query_substring_false_positive,
+    ],
+  ];
+  for (const [labelRange, valueRange, label, value] of classificationCards) {
+    permitProxy.getRange(labelRange).merge();
+    permitProxy.getRange(labelRange.split(':')[0]).values = [[label]];
+    permitProxy.getRange(labelRange).format = {
+      fill: C.soft,
+      font: { bold: true, color: C.muted, size: 9 },
+      horizontalAlignment: 'center',
+      verticalAlignment: 'center',
+      borders: { preset: 'outside', style: 'thin', color: C.line },
+    };
+    permitProxy.getRange(valueRange).merge();
+    permitProxy.getRange(valueRange.split(':')[0]).values = [[value]];
+    permitProxy.getRange(valueRange).format = {
+      fill: C.white,
+      font: { bold: true, color: C.ink, size: 13 },
+      horizontalAlignment: 'center',
+      verticalAlignment: 'center',
+      borders: { preset: 'outside', style: 'thin', color: C.line },
+    };
+  }
+
+  const headers = [
+    'permit_proxy_id',
+    'issue_date',
+    'job_category',
+    'building_type',
+    'work_type',
+    'matched_terms',
+    'reported_estimated_value_cad_proxy',
+    'floor_area_sq_ft',
+    'occupancy_status',
+    'ai_specificity_status',
+    'classification_evidence_status',
+    'description_sha256',
+    'quality_flags',
+  ];
+  permitProxy.getRange('A13:M13').values = [headers];
+  header(permitProxy.getRange('A13:M13'));
+  const candidateRows = permitProxyRows
+    .filter((row) => row.candidate_status === 'data_centre_candidate')
+    .map((row) => [
+      row.permit_proxy_id,
+      dateOrNull(row.issue_date),
+      row.job_category,
+      row.building_type,
+      row.work_type,
+      row.matched_terms,
+      numberOrNull(row.reported_estimated_construction_value_cad),
+      numberOrNull(row.floor_area_sq_ft),
+      row.occupancy_date_status,
+      row.ai_specificity_status,
+      row.classification_evidence_status,
+      row.description_sha256,
+      row.quality_flags,
+    ]);
+  const candidateLastRow = 13 + candidateRows.length;
+  permitProxy.getRange(`A14:M${candidateLastRow}`).values = candidateRows;
+  permitProxy.getRange(`B14:B${candidateLastRow}`).format.numberFormat = 'yyyy-mm-dd';
+  permitProxy.getRange(`G14:G${candidateLastRow}`).format.numberFormat = '$#,##0';
+  permitProxy.getRange(`H14:H${candidateLastRow}`).format.numberFormat = '#,##0';
+  permitProxy.getRange(`A14:A${candidateLastRow}`).format.font = {
+    name: 'Aptos Mono',
+    size: 8,
+    color: C.ink,
+  };
+  permitProxy.getRange(`L14:L${candidateLastRow}`).format.font = {
+    name: 'Aptos Mono',
+    size: 7,
+    color: C.muted,
+  };
+  permitProxy.getRange(`I14:J${candidateLastRow}`).format = {
+    fill: C.amberLight,
+    font: { color: '#8A4826', size: 8 },
+  };
+  const table = permitProxy.tables.add(
+    `A13:M${candidateLastRow}`,
+    true,
+    'EdmontonPermitProxyTable',
+  );
+  table.style = 'TableStyleMedium2';
+
+  permitProxy.getRange('A33:M33').merge();
+  permitProxy.getRange('A33').values = [['Audit and privacy controls']];
+  sectionHeader(permitProxy.getRange('A33:M33'));
+  const auditRows = [
+    ['Source ID', permitProxyReport.source_ids.join('; ')],
+    ['Evidence status', permitProxyReport.evidence_status],
+    ['Input SHA-256', permitProxyReport.input_sha256],
+    ['Output SHA-256', permitProxyReport.output_sha256],
+    ['Retrieval manifest SHA-256', permitProxyReport.retrieval_manifest_sha256],
+    ['Fields excluded', permitProxyReport.field_minimization.processed_output_excludes.join('; ')],
+    ['Publication status', permitProxyReport.publication_boundary.status],
+  ];
+  auditRows.forEach(([label, value], index) => {
+    const row = 34 + index;
+    permitProxy.getRange(`A${row}:B${row}`).merge();
+    permitProxy.getRange(`A${row}`).values = [[label]];
+    permitProxy.getRange(`A${row}:B${row}`).format = {
+      font: { bold: true, color: C.ink },
+      borders: { preset: 'inside', style: 'thin', color: C.line },
+    };
+    permitProxy.getRange(`C${row}:G${row}`).merge();
+    permitProxy.getRange(`C${row}`).values = [[value]];
+    permitProxy.getRange(`C${row}:G${row}`).format = {
+      font: { name: 'Aptos Mono', size: 8, color: C.muted },
+      wrapText: true,
+      borders: { preset: 'inside', style: 'thin', color: C.line },
+    };
+  });
+  permitProxy.getRange('H34:M40').merge();
+  permitProxy.getRange('H34').values = [
+    [
+      `Controlled classification is inferred and requires human review. Exact addresses, legal descriptions, coordinates, neighbourhoods and raw free-text job descriptions are absent from this processed sheet. Description lineage is retained only as a SHA-256 trace plus controlled matched-term labels. Official source: ${currentSourceRegistry.sources.find((item) => item.source_id === permitProxyReport.source_ids[0])?.canonical_url ?? ''}`,
+    ],
+  ];
+  noteBlock(permitProxy.getRange('H34:M40'));
+  permitProxy.freezePanes.freezeRows(13);
+  permitProxy.freezePanes.freezeColumns(2);
+  setWidths(
+    permitProxy,
+    {
+      A: 27,
+      B: 15,
+      C: 24,
+      D: 31,
+      E: 27,
+      F: 18,
+      G: 23,
+      H: 16,
+      I: 18,
+      J: 19,
+      K: 21,
+      L: 30,
+      M: 60,
+    },
+    42,
+  );
+}
+
 function buildSources() {
   titleBand(
     sources,
@@ -3774,8 +4037,9 @@ function buildReleaseChecks() {
     ['AI-attributable effect remains unauthorized and null', 'PASS'],
     ['Regional investment-control panel reconciles to artifact', 'PASS'],
     ['CanadaBuys procurement intake reconciles and remains non-authorizing', 'PASS'],
+    ['Edmonton permit proxy reconciles and remains non-authorizing', 'PASS'],
   ];
-  checks.getRange('A16:C39').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C40').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -3905,21 +4169,31 @@ function buildReleaseChecks() {
       `=IF(AND(ROWS('Procurement Intake'!$A$11:$A$${procurementIntakeLastRow})=${procurementOutcomeReport.construction_linkage_count},'Procurement Intake'!A6=${procurementOutcomeReport.construction_linkage_count},'Procurement Intake'!U6=0,COUNTIF('Procurement Intake'!$R$11:$R$${procurementIntakeLastRow},"missing_required_fields")=${procurementOutcomeReport.construction_linkage_count},COUNTIF('Procurement Intake'!$S$11:$S$${procurementIntakeLastRow},"missing_required_fields")=${procurementOutcomeReport.construction_linkage_count},COUNTIF('Procurement Intake'!$T$11:$T$${procurementIntakeLastRow},"missing_compliant_bidder_count")=${procurementOutcomeReport.construction_linkage_count}),"PASS","FAIL")`,
     ],
   ];
-  checks.getRange('B16:B39').conditionalFormats.add('containsText', {
+  const permitCandidateLastRow =
+    13 +
+    permitProxyRows.filter(
+      (row) => row.candidate_status === 'data_centre_candidate',
+    ).length;
+  checks.getRange('B40').formulas = [
+    [
+      `=IF(AND('Permit Proxy'!A6=${permitProxyReport.broad_screen_row_count},'Permit Proxy'!C6=${permitProxyReport.data_centre_candidate_count},'Permit Proxy'!G6=${permitProxyReport.explicit_ai_reference_count},'Permit Proxy'!I6=${permitProxyReport.data_centre_candidate_occupancy_date_available_count},ROWS('Permit Proxy'!$A$14:$A$${permitCandidateLastRow})=${permitProxyReport.data_centre_candidate_count},COUNTIF('Permit Proxy'!$J$14:$J$${permitCandidateLastRow},"observed")=0),"PASS","FAIL")`,
+    ],
+  ];
+  checks.getRange('B16:B40').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B39').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B40').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A41:D43').merge();
-  checks.getRange('A41').values = [
+  checks.getRange('A42:D44').merge();
+  checks.getRange('A42').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A41:D43'));
+  noteBlock(checks.getRange('A42:D44'));
   setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 47);
 }
 
