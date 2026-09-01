@@ -14,6 +14,7 @@ from .digest import validate_digest_cadence
 from .model_review import PACKAGE_ID as REFERENCE_COST_REVIEW_PACKAGE_ID
 from .model_review import REVIEW_CRITERIA as REFERENCE_COST_REVIEW_CRITERIA
 from .registry import load_registry
+from .research_surface import validate_research_surface_manifest
 from .schemas import ValidationError
 
 
@@ -738,6 +739,34 @@ def audit_program_readiness(
         if not product_missing
         else "The public product surface or its quality tooling is incomplete.",
         product_paths if not product_missing else product_missing,
+        release_gate=True,
+    )
+
+    research_surface_path = root / "public/data/research-surface.json"
+    try:
+        surface_manifest = validate_research_surface_manifest(
+            root, research_surface_path
+        )
+        surface_status = PASS
+        surface_summary = (
+            f"The evolving research website reconciles {surface_manifest['artifact_count']} "
+            "hash-locked artifacts above the frozen release without promoting them."
+        )
+        surface_evidence = [
+            "public/data/research-surface.json",
+            f"artifact_manifest_sha256={surface_manifest['artifact_manifest_sha256']}",
+            "research/src/aiio/research_surface.py",
+        ]
+    except (OSError, json.JSONDecodeError, ValidationError) as exc:
+        surface_status = FAIL
+        surface_summary = f"The research website provenance surface is missing or stale: {exc}"
+        surface_evidence = ["public/data/research-surface.json"]
+    record(
+        "research_surface_provenance",
+        "product",
+        surface_status,
+        surface_summary,
+        surface_evidence,
         release_gate=True,
     )
 

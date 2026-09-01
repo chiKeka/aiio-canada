@@ -43,6 +43,12 @@ jobs:
       - name: Verify digest artifacts are deterministic
         run: git diff --exit-code -- data/digests
 
+      - name: Rebuild research-surface provenance manifest
+        run: npm run research-surface:build
+
+      - name: Verify research-surface manifest is deterministic
+        run: git diff --exit-code -- public/data/research-surface.json
+
       - name: Test graph, scenarios, schemas, and release controls
         run: npm run research:test
 

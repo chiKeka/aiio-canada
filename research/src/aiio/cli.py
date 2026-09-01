@@ -82,6 +82,7 @@ from .project_cost import run_project_reference_cost
 from .public_projects import run_public_project_exposure
 from .registry import load_registry
 from .readiness import audit_program_readiness, require_release_ready
+from .research_surface import build_research_surface_manifest
 from .retrieval import retrieve
 from .schemas import ValidationError
 from .scenario import run_scenario
@@ -398,6 +399,14 @@ def main() -> None:
     subparsers.add_parser(
         "build-latest-digest",
         help="render the newest valid dated weekly evidence intake",
+    )
+
+    research_surface_parser = subparsers.add_parser(
+        "build-research-surface-manifest",
+        help="hash-lock every supplemental artifact imported by the evolving research website",
+    )
+    research_surface_parser.add_argument(
+        "--output", type=Path, default=Path("public/data/research-surface.json")
     )
 
     digest_audit_parser = subparsers.add_parser(
@@ -1380,6 +1389,21 @@ def main() -> None:
                         "output": str(output),
                         "manifest": str(output.with_suffix(".manifest.json")),
                         "digest_id": manifest["digest_id"],
+                    }
+                )
+            )
+        elif args.command == "build-research-surface-manifest":
+            output_path = (
+                args.output if args.output.is_absolute() else root / args.output
+            ).resolve()
+            manifest = build_research_surface_manifest(root, output_path)
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "output": str(output_path),
+                        "surface_id": manifest["surface_id"],
+                        "artifact_count": manifest["artifact_count"],
                     }
                 )
             )

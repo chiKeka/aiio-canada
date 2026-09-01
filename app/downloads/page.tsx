@@ -7,6 +7,7 @@ import {
 
 import { PageIntro, SiteFooter, SiteHeader } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
+import researchSurface from '@/public/data/research-surface.json';
 
 const downloads = [
   {
@@ -22,6 +23,14 @@ const downloads = [
     title: 'Release manifest',
     detail: 'Input and output hashes, model version and code state',
     href: '/data/manifest.json',
+    format: 'JSON',
+  },
+  {
+    icon: Fingerprint,
+    title: 'Research workspace manifest',
+    detail:
+      'Hashes the supplemental research artifacts used by the evolving website without promoting them into the frozen release',
+    href: '/data/research-surface.json',
     format: 'JSON',
   },
   {
@@ -102,26 +111,33 @@ export default function DownloadsPage() {
       <SiteHeader />
       <PageIntro
         eyebrow="Downloads and reproducibility"
-        title="One release, many publication surfaces."
-        description="Download the same versioned evidence and scenario artifacts used by the website. File hashes in the manifest make mixed vintages and silent changes detectable."
+        title="Two identities, one explicit boundary."
+        description="The frozen release remains reproducible while the research workspace evolves above it. Separate manifests make mixed vintages, silent changes and accidental promotion detectable."
       />
       <section className="mx-auto max-w-5xl px-5 py-12 sm:px-8 lg:py-16">
-        <div className="mb-8 rounded-xl border border-[#cbd7d1] bg-[#e8eeea] p-5">
-          <p className="font-mono text-xs text-[#2a7069]">
-            RELEASE {releaseData.manifest.version}
-          </p>
-          <div className="mt-3 grid gap-2 text-xs text-[#52645f] md:grid-cols-2">
-            <p>Model: {releaseData.manifest.model_version}</p>
-            <p>Schema: {releaseData.manifest.schema_version}</p>
-            <p>
-              Input manifest:{' '}
-              <span className="font-mono">
-                {releaseData.manifest.input_manifest_hash.slice(0, 28)}…
-              </span>
-            </p>
-            <p>Status: {releaseData.manifest.status}</p>
+        <div className="mb-8 grid gap-4 md:grid-cols-2">
+          <div className="rounded-xl border border-[#9fc8be] bg-[#e8f1ed] p-5">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#236c65]">Frozen publication basis</p>
+            <p className="mt-2 text-lg font-medium">Release {releaseData.manifest.version}</p>
+            <div className="mt-4 grid gap-2 text-xs text-[#52645f]">
+              <p>Model: {releaseData.manifest.model_version}</p>
+              <p>Schema: {releaseData.manifest.schema_version}</p>
+              <p>Input manifest: <span className="font-mono">{releaseData.manifest.input_manifest_hash.slice(0, 28)}…</span></p>
+              <p>Status: {releaseData.manifest.status}</p>
+            </div>
+          </div>
+          <div className="rounded-xl border border-[#dfb38f] bg-[#fff2e7] p-5">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#93491f]">Evolving research workspace</p>
+            <p className="mt-2 text-lg font-medium">{researchSurface.artifact_count} hash-locked artifacts</p>
+            <div className="mt-4 grid gap-2 text-xs text-[#6f584a]">
+              <p>Surface: {researchSurface.surface_id}</p>
+              <p>Base release: {researchSurface.frozen_release_version}</p>
+              <p>Artifact manifest: <span className="font-mono">{researchSurface.artifact_manifest_sha256.slice(0, 28)}…</span></p>
+              <p>Status: workspace research preview · not a public release</p>
+            </div>
           </div>
         </div>
+        <p className="mb-8 rounded-lg border border-[#d9b08f] bg-[#fff8ef] p-4 text-xs leading-5 text-[#75513e]">Supplemental research artifacts support current Research Mode and fail-closed executive diagnostics. They are not members of release {releaseData.manifest.version}, do not authorize AI-attributable cost or schedule estimates, and will not enter a public bundle until the release workflow passes.</p>
         <div className="grid gap-4 sm:grid-cols-2">
           {downloads.map((item) => (
             <a

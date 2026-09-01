@@ -46,6 +46,7 @@
     "power:planning:provinces": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-provincial-power-planning data/manual/provincial_power_planning_extract_2026_09.json data/model-runs/provincial_power_planning_contract_v0.1.json data/processed/provincial_power_planning_metrics.csv",
     "digest:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-latest-digest",
     "digest:audit": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-digest-cadence",
+    "research-surface:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-research-surface-manifest",
     "program:audit": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-program-readiness",
     "program:audit:release": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-program-readiness --require-release-ready",
     "attribution:readiness": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-attribution-readiness data/model/ai_attribution_panel_contract_v0.1.json data/model-runs/ai_attribution_identification_readiness_v0.1.json",

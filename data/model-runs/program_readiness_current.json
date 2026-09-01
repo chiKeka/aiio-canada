@@ -233,6 +233,18 @@
     },
     {
       "category": "product",
+      "check_id": "research_surface_provenance",
+      "evidence": [
+        "public/data/research-surface.json",
+        "artifact_manifest_sha256=sha256:a574575ce043ecf4102f43962b02c59229ad273237c683abb536047deb0871d0",
+        "research/src/aiio/research_surface.py"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The evolving research website reconciles 23 hash-locked artifacts above the frozen release without promoting them."
+    },
+    {
+      "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
         "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.26.0-dev.xlsx",
@@ -446,7 +458,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 28,
+    "pass": 29,
     "pending": 3
   },
   "structural_integrity": true

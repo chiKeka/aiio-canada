@@ -30,7 +30,8 @@ BC/Ontario/Quebec evidence intakes, the hash-reconciled Quebec authorized-revisi
 candidate panel, threshold-aware archive milestones, complete-catalog transition
 panel, official-XLSX fallback contract, pending parser-review package,
 weekly digest hashes and cadence, dual-mode website, workbook
-inspection receipt, frozen public release integrity,
+inspection receipt, the evolving research-surface provenance manifest, frozen
+public release integrity,
 decision-grade calibration, the hash-locked Alberta reference-cost review
 instrument, independent review and publication state.
 

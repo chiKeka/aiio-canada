@@ -1,0 +1,157 @@
+{
+  "artifact_count": 23,
+  "artifact_manifest_sha256": "sha256:a574575ce043ecf4102f43962b02c59229ad273237c683abb536047deb0871d0",
+  "artifacts": [
+    {
+      "artifact_id": "frozen_release_bundle",
+      "evidence_role": "frozen_release",
+      "path": "public/data/latest.json",
+      "sha256": "sha256:7e2a3079f8003448aeb34d03c81dc42daef256819cf0dfbee7ed77b827272b9f"
+    },
+    {
+      "artifact_id": "frozen_release_manifest",
+      "evidence_role": "governance",
+      "path": "public/data/manifest.json",
+      "sha256": "sha256:82c3a116d18ad0eb07041b99355cc32e687e2b47991b159252effa3ab29bfe01"
+    },
+    {
+      "artifact_id": "program_gates",
+      "evidence_role": "governance",
+      "path": "data/governance/program-gates.json",
+      "sha256": "sha256:d31caea34f6a4bef4676ad899242dc6045192f9c737b23ebb26d27adebadef5d"
+    },
+    {
+      "artifact_id": "alberta_graph",
+      "evidence_role": "assumption",
+      "path": "data/model/alberta_graph_v0.2.json",
+      "sha256": "sha256:4ae7347787f0fa53e670f8f03b80c1f7c93f03bc8d75a6b99168e3a3763e1a22"
+    },
+    {
+      "artifact_id": "scenario_suite",
+      "evidence_role": "scenario",
+      "path": "data/model-runs/alberta_50b_scenario_suite_v0.1.json",
+      "sha256": "sha256:bdf508cb07a8d8ac903c15a78cd65ca02c08aa28ddfb3cb28afcaa99e4914772"
+    },
+    {
+      "artifact_id": "historical_envelope",
+      "evidence_role": "observed_descriptive",
+      "path": "data/model-runs/alberta_bcpi_historical_envelope_v0.1.json",
+      "sha256": "sha256:a6f64d8755b88a25cf54236c118921959cc746c41d8e7754cdc376c8193ed217"
+    },
+    {
+      "artifact_id": "historical_analog",
+      "evidence_role": "historical_what_if",
+      "path": "data/model-runs/alberta_project_historical_analog_matrix_v0.1.json",
+      "sha256": "sha256:b60294b20f83c10f5d54e8fc411cfdd8f73cba75b27db4ab6e336510b8ab9642"
+    },
+    {
+      "artifact_id": "reference_review",
+      "evidence_role": "governance",
+      "path": "data/model-runs/alberta_reference_cost_review_package_v0.1.json",
+      "sha256": "sha256:9aac1025fdd1235017abca9e79fbeba6c9330fc7bc368095bbd29fbfdada54bf"
+    },
+    {
+      "artifact_id": "information_sector_capex",
+      "evidence_role": "inferred_proxy",
+      "path": "data/model-runs/information_sector_construction_capex_screen_v0.1.json",
+      "sha256": "sha256:62d7a268cb7aaa37f07a155237bc488f9fa1720b7454a3eaa0a3fdc1be0189fe"
+    },
+    {
+      "artifact_id": "cma_reference",
+      "evidence_role": "withheld_model_output",
+      "path": "data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json",
+      "sha256": "sha256:642a7149014dfb9f39c96b7aea2a743fd5db4e720f05a147a605a24c38dc0f0f"
+    },
+    {
+      "artifact_id": "regional_macro",
+      "evidence_role": "observed_descriptive",
+      "path": "data/model-runs/regional_macro_controls_canada_v0.1.json",
+      "sha256": "sha256:81b583e1d51aabc1bba41fb75e80dabde9c45bab139ecd30d62d638a11432da1"
+    },
+    {
+      "artifact_id": "province_linked_reference",
+      "evidence_role": "inferred_proxy",
+      "path": "data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json",
+      "sha256": "sha256:4a9a19269a889db967b1c170173ce017722161eeb335122e89ee1730147c5d0b"
+    },
+    {
+      "artifact_id": "ai_capex_ledger",
+      "evidence_role": "observed_and_inferred",
+      "path": "data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json",
+      "sha256": "sha256:88862880dda6b03809699b39eeb956184d1170632c473ce99da593f846474170"
+    },
+    {
+      "artifact_id": "attribution_readiness",
+      "evidence_role": "governance",
+      "path": "data/model-runs/ai_attribution_identification_readiness_v0.1.json",
+      "sha256": "sha256:db85036c1604439d5aaef550a4429f9c8c5952632df22bde06347797da90da98"
+    },
+    {
+      "artifact_id": "panel_preflight",
+      "evidence_role": "governance",
+      "path": "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
+      "sha256": "sha256:69ea562391c3d0308c9fc3fefc26c8510aa500ec4e42a934f5c351603559443d"
+    },
+    {
+      "artifact_id": "treatment_source_feasibility",
+      "evidence_role": "governance",
+      "path": "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
+      "sha256": "sha256:c2fdf9152ec9c1acf7a302fb6838851fb1001c530e26815dc5e11a8f5a6f4b26"
+    },
+    {
+      "artifact_id": "building_investment_controls",
+      "evidence_role": "observed_descriptive",
+      "path": "data/model-runs/building_investment_controls_canada_v0.1.json",
+      "sha256": "sha256:efc353850648d0f3d919ae9494535c5238a7f96f7f06ac25e42f71f1d1a2fc31"
+    },
+    {
+      "artifact_id": "procurement_feasibility",
+      "evidence_role": "governance",
+      "path": "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json",
+      "sha256": "sha256:597ad07e642e6d619a56243de4af3c0a241f919e9599544acdff54218c82a19c"
+    },
+    {
+      "artifact_id": "edmonton_permit_proxy",
+      "evidence_role": "inferred_proxy",
+      "path": "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json",
+      "sha256": "sha256:787436ff826347ad672cb5543434498505e97a56cdd278a6795925837605a782"
+    },
+    {
+      "artifact_id": "audited_outcomes",
+      "evidence_role": "observed_reference",
+      "path": "data/model-runs/oago_audited_project_outcomes_v0.1.json",
+      "sha256": "sha256:9106612b664aac9617e67782e976b08ff0d6b2c4a9fe0bc89cdc27bc8af4e0bb"
+    },
+    {
+      "artifact_id": "quebec_revisions",
+      "evidence_role": "observed_reference",
+      "path": "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json",
+      "sha256": "sha256:dc2f3d7d6c2644edf34e82eebde08c86b365fd9fa451617507869ccbe90f559f"
+    },
+    {
+      "artifact_id": "quebec_full_archive",
+      "evidence_role": "observed_and_inferred",
+      "path": "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json",
+      "sha256": "sha256:df2df36431380339a7ab57d94203b87c9607ee7b6c891088eaf1fbefbd48f8e9"
+    },
+    {
+      "artifact_id": "quebec_parser_review",
+      "evidence_role": "governance",
+      "path": "data/model-runs/quebec_pqi_parser_review_package_v0.1.json",
+      "sha256": "sha256:ac2cd813ab91da01c9896d25ff2223396483190c8d714675ce1feb355676703a"
+    }
+  ],
+  "frozen_release_id": "AIIO_RELEASE_0_6_0_DEV",
+  "frozen_release_version": "0.6.0-dev",
+  "publication_boundary": {
+    "ai_attributable_effect_authorized": false,
+    "decision_grade_ready": false,
+    "deployment_authorized": false,
+    "is_frozen_public_release": false,
+    "note": "This manifest reconciles the evolving research workspace above the frozen public release. It does not promote supplemental artifacts into that release.",
+    "project_cost_forecast_authorized": false
+  },
+  "schema_version": "1.0.0",
+  "status": "workspace_research_preview",
+  "surface_id": "AIIO_CANADA_RESEARCH_SURFACE_0_1"
+}
