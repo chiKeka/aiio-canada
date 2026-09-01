@@ -22,6 +22,7 @@ from .digest import build_digest
 from .labour import run_labour_recruitment_pressure
 from .materials import run_material_cost_screen, run_provincial_material_cost_screen
 from .power_evidence import run_power_evidence_screen
+from .project_cost import run_project_reference_cost
 from .public_projects import run_public_project_exposure
 from .registry import load_registry
 from .retrieval import retrieve
@@ -113,6 +114,14 @@ def main() -> None:
     )
     cost_baseline_parser.add_argument("bcpi_path", type=Path)
     cost_baseline_parser.add_argument("output_path", type=Path)
+
+    project_cost_parser = subparsers.add_parser(
+        "run-project-reference-cost",
+        help="apply a validated BCPI reference path to an explicit expenditure profile",
+    )
+    project_cost_parser.add_argument("project_path", type=Path)
+    project_cost_parser.add_argument("baseline_path", type=Path)
+    project_cost_parser.add_argument("output_path", type=Path)
 
     power_evidence_parser = subparsers.add_parser(
         "run-power-evidence",
@@ -334,6 +343,21 @@ def main() -> None:
                         "reference_class_count": len(
                             output["reference_class_results"]
                         ),
+                    }
+                )
+            )
+        elif args.command == "run-project-reference-cost":
+            output = run_project_reference_cost(
+                args.project_path.resolve(),
+                args.baseline_path.resolve(),
+                args.output_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": output["status"],
+                        "model_id": output["model_id"],
+                        "project_id": output["project_id"],
                     }
                 )
             )

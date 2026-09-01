@@ -60,6 +60,23 @@ show “calibration pending” for AI-attributable project cost escalation. It m
 show observed BCPI change and scenario pressure scores side by side, but it may
 not add, multiply or otherwise fuse them into a forecast.
 
+## Project reference-cost contract
+
+When a reference-class baseline is independently authorized, Decision Mode may
+translate it to a schedule-weighted current-price equivalent only when the user
+supplies:
+
+- an estimate value and exact price-basis quarter;
+- a supported asset class and CMA reference geography; and
+- positive annual expenditure shares that sum to one.
+
+Each expenditure year is escalated separately and then recombined. The tool
+must not apply the end-year index to the full project estimate. If any required
+horizon failed validation, the price basis cannot be reconciled, the reference
+class is unsupported, or independent review is incomplete, the entire project
+baseline remains null. This market reference calculation never contains the AI
+increment and never uses a graph pressure score.
+
 ## Analysis channels
 
 The product distinguishes five channels:

@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 from aiio.calibration import run_reference_class_baseline
+from aiio.project_cost import build_project_reference_cost
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -60,6 +61,39 @@ class CalibrationArtifactTests(unittest.TestCase):
         self.assertFalse(
             artifact["publication_authorization"][
                 "public_projection_authorized"
+            ]
+        )
+
+    def test_real_five_year_health_project_fails_closed(self) -> None:
+        artifact = json.loads(
+            (
+                ROOT
+                / "data/model-runs/alberta_bcpi_reference_baseline_v0.1.json"
+            ).read_text(encoding="utf-8")
+        )
+        result = build_project_reference_cost(
+            {
+                "project_id": "INTEGRATION_TEST",
+                "project_name": "Five-year health integration test",
+                "asset_class": "health_facilities",
+                "geography_id": "CMA_825",
+                "current_estimate_cad": 1.0,
+                "estimate_price_basis_period_end": "2026-06-30",
+                "expenditure_profile": [
+                    {"horizon_years": year, "share": 0.2}
+                    for year in range(1, 6)
+                ],
+            },
+            artifact,
+        )
+        self.assertEqual(result["status"], "not_assessed")
+        self.assertEqual(
+            [item["horizon_years"] for item in result["failed_horizons"]],
+            [1, 2, 3, 4, 5],
+        )
+        self.assertIsNone(
+            result["market_reference_baseline"][
+                "schedule_weighted_estimate_cad"
             ]
         )
 
