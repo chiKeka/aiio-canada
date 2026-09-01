@@ -1,6 +1,6 @@
 {
-  "artifact_count": 25,
-  "artifact_manifest_sha256": "sha256:7a3e0094025f29223704fbb7dddbcf68066d6d34e1e73cfa98106ce546401353",
+  "artifact_count": 26,
+  "artifact_manifest_sha256": "sha256:69a42763bd2a43444c5b74f78c99fe295f8f55d05f84384c6e710cb5f0b8d309",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -19,6 +19,12 @@
       "evidence_role": "governance",
       "path": "data/governance/program-gates.json",
       "sha256": "sha256:d31caea34f6a4bef4676ad899242dc6045192f9c737b23ebb26d27adebadef5d"
+    },
+    {
+      "artifact_id": "source_registry",
+      "evidence_role": "source_provenance",
+      "path": "data/registry/sources.json",
+      "sha256": "sha256:f0e98225614a2c9fe4bb99a50b6b8719d5f3090d108c6fdfe7bf666b786a5f8b"
     },
     {
       "artifact_id": "pspe_method_lineage",
