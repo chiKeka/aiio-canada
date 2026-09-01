@@ -48,6 +48,17 @@ completion required to authorize an AI-attributable effect. See
 The Edmonton permit implementation is documented in
 `docs/methodology/edmonton-data-centre-permit-proxy.md`.
 
+The Alberta Major Projects AI-relevant extract now also feeds a deterministic
+announcement ledger. The 2026-08-31 snapshot contains 22 records and preserves
+project stage, partial reported-estimated-cost coverage, schedule coverage and
+source links. Ten records report $55.41 billion in estimated cost, split into
+$49.01 billion of core facilities and $6.40 billion of enabling power. The sum
+is incomplete and is not a commitment or realized-spending total. Four records
+carry an `Under Construction` publisher stage, but none supplies a verified
+realized construction-start date or realized regional-period spend. The ledger
+therefore authorizes descriptive announcement tracking only. See
+`docs/methodology/ai-capex-announcement-ledger.md`.
+
 Four additional Statistics Canada sources now join the provincial building-
 investment control in a common quarterly regional macro panel. It preserves
 all-items and shelter CPI, population, all-industry and construction weekly

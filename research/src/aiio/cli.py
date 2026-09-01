@@ -63,6 +63,7 @@ from .provincial_backcast_review import (
     validate_province_linked_review_verdict,
 )
 from .attribution import build_attribution_readiness
+from .ai_capex_ledger import run_ai_capex_announcement_ledger
 from .digest import build_digest, validate_digest_cadence
 from .historical_envelope import run_historical_reference_envelope
 from .historical_analog import run_historical_analog_matrix
@@ -153,6 +154,13 @@ def main() -> None:
     capex_treatment_parser.add_argument("zip_path", type=Path)
     capex_treatment_parser.add_argument("output_csv_path", type=Path)
     capex_treatment_parser.add_argument("output_json_path", type=Path)
+
+    ai_capex_ledger_parser = subparsers.add_parser(
+        "run-ai-capex-announcement-ledger",
+        help="build the fail-closed Alberta AI-capex announcement and treatment-candidate ledger",
+    )
+    ai_capex_ledger_parser.add_argument("input_csv_path", type=Path)
+    ai_capex_ledger_parser.add_argument("output_json_path", type=Path)
 
     canadabuys_parser = subparsers.add_parser(
         "normalize-canadabuys-outcomes",
@@ -596,6 +604,26 @@ def main() -> None:
                         "model_id": output["model_id"],
                         "observation_count": output["observation_count"],
                         "authorizing_treatment_present": output[
+                            "treatment_requirement_assessment"
+                        ]["authorizing_treatment_present"],
+                    }
+                )
+            )
+        elif args.command == "run-ai-capex-announcement-ledger":
+            report = run_ai_capex_announcement_ledger(
+                args.input_csv_path.resolve(),
+                args.output_json_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "ledger_id": report["ledger_id"],
+                        "record_count": report["record_count"],
+                        "known_reported_estimated_cost_cad": report[
+                            "coverage_summary"
+                        ]["known_reported_estimated_cost_cad"],
+                        "authorizing_treatment_present": report[
                             "treatment_requirement_assessment"
                         ]["authorizing_treatment_present"],
                     }

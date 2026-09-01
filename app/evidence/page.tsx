@@ -8,9 +8,11 @@ import releaseData from '@/public/data/latest.json';
 import informationSectorCapex from '@/data/model-runs/information_sector_construction_capex_screen_v0.1.json';
 import cmaReferenceBaseline from '@/data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json';
 import provinceLinkedBaseline from '@/data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json';
+import aiCapexLedger from '@/data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json';
 
 export default function EvidencePage() {
   const pipeline = releaseData.baseline.ai_project_pipeline;
+  const ledger = aiCapexLedger.coverage_summary;
   const labour = (
     releaseData.baseline as typeof releaseData.baseline & {
       labour_availability?: LabourAvailability;
@@ -36,16 +38,17 @@ export default function EvidencePage() {
       <SiteHeader />
       <PageIntro eyebrow="Evidence register" title="Inspect the record before interpreting the result." description="Every project, indicator and claim retains its public source, time stamp, geography and evidence status. The current view is Alberta-first and deliberately distinguishes reported fields from research classifications." />
       <section className="border-b border-[#d4dcd7] bg-[#0c2c38] text-white">
-        <div className="mx-auto grid max-w-[1440px] gap-px bg-white/10 sm:grid-cols-3">
-          <Metric label="Core facility records" value={String(pipeline.core_project_count)} note="Inferred classification" />
-          <Metric label="Known reported core capex" value={`$${(pipeline.known_core_capex_cad / 1_000_000_000).toFixed(2)}B`} note={`${pipeline.known_core_capex_coverage.projects_with_value} of ${pipeline.known_core_capex_coverage.core_projects} records have values`} />
-          <Metric label="Enabling power records" value={String(pipeline.enabling_power_project_count)} note="Kept separate to prevent double counting" />
+        <div className="mx-auto grid max-w-[1440px] gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+          <Metric label="AI-relevant records" value={String(aiCapexLedger.record_count)} note={`${ledger.core_data_centre_record_count} core · ${ledger.enabling_power_record_count} enabling power`} />
+          <Metric label="Partial known estimates" value={`$${(ledger.known_reported_estimated_cost_cad / 1_000_000_000).toFixed(2)}B`} note={`${ledger.reported_estimated_cost_record_count} of ${aiCapexLedger.record_count} records report a value`} />
+          <Metric label="Construction-stage candidates" value={String(ledger.publisher_construction_stage_candidate_count)} note="Publisher stage only · onset unverified" />
+          <Metric label="Authorizing treatment" value={`${ledger.authorizing_treatment_onset_count} / ${aiCapexLedger.record_count}`} note="No realized onset or regional-period dose" />
         </div>
       </section>
       <section className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
         <div className="mb-8 grid gap-4 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-5 md:grid-cols-[auto_1fr]">
           <ShieldCheck className="mt-0.5 size-5 text-[#a3532b]" />
-          <div><p className="font-medium text-[#713b25]">Announcement pipeline, not committed investment</p><p className="mt-1 text-sm leading-6 text-[#825a47]">{pipeline.warning} The $50B scenario remains a separate counterfactual even though its headline magnitude is close to the current sum of known reported values.</p></div>
+          <div><p className="font-medium text-[#713b25]">Announcement pipeline, not committed investment</p><p className="mt-1 text-sm leading-6 text-[#825a47]">{pipeline.warning} The formal ledger keeps the $49.01B of known core estimates separate from $6.40B of enabling-power estimates. Missing values are not zero, no stage probabilities are applied, and the $50B scenario remains a separate counterfactual.</p></div>
         </div>
         <EvidenceExplorer projects={releaseData.baseline.projects} />
       </section>

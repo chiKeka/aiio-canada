@@ -10,11 +10,22 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.23.0-dev';
+const workbookBuildVersion = '0.24.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
     path.join(projectRoot, 'public', 'data', 'latest.json'),
+    'utf8',
+  ),
+);
+const aiCapexLedger = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'alberta_ai_capex_announcement_ledger_v0.1.json',
+    ),
     'utf8',
   ),
 );
@@ -657,7 +668,7 @@ console.log(inspectProjectCost.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D56',
+  range: 'Release Checks!A1:D57',
   include: 'values,formulas',
   tableMaxRows: 54,
   tableMaxCols: 4,
@@ -825,7 +836,7 @@ const previewRanges = {
   Sensitivity: 'A1:M18',
   'Scenario Variants': 'A1:O42',
   'Power Overlay': 'A1:J36',
-  'AI Projects': 'A1:Q18',
+  'AI Projects': 'A1:AC21',
   'BCPI Data': 'A1:I24',
   'Labour Availability': 'A1:O32',
   'Labour Canada': 'A1:Q28',
@@ -852,7 +863,7 @@ const previewRanges = {
   'Quebec Revisions': 'A1:R38',
   'Quebec Vintages': 'A1:V42',
   Sources: 'A1:J42',
-  'Release Checks': 'A1:D56',
+  'Release Checks': 'A1:D57',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -1863,8 +1874,8 @@ function buildProjects() {
   titleBand(
     projects,
     'Alberta AI-relevant project register',
-    'Observed project fields with inferred relevance classification',
-    'Q',
+    'Formal announcement ledger · observed project fields, inferred relevance, and a fail-closed treatment screen',
+    'AC',
   );
   const headers = [
     'Project ID',
@@ -1884,39 +1895,170 @@ function buildProjects() {
     'Classification status',
     'As-of date',
     'Register source URL',
+    'Schedule coverage',
+    'Treatment screen',
+    'Treatment onset available',
+    'Treatment dose available',
+    'Reported cost status',
+    'Power capacity (MW)',
+    'Ledger ID',
   ];
-  projects.getRange('A4:Q4').values = [headers];
-  header(projects.getRange('A4:Q4'));
+  projects.getRange('A4:X4').values = [headers];
+  header(projects.getRange('A4:X4'));
   const rows = release.baseline.projects;
-  projects.getRange(`A5:Q${4 + rows.length}`).values = rows.map((item) => [
-    item.project_id,
-    item.name,
-    item.estimated_cost_cad,
-    item.municipality,
-    item.start_year,
-    item.end_year,
-    item.stage,
-    item.developer,
-    item.project_website,
-    item.longitude,
-    item.latitude,
-    item.location_precision,
-    item.ai_relevance,
-    item.source_evidence_status,
-    item.classification_evidence_status,
-    new Date(`${item.as_of_date}T00:00:00Z`),
-    'https://www.majorprojects.alberta.ca/',
-  ]);
+  const ledgerByProjectId = new Map(
+    aiCapexLedger.records.map((item) => [item.project_id, item]),
+  );
+  projects.getRange(`A5:X${4 + rows.length}`).values = rows.map((item) => {
+    const ledgerRecord = ledgerByProjectId.get(item.project_id);
+    if (!ledgerRecord) {
+      throw new Error(`AI-capex ledger is missing project ${item.project_id}`);
+    }
+    return [
+      item.project_id,
+      item.name,
+      item.estimated_cost_cad,
+      item.municipality,
+      item.start_year,
+      item.end_year,
+      item.stage,
+      item.developer,
+      item.project_website,
+      item.longitude,
+      item.latitude,
+      item.location_precision,
+      item.ai_relevance,
+      item.source_evidence_status,
+      item.classification_evidence_status,
+      new Date(`${item.as_of_date}T00:00:00Z`),
+      'https://www.majorprojects.alberta.ca/',
+      ledgerRecord.schedule_status,
+      ledgerRecord.treatment_screen_status,
+      ledgerRecord.authorizing_treatment_onset_available,
+      ledgerRecord.authorizing_treatment_dose_available,
+      ledgerRecord.reported_cost_status,
+      ledgerRecord.power_generation_capacity_mw,
+      aiCapexLedger.ledger_id,
+    ];
+  });
   projects.getRange(`C5:C${4 + rows.length}`).format.numberFormat = '$#,##0';
   projects.getRange(`J5:K${4 + rows.length}`).format.numberFormat = '0.0000';
   projects.getRange(`P5:P${4 + rows.length}`).format.numberFormat =
     'yyyy-mm-dd';
+  projects.getRange(`W5:W${4 + rows.length}`).format.numberFormat = '#,##0.0';
   const table = projects.tables.add(
-    `A4:Q${4 + rows.length}`,
+    `A4:X${4 + rows.length}`,
     true,
     'AIProjectsTable',
   );
   table.style = 'TableStyleMedium2';
+
+  projects.getRange('Z4:AC4').merge();
+  projects.getRange('Z4').values = [['Announcement-ledger controls']];
+  sectionHeader(projects.getRange('Z4:AC4'));
+  projects.getRange('Z5:AC5').values = [
+    ['Metric', 'Workbook', 'Artifact', 'Check'],
+  ];
+  header(projects.getRange('Z5:AC5'));
+  const summaryMetrics = [
+    ['Ledger ID', null, aiCapexLedger.ledger_id],
+    ['Project records', null, aiCapexLedger.record_count],
+    [
+      'Core data-centre records',
+      null,
+      aiCapexLedger.coverage_summary.core_data_centre_record_count,
+    ],
+    [
+      'Enabling-power records',
+      null,
+      aiCapexLedger.coverage_summary.enabling_power_record_count,
+    ],
+    [
+      'Reported estimate records',
+      null,
+      aiCapexLedger.coverage_summary.reported_estimated_cost_record_count,
+    ],
+    [
+      'Partial known estimates (CAD)',
+      null,
+      aiCapexLedger.coverage_summary.known_reported_estimated_cost_cad,
+    ],
+    [
+      'Publisher construction candidates',
+      null,
+      aiCapexLedger.coverage_summary.publisher_construction_stage_candidate_count,
+    ],
+    [
+      'Authorizing treatment onset',
+      null,
+      aiCapexLedger.coverage_summary.authorizing_treatment_onset_count,
+    ],
+    [
+      'Authorizing treatment dose',
+      null,
+      aiCapexLedger.coverage_summary.authorizing_treatment_dose_count,
+    ],
+    [
+      'Partial aggregate authorized',
+      null,
+      aiCapexLedger.publication_boundary.partial_known_reported_cost_aggregate_authorized
+        ? 'YES'
+        : 'NO',
+    ],
+    [
+      'Realized treatment authorized',
+      null,
+      aiCapexLedger.publication_boundary.realized_construction_treatment_authorized
+        ? 'YES'
+        : 'NO',
+    ],
+  ];
+  projects.getRange('Z6:AB16').values = summaryMetrics;
+  projects.getRange('AA6:AA16').formulas = [
+    ['=X5'],
+    [`=COUNTA(A5:A${4 + rows.length})`],
+    [`=COUNTIF(M5:M${4 + rows.length},"core_data_centre")`],
+    [`=COUNTIF(M5:M${4 + rows.length},"enabling_power")`],
+    [`=COUNT(C5:C${4 + rows.length})`],
+    [`=SUM(C5:C${4 + rows.length})`],
+    [
+      `=COUNTIF(S5:S${4 + rows.length},"publisher_stage_indicates_construction_activity_candidate")`,
+    ],
+    [`=COUNTIF(T5:T${4 + rows.length},TRUE)`],
+    [`=COUNTIF(U5:U${4 + rows.length},TRUE)`],
+    [
+      aiCapexLedger.publication_boundary
+        .partial_known_reported_cost_aggregate_authorized
+        ? '="YES"'
+        : '="NO"',
+    ],
+    [
+      aiCapexLedger.publication_boundary.realized_construction_treatment_authorized
+        ? '="YES"'
+        : '="NO"',
+    ],
+  ];
+  projects.getRange('AC6').formulas = [['=IF(AA6=AB6,"PASS","FAIL")']];
+  projects.getRange('AC6:AC16').fillDown();
+  projects.getRange('AA11:AB11').format.numberFormat = '$#,##0';
+  projects.getRange('AA6:AC16').format.borders = {
+    preset: 'inside',
+    style: 'thin',
+    color: C.line,
+  };
+  projects.getRange('AC6:AC16').conditionalFormats.add('containsText', {
+    text: 'PASS',
+    format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+  });
+  projects.getRange('AC6:AC16').conditionalFormats.add('containsText', {
+    text: 'FAIL',
+    format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
+  });
+  projects.getRange('Z18:AC21').merge();
+  projects.getRange('Z18').values = [[
+    'Boundary: the $55.41B total is a partial sum of reported estimates for 10 of 22 records. Missing costs are not zero; enabling power is separate; no probability weighting is applied; publisher stage does not establish realized construction onset or spend.',
+  ]];
+  noteBlock(projects.getRange('Z18:AC21'));
   projects.freezePanes.freezeRows(4);
   projects.freezePanes.freezeColumns(2);
   setWidths(
@@ -1939,6 +2081,18 @@ function buildProjects() {
       O: 20,
       P: 14,
       Q: 36,
+      R: 24,
+      S: 34,
+      T: 24,
+      U: 23,
+      V: 24,
+      W: 20,
+      X: 34,
+      Y: 3,
+      Z: 34,
+      AA: 20,
+      AB: 20,
+      AC: 14,
     },
     30,
   );
@@ -6841,8 +6995,9 @@ function buildReleaseChecks() {
     ['Regional macro controls reconcile and remain descriptive only', 'PASS'],
     ['Province-linked BCPI bridge reconciles and remains non-authorizing', 'PASS'],
     ['Historical project analogs reconcile and remain non-forecasting', 'PASS'],
+    ['AI-capex announcement ledger reconciles and remains non-authorizing', 'PASS'],
   ];
-  checks.getRange('A16:C51').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C52').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -7038,21 +7193,24 @@ function buildReleaseChecks() {
   checks.getRange('B51').formulas = [[
     '=IF(AND(\'Historical Analog\'!B6=8,\'Historical Analog\'!B7=1560,\'Historical Analog\'!E5="YES",\'Historical Analog\'!E6="YES",COUNTIF(\'Historical Analog\'!E7:E10,"NO")=4,ROWS(\'Historical Analog\'!$A$24:$A$1583)=1560,\'Historical Analog\'!J13="limited_history_only",\'Historical Analog\'!J14=154,\'Historical Analog\'!J15=6,ABS(\'Historical Analog\'!F14-1.136742)<0.000001,ABS(\'Historical Analog\'!F15-(\'Historical Analog\'!F14-1))<0.000001,ABS(\'Historical Analog\'!F16-\'Historical Analog\'!B13*\'Historical Analog\'!F14)<1,\'Historical Analog\'!J16="NO",\'Historical Analog\'!J17="NO",COUNTIF(\'Historical Analog\'!$R$24:$R$1583,"")=0),"PASS","FAIL")',
   ]];
-  checks.getRange('B16:B51').conditionalFormats.add('containsText', {
+  checks.getRange('B52').formulas = [[
+    '=IF(AND(COUNTIF(\'AI Projects\'!$AC$6:$AC$16,"PASS")=11,\'AI Projects\'!AA16="NO"),"PASS","FAIL")',
+  ]];
+  checks.getRange('B16:B52').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B51').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B52').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A53:D55').merge();
-  checks.getRange('A53').values = [
+  checks.getRange('A54:D56').merge();
+  checks.getRange('A54').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A53:D55'));
+  noteBlock(checks.getRange('A54:D56'));
   setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 57);
 }
 

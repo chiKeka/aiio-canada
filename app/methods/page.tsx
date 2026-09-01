@@ -15,6 +15,7 @@ import informationSectorCapex from '@/data/model-runs/information_sector_constru
 import cmaReferenceBaseline from '@/data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json';
 import regionalMacroControls from '@/data/model-runs/regional_macro_controls_canada_v0.1.json';
 import provinceLinkedBaseline from '@/data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json';
+import aiCapexLedger from '@/data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json';
 
 const methodSteps = [
   [
@@ -68,6 +69,7 @@ export default function MethodsPage() {
     ...cmaReferenceBaseline.limitations,
     ...regionalMacroControls.limitations,
     ...provinceLinkedBaseline.limitations,
+    ...aiCapexLedger.limitations,
   ];
   return (
     <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">
@@ -192,6 +194,7 @@ export default function MethodsPage() {
               'CAD pressure and MW power quantities use separate artifacts.',
               'Historical index envelopes are descriptive; predictive and causal calibration remain gated.',
               'Historical project analogs preserve complete past trajectories; their dollar equivalents are stress tests, not forecasts or AI premiums.',
+              'The AI-capex ledger tracks reported estimates and publisher stages without stage weighting; zero records currently authorize realized treatment onset or dose.',
             ].map((item) => (
               <div
                 className="flex gap-3 rounded-lg border border-white/10 bg-white/4 p-4 text-sm leading-5 text-[#d6e1e4]"

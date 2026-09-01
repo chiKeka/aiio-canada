@@ -165,6 +165,25 @@ scenarios and graph scores are prohibited. Cost and schedule effect fields remai
 null in a readiness artifact; only a separately reviewed estimator run may
 authorize them.
 
+## AI-capex announcement ledger
+
+Required artifact fields: `ledger_id`, `source_id`, `geography_id`,
+`as_of_date`, `input_sha256`, `code_sha256`, `record_count`,
+`coverage_summary`, `stage_counts`, `schedule_status_counts`,
+`treatment_requirement_assessment`, `aggregation_controls`,
+`publication_boundary`, `records` and `limitations`.
+
+Each record preserves the publisher project identity, municipality, developer,
+stage, reported estimated cost, schedule text and years, website, location
+coverage and enabling-power capacity where present. It separately records the
+inferred AI relevance and the treatment-screen status. Required authorizing
+fields—`realized_construction_start_date`, `realized_construction_spend_cad`,
+`authorizing_treatment_onset_available` and
+`authorizing_treatment_dose_available`—remain null or false until verified
+realized construction evidence exists. Missing reported estimates are not zero,
+enabling power remains separate, and no probability or stage weighting is
+permitted.
+
 ## Information-sector construction-capex screen
 
 Required observation fields: `observation_id`, `geography_id`,

@@ -77,6 +77,19 @@
       "summary": "Alberta project, price, labour, material, public-project and power evidence artifacts are present."
     },
     {
+      "category": "evidence_pipeline",
+      "check_id": "alberta_ai_capex_announcement_ledger",
+      "evidence": [
+        "data/processed/alberta_ai_projects.csv",
+        "data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json",
+        "research/src/aiio/ai_capex_ledger.py",
+        "docs/methodology/ai-capex-announcement-ledger.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The Alberta announcement ledger hash-locks project-stage, reported-cost and schedule coverage while authorizing no realized treatment or AI effect."
+    },
+    {
       "category": "canada_expansion",
       "check_id": "canada_labour_spine",
       "evidence": [
@@ -222,9 +235,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.23.0-dev.xlsx",
-        "workbook_sha256=sha256:bc2e7a1a168a1fb06dcd42abfd22e2b344735d7246b469aa8c01c8d71e1a3f0b",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.23.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.24.0-dev.xlsx",
+        "workbook_sha256=sha256:c090d96823c73f8937c9fa8d29c121f8208cf3d980a16ecb65c74fa8c084dcaf",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.24.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",
@@ -405,7 +418,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 25,
+    "pass": 26,
     "pending": 3
   },
   "structural_integrity": true

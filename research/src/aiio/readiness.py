@@ -224,6 +224,62 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    ai_capex_input_path = root / "data/processed/alberta_ai_projects.csv"
+    ai_capex_ledger_path = (
+        root / "data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json"
+    )
+    ai_capex_ledger = load_json_or_empty(ai_capex_ledger_path)
+    ai_capex_coverage = ai_capex_ledger.get("coverage_summary", {})
+    ai_capex_boundary = ai_capex_ledger.get("publication_boundary", {})
+    ai_capex_assessment = ai_capex_ledger.get(
+        "treatment_requirement_assessment", {}
+    )
+    ai_capex_ledger_ready = (
+        ai_capex_input_path.exists()
+        and ai_capex_ledger_path.exists()
+        and ai_capex_ledger.get("input_sha256")
+        == sha256_file(ai_capex_input_path).removeprefix("sha256:")
+        and ai_capex_ledger.get("code_sha256")
+        == sha256_file(root / "research/src/aiio/ai_capex_ledger.py").removeprefix(
+            "sha256:"
+        )
+        and ai_capex_ledger.get("record_count") == 22
+        and ai_capex_coverage.get("core_data_centre_record_count") == 19
+        and ai_capex_coverage.get("enabling_power_record_count") == 3
+        and ai_capex_coverage.get("known_core_reported_estimated_cost_cad")
+        == 49_010_000_000
+        and ai_capex_coverage.get("known_enabling_reported_estimated_cost_cad")
+        == 6_400_000_000
+        and ai_capex_coverage.get("authorizing_treatment_onset_count") == 0
+        and ai_capex_coverage.get("authorizing_treatment_dose_count") == 0
+        and ai_capex_assessment.get("authorizing_treatment_present") is False
+        and ai_capex_boundary.get("descriptive_announcement_ledger_authorized")
+        is True
+        and ai_capex_boundary.get("committed_investment_claim_authorized")
+        is False
+        and ai_capex_boundary.get("realized_construction_treatment_authorized")
+        is False
+        and ai_capex_boundary.get("probability_weighted_pipeline_authorized")
+        is False
+        and ai_capex_boundary.get("future_spend_forecast_authorized") is False
+        and ai_capex_boundary.get("ai_attributable_effect_authorized") is False
+    )
+    record(
+        "alberta_ai_capex_announcement_ledger",
+        "evidence_pipeline",
+        PASS if ai_capex_ledger_ready else FAIL,
+        "The Alberta announcement ledger hash-locks project-stage, reported-cost and schedule coverage while authorizing no realized treatment or AI effect."
+        if ai_capex_ledger_ready
+        else "The Alberta announcement ledger is missing, unreconciled or has an unsafe treatment boundary.",
+        [
+            "data/processed/alberta_ai_projects.csv",
+            "data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json",
+            "research/src/aiio/ai_capex_ledger.py",
+            "docs/methodology/ai-capex-announcement-ledger.md",
+        ],
+        release_gate=True,
+    )
+
     labour_paths = [
         root / "data/processed/labour_availability_canada.csv",
         root / "data/processed/labour_workforce_stock_canada.csv",

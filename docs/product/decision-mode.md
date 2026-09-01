@@ -107,6 +107,15 @@ recommended contingencies or an AI increment. The graph may identify diligence
 channels beside the result but must never supply a multiplier or be added to the
 historical marker.
 
+## AI-capex announcement evidence
+
+Evidence Mode exposes the hash-locked Alberta AI-capex announcement ledger. It
+reports record counts, partial known estimated cost, publisher stage and
+schedule/source completeness. Core data-centre estimates remain separate from
+enabling-power estimates. The ledger applies no stage probability and displays
+zero authorizing treatment records because publisher stage and estimated cost
+do not establish realized construction onset or regional-period spend.
+
 ## Analysis channels
 
 The product distinguishes five channels:
