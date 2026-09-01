@@ -66,6 +66,11 @@ npm run digest:audit
 npm run research:test
 ```
 
+`digest:build` selects the newest valid `YYYY-MM-DD.json` intake, verifies that
+its payload date matches its filename, and rebuilds that edition and manifest.
+This keeps the CI determinism check aligned with future editions instead of a
+hard-coded launch date.
+
 The public website and workbook consume the digest contained in their release
 manifest. A newer review edition may exist in the repository without changing
 the current public release.

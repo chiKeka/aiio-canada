@@ -66,7 +66,7 @@ from .attribution import build_attribution_readiness
 from .ai_capex_ledger import run_ai_capex_announcement_ledger
 from .panel_preflight import run_panel_acquisition_preflight
 from .treatment_source_feasibility import run_treatment_source_feasibility
-from .digest import build_digest, validate_digest_cadence
+from .digest import build_digest, find_latest_digest_items, validate_digest_cadence
 from .historical_envelope import run_historical_reference_envelope
 from .historical_analog import run_historical_analog_matrix
 from .labour import run_labour_recruitment_pressure
@@ -394,6 +394,11 @@ def main() -> None:
     digest_parser = subparsers.add_parser("build-digest", help="render a reviewed weekly evidence digest")
     digest_parser.add_argument("items_path", type=Path)
     digest_parser.add_argument("--date", default=utc_today)
+
+    subparsers.add_parser(
+        "build-latest-digest",
+        help="render the newest valid dated weekly evidence intake",
+    )
 
     digest_audit_parser = subparsers.add_parser(
         "audit-digest-cadence",
@@ -1350,6 +1355,28 @@ def main() -> None:
                 json.dumps(
                     {
                         "status": "passed",
+                        "output": str(output),
+                        "manifest": str(output.with_suffix(".manifest.json")),
+                        "digest_id": manifest["digest_id"],
+                    }
+                )
+            )
+        elif args.command == "build-latest-digest":
+            edition_date, items_path = find_latest_digest_items(
+                root / "data" / "digests" / "items"
+            )
+            output = root / "data" / "digests" / f"{edition_date.isoformat()}.md"
+            manifest = build_digest(
+                items_path.resolve(),
+                output,
+                edition_date,
+                source_registry_path=root / "data" / "registry" / "sources.json",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "items": str(items_path),
                         "output": str(output),
                         "manifest": str(output.with_suffix(".manifest.json")),
                         "digest_id": manifest["digest_id"],

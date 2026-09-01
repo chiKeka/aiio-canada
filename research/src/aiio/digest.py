@@ -266,6 +266,28 @@ def validate_digest_cadence(
     }
 
 
+def find_latest_digest_items(items_dir: Path) -> tuple[date, Path]:
+    """Return the newest valid dated intake without silently accepting date drift."""
+    editions: list[tuple[date, Path]] = []
+    for path in sorted(items_dir.glob("*.json")):
+        try:
+            filename_date = date.fromisoformat(path.stem)
+        except ValueError:
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ValidationError(f"unable to read digest intake {path.name}: {exc}") from exc
+        if payload.get("edition_date") != filename_date.isoformat():
+            raise ValidationError(
+                f"digest filename and edition_date disagree: {path.name}"
+            )
+        editions.append((filename_date, path))
+    if not editions:
+        raise ValidationError("no dated digest item files found")
+    return max(editions)
+
+
 def load_registry(path: Path) -> dict[str, dict[str, Any]]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     sources = payload.get("sources", [])

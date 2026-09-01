@@ -6,7 +6,12 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from aiio.digest import build_digest, sha256_file, validate_digest_cadence
+from aiio.digest import (
+    build_digest,
+    find_latest_digest_items,
+    sha256_file,
+    validate_digest_cadence,
+)
 from aiio.schemas import ValidationError
 
 
@@ -145,6 +150,26 @@ class DigestTests(unittest.TestCase):
             validate_digest_cadence(
                 self.items_dir, as_of_date=date(2026, 9, 1), max_age_days=8
             )
+
+    def test_latest_selector_uses_newest_valid_dated_intake(self) -> None:
+        older_path = self.items_dir / "2026-08-25.json"
+        older_path.write_text(
+            json.dumps({"edition_date": "2026-08-25", "items": []}) + "\n",
+            encoding="utf-8",
+        )
+        (self.items_dir / "README.json").write_text("{}\n", encoding="utf-8")
+        edition_date, path = find_latest_digest_items(self.items_dir)
+        self.assertEqual(edition_date, date(2026, 9, 1))
+        self.assertEqual(path, self.items_path)
+
+    def test_latest_selector_rejects_date_drift_and_empty_directory(self) -> None:
+        self.payload["edition_date"] = "2026-08-31"
+        self.write_payload()
+        with self.assertRaisesRegex(ValidationError, "disagree"):
+            find_latest_digest_items(self.items_dir)
+        self.items_path.unlink()
+        with self.assertRaisesRegex(ValidationError, "no dated digest"):
+            find_latest_digest_items(self.items_dir)
 
 
 if __name__ == "__main__":

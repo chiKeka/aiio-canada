@@ -3,7 +3,7 @@
 Act as an independent modelling reviewer. Work read-only: do not edit artifacts, alter governance gates or authorize publication directly. Verify the exact packet and every manifest hash before reviewing.
 
 Packet: `data/model-runs/bc_on_qc_province_linked_review_package_v0.1.json`
-Packet SHA-256: `sha256:763d1cb9d265f9fe37fc6e7b589db6480f79b107512bfc7a2698bd191dc7b8b3`
+Packet SHA-256: `sha256:cff7083d10641ee4f78f93b7b47014148f36b9be4358fa9248e48c7f2320af70`
 
 ## Locked inputs
 
@@ -16,7 +16,7 @@ Packet SHA-256: `sha256:763d1cb9d265f9fe37fc6e7b589db6480f79b107512bfc7a2698bd19
 - `research/src/aiio/provincial_backcast_review.py` — `sha256:545c8418fc4e79c7405c794cca6ef75f68e04aba8d3ba3856b72d68703db9112`
 - `research/tests/test_provincial_backcast.py` — `sha256:ba7067449692ebcbcf20876e5d4683e83484370e48d20427b33d8b52b66c6409`
 - `docs/methodology/province-linked-bcpi-backcast.md` — `sha256:72fbf6fa45b153175417498d3d2d5c4714c0b34faa838bcc35b77643caf5f6fe`
-- `docs/product/decision-mode.md` — `sha256:0c8142e6c73f38902ff9e0c315a6991e77c7fff97cebd17248229863c64eae94`
+- `docs/product/decision-mode.md` — `sha256:bc9b6f850385bd2164a0e6e23d146d0eda2025cbe235a1a2411aa03fb0a5084a`
 
 ## Required criteria
 

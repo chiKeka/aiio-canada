@@ -44,7 +44,7 @@
     "cost:review-package": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-reference-cost-review data/model-runs/alberta_reference_cost_review_package_v0.1.json docs/reviews/2026-09-01-reference-cost-review-prompt.md",
     "power:evidence": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-power-evidence data/manual/aeso_data_centre_update_2025_09_page1.json data/raw/aeso_data_centre_update_2025_09/2026-08-31_d997820b3ed2.pdf data/raw/aeso_large_load_projects/2026-08-31_43d55ccde558.html data/raw/aeso_interim_large_load_2025_06/2026-08-31_86ea3ce051e0.html data/model-runs/power_evidence_alberta_v0.1.json data/processed/power_evidence_alberta.csv",
     "power:planning:provinces": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-provincial-power-planning data/manual/provincial_power_planning_extract_2026_09.json data/model-runs/provincial_power_planning_contract_v0.1.json data/processed/provincial_power_planning_metrics.csv",
-    "digest:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-digest data/digests/items/2026-09-01.json --date 2026-09-01",
+    "digest:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-latest-digest",
     "digest:audit": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-digest-cadence",
     "program:audit": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-program-readiness",
     "program:audit:release": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-program-readiness --require-release-ready",
