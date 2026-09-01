@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.26.0-dev';
+const workbookBuildVersion = '0.27.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -492,6 +492,17 @@ const provinceLinkedBaseline = JSON.parse(
     'utf8',
   ),
 );
+const canadaCrossDomainCoverage = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'canada_cross_domain_coverage_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -521,6 +532,7 @@ const cmaReferenceSheet = workbook.worksheets.add('CMA Reference');
 const provinceBridgeSheet = workbook.worksheets.add('Province Bridge');
 const projectCost = workbook.worksheets.add('Project Cost Check');
 const canadaExpansion = workbook.worksheets.add('Canada Expansion');
+const canadaCoverageSheet = workbook.worksheets.add('Canada Coverage');
 const attributionGate = workbook.worksheets.add('Attribution Gate');
 const panelPreflightSheet = workbook.worksheets.add('Panel Preflight');
 const treatmentSourcesSheet = workbook.worksheets.add('Treatment Sources');
@@ -578,6 +590,7 @@ for (const sheet of [
   provinceBridgeSheet,
   projectCost,
   canadaExpansion,
+  canadaCoverageSheet,
   attributionGate,
   panelPreflightSheet,
   treatmentSourcesSheet,
@@ -621,6 +634,7 @@ buildCmaReference();
 buildProvinceBridge();
 buildProjectCostCheck();
 buildCanadaExpansion();
+buildCanadaCoverage();
 buildAttributionGate();
 buildPanelPreflight();
 buildTreatmentSources();
@@ -678,7 +692,7 @@ console.log(inspectDashboard.ndjson);
 
 const inspectReadMe = await workbook.inspect({
   kind: 'table',
-  range: 'Read Me!A1:H58',
+  range: 'Read Me!A1:H59',
   include: 'values,formulas',
   tableMaxRows: 58,
   tableMaxCols: 8,
@@ -696,7 +710,7 @@ console.log(inspectProjectCost.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D59',
+  range: 'Release Checks!A1:D60',
   include: 'values,formulas',
   tableMaxRows: 59,
   tableMaxCols: 4,
@@ -874,7 +888,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H58',
+  'Read Me': 'A1:H59',
   Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -900,6 +914,7 @@ const previewRanges = {
   'Province Bridge': 'A1:W32',
   'Project Cost Check': 'A1:L38',
   'Canada Expansion': 'A1:J48',
+  'Canada Coverage': 'A1:Q42',
   'Attribution Gate': 'A1:J48',
   'Panel Preflight': 'A1:J46',
   'Treatment Sources': 'A1:M35',
@@ -911,7 +926,7 @@ const previewRanges = {
   'Quebec Revisions': 'A1:R38',
   'Quebec Vintages': 'A1:V42',
   Sources: 'A1:J44',
-  'Release Checks': 'A1:D59',
+  'Release Checks': 'A1:D60',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -976,7 +991,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H54').values = [
+  readme.getRange('A18:H55').values = [
     [
       '1',
       'Dashboard',
@@ -1347,30 +1362,40 @@ function buildReadMe() {
       '',
       '',
     ],
+    [
+      '38',
+      'Canada Coverage',
+      'Inspect the 13-geography, seven-domain availability and missingness inventory; availability does not authorize comparison.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
   ];
-  readme.getRange('A18:A54').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B54').format.font = { bold: true };
-  readme.getRange('C18:H54').merge(true);
-  readme.getRange('A56:H56').merge();
-  readme.getRange('A56').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A56:H56'), C.amber);
+  readme.getRange('A18:A55').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B55').format.font = { bold: true };
+  readme.getRange('C18:H55').merge(true);
   readme.getRange('A57:H57').merge();
-  readme.getRange('A57').values = [
+  readme.getRange('A57').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A57:H57'), C.amber);
+  readme.getRange('A58:H58').merge();
+  readme.getRange('A58').values = [
     [
       `WITHHELD FORECAST + UNCALIBRATED AI DIAGNOSTIC. Only 1 of 40 Alberta asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The CMA expansion adds 60 Vancouver, Toronto and Montréal horizon checks: 9 pass internally, 36 fail and 15 are not assessed. The Province Bridge transparently relabels 1,296 pre-2017 CMA-linked values as inferred, preserves 456 official provincial observations and reproduces the same nine internal British Columbia-linked passes; none is an official pre-2017 province observation or an authorized projection. The ${referenceCostReview.required_criteria.length}-criterion Alberta review packet is prepared but has no verdict, and both reviewer channels remain blocked. No forward project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only. The Historical Analog sheet adds ${historicalAnalogMatrix.reference_class_results.reduce((total, item) => total + item.grid.length, 0)} coherent-path schedule combinations and may translate an explicitly confirmed price-basis estimate only as a historical what-if; its markers are not probabilities, forecasts, recommended allowances or AI premiums. The NAICS 51 Sector Capex screen adds ${informationSectorCapex.observation_count} annual Canada/province cells and reports Alberta 2024 actual/revised construction capital of $458.6M, but ${informationSectorCapex.quality_flag_counts.suppressed_confidentiality} cells are suppressed and the broad industry cannot identify AI/data-centre treatment. The Regional Macro sheet adds ${regionalMacroReport.series_count} separate quarterly control series through ${regionalMacroReport.common_latest_period_end}; they are descriptive context, not a composite score, scenario calibration or AI effect. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. The Treatment Sources screen tests ${treatmentSourceFeasibility.candidate_count} public-source candidates against ${treatmentSourceFeasibility.required_gate_count} required gates; ${treatmentSourceFeasibility.qualifying_source_count} qualify, so treatment estimation remains unauthorized. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
     ],
   ];
-  readme.getRange('A57:H57').format = {
+  readme.getRange('A58:H58').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A57').format.rowHeight = 300;
+  readme.getRange('A58').format.rowHeight = 300;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
-    58,
+    59,
   );
 }
 
@@ -7252,6 +7277,111 @@ function buildQuebecVintages() {
   );
 }
 
+function buildCanadaCoverage() {
+  titleBand(
+    canadaCoverageSheet,
+    'Canada cross-domain evidence coverage',
+    `All 13 provinces and territories · seven evidence domains · workbook ${workbookBuildVersion}`,
+    'Q',
+  );
+  canadaCoverageSheet.getRange('A5:B10').values = [
+    ['Model ID', canadaCrossDomainCoverage.model_id],
+    ['Geographies', canadaCrossDomainCoverage.geography_count],
+    ['Evidence domains', canadaCrossDomainCoverage.domain_count],
+    ['Coverage cells', canadaCrossDomainCoverage.matrix_cell_count],
+    ['Comparison authorized', canadaCrossDomainCoverage.publication_boundary.cross_province_comparison_authorized ? 'YES' : 'NO'],
+    ['Missingness imputed', canadaCrossDomainCoverage.publication_boundary.missingness_imputed ? 'YES' : 'NO'],
+  ];
+  canadaCoverageSheet.getRange('A5:A10').format.font = { bold: true };
+  canadaCoverageSheet.getRange('B9:B10').format = {
+    fill: C.amberLight,
+    font: { color: '#8A4826', bold: true },
+  };
+  canadaCoverageSheet.getRange('D5:Q5').merge();
+  canadaCoverageSheet.getRange('D5').values = [['Interpretation boundary']];
+  sectionHeader(canadaCoverageSheet.getRange('D5:Q5'), C.amber);
+  canadaCoverageSheet.getRange('D6:Q10').merge();
+  canadaCoverageSheet.getRange('D6').values = [[
+    'Availability is not comparability. Public-project inventories, power quantities and broad-sector capex retain different scopes and meanings. Missing evidence is shown as not available and is never imputed. This sheet cannot authorize province rankings, province-specific calibration, an AI-attributable effect or a transmission requirement.',
+  ]];
+  noteBlock(canadaCoverageSheet.getRange('D6:Q10'));
+
+  const domains = [
+    ['labour', 'Labour'],
+    ['materials', 'Materials'],
+    ['building_investment', 'Investment'],
+    ['regional_macro', 'Macro'],
+    ['public_projects', 'Projects'],
+    ['power_planning', 'Power'],
+    ['information_sector_capex', 'Sector capex'],
+  ];
+  canadaCoverageSheet.getRange('A12:Q12').values = [[
+    'Geography',
+    'Geography ID',
+    ...domains.map(([, label]) => label),
+    ...domains.map(([, label]) => `${label} records`),
+    'Publication role',
+  ]];
+  header(canadaCoverageSheet.getRange('A12:Q12'));
+  const firstRow = 13;
+  const lastRow = firstRow + canadaCrossDomainCoverage.geographies.length - 1;
+  canadaCoverageSheet.getRange(`A${firstRow}:Q${lastRow}`).values =
+    canadaCrossDomainCoverage.geographies.map((geography) => [
+      geography.geography_label,
+      geography.geography_id,
+      ...domains.map(([domain]) => geography.domains[domain].status),
+      ...domains.map(([domain]) => geography.domains[domain].record_count),
+      geography.geography_id === 'PR_48' ? 'Alberta pilot + coverage inventory' : 'Coverage inventory only',
+    ]);
+  canadaCoverageSheet.getRange(`C${firstRow}:I${lastRow}`).conditionalFormats.add(
+    'cellIs',
+    { operator: 'equal', formula: '"available"', format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } } },
+  );
+  canadaCoverageSheet.getRange(`C${firstRow}:I${lastRow}`).conditionalFormats.add(
+    'cellIs',
+    { operator: 'equal', formula: '"available_with_missingness"', format: { fill: '#E9F0F2', font: { color: '#456574', bold: true } } },
+  );
+  canadaCoverageSheet.getRange(`C${firstRow}:I${lastRow}`).conditionalFormats.add(
+    'cellIs',
+    { operator: 'equal', formula: '"not_available"', format: { fill: C.amberLight, font: { color: '#8A4826', bold: true } } },
+  );
+  canadaCoverageSheet.getRange(`J${firstRow}:P${lastRow}`).format.numberFormat = '#,##0';
+  const coverageTable = canadaCoverageSheet.tables.add(
+    `A12:Q${lastRow}`,
+    true,
+    'CanadaCrossDomainCoverageTable',
+  );
+  coverageTable.style = 'TableStyleMedium2';
+
+  canadaCoverageSheet.getRange('A28:C28').values = [['Input ID', 'Path', 'SHA-256']];
+  header(canadaCoverageSheet.getRange('A28:C28'));
+  const inputRows = Object.entries(canadaCrossDomainCoverage.input_manifest);
+  canadaCoverageSheet.getRange(`A29:C${28 + inputRows.length}`).values = inputRows.map(
+    ([inputId, item]) => [inputId, item.path, item.sha256],
+  );
+  canadaCoverageSheet.getRange(`C29:C${28 + inputRows.length}`).format.font = {
+    name: 'Aptos Mono',
+    size: 8,
+    color: C.muted,
+  };
+  const inputTable = canadaCoverageSheet.tables.add(
+    `A28:C${28 + inputRows.length}`,
+    true,
+    'CanadaCoverageInputManifestTable',
+  );
+  inputTable.style = 'TableStyleMedium2';
+  canadaCoverageSheet.freezePanes.freezeRows(12);
+  canadaCoverageSheet.freezePanes.freezeColumns(2);
+  setWidths(
+    canadaCoverageSheet,
+    {
+      A: 27, B: 15, C: 24, D: 24, E: 24, F: 24, G: 24, H: 24, I: 24,
+      J: 14, K: 14, L: 14, M: 14, N: 14, O: 14, P: 14, Q: 31,
+    },
+    42,
+  );
+}
+
 function buildSources() {
   titleBand(
     sources,
@@ -7404,8 +7534,9 @@ function buildReleaseChecks() {
     ['AI-capex announcement ledger reconciles and remains non-authorizing', 'PASS'],
     ['Attribution panel preflight reconciles and assembles zero ineligible rows', 'PASS'],
     ['Treatment-source qualification reconciles and remains non-authorizing', 'PASS'],
+    ['Canada cross-domain coverage reconciles without comparison or imputation', 'PASS'],
   ];
-  checks.getRange('A16:C54').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C55').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -7610,22 +7741,25 @@ function buildReleaseChecks() {
   checks.getRange('B54').formulas = [[
     '=IF(AND(\'Treatment Sources\'!A6=8,\'Treatment Sources\'!D6=7,\'Treatment Sources\'!G6=0,\'Treatment Sources\'!J6="NO",COUNTA(\'Treatment Sources\'!$A$14:$A$21)=8,COUNTIF(\'Treatment Sources\'!$L$14:$L$21,"EXCLUDED")=8,COUNTIF(\'Treatment Sources\'!$D$14:$J$21,"FAIL")>0,COUNTA(\'Treatment Sources\'!$B$30:$B$32)=0),"PASS","FAIL")',
   ]];
-  checks.getRange('B16:B54').conditionalFormats.add('containsText', {
+  checks.getRange('B55').formulas = [[
+    '=IF(AND(\'Canada Coverage\'!B6=13,\'Canada Coverage\'!B7=7,\'Canada Coverage\'!B8=91,\'Canada Coverage\'!B9="NO",\'Canada Coverage\'!B10="NO",COUNTA(\'Canada Coverage\'!$A$13:$A$25)=13,COUNTA(\'Canada Coverage\'!$C$13:$I$25)=91,COUNTIF(\'Canada Coverage\'!$C$13:$I$25,"not_available")=22,COUNTIF(\'Canada Coverage\'!$C$13:$I$25,"available_with_missingness")=27,COUNTIF(\'Canada Coverage\'!$C$13:$I$25,"available")=42),"PASS","FAIL")',
+  ]];
+  checks.getRange('B16:B55').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B54').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B55').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A56:D58').merge();
-  checks.getRange('A56').values = [
+  checks.getRange('A57:D59').merge();
+  checks.getRange('A57').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A56:D58'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 59);
+  noteBlock(checks.getRange('A57:D59'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 60);
 }
 
 function buildDashboard() {
