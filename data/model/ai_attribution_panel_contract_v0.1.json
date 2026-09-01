@@ -1,0 +1,217 @@
+{
+  "schema_version": "1.0.0",
+  "contract_id": "AIIO_E2_ATTRIBUTION_PANEL_CONTRACT_0_1",
+  "estimand_id": "E2_AI_ATTRIBUTABLE_INCREMENT",
+  "estimand": "Difference between a public-project outcome under observed regional AI-infrastructure construction exposure and the otherwise-equivalent outcome without that exposure.",
+  "unit_of_analysis": "region_quarter_asset_class",
+  "geography_level": "census_metropolitan_area_or_reconciled_electricity_planning_region",
+  "frequency": "quarterly",
+  "design": {
+    "primary_estimator": "staggered_group_time_average_treatment_effect",
+    "control_cohort": "not_yet_treated_or_never_treated_regions_with_common_support",
+    "aggregation": "event_time_and_exposure_cohort",
+    "two_way_fixed_effects_event_study_primary": false,
+    "anticipation_periods": 2,
+    "minimum_pre_treatment_quarters": 8,
+    "minimum_post_treatment_quarters": 4,
+    "minimum_treated_regions": 2,
+    "minimum_control_regions_per_cohort": 3,
+    "minimum_asset_classes": 2,
+    "leave_one_region_out_required": true,
+    "leave_one_event_out_required": true,
+    "negative_control_outcome_required": true,
+    "placebo_event_dates_required": true,
+    "pretrend_equivalence_assessment_required": true,
+    "covariates_locked_before_outcome_analysis": true
+  },
+  "treatment": {
+    "primary_quantity": "realized_ai_infrastructure_construction_activity",
+    "authorizing_measures": [
+      "realized_construction_spend_cad",
+      "data_centre_construction_labour_hours"
+    ],
+    "proxy_measures_research_only": [
+      "permitted_construction_value_cad",
+      "energized_data_centre_load_mw"
+    ],
+    "prohibited_as_treatment": [
+      "announced_capex_cad",
+      "requested_connection_load_mw",
+      "forecast_data_centre_demand_mw",
+      "scenario_capex_cad",
+      "graph_pressure_score"
+    ],
+    "onset_rule": "First quarter in which an authorizing realized construction measure is positive after source and geography reconciliation.",
+    "dose_rule": "Quarterly authorizing quantity in its published physical or currency unit; no conversion from announcements or graph scores."
+  },
+  "outcomes": [
+    {
+      "outcome_id": "PUBLIC_PROJECT_COST_CHANGE",
+      "family": "cost",
+      "required_fields": [
+        "project_id",
+        "asset_class",
+        "geography_id",
+        "estimate_value_cad",
+        "estimate_price_basis_date",
+        "tender_or_award_value_cad",
+        "award_date",
+        "approved_change_value_cad",
+        "outcome_source_id"
+      ],
+      "publication_unit": "percentage_points_or_cad_after_price_basis_reconciliation"
+    },
+    {
+      "outcome_id": "PUBLIC_PROJECT_SCHEDULE_CHANGE",
+      "family": "schedule",
+      "required_fields": [
+        "project_id",
+        "asset_class",
+        "geography_id",
+        "baseline_start_date",
+        "baseline_completion_date",
+        "actual_start_date",
+        "actual_completion_date",
+        "schedule_baseline_vintage",
+        "outcome_source_id"
+      ],
+      "publication_unit": "days"
+    },
+    {
+      "outcome_id": "PROCUREMENT_COMPETITION",
+      "family": "procurement",
+      "required_fields": [
+        "project_id",
+        "geography_id",
+        "tender_open_date",
+        "tender_close_date",
+        "award_date",
+        "compliant_bidder_count",
+        "outcome_source_id"
+      ],
+      "publication_unit": "count_and_days"
+    }
+  ],
+  "data_domains": [
+    {
+      "domain_id": "REALIZED_AI_CONSTRUCTION_TREATMENT",
+      "role": "authorizing_treatment",
+      "status": "missing",
+      "source_ids": [
+        "EDMONTON_GENERAL_BUILDING_PERMITS",
+        "AESO_LARGE_LOAD_PROJECTS"
+      ],
+      "available_variables": [
+        "permitted_construction_value_cad_proxy",
+        "requested_and_contracted_load_mw"
+      ],
+      "missing_variables": [
+        "realized_construction_spend_cad",
+        "data_centre_construction_labour_hours"
+      ],
+      "limitation": "Current public sources expose intentions, connection states and proxies, not a consistent realized construction input across regions."
+    },
+    {
+      "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",
+      "role": "authorizing_outcome",
+      "status": "missing",
+      "source_ids": [
+        "CANADABUYS_PROCUREMENT_DATA",
+        "GC_PROACTIVE_CONTRACTS"
+      ],
+      "available_variables": [
+        "tender_dates",
+        "award_value_cad",
+        "contract_amendment_value_cad_for_selected_federal_records"
+      ],
+      "missing_variables": [
+        "independent_estimate_with_price_basis",
+        "complete_approved_change_history",
+        "consistent_asset_reference_class"
+      ],
+      "limitation": "Procurement coverage and fields differ by publisher and cannot yet reconcile a common estimate-to-outturn outcome."
+    },
+    {
+      "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
+      "role": "authorizing_outcome",
+      "status": "missing",
+      "source_ids": [
+        "CANADABUYS_PROCUREMENT_DATA"
+      ],
+      "available_variables": [
+        "tender_open_date",
+        "tender_close_date",
+        "award_date_for_selected_records"
+      ],
+      "missing_variables": [
+        "baseline_start_date_and_vintage",
+        "baseline_completion_date_and_vintage",
+        "actual_start_date",
+        "actual_completion_date"
+      ],
+      "limitation": "Tender timing is not physical project schedule performance."
+    },
+    {
+      "domain_id": "REGIONAL_CONSTRUCTION_ACTIVITY_CONTROLS",
+      "role": "control",
+      "status": "available",
+      "source_ids": [
+        "STATCAN_IBC_34100293",
+        "STATCAN_BCPI_18100289"
+      ],
+      "available_variables": [
+        "monthly_building_investment_cad",
+        "quarterly_building_construction_price_index"
+      ],
+      "missing_variables": [
+        "engineering_construction_activity_by_cma"
+      ],
+      "limitation": "Building investment excludes engineering work and BCPI is a model-building bid-price index."
+    },
+    {
+      "domain_id": "LABOUR_AND_WAGE_CONTROLS",
+      "role": "control",
+      "status": "available",
+      "source_ids": [
+        "STATCAN_JVWS_14100444",
+        "STATCAN_CENSUS_OCCUPATION_98100449"
+      ],
+      "available_variables": [
+        "job_vacancies",
+        "average_offered_hourly_wage",
+        "employed_persons_stock"
+      ],
+      "missing_variables": [
+        "quarterly_five_digit_occupation_employment_stock"
+      ],
+      "limitation": "The 2021 Census stock and current vacancy observations have different reference periods and survey designs."
+    },
+    {
+      "domain_id": "GRID_AND_LARGE_LOAD_CONTROLS",
+      "role": "mechanism_and_control",
+      "status": "available",
+      "source_ids": [
+        "AESO_LARGE_LOAD_PROJECTS",
+        "AESO_DATA_CENTRE_UPDATE_2025_09"
+      ],
+      "available_variables": [
+        "connection_request_mw",
+        "executed_load_contract_mw",
+        "connection_stage"
+      ],
+      "missing_variables": [
+        "distribution_connected_data_centres",
+        "off_grid_data_centres",
+        "construction_spend_timing"
+      ],
+      "limitation": "Requested, contracted and energized MW are distinct and none directly measure construction resource use."
+    }
+  ],
+  "publication_authorization": {
+    "status": "withheld_missing_identification_panel",
+    "ai_attributable_increment_authorized": false,
+    "cost_escalation_percent": null,
+    "cost_escalation_cad": null,
+    "schedule_delay_days": null
+  }
+}

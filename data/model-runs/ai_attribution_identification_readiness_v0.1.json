@@ -1,0 +1,289 @@
+{
+  "analysis_status": "not_assessed",
+  "candidate_source_ids": [
+    "AESO_DATA_CENTRE_UPDATE_2025_09",
+    "AESO_LARGE_LOAD_PROJECTS",
+    "CANADABUYS_PROCUREMENT_DATA",
+    "EDMONTON_GENERAL_BUILDING_PERMITS",
+    "GC_PROACTIVE_CONTRACTS",
+    "STATCAN_BCPI_18100289",
+    "STATCAN_CENSUS_OCCUPATION_98100449",
+    "STATCAN_IBC_34100293",
+    "STATCAN_JVWS_14100444"
+  ],
+  "contract_id": "AIIO_E2_ATTRIBUTION_PANEL_CONTRACT_0_1",
+  "contract_sha256": "sha256:0b2c69e0dc8e3d81bb3590098e132e2ee87eb2b51d6e124ac29025574f5ec2aa",
+  "design": {
+    "aggregation": "event_time_and_exposure_cohort",
+    "anticipation_periods": 2,
+    "control_cohort": "not_yet_treated_or_never_treated_regions_with_common_support",
+    "covariates_locked_before_outcome_analysis": true,
+    "leave_one_event_out_required": true,
+    "leave_one_region_out_required": true,
+    "minimum_asset_classes": 2,
+    "minimum_control_regions_per_cohort": 3,
+    "minimum_post_treatment_quarters": 4,
+    "minimum_pre_treatment_quarters": 8,
+    "minimum_treated_regions": 2,
+    "negative_control_outcome_required": true,
+    "placebo_event_dates_required": true,
+    "pretrend_equivalence_assessment_required": true,
+    "primary_estimator": "staggered_group_time_average_treatment_effect",
+    "two_way_fixed_effects_event_study_primary": false
+  },
+  "domain_status": [
+    {
+      "available_variables": [
+        "permitted_construction_value_cad_proxy",
+        "requested_and_contracted_load_mw"
+      ],
+      "domain_id": "REALIZED_AI_CONSTRUCTION_TREATMENT",
+      "limitation": "Current public sources expose intentions, connection states and proxies, not a consistent realized construction input across regions.",
+      "missing_variables": [
+        "realized_construction_spend_cad",
+        "data_centre_construction_labour_hours"
+      ],
+      "role": "authorizing_treatment",
+      "source_ids": [
+        "EDMONTON_GENERAL_BUILDING_PERMITS",
+        "AESO_LARGE_LOAD_PROJECTS"
+      ],
+      "status": "missing"
+    },
+    {
+      "available_variables": [
+        "tender_dates",
+        "award_value_cad",
+        "contract_amendment_value_cad_for_selected_federal_records"
+      ],
+      "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",
+      "limitation": "Procurement coverage and fields differ by publisher and cannot yet reconcile a common estimate-to-outturn outcome.",
+      "missing_variables": [
+        "independent_estimate_with_price_basis",
+        "complete_approved_change_history",
+        "consistent_asset_reference_class"
+      ],
+      "role": "authorizing_outcome",
+      "source_ids": [
+        "CANADABUYS_PROCUREMENT_DATA",
+        "GC_PROACTIVE_CONTRACTS"
+      ],
+      "status": "missing"
+    },
+    {
+      "available_variables": [
+        "tender_open_date",
+        "tender_close_date",
+        "award_date_for_selected_records"
+      ],
+      "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
+      "limitation": "Tender timing is not physical project schedule performance.",
+      "missing_variables": [
+        "baseline_start_date_and_vintage",
+        "baseline_completion_date_and_vintage",
+        "actual_start_date",
+        "actual_completion_date"
+      ],
+      "role": "authorizing_outcome",
+      "source_ids": [
+        "CANADABUYS_PROCUREMENT_DATA"
+      ],
+      "status": "missing"
+    },
+    {
+      "available_variables": [
+        "monthly_building_investment_cad",
+        "quarterly_building_construction_price_index"
+      ],
+      "domain_id": "REGIONAL_CONSTRUCTION_ACTIVITY_CONTROLS",
+      "limitation": "Building investment excludes engineering work and BCPI is a model-building bid-price index.",
+      "missing_variables": [
+        "engineering_construction_activity_by_cma"
+      ],
+      "role": "control",
+      "source_ids": [
+        "STATCAN_IBC_34100293",
+        "STATCAN_BCPI_18100289"
+      ],
+      "status": "available"
+    },
+    {
+      "available_variables": [
+        "job_vacancies",
+        "average_offered_hourly_wage",
+        "employed_persons_stock"
+      ],
+      "domain_id": "LABOUR_AND_WAGE_CONTROLS",
+      "limitation": "The 2021 Census stock and current vacancy observations have different reference periods and survey designs.",
+      "missing_variables": [
+        "quarterly_five_digit_occupation_employment_stock"
+      ],
+      "role": "control",
+      "source_ids": [
+        "STATCAN_JVWS_14100444",
+        "STATCAN_CENSUS_OCCUPATION_98100449"
+      ],
+      "status": "available"
+    },
+    {
+      "available_variables": [
+        "connection_request_mw",
+        "executed_load_contract_mw",
+        "connection_stage"
+      ],
+      "domain_id": "GRID_AND_LARGE_LOAD_CONTROLS",
+      "limitation": "Requested, contracted and energized MW are distinct and none directly measure construction resource use.",
+      "missing_variables": [
+        "distribution_connected_data_centres",
+        "off_grid_data_centres",
+        "construction_spend_timing"
+      ],
+      "role": "mechanism_and_control",
+      "source_ids": [
+        "AESO_LARGE_LOAD_PROJECTS",
+        "AESO_DATA_CENTRE_UPDATE_2025_09"
+      ],
+      "status": "available"
+    }
+  ],
+  "estimand_id": "E2_AI_ATTRIBUTABLE_INCREMENT",
+  "evidence_status": "inferred_contract_audit",
+  "graph_role": "S3/PSPE maps mechanisms, priorities, bottlenecks and missing links. It does not supply the counterfactual or identify the E2 treatment effect.",
+  "outcome_contracts": [
+    {
+      "family": "cost",
+      "outcome_id": "PUBLIC_PROJECT_COST_CHANGE",
+      "publication_unit": "percentage_points_or_cad_after_price_basis_reconciliation",
+      "required_fields": [
+        "project_id",
+        "asset_class",
+        "geography_id",
+        "estimate_value_cad",
+        "estimate_price_basis_date",
+        "tender_or_award_value_cad",
+        "award_date",
+        "approved_change_value_cad",
+        "outcome_source_id"
+      ]
+    },
+    {
+      "family": "schedule",
+      "outcome_id": "PUBLIC_PROJECT_SCHEDULE_CHANGE",
+      "publication_unit": "days",
+      "required_fields": [
+        "project_id",
+        "asset_class",
+        "geography_id",
+        "baseline_start_date",
+        "baseline_completion_date",
+        "actual_start_date",
+        "actual_completion_date",
+        "schedule_baseline_vintage",
+        "outcome_source_id"
+      ]
+    },
+    {
+      "family": "procurement",
+      "outcome_id": "PROCUREMENT_COMPETITION",
+      "publication_unit": "count_and_days",
+      "required_fields": [
+        "project_id",
+        "geography_id",
+        "tender_open_date",
+        "tender_close_date",
+        "award_date",
+        "compliant_bidder_count",
+        "outcome_source_id"
+      ]
+    }
+  ],
+  "publication_authorization": {
+    "ai_attributable_increment_authorized": false,
+    "cost_escalation_cad": null,
+    "cost_escalation_percent": null,
+    "reason": "Public data currently provide regional controls and useful proxies, but not a common realized AI-construction treatment plus estimate-to-outturn and baseline-to-actual public-project outcomes.",
+    "schedule_delay_days": null,
+    "status": "withheld_missing_identification_panel"
+  },
+  "readiness_checks": [
+    {
+      "check_id": "contract_and_source_lineage",
+      "status": "pass",
+      "summary": "The preregistered contract validates and every candidate source is registry-bound."
+    },
+    {
+      "check_id": "realized_ai_construction_treatment",
+      "status": "pending",
+      "summary": "The realized AI-construction treatment domain is missing; missing: realized_construction_spend_cad, data_centre_construction_labour_hours."
+    },
+    {
+      "check_id": "public_project_cost_outcome",
+      "status": "pending",
+      "summary": "The reconciled public-project cost outcome domain is missing; missing: independent_estimate_with_price_basis, complete_approved_change_history, consistent_asset_reference_class."
+    },
+    {
+      "check_id": "public_project_schedule_outcome",
+      "status": "pending",
+      "summary": "The baseline-to-actual public-project schedule outcome domain is missing; missing: baseline_start_date_and_vintage, baseline_completion_date_and_vintage, actual_start_date, actual_completion_date."
+    },
+    {
+      "check_id": "regional_controls",
+      "status": "pass",
+      "summary": "All declared labour, construction-activity and grid controls are available."
+    },
+    {
+      "check_id": "panel_assembly",
+      "status": "not_assessed",
+      "summary": "No unit-period panel is assembled until both the authorizing treatment and outcome domains pass."
+    },
+    {
+      "check_id": "cohort_overlap",
+      "status": "not_assessed",
+      "summary": "Treated/control common support cannot be tested before panel assembly."
+    },
+    {
+      "check_id": "pretrend_and_equivalence",
+      "status": "not_assessed",
+      "summary": "Pre-treatment dynamics and equivalence bounds cannot be assessed before panel assembly."
+    },
+    {
+      "check_id": "placebo_and_negative_controls",
+      "status": "not_assessed",
+      "summary": "Placebo dates and negative-control outcomes cannot be run before panel assembly."
+    },
+    {
+      "check_id": "leave_one_out_sensitivity",
+      "status": "not_assessed",
+      "summary": "Region/event influence cannot be tested before an eligible estimation cohort exists."
+    },
+    {
+      "check_id": "independent_modelling_review",
+      "status": "blocked",
+      "summary": "Review cannot authorize an effect until the evidence and identification gates produce an eligible model package."
+    }
+  ],
+  "registered_source_count": 25,
+  "run_id": "AIIO_E2_IDENTIFICATION_READINESS_0_1",
+  "schema_version": "1.0.0",
+  "source_registry_sha256": "sha256:d606033e98e33dec3a7d4c0f958a44e7ae47c941bb7fef5739cd1ab50fd8e28a",
+  "treatment_contract": {
+    "authorizing_measures": [
+      "realized_construction_spend_cad",
+      "data_centre_construction_labour_hours"
+    ],
+    "dose_rule": "Quarterly authorizing quantity in its published physical or currency unit; no conversion from announcements or graph scores.",
+    "onset_rule": "First quarter in which an authorizing realized construction measure is positive after source and geography reconciliation.",
+    "primary_quantity": "realized_ai_infrastructure_construction_activity",
+    "prohibited_as_treatment": [
+      "announced_capex_cad",
+      "requested_connection_load_mw",
+      "forecast_data_centre_demand_mw",
+      "scenario_capex_cad",
+      "graph_pressure_score"
+    ],
+    "proxy_measures_research_only": [
+      "permitted_construction_value_cad",
+      "energized_data_centre_load_mw"
+    ]
+  }
+}

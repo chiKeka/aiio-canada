@@ -22,6 +22,20 @@ access methods must be revalidated at ingestion time.
 | Population/building demand | Statistics Canada demographics and provincial forecasts | Population and cohort demand drivers | Provincial/CMA; quarterly/annual | P2 |
 | Procurement/schedules | Alberta Purchasing Connection and public tender portals | Tender volume, award timing, bid signals | Alberta/municipal; event-based | P2 |
 
+## Causal-attribution feasibility sources
+
+Four additional sources are registered for the E2 identification workstream.
+Statistics Canada table 34-10-0293-01 is now implemented as a content-hashed,
+quarterly regional building-investment control across 13 provinces/territories
+and 36 published CMAs or CMA parts. CanadaBuys tender/award/contract-history
+datasets, the federal proactive contract publication, and Edmonton's General
+Building Permits API remain candidates for procurement screening and permit-
+based proxy work. None currently supplies the
+combination of realized AI-construction spend or labour hours, independent
+project estimate with price basis, complete approved changes, and actual project
+completion required to authorize an AI-attributable effect. See
+`docs/methodology/ai-attribution-identification.md`.
+
 ## Implemented provincial public-project intake
 
 Three official provincial inventories now share a source-preserving schema:

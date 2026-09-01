@@ -107,6 +107,33 @@ Required fields: `metric_id`, `period`, `value`, `unit`, `evidence_status`, `sou
 
 Required fields: `release_id`, `version`, `published_at`, `code_commit`, `dirty_worktree`, `input_manifest_hash`, `configuration_hash`, `model_version`, `engine_version`, `parameter_set_id`, `status`, `notes`.
 
+## AI-attribution panel contract
+
+Required contract fields: `contract_id`, `estimand_id`, `unit_of_analysis`,
+`geography_level`, `frequency`, `design`, `treatment`, `outcomes`,
+`data_domains`, `publication_authorization`.
+
+Each data domain records `domain_id`, `role`, `status`, registry-bound
+`source_ids`, `available_variables`, `missing_variables` and `limitation`.
+Treatment authorizing measures are restricted to realized construction spend or
+construction labour hours. Announcements, connection requests, forecasts,
+scenarios and graph scores are prohibited. Cost and schedule effect fields remain
+null in a readiness artifact; only a separately reviewed estimator run may
+authorize them.
+
+## Regional building-investment control
+
+Required fields: `observation_id`, `indicator_id`, `geography_label`,
+`statcan_dguid`, `type_of_structure`, `investment_basis`, `value`, `unit`,
+`geography_id`, `period_start`, `period_end`, `source_id`,
+`source_evidence_status`, `evidence_status`, `transformation_id`,
+`source_month_count`, `quality_flags`.
+
+Each quarterly value requires three contiguous monthly source cells. Current and
+constant dollars remain separate series. Province/territory and CMA identifiers
+remain separate; named CMA parts are not silently merged. The quarterly sum is
+inferred from observed monthly investment values and is a regional control only.
+
 ## Conventions
 
 - Currency is CAD and carries a price year.

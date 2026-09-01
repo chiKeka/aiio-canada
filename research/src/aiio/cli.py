@@ -17,6 +17,7 @@ from .adapters.statcan_census import (
     fetch_census_trade_employment,
     normalize_census_trade_employment,
 )
+from .adapters.statcan_investment import normalize_investment_controls
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .adapters.provincial_projects import (
     BC_SOURCE_ID,
@@ -30,6 +31,7 @@ from .calibration import (
     PROVINCIAL_REFERENCE_MODEL_ID,
     run_reference_class_baseline,
 )
+from .attribution import build_attribution_readiness
 from .digest import build_digest, validate_digest_cadence
 from .labour import run_labour_recruitment_pressure
 from .materials import run_material_cost_screen, run_provincial_material_cost_screen
@@ -83,6 +85,12 @@ def main() -> None:
         help="normalize provincial and territorial trade labour observations",
     )
     labour_canada_parser.add_argument("zip_path", type=Path)
+
+    investment_parser = subparsers.add_parser(
+        "normalize-investment-controls",
+        help="normalize quarterly regional non-residential building-investment controls",
+    )
+    investment_parser.add_argument("zip_path", type=Path)
 
     subparsers.add_parser(
         "fetch-census-workforce",
@@ -213,6 +221,13 @@ def main() -> None:
     )
     readiness_parser.add_argument("--require-release-ready", action="store_true")
 
+    attribution_parser = subparsers.add_parser(
+        "run-attribution-readiness",
+        help="validate the E2 causal-panel contract and write a fail-closed readiness run",
+    )
+    attribution_parser.add_argument("contract_path", type=Path)
+    attribution_parser.add_argument("output_path", type=Path)
+
     scenario_parser = subparsers.add_parser(
         "run-scenario", help="run a versioned graph scenario and write auditable JSON output"
     )
@@ -309,6 +324,27 @@ def main() -> None:
                 root / "data" / "processed" / "labour_availability_canada.csv",
             )
             print(json.dumps({"status": "passed", "observation_count": len(observations)}))
+        elif args.command == "normalize-investment-controls":
+            observations = normalize_investment_controls(
+                args.zip_path.resolve(),
+                root / "data/processed/building_investment_controls_canada.csv",
+                root
+                / "data/model-runs/building_investment_controls_canada_v0.1.json",
+                args.zip_path.resolve().with_suffix(
+                    args.zip_path.resolve().suffix + ".manifest.json"
+                ),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "observation_count": len(observations),
+                        "geography_count": len(
+                            {item["geography_id"] for item in observations}
+                        ),
+                    }
+                )
+            )
         elif args.command == "fetch-major-projects":
             record = fetch_major_projects(root / "data" / "raw")
             print(json.dumps(asdict(record), indent=2))
@@ -585,6 +621,24 @@ def main() -> None:
                         "decision_grade_ready": result["decision_grade_ready"],
                         "release_ready": result["release_ready"],
                         "status_counts": result["status_counts"],
+                    }
+                )
+            )
+        elif args.command == "run-attribution-readiness":
+            output = build_attribution_readiness(
+                args.contract_path.resolve(),
+                registry_path,
+                args.output_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "run_id": output["run_id"],
+                        "analysis_status": output["analysis_status"],
+                        "ai_attributable_increment_authorized": output[
+                            "publication_authorization"
+                        ]["ai_attributable_increment_authorized"],
                     }
                 )
             )

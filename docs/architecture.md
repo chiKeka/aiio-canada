@@ -57,6 +57,13 @@ passes the protocol in
 [`docs/methodology/calibration-protocol.md`](methodology/calibration-protocol.md).
 The graph never supplies a multiplier for the reference baseline.
 
+The E2 readiness pipeline validates a locked regional panel contract against the
+source registry and writes an explicit missing-data/gate artifact. It separates
+authorizing realized treatment measures from permit, announcement and grid
+proxies, and it separates tender timing from physical schedule outcomes. The
+protocol is documented in
+[`docs/methodology/ai-attribution-identification.md`](methodology/ai-attribution-identification.md).
+
 ### 5. Graph model
 
 Nodes represent shocks, resources, materials, cost signals and public-delivery delay pressure. Directed typed edges encode mechanisms. Each edge records sign, magnitude range, lag, absorption, supporting evidence, confidence, author, version and assumption ID. Resource, material, signal and outcome nodes may retain part of a pressure state into later years using an explicit low/central/high retention factor. The engine reports signed totals and the paths that produced them.

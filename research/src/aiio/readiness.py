@@ -174,6 +174,43 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    investment_output_path = (
+        root / "data/processed/building_investment_controls_canada.csv"
+    )
+    investment_report_path = (
+        root / "data/model-runs/building_investment_controls_canada_v0.1.json"
+    )
+    investment_report = load_json_or_empty(investment_report_path)
+    investment_control_ready = (
+        investment_output_path.exists()
+        and investment_report.get("output_sha256")
+        == sha256_file(investment_output_path)
+        and investment_report.get("province_and_territory_count") == 13
+        and investment_report.get("cma_or_cma_part_count", 0) >= 30
+        and investment_report.get("publication_boundary", {}).get(
+            "ai_treatment_authorized"
+        )
+        is False
+        and investment_report.get("publication_boundary", {}).get(
+            "ai_attributable_effect_authorized"
+        )
+        is False
+    )
+    record(
+        "regional_building_investment_controls",
+        "evidence_pipeline",
+        PASS if investment_control_ready else FAIL,
+        "The quarterly regional building-investment control is hash-locked across 13 provinces/territories and 36 CMAs or CMA parts."
+        if investment_control_ready
+        else "The regional building-investment control is missing, unreconciled or has an unsafe publication boundary.",
+        [
+            "data/processed/building_investment_controls_canada.csv",
+            "data/model-runs/building_investment_controls_canada_v0.1.json",
+            "docs/methodology/regional-building-investment-controls.md",
+        ],
+        release_gate=True,
+    )
+
     provincial_paths = [
         "data/model-runs/public_projects_bc_on_qc_intake_v0.1.json",
         "data/model-runs/bcpi_material_cost_screen_provinces_v0.1.json",
@@ -319,6 +356,42 @@ def audit_program_readiness(
         if projection_authorized
         else "The reproducible Alberta reference-cost run is built, but publication remains withheld pending independent modelling review.",
         ["data/model-runs/alberta_bcpi_reference_baseline_v0.1.json"],
+        release_gate=True,
+    )
+
+    attribution_contract_path = root / "data/model/ai_attribution_panel_contract_v0.1.json"
+    attribution_run_path = (
+        root / "data/model-runs/ai_attribution_identification_readiness_v0.1.json"
+    )
+    attribution_run = load_json_or_empty(attribution_run_path)
+    attribution_contract_ready = (
+        attribution_contract_path.exists()
+        and attribution_run.get("analysis_status") == "not_assessed"
+        and attribution_run.get("publication_authorization", {}).get(
+            "ai_attributable_increment_authorized"
+        )
+        is False
+        and attribution_run.get("publication_authorization", {}).get(
+            "cost_escalation_percent"
+        )
+        is None
+        and attribution_run.get("publication_authorization", {}).get(
+            "schedule_delay_days"
+        )
+        is None
+    )
+    record(
+        "causal_attribution_workstream",
+        "research_design",
+        PASS if attribution_contract_ready else FAIL,
+        "The E2 treatment/outcome panel contract and fail-closed identification-readiness pipeline are implemented."
+        if attribution_contract_ready
+        else "The E2 attribution contract or its fail-closed readiness artifact is missing or unsafe.",
+        [
+            "data/model/ai_attribution_panel_contract_v0.1.json",
+            "data/model-runs/ai_attribution_identification_readiness_v0.1.json",
+            "docs/methodology/ai-attribution-identification.md",
+        ],
         release_gate=True,
     )
 

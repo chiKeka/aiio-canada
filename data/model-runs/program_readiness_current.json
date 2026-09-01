@@ -21,11 +21,11 @@
       "check_id": "public_evidence_registry",
       "evidence": [
         "data/registry/sources.json",
-        "raw_manifest_count=16"
+        "raw_manifest_count=17"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The public-source registry validates with 21 unique sources."
+      "summary": "The public-source registry validates with 25 unique sources."
     },
     {
       "category": "analysis_engine",
@@ -70,6 +70,18 @@
       "release_gate": true,
       "status": "pass",
       "summary": "The common vacancy/wage and workforce-stock spine covers all 13 provinces and territories."
+    },
+    {
+      "category": "evidence_pipeline",
+      "check_id": "regional_building_investment_controls",
+      "evidence": [
+        "data/processed/building_investment_controls_canada.csv",
+        "data/model-runs/building_investment_controls_canada_v0.1.json",
+        "docs/methodology/regional-building-investment-controls.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The quarterly regional building-investment control is hash-locked across 13 provinces/territories and 36 CMAs or CMA parts."
     },
     {
       "category": "canada_expansion",
@@ -154,6 +166,18 @@
       "summary": "The reproducible Alberta reference-cost run is built, but publication remains withheld pending independent modelling review."
     },
     {
+      "category": "research_design",
+      "check_id": "causal_attribution_workstream",
+      "evidence": [
+        "data/model/ai_attribution_panel_contract_v0.1.json",
+        "data/model-runs/ai_attribution_identification_readiness_v0.1.json",
+        "docs/methodology/ai-attribution-identification.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The E2 treatment/outcome panel contract and fail-closed identification-readiness pipeline are implemented."
+    },
+    {
       "category": "decision_grade_outputs",
       "check_id": "ai_attributable_cost_schedule_effect",
       "evidence": [
@@ -204,7 +228,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 10,
+    "pass": 12,
     "pending": 3
   },
   "structural_integrity": true
