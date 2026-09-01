@@ -18,6 +18,7 @@ from .adapters.statcan_census import (
     normalize_census_trade_employment,
 )
 from .adapters.statcan_investment import normalize_investment_controls
+from .adapters.statcan_capex import normalize_information_sector_construction_capex
 from .adapters.canadabuys import (
     AWARD_SOURCE_ID as CANADABUYS_AWARD_SOURCE_ID,
     CONTRACT_SOURCE_ID as CANADABUYS_CONTRACT_SOURCE_ID,
@@ -120,6 +121,14 @@ def main() -> None:
         help="normalize quarterly regional non-residential building-investment controls",
     )
     investment_parser.add_argument("zip_path", type=Path)
+
+    capex_treatment_parser = subparsers.add_parser(
+        "normalize-capex-treatment-screen",
+        help="build the fail-closed NAICS 51 construction-capex treatment feasibility screen",
+    )
+    capex_treatment_parser.add_argument("zip_path", type=Path)
+    capex_treatment_parser.add_argument("output_csv_path", type=Path)
+    capex_treatment_parser.add_argument("output_json_path", type=Path)
 
     canadabuys_parser = subparsers.add_parser(
         "normalize-canadabuys-outcomes",
@@ -462,6 +471,30 @@ def main() -> None:
                         "geography_count": len(
                             {item["geography_id"] for item in observations}
                         ),
+                    }
+                )
+            )
+        elif args.command == "normalize-capex-treatment-screen":
+            manifest_path = args.zip_path.resolve().with_suffix(
+                args.zip_path.resolve().suffix + ".manifest.json"
+            )
+            output = normalize_information_sector_construction_capex(
+                args.zip_path.resolve(),
+                args.output_csv_path.resolve(),
+                args.output_json_path.resolve(),
+                retrieval_manifest_path=(
+                    manifest_path if manifest_path.exists() else None
+                ),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "observation_count": output["observation_count"],
+                        "authorizing_treatment_present": output[
+                            "treatment_requirement_assessment"
+                        ]["authorizing_treatment_present"],
                     }
                 )
             )

@@ -131,6 +131,22 @@ scenarios and graph scores are prohibited. Cost and schedule effect fields remai
 null in a readiness artifact; only a separately reviewed estimator run may
 authorize them.
 
+## Information-sector construction-capex screen
+
+Required observation fields: `observation_id`, `geography_id`,
+`geography_label`, `statcan_dguid`, `reference_year`,
+`release_measure_status`, `value_millions_cad`, `value_cad`, `unit`,
+`naics_code`, `naics_label`, `expenditure_category`,
+`statcan_quality_symbol`, `quality_flag`, `source_id`,
+`source_evidence_status`, `classification_evidence_status`, `treatment_role`
+and `ai_construction_treatment_authorized`.
+
+The screen selects NAICS 51 capital construction for Canada and all 13
+provinces/territories. Values remain annual and publisher quality symbols are
+preserved; suppressed values remain blank. NAICS 51 is a broad information and
+cultural industry aggregate, so every row is a research-only contextual proxy
+and `ai_construction_treatment_authorized` is false.
+
 ## Regional building-investment control
 
 Required fields: `observation_id`, `indicator_id`, `geography_label`,

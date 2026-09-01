@@ -788,6 +788,59 @@ def audit_program_readiness(
     )
 
     attribution_contract_path = root / "data/model/ai_attribution_panel_contract_v0.1.json"
+    capex_screen_path = (
+        root
+        / "data/model-runs/information_sector_construction_capex_screen_v0.1.json"
+    )
+    capex_screen = load_json_or_empty(capex_screen_path)
+    capex_source_path = (
+        root
+        / "data/raw/statcan_capex_industry_geography_34100035/2026-09-01_a65541e3a9ad.zip"
+    )
+    capex_manifest_path = capex_source_path.with_suffix(
+        capex_source_path.suffix + ".manifest.json"
+    )
+    capex_output_path = (
+        root / "data/processed/information_sector_construction_capex_canada.csv"
+    )
+    capex_boundary = capex_screen.get("publication_boundary", {})
+    capex_assessment = capex_screen.get("treatment_requirement_assessment", {})
+    capex_screen_ready = (
+        capex_screen_path.exists()
+        and capex_source_path.exists()
+        and capex_manifest_path.exists()
+        and capex_output_path.exists()
+        and capex_screen.get("input_sha256") == sha256_file(capex_source_path)
+        and capex_screen.get("retrieval_manifest_sha256")
+        == sha256_file(capex_manifest_path)
+        and capex_screen.get("output_sha256") == sha256_file(capex_output_path)
+        and capex_screen.get("code_sha256")
+        == sha256_file(root / "research/src/aiio/adapters/statcan_capex.py")
+        and capex_screen.get("observation_count") == 294
+        and capex_screen.get("geography_count") == 14
+        and capex_screen.get("reference_year_count") == 21
+        and capex_assessment.get("status") == "proxy_only_not_authorizing"
+        and capex_assessment.get("exact_naics_518210_present") is False
+        and capex_assessment.get("authorizing_treatment_present") is False
+        and capex_boundary.get("descriptive_broad_sector_capex_authorized") is True
+        and capex_boundary.get("ai_construction_treatment_authorized") is False
+        and capex_boundary.get("ai_attributable_effect_authorized") is False
+    )
+    record(
+        "information_sector_capex_treatment_screen",
+        "research_design",
+        PASS if capex_screen_ready else FAIL,
+        "The Statistics Canada NAICS 51 construction-capex screen is hash-locked, preserves suppression and remains a descriptive non-authorizing proxy."
+        if capex_screen_ready
+        else "The information-sector capex screen is missing, stale or has an unsafe treatment boundary.",
+        [
+            "data/raw/statcan_capex_industry_geography_34100035/2026-09-01_a65541e3a9ad.zip",
+            "data/processed/information_sector_construction_capex_canada.csv",
+            "data/model-runs/information_sector_construction_capex_screen_v0.1.json",
+            "docs/methodology/information-sector-construction-capex-screen.md",
+        ],
+        release_gate=True,
+    )
     attribution_run_path = (
         root / "data/model-runs/ai_attribution_identification_readiness_v0.1.json"
     )

@@ -559,6 +559,24 @@
       "evidence_status": "observed",
       "status": "candidate",
       "notes": "Independent performance audit of three named Ontario infrastructure projects. Lakeridge Gardens and Highway 427 contain valuable estimate-to-latest-cost and planned-to-actual substantial-completion evidence, but price-basis dates, complete approved-change histories and a reusable outcome panel remain incomplete. Highway 427 final costs were under dispute at the audit date."
+    },
+    {
+      "source_id": "STATCAN_CAPEX_INDUSTRY_GEOGRAPHY_34100035",
+      "title": "Capital and repair expenditures, non-residential tangible assets, by industry and geography",
+      "publisher": "Statistics Canada",
+      "canonical_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410003501",
+      "retrieval_url": "https://www150.statcan.gc.ca/n1/en/tbl/csv/34100035-eng.zip",
+      "source_type": "statistical_table",
+      "domain": "ai_construction_treatment_feasibility",
+      "geography": "Canada; provinces and territories",
+      "as_of_date": "2026-02-25",
+      "last_verified": "2026-09-01",
+      "licence_note": "Statistics Canada Open Licence; attribution and table citation required.",
+      "access_method": "bulk_zip",
+      "update_frequency": "annual",
+      "evidence_status": "observed",
+      "status": "candidate",
+      "notes": "Table 34-10-0035-01 reports annual capital and repair expenditures by NAICS and geography from 2006 onward, with actual, preliminary actual and intentions vintages. NAICS 518210 includes computing infrastructure providers, data processing, web hosting and related services, but also non-data-centre activities; the table must be screened for province, asset and expenditure-type coverage before it can be considered even a broad realized-spend proxy."
     }
   ]
 }

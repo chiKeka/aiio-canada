@@ -99,20 +99,22 @@
       "status": "missing",
       "source_ids": [
         "EDMONTON_GENERAL_BUILDING_PERMITS",
-        "AESO_LARGE_LOAD_PROJECTS"
+        "AESO_LARGE_LOAD_PROJECTS",
+        "STATCAN_CAPEX_INDUSTRY_GEOGRAPHY_34100035"
       ],
       "available_variables": [
         "permitted_construction_value_cad_proxy",
         "issued_building_permit_date",
         "inferred_data_centre_keyword_candidate",
         "occupancy_granted_date_trend_proxy",
-        "requested_and_contracted_load_mw"
+        "requested_and_contracted_load_mw",
+        "annual_provincial_naics_51_construction_capex_cad_proxy"
       ],
       "missing_variables": [
         "realized_construction_spend_cad",
         "data_centre_construction_labour_hours"
       ],
-      "limitation": "The implemented Edmonton screen identifies 17 explicit data-centre permit candidates from 85 broad records, but finds no explicit AI references and no candidate occupancy dates. Permit values, occupancy trend fields and large-load connection states remain proxies rather than a consistent realized construction input across regions."
+      "limitation": "The implemented Edmonton screen identifies 17 explicit data-centre permit candidates from 85 broad records, but finds no explicit AI references and no candidate occupancy dates. The Statistics Canada capex screen adds 294 annual Canada/province cells for NAICS 51 construction capital from 2006-2026, including an Alberta 2024 actual/revised value of $458.6 million, but NAICS 51 includes telecommunications, publishing, broadcasting and other information activities; 99 cells are suppressed, the series is annual rather than quarterly and it cannot isolate AI or data-centre construction. Permit values, broad-sector capex and large-load connection states remain non-authorizing proxies."
     },
     {
       "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",

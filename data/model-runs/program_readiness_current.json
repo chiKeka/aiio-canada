@@ -21,11 +21,11 @@
       "check_id": "public_evidence_registry",
       "evidence": [
         "data/registry/sources.json",
-        "raw_manifest_count=94"
+        "raw_manifest_count=95"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The public-source registry validates with 31 unique sources."
+      "summary": "The public-source registry validates with 32 unique sources."
     },
     {
       "category": "analysis_engine",
@@ -209,9 +209,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.18.0-dev.xlsx",
-        "workbook_sha256=sha256:69b242eee7ee58d6393d329fdb0a4ae37d5b5d36093cf4407bd56cf6f47b339b",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.18.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.19.0-dev.xlsx",
+        "workbook_sha256=sha256:81c639ec90e61c52fb369c2a7511e20907fdb08f8c61968a747936d40cae95b6",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.19.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",
@@ -263,6 +263,19 @@
       "release_gate": true,
       "status": "pending",
       "summary": "The reproducible Alberta reference-cost run is built, but publication remains withheld pending independent modelling review."
+    },
+    {
+      "category": "research_design",
+      "check_id": "information_sector_capex_treatment_screen",
+      "evidence": [
+        "data/raw/statcan_capex_industry_geography_34100035/2026-09-01_a65541e3a9ad.zip",
+        "data/processed/information_sector_construction_capex_canada.csv",
+        "data/model-runs/information_sector_construction_capex_screen_v0.1.json",
+        "docs/methodology/information-sector-construction-capex-screen.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The Statistics Canada NAICS 51 construction-capex screen is hash-locked, preserves suppression and remains a descriptive non-authorizing proxy."
     },
     {
       "category": "research_design",
@@ -327,7 +340,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 19,
+    "pass": 20,
     "pending": 3
   },
   "structural_integrity": true

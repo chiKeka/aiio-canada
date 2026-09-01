@@ -89,6 +89,7 @@ latest published project status.
 | Audited Ontario outcomes | [Ontario Auditor General: Procurement and Delivery of Selected Infrastructure Projects](https://www.auditor.on.ca/en/content/annualreports/audits/en2024/AR-PA_infrastructureON_en24.html) | Two completed named-project cost and substantial-completion histories plus source cost-component breakdowns | Implemented hash-locked reference intake: one completed total-cost comparison, one estimated cost under dispute, and one exact-day completion pair; no price-basis dates, complete change histories, reusable panel or publisher-stable project IDs |
 | Quebec authorized revisions and complete archive | [Quebec infrastructure project dashboard](https://www.tresor.gouv.qc.ca/infrastructures-publiques/tableau-de-bord), official archive catalog and field dictionary | Stable lifecycle project IDs, total authorized cost, lifecycle-authorized cost/schedule changes, 69-date presence patterns and publisher-declared retirement markers | Implemented parser-reconciled candidate panel: 141 cost chains, 168 completion-month chains and 111 joint chains; the complete archive exposes 1,122 stable IDs, 510 disappearances and 36 reentry projects. Publisher-declared complete service and planned retirement precede 291 disappearances, but are not audited final outcomes; 219 causes remain unclassified, one malformed CSV uses its paired official XLSX, price-basis dates are absent and independent parser review is pending |
 | Municipal permits | [Edmonton General Building Permits](https://data.edmonton.ca/Urban-Planning-Economy/General-Building-Permits/24uj-dj8v) | Implemented field-minimized screen: issue date, building/work type, reported construction-value estimate and occupancy trend field | 85 broad records produce 17 explicit data-centre candidates, 0 explicit AI references and 0 candidate occupancy dates; still not realized spend or hours |
+| Information-sector construction capex | [Statistics Canada table 34-10-0035-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410003501) | 294 annual Canada/province/territory cells for NAICS 51 capital construction, 2006–2026; Alberta 2024 actual/revised value is $458.6 million | Implemented fail-closed screen: NAICS 51 is broader than data centres, 99 cells are suppressed, and annual provincial values cannot satisfy the quarterly regional AI-treatment contract |
 | Alberta large loads | [AESO connection project reporting](https://www.aeso.ca/grid/transmission-projects/) and the registered large-load sources | Requested/contracted load, project stage and selected energization information | MW states are distinct and do not measure construction resource use |
 | Labour and prices | Existing Statistics Canada JVWS, Census and BCPI adapters | Vacancy, offered-wage, workforce-stock and price controls | Different vintages/designs remain explicit; none identify E2 by themselves |
 
@@ -104,6 +105,9 @@ boundary are documented in
 The municipal permit retrieval, classifier and non-authorizing boundary are
 documented in
 `docs/methodology/edmonton-data-centre-permit-proxy.md`.
+The broad information-sector capex selection, vintage distinctions and
+non-authorizing treatment assessment are documented in
+`docs/methodology/information-sector-construction-capex-screen.md`.
 The Ontario audit extraction, scope reconciliation, component bridge and
 non-authorizing boundary are documented in
 `docs/methodology/audited-project-outcome-references.md`.

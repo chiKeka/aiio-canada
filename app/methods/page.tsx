@@ -10,6 +10,7 @@ import releaseData from '@/public/data/latest.json';
 import historicalEnvelope from '@/data/model-runs/alberta_bcpi_historical_envelope_v0.1.json';
 import referenceCostReview from '@/data/model-runs/alberta_reference_cost_review_package_v0.1.json';
 import programGates from '@/data/governance/program-gates.json';
+import informationSectorCapex from '@/data/model-runs/information_sector_construction_capex_screen_v0.1.json';
 
 const methodSteps = [
   [
@@ -58,6 +59,7 @@ export default function MethodsPage() {
     ...(evidenceScreens.public_project_exposure?.limitations ?? []),
     ...(evidenceScreens.power_evidence?.limitations ?? []),
     ...historicalEnvelope.limitations,
+    ...informationSectorCapex.limitations,
   ];
   return (
     <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">

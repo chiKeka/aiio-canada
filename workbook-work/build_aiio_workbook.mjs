@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.18.0-dev';
+const workbookBuildVersion = '0.19.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -382,6 +382,28 @@ const programGates = JSON.parse(
     'utf8',
   ),
 );
+const informationSectorCapex = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'information_sector_construction_capex_screen_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const informationSectorCapexRows = parseCsv(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'processed',
+      'information_sector_construction_capex_canada.csv',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -405,6 +427,7 @@ const powerEvidence = workbook.worksheets.add('Power Evidence');
 const costBaselineSheet = workbook.worksheets.add('Cost Baseline');
 const historicalCostSheet = workbook.worksheets.add('Historical Envelope');
 const referenceReviewSheet = workbook.worksheets.add('Reference Review');
+const sectorCapexSheet = workbook.worksheets.add('Sector Capex');
 const projectCost = workbook.worksheets.add('Project Cost Check');
 const canadaExpansion = workbook.worksheets.add('Canada Expansion');
 const attributionGate = workbook.worksheets.add('Attribution Gate');
@@ -455,6 +478,7 @@ for (const sheet of [
   costBaselineSheet,
   historicalCostSheet,
   referenceReviewSheet,
+  sectorCapexSheet,
   projectCost,
   canadaExpansion,
   attributionGate,
@@ -491,6 +515,7 @@ buildPowerEvidence();
 buildCostBaseline();
 buildHistoricalCostEnvelope();
 buildReferenceReview();
+buildSectorCapex();
 buildProjectCostCheck();
 buildCanadaExpansion();
 buildAttributionGate();
@@ -539,9 +564,9 @@ console.log(inspectDashboard.ndjson);
 
 const inspectReadMe = await workbook.inspect({
   kind: 'table',
-  range: 'Read Me!A1:H52',
+  range: 'Read Me!A1:H53',
   include: 'values,formulas',
-  tableMaxRows: 52,
+  tableMaxRows: 53,
   tableMaxCols: 8,
 });
 console.log(inspectReadMe.ndjson);
@@ -557,9 +582,9 @@ console.log(inspectProjectCost.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D51',
+  range: 'Release Checks!A1:D52',
   include: 'values,formulas',
-  tableMaxRows: 51,
+  tableMaxRows: 52,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
@@ -590,6 +615,15 @@ const inspectReferenceReview = await workbook.inspect({
   tableMaxCols: 10,
 });
 console.log(inspectReferenceReview.ndjson);
+
+const inspectSectorCapex = await workbook.inspect({
+  kind: 'table',
+  range: 'Sector Capex!A1:T310',
+  include: 'values,formulas',
+  tableMaxRows: 310,
+  tableMaxCols: 20,
+});
+console.log(inspectSectorCapex.ndjson);
 
 const inspectCanadaExpansion = await workbook.inspect({
   kind: 'table',
@@ -672,7 +706,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H52',
+  'Read Me': 'A1:H53',
   Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -692,6 +726,7 @@ const previewRanges = {
   'Cost Baseline': 'A1:P54',
   'Historical Envelope': 'A1:S55',
   'Reference Review': 'A1:J40',
+  'Sector Capex': 'A1:T45',
   'Project Cost Check': 'A1:L38',
   'Canada Expansion': 'A1:J48',
   'Attribution Gate': 'A1:J48',
@@ -702,7 +737,7 @@ const previewRanges = {
   'Quebec Revisions': 'A1:R38',
   'Quebec Vintages': 'A1:V42',
   Sources: 'A1:J34',
-  'Release Checks': 'A1:D53',
+  'Release Checks': 'A1:D54',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -767,7 +802,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H47').values = [
+  readme.getRange('A18:H48').values = [
     [
       '1',
       'Dashboard',
@@ -1050,6 +1085,16 @@ function buildReadMe() {
     ],
     [
       '29',
+      'Sector Capex',
+      'Inspect the annual provincial NAICS 51 construction-capex screen and its explicit non-authorizing AI-treatment boundary.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '30',
       'Sources',
       'Open the current research source register, distinguish release sources and check source vintages.',
       '',
@@ -1059,7 +1104,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '30',
+      '31',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -1069,29 +1114,29 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A47').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B47').format.font = { bold: true };
-  readme.getRange('C18:H47').merge(true);
-  readme.getRange('A49:H49').merge();
-  readme.getRange('A49').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A49:H49'), C.amber);
+  readme.getRange('A18:A48').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B48').format.font = { bold: true };
+  readme.getRange('C18:H48').merge(true);
   readme.getRange('A50:H50').merge();
-  readme.getRange('A50').values = [
+  readme.getRange('A50').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A50:H50'), C.amber);
+  readme.getRange('A51:H51').merge();
+  readme.getRange('A51').values = [
     [
-      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The ${referenceCostReview.required_criteria.length}-criterion independent-review packet is prepared but has no verdict, and both reviewer channels remain blocked. No public project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only; its quantiles are not forecasts, probabilities or project allowances. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
+      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The ${referenceCostReview.required_criteria.length}-criterion independent-review packet is prepared but has no verdict, and both reviewer channels remain blocked. No public project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only; its quantiles are not forecasts, probabilities or project allowances. The NAICS 51 Sector Capex screen adds ${informationSectorCapex.observation_count} annual Canada/province cells and reports Alberta 2024 actual/revised construction capital of $458.6M, but ${informationSectorCapex.quality_flag_counts.suppressed_confidentiality} cells are suppressed and the broad industry cannot identify AI/data-centre treatment. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
     ],
   ];
-  readme.getRange('A50:H50').format = {
+  readme.getRange('A51:H51').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A50').format.rowHeight = 190;
+  readme.getRange('A51').format.rowHeight = 210;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
-    52,
+    53,
   );
 }
 
@@ -3289,6 +3334,204 @@ function buildReferenceReview() {
       J: 18,
     },
     40,
+  );
+}
+
+function buildSectorCapex() {
+  titleBand(
+    sectorCapexSheet,
+    'Information-sector construction-capex screen',
+    'Statistics Canada table 34-10-0035-01 · broad NAICS 51 context · not an AI-treatment measure',
+    'T',
+  );
+  const boundary = informationSectorCapex.publication_boundary;
+  const assessment = informationSectorCapex.treatment_requirement_assessment;
+  const sourceUrl =
+    'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410003501';
+
+  sectorCapexSheet.getRange('A5:B10').values = [
+    ['Model ID', informationSectorCapex.model_id],
+    ['Observations', informationSectorCapex.observation_count],
+    ['Geographies', informationSectorCapex.geography_count],
+    ['Reference years', informationSectorCapex.reference_year_count],
+    ['First year', informationSectorCapex.first_reference_year],
+    ['Latest year', informationSectorCapex.latest_reference_year],
+  ];
+  sectorCapexSheet.getRange('A5:A10').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  sectorCapexSheet.getRange('B5:B10').format = {
+    fill: C.soft,
+    borders: { preset: 'outside', style: 'thin', color: C.line },
+  };
+  sectorCapexSheet.getRange('D5:E9').values = [
+    [
+      'Descriptive context authorized',
+      boundary.descriptive_broad_sector_capex_authorized ? 'YES' : 'NO',
+    ],
+    [
+      'AI construction treatment authorized',
+      boundary.ai_construction_treatment_authorized ? 'YES' : 'NO',
+    ],
+    [
+      'AI-attributable effect authorized',
+      boundary.ai_attributable_effect_authorized ? 'YES' : 'NO',
+    ],
+    [
+      'Suppressed cells',
+      informationSectorCapex.quality_flag_counts.suppressed_confidentiality,
+    ],
+    ['Finest relevant NAICS', assessment.finest_available_relevant_naics_code],
+  ];
+  sectorCapexSheet.getRange('D5:D9').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  sectorCapexSheet.getRange('E5').format = {
+    fill: C.tealLight,
+    font: { bold: true, color: C.tealDark },
+  };
+  sectorCapexSheet.getRange('E6:E7').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+  };
+  sectorCapexSheet.getRange('G5:T10').merge();
+  sectorCapexSheet.getRange('G5').values = [[
+    `CONTEXT ONLY. The finest relevant provincial industry is broad NAICS ${assessment.finest_available_relevant_naics_code}, not 518210 or project-level data-centre construction. The source is ${assessment.published_frequency} at ${assessment.published_geography} resolution. Values through ${assessment.actual_or_revised_data_available_through} are actual/revised; 2025 is preliminary actual and 2026 is intentions. Suppressed cells remain blank. This evidence cannot authorize AI treatment, cost escalation or schedule-delay attribution.`,
+  ]];
+  sectorCapexSheet.getRange('G5:T10').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529' },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  sectorCapexSheet.getRange('A12:T12').values = [[
+    'Observation ID',
+    'Geography ID',
+    'Geography',
+    'Statistics Canada DGUID',
+    'Reference year',
+    'Release measure status',
+    'Value ($ millions)',
+    'Value (CAD, formula)',
+    'Unit',
+    'NAICS code',
+    'NAICS label',
+    'Expenditure category',
+    'Statistics Canada symbol',
+    'Quality flag',
+    'Source evidence',
+    'Classification evidence',
+    'Treatment role',
+    'AI treatment authorized',
+    'Source ID',
+    'Source URL',
+  ]];
+  header(sectorCapexSheet.getRange('A12:T12'));
+  const dataStart = 13;
+  const dataEnd = dataStart + informationSectorCapexRows.length - 1;
+  const values = informationSectorCapexRows.map((row) => [
+    row.observation_id,
+    row.geography_id,
+    row.geography_label,
+    row.statcan_dguid,
+    Number(row.reference_year),
+    row.release_measure_status,
+    numberOrNull(row.value_millions_cad),
+    null,
+    row.unit,
+    row.naics_code,
+    row.naics_label,
+    row.expenditure_category,
+    row.statcan_quality_symbol,
+    row.quality_flag,
+    row.source_evidence_status,
+    row.classification_evidence_status,
+    row.treatment_role,
+    yesNo(row.ai_construction_treatment_authorized),
+    row.source_id,
+    sourceUrl,
+  ]);
+  sectorCapexSheet.getRange(`A${dataStart}:T${dataEnd}`).values = values;
+  for (let row = dataStart; row <= dataEnd; row += 1) {
+    sectorCapexSheet.getRange(`H${row}`).formulas = [
+      [`=IF(G${row}="","",G${row}*1000000)`],
+    ];
+  }
+  sectorCapexSheet.getRange(`E${dataStart}:E${dataEnd}`).format.numberFormat =
+    '0';
+  sectorCapexSheet.getRange(`G${dataStart}:G${dataEnd}`).format.numberFormat =
+    '$#,##0.0';
+  sectorCapexSheet.getRange(`H${dataStart}:H${dataEnd}`).format.numberFormat =
+    '$#,##0';
+  sectorCapexSheet
+    .getRange(`F${dataStart}:F${dataEnd}`)
+    .conditionalFormats.add('containsText', {
+      text: 'actual_or_revised',
+      format: { fill: C.tealLight, font: { color: C.tealDark } },
+    });
+  sectorCapexSheet
+    .getRange(`F${dataStart}:F${dataEnd}`)
+    .conditionalFormats.add('containsText', {
+      text: 'preliminary_actual',
+      format: { fill: '#FFF5D8', font: { color: '#7A5A00' } },
+    });
+  sectorCapexSheet
+    .getRange(`F${dataStart}:F${dataEnd}`)
+    .conditionalFormats.add('containsText', {
+      text: 'intentions',
+      format: { fill: C.amberLight, font: { color: '#8A4826' } },
+    });
+  sectorCapexSheet
+    .getRange(`N${dataStart}:N${dataEnd}`)
+    .conditionalFormats.add('containsText', {
+      text: 'suppressed_confidentiality',
+      format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
+    });
+  const table = sectorCapexSheet.tables.add(
+    `A12:T${dataEnd}`,
+    true,
+    'SectorCapexTable',
+  );
+  table.style = 'TableStyleMedium2';
+
+  const noteStart = dataEnd + 2;
+  const noteEnd = noteStart + 2;
+  sectorCapexSheet.getRange(`A${noteStart}:T${noteEnd}`).merge();
+  sectorCapexSheet.getRange(`A${noteStart}`).values = [[
+    `Permitted use: ${boundary.permitted_use}. Prohibited use: ${boundary.prohibited_use}. Source: Statistics Canada table 34-10-0035-01; source and transformation hashes are recorded in the model artifact.`,
+  ]];
+  noteBlock(sectorCapexSheet.getRange(`A${noteStart}:T${noteEnd}`));
+  sectorCapexSheet.freezePanes.freezeRows(12);
+  sectorCapexSheet.freezePanes.freezeColumns(4);
+  setWidths(
+    sectorCapexSheet,
+    {
+      A: 36,
+      B: 13,
+      C: 25,
+      D: 20,
+      E: 13,
+      F: 22,
+      G: 17,
+      H: 19,
+      I: 22,
+      J: 12,
+      K: 39,
+      L: 25,
+      M: 18,
+      N: 27,
+      O: 18,
+      P: 23,
+      Q: 36,
+      R: 19,
+      S: 45,
+      T: 52,
+    },
+    noteEnd,
   );
 }
 
@@ -5549,8 +5792,9 @@ function buildReleaseChecks() {
     ['Alberta scenario variants reconcile and remain non-authorizing', 'PASS'],
     ['Historical cost envelope reconciles and remains non-forecasting', 'PASS'],
     ['Reference-cost review packet reconciles and remains non-authorizing', 'PASS'],
+    ['Information-sector capex screen reconciles and remains non-authorizing', 'PASS'],
   ];
-  checks.getRange('A16:C46').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C47').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -5724,22 +5968,27 @@ function buildReleaseChecks() {
       '=IF(AND(\'Reference Review\'!B6="pending_independent_review",\'Reference Review\'!E5="NO",\'Reference Review\'!E6="NO",\'Reference Review\'!E7="NO",\'Reference Review\'!E8="NO",\'Reference Review\'!E9=0,\'Reference Review\'!B8=10,\'Reference Review\'!B9=10,\'Reference Review\'!B10=1,COUNTA(\'Reference Review\'!$A$19:$A$28)=10,COUNTIF(\'Reference Review\'!$C$19:$C$28,"pending_independent_review")=10,COUNTA(\'Reference Review\'!$A$14:$A$15)=2,COUNTIF(\'Reference Review\'!$B$14:$B$15,"blocked")=2),"PASS","FAIL")',
     ],
   ];
-  checks.getRange('B16:B46').conditionalFormats.add('containsText', {
+  checks.getRange('B47').formulas = [
+    [
+      '=IF(AND(\'Sector Capex\'!B6=294,\'Sector Capex\'!B7=14,\'Sector Capex\'!B8=21,\'Sector Capex\'!E5="YES",\'Sector Capex\'!E6="NO",\'Sector Capex\'!E7="NO",\'Sector Capex\'!E8=99,\'Sector Capex\'!E9="51",ROWS(\'Sector Capex\'!$A$13:$A$306)=294,COUNTIF(\'Sector Capex\'!$R$13:$R$306,"NO")=294,COUNTIF(\'Sector Capex\'!$T$13:$T$306,"")=0,SUMIFS(\'Sector Capex\'!$H$13:$H$306,\'Sector Capex\'!$B$13:$B$306,"PR_48",\'Sector Capex\'!$E$13:$E$306,2024)=458600000),"PASS","FAIL")',
+    ],
+  ];
+  checks.getRange('B16:B47').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B46').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B47').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A48:D50').merge();
-  checks.getRange('A48').values = [
+  checks.getRange('A49:D51').merge();
+  checks.getRange('A49').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A48:D50'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 54);
+  noteBlock(checks.getRange('A49:D51'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 55);
 }
 
 function buildDashboard() {

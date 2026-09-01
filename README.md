@@ -57,6 +57,7 @@ npm run digest:build
 npm run digest:audit
 npm run program:audit
 npm run attribution:readiness
+npm run treatment:capex-screen
 npm run cost:historical-envelope
 npm run cost:review-package
 npm run model:run

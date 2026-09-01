@@ -1,9 +1,10 @@
-import { BriefcaseBusiness, Database, ExternalLink, ShieldCheck } from 'lucide-react';
+import { BriefcaseBusiness, Database, ExternalLink, ShieldCheck, TrendingUp } from 'lucide-react';
 
 import { EvidenceExplorer } from '@/components/evidence-explorer';
 import { LabourMarketExplorer, type NationalLabourAvailability, type NationalLabourPressure, type NationalWorkforceStock } from '@/components/labour-market-explorer';
 import { EvidencePill, PageIntro, SiteFooter, SiteHeader } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
+import informationSectorCapex from '@/data/model-runs/information_sector_construction_capex_screen_v0.1.json';
 
 export default function EvidencePage() {
   const pipeline = releaseData.baseline.ai_project_pipeline;
@@ -46,6 +47,7 @@ export default function EvidencePage() {
         <EvidenceExplorer projects={releaseData.baseline.projects} />
       </section>
       {labourCanada ? <LabourMarketExplorer labour={labourCanada} pressure={labourPressure} workforce={workforceCanada} /> : labour ? <LabourAvailabilityPanel labour={labour} /> : null}
+      <InformationSectorCapexPanel />
       <section className="border-t border-[#d5ddd8] bg-[#e9ebe5]">
         <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
           <div className="mb-6 flex items-center gap-2"><Database className="size-4 text-[#24746c]" /><h2 className="text-xl font-medium">Registered public sources</h2></div>
@@ -63,6 +65,58 @@ export default function EvidencePage() {
       <SiteFooter />
     </main>
   );
+}
+
+function InformationSectorCapexPanel() {
+  const selected = ['PR_48', 'PR_59', 'PR_35', 'PR_24'].map((geographyId) =>
+    informationSectorCapex.geography_summaries.find(
+      (item) => item.geography_id === geographyId,
+    ),
+  ).filter((item): item is NonNullable<typeof item> => Boolean(item));
+  return (
+    <section className="border-t border-[#d5ddd8] bg-[#fbfaf5]">
+      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
+        <div className="flex items-center gap-2 text-[#24746c]">
+          <TrendingUp className="size-4" />
+          <h2 className="text-xl font-medium">Broad information-sector construction context</h2>
+        </div>
+        <p className="mt-3 max-w-4xl text-sm leading-6 text-[#52645f]">
+          Statistics Canada table 34-10-0035-01 · latest published actual or
+          revised year by province. These values cover all NAICS 51 information
+          and cultural industries—not data centres or AI construction alone.
+        </p>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {selected.map((item) => (
+            <article
+              className="rounded-xl border border-[#d2dad5] bg-white p-5"
+              key={item.geography_id}
+            >
+              <p className="text-xs text-[#667873]">{item.geography_label}</p>
+              <p className="mt-2 font-mono text-2xl font-semibold text-[#155d58]">
+                {formatCompactCad(item.latest_actual_or_revised_value_cad)}
+              </p>
+              <p className="mt-1 text-xs text-[#667873]">
+                {item.latest_actual_or_revised_year} actual/revised ·{' '}
+                {item.withheld_or_unavailable_count} suppressed or unavailable years
+              </p>
+            </article>
+          ))}
+        </div>
+        <div className="mt-5 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-4 text-sm leading-6 text-[#825a47]">
+          Descriptive proxy only. NAICS 518210 is not separately published in
+          this provincial table, the series is annual rather than quarterly,
+          and it cannot define AI treatment onset or dose. AI-attributable cost
+          and schedule effects remain null.
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function formatCompactCad(value: number | null) {
+  if (value === null) return 'Not published';
+  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`;
+  return `$${(value / 1_000_000).toFixed(1)}M`;
 }
 
 type LabourObservation = {
