@@ -2,7 +2,7 @@
   "automatic_model_change": false,
   "digest_id": "AIIO_DIGEST_2026_09_01",
   "edition_date": "2026-09-01",
-  "item_count": 7,
+  "item_count": 8,
   "item_ids": [
     "PROVINCIAL_PUBLIC_PROJECT_INTAKE_2026_09",
     "PROVINCIAL_POWER_PLANNING_CONTRACT_2026_09",
@@ -10,10 +10,11 @@
     "INFORMATION_SECTOR_CONSTRUCTION_CAPEX_SCREEN_2026_09",
     "CMA_REFERENCE_COST_EXPANSION_2026_09",
     "PROVINCE_LINKED_BCPI_BACKCAST_2026_09",
+    "ALBERTA_PROJECT_HISTORICAL_ANALOG_2026_09",
     "REGIONAL_MACRO_CONTROL_PANEL_2026_09"
   ],
-  "items_sha256": "sha256:b67c675f4c8e15e66f1cb6268580141a763e03ac204bd8f9b58fea86275b81a8",
-  "markdown_sha256": "sha256:4a86c65d7b86aa5481c03cefdc35cd14cad973a52655b5758d44d08255739f40",
+  "items_sha256": "sha256:411f556c7c0982e3b213c9902428c97cee451734a4b232ddf48022a456096d85",
+  "markdown_sha256": "sha256:c4be098c031885a17d868a9abd2b539ed3774314fc46a953cc31c59994e3a6b2",
   "publication_boundary": {
     "baseline_changed": false,
     "model_parameters_changed": false,

@@ -120,6 +120,23 @@ findings, acknowledge the narrow claim boundary and return either `pass` with
 `authorize_baseline_only` or `hold` with `withhold`. Validation of a verdict
 does not itself edit a model artifact, governance gate or public release.
 
+## Project historical-analog stress-test matrix
+
+Required artifact fields: `model_id`, `source_id`, `input_sha256`,
+`code_sha256`, `as_of_date`, `evidence_status`, `estimand`, `configuration`,
+`publication_authorization`, `reference_class_results`,
+`unsupported_asset_classes` and `limitations`.
+
+Each reference-class result retains the asset and CMA mapping, unit, observation
+coverage and a governed schedule grid. Required grid fields are
+`start_lag_years`, `duration_years`, `profile_id`, `expenditure_schedule`,
+`maximum_horizon_years`, `status`, origin counts and periods,
+`schedule_weighted_factor` and `schedule_weighted_change_percent`. A missing
+complete trajectory produces `not_assessed` with null summaries. Historical
+factors are inferred transformations of observed BCPI paths; their budget
+equivalents are scenario stress translations, not forecasts, probabilities,
+recommended allowances or AI-attributable effects.
+
 ## Public-project exposure
 
 Required fields: `project_id`, `asset_class`, `asset_class_evidence_status`, `sponsor_signal`, `sponsor_signal_evidence_status`, `estimated_cost_cad`, `start_year`, `end_year`, `schedule_overlap_status`, `overlap_years`, `annualized_cost_cad_if_complete`, `indicative_cost_allocated_to_window_cad`, `source_id`, `source_evidence_status`.

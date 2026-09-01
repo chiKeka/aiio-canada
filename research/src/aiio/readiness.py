@@ -816,6 +816,51 @@ def audit_program_readiness(
         ],
         release_gate=True,
     )
+    historical_analog_path = (
+        root / "data/model-runs/alberta_project_historical_analog_matrix_v0.1.json"
+    )
+    historical_analog = load_json_or_empty(historical_analog_path)
+    analog_boundary = historical_analog.get("publication_authorization", {})
+    analog_results = historical_analog.get("reference_class_results", [])
+    analog_grid_count = sum(
+        len(item.get("grid", [])) for item in analog_results if isinstance(item, dict)
+    )
+    historical_analog_ready = (
+        historical_analog_path.exists()
+        and historical_analog.get("input_sha256")
+        == sha256_file(root / "data/processed/bcpi_alberta.csv").removeprefix("sha256:")
+        and historical_analog.get("code_sha256")
+        == sha256_file(root / "research/src/aiio/historical_analog.py").removeprefix(
+            "sha256:"
+        )
+        and len(analog_results) == 8
+        and analog_grid_count == 1560
+        and analog_boundary.get("historical_analog_stress_test_authorized") is True
+        and analog_boundary.get("historical_analog_budget_translation_authorized")
+        is True
+        and analog_boundary.get("future_projection_authorized") is False
+        and analog_boundary.get("probability_interval_authorized") is False
+        and analog_boundary.get("recommended_escalation_allowance_authorized")
+        is False
+        and analog_boundary.get("ai_attributable_effect_authorized") is False
+        and analog_boundary.get("forecast_project_cost_translation_authorized")
+        is False
+    )
+    record(
+        "alberta_project_historical_analog_stress_test",
+        "decision_support",
+        PASS if historical_analog_ready else FAIL,
+        "The Alberta product can translate declared project schedules through coherent observed BCPI trajectories while forecast, probability, allowance and AI-effect claims remain closed."
+        if historical_analog_ready
+        else "The project historical-analog matrix is missing, unreconciled or has an unsafe publication boundary.",
+        [
+            "data/processed/bcpi_alberta.csv",
+            "data/model-runs/alberta_project_historical_analog_matrix_v0.1.json",
+            "research/src/aiio/historical_analog.py",
+            "docs/methodology/project-historical-analog-stress-test.md",
+        ],
+        release_gate=True,
+    )
     projection_authorized = alberta_baseline.get("publication_authorization", {}).get(
         "public_projection_authorized"
     ) is True

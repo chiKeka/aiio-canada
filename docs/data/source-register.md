@@ -64,6 +64,14 @@ single-level anchor and an overlap screen. The result is not an official
 provincial series and remains outside Decision Mode. See
 `docs/methodology/province-linked-bcpi-backcast.md`.
 
+The same locked Calgary and Edmonton BCPI histories now feed a project-level
+historical analog matrix. It applies declared annual expenditure shapes to
+complete observed index trajectories and reports descriptive schedule-weighted
+markers. Arithmetic budget equivalents are permitted only as clearly labelled
+historical stress tests; future forecasts, probability intervals, recommended
+allowances and AI-attributable increments remain prohibited. See
+`docs/methodology/project-historical-analog-stress-test.md`.
+
 The 2024 Ontario Auditor General performance audit is now a registered,
 content-hash-locked outcome source. Its fail-closed intake preserves two named
 completed projects: Lakeridge Gardens Long-Term Care Home and Highway 427

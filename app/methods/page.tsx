@@ -8,6 +8,7 @@ import {
 } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
 import historicalEnvelope from '@/data/model-runs/alberta_bcpi_historical_envelope_v0.1.json';
+import historicalAnalogMatrix from '@/data/model-runs/alberta_project_historical_analog_matrix_v0.1.json';
 import referenceCostReview from '@/data/model-runs/alberta_reference_cost_review_package_v0.1.json';
 import programGates from '@/data/governance/program-gates.json';
 import informationSectorCapex from '@/data/model-runs/information_sector_construction_capex_screen_v0.1.json';
@@ -62,6 +63,7 @@ export default function MethodsPage() {
     ...(evidenceScreens.public_project_exposure?.limitations ?? []),
     ...(evidenceScreens.power_evidence?.limitations ?? []),
     ...historicalEnvelope.limitations,
+    ...historicalAnalogMatrix.limitations,
     ...informationSectorCapex.limitations,
     ...cmaReferenceBaseline.limitations,
     ...regionalMacroControls.limitations,
@@ -189,6 +191,7 @@ export default function MethodsPage() {
               'Raw pressure is transformed as raw ÷ (1 + raw) for bounded public display only.',
               'CAD pressure and MW power quantities use separate artifacts.',
               'Historical index envelopes are descriptive; predictive and causal calibration remain gated.',
+              'Historical project analogs preserve complete past trajectories; their dollar equivalents are stress tests, not forecasts or AI premiums.',
             ].map((item) => (
               <div
                 className="flex gap-3 rounded-lg border border-white/10 bg-white/4 p-4 text-sm leading-5 text-[#d6e1e4]"

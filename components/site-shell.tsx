@@ -9,18 +9,18 @@ import {
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-[#e2e0d9] bg-[#faf9f5]/95 text-[#172f35] backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
+    <header className="sticky top-0 z-40 border-b border-[#e2e0d9] bg-[#faf9f5]/92 text-[#172f35] backdrop-blur-xl">
+      <div className="mx-auto flex h-[68px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
         <Link
           className="flex items-center gap-3"
           href="/"
           aria-label="AIIO Canada home"
         >
-          <span className="grid size-9 place-items-center rounded-full border border-[#bdd5ce] bg-white font-mono text-xs font-semibold text-[#17665f]">
+          <span className="grid size-9 place-items-center rounded-full border border-[#bdd5ce] bg-white font-mono text-xs font-semibold text-[#17665f] shadow-[0_1px_2px_rgba(13,43,54,0.05)]">
             AI
           </span>
           <span>
-            <span className="block text-sm font-semibold tracking-[-0.01em]">
+            <span className="block text-sm font-semibold tracking-[-0.02em]">
               AIIO Canada
             </span>
             <span className="hidden text-[9px] uppercase tracking-[0.16em] text-[#536864] sm:block">
@@ -34,7 +34,7 @@ export function SiteHeader() {
             <ModeToggle compact />
           </div>
           <Link
-            className="hidden h-8 items-center gap-1.5 rounded-full border border-[#d5d9d4] bg-white px-3 text-xs font-medium text-[#294a49] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] xl:inline-flex"
+            className="hidden h-8 items-center gap-1.5 rounded-full border border-[#d5d9d4] bg-white px-3 text-xs font-medium text-[#294a49] shadow-[0_1px_2px_rgba(13,43,54,0.04)] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] xl:inline-flex"
             href="/downloads"
           >
             Downloads <ChevronRight className="size-3.5" />

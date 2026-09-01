@@ -65,6 +65,7 @@ from .provincial_backcast_review import (
 from .attribution import build_attribution_readiness
 from .digest import build_digest, validate_digest_cadence
 from .historical_envelope import run_historical_reference_envelope
+from .historical_analog import run_historical_analog_matrix
 from .labour import run_labour_recruitment_pressure
 from .materials import run_material_cost_screen, run_provincial_material_cost_screen
 from .macro_controls import build_regional_macro_controls
@@ -274,6 +275,13 @@ def main() -> None:
     )
     historical_envelope_parser.add_argument("bcpi_path", type=Path)
     historical_envelope_parser.add_argument("output_path", type=Path)
+
+    historical_analog_parser = subparsers.add_parser(
+        "run-historical-project-analogs",
+        help="build schedule-weighted historical BCPI analog stress-test matrices",
+    )
+    historical_analog_parser.add_argument("bcpi_path", type=Path)
+    historical_analog_parser.add_argument("output_path", type=Path)
 
     provincial_cost_baseline_parser = subparsers.add_parser(
         "run-cost-baseline-provinces",
@@ -1184,6 +1192,29 @@ def main() -> None:
                         "historical_summary_authorized": output[
                             "publication_authorization"
                         ]["historical_summary_authorized"],
+                    }
+                )
+            )
+        elif args.command == "run-historical-project-analogs":
+            output = run_historical_analog_matrix(
+                args.bcpi_path.resolve(),
+                args.output_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "reference_class_count": len(
+                            output["reference_class_results"]
+                        ),
+                        "grid_result_count": sum(
+                            len(item["grid"])
+                            for item in output["reference_class_results"]
+                        ),
+                        "historical_analog_stress_test_authorized": output[
+                            "publication_authorization"
+                        ]["historical_analog_stress_test_authorized"],
                     }
                 )
             )

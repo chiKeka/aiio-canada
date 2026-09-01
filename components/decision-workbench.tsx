@@ -18,6 +18,7 @@ import {
 } from '@/lib/decision-analysis';
 import releaseData from '@/public/data/latest.json';
 import historicalEnvelope from '@/data/model-runs/alberta_bcpi_historical_envelope_v0.1.json';
+import historicalAnalogMatrix from '@/data/model-runs/alberta_project_historical_analog_matrix_v0.1.json';
 import auditedProjectOutcomes from '@/data/model-runs/oago_audited_project_outcomes_v0.1.json';
 import quebecFullArchive from '@/data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json';
 import quebecProjectRevisions from '@/data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json';
@@ -37,6 +38,12 @@ const ASSET_TO_HISTORICAL_CLASS: Partial<Record<AssetId, string>> = {
   government: 'government_and_civic_facilities',
   municipal: 'municipal_operations_facilities',
 };
+type SpendProfileId = 'front_loaded' | 'even' | 'back_loaded';
+const SPEND_PROFILE_LABELS: Record<SpendProfileId, string> = {
+  front_loaded: 'Front-loaded',
+  even: 'Even annual spend',
+  back_loaded: 'Back-loaded',
+};
 
 export function DecisionWorkbench() {
   const [projectName, setProjectName] = useState('New regional health centre');
@@ -45,6 +52,8 @@ export function DecisionWorkbench() {
   const [budgetMillions, setBudgetMillions] = useState(1200);
   const [startYear, setStartYear] = useState(2029);
   const [duration, setDuration] = useState(5);
+  const [spendProfile, setSpendProfile] = useState<SpendProfileId>('even');
+  const [priceBasisConfirmed, setPriceBasisConfirmed] = useState(false);
   const analysis = useMemo(
     () => buildDecisionAnalysis({ assetId, duration, metroId, startYear }),
     [assetId, duration, metroId, startYear],
@@ -55,16 +64,16 @@ export function DecisionWorkbench() {
       <SiteHeader />
       <section className="relative overflow-hidden border-b border-[#e0dfd8] bg-[#faf9f5]">
         <div className="observatory-grid absolute inset-0 opacity-55" aria-hidden="true" />
-        <div className="relative mx-auto grid max-w-[1440px] gap-7 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_360px] lg:px-12 lg:py-14">
+        <div className="relative mx-auto grid max-w-[1440px] gap-7 px-5 py-9 sm:px-8 lg:grid-cols-[1fr_360px] lg:px-12 lg:py-12">
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <Badge className="border-[#b8d4cc] bg-[#e6f1ed] text-[#155d56]">Executive decision workspace</Badge>
               <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#5b6d69]">Alberta pilot · release {releaseData.manifest.version}</span>
             </div>
-            <h1 className="max-w-4xl text-balance text-4xl font-normal leading-[1.04] tracking-[-0.05em] text-[#112f37] sm:text-6xl">What do we <span className="editorial-highlight">know</span>—and what must we resolve—before this project goes to market?</h1>
+            <h1 className="max-w-4xl text-balance text-4xl font-normal leading-[1.05] tracking-[-0.045em] text-[#112f37] sm:text-[52px]">What do we <span className="editorial-highlight">know</span>—and what must we resolve—before this project goes to market?</h1>
             <p className="mt-5 max-w-3xl text-sm leading-6 text-[#596d69] sm:text-base">Define a capital project, separate observed market conditions from the Alberta $50B counterfactual, inspect relevant model paths, and turn evidence gaps into decision gates.</p>
           </div>
-          <div className="self-end rounded-[10px] border border-[#dfc5b3] border-l-4 border-l-[#d66b35] bg-white px-5 py-4 text-xs leading-5 text-[#774a35]">
+          <div className="self-end rounded-2xl border border-[#dfc5b3] border-l-4 border-l-[#d66b35] bg-white px-5 py-4 text-xs leading-5 text-[#774a35] shadow-[0_1px_2px_rgba(13,43,54,0.04)]">
             <span className="font-semibold text-[#984b27]">Decision boundary:</span> AI-attributable cost escalation remains unquantified. No number on this page is an AI cost forecast for the project.
           </div>
           <DecisionSignalRail />
@@ -78,10 +87,13 @@ export function DecisionWorkbench() {
             metroId={metroId} projectName={projectName} setAssetId={setAssetId}
             setBudgetMillions={setBudgetMillions} setDuration={setDuration}
             setMetroId={setMetroId} setProjectName={setProjectName}
-            setStartYear={setStartYear} startYear={startYear}
+            setPriceBasisConfirmed={setPriceBasisConfirmed}
+            setSpendProfile={setSpendProfile} setStartYear={setStartYear}
+            spendProfile={spendProfile} startYear={startYear}
+            priceBasisConfirmed={priceBasisConfirmed}
           />
           <div className="space-y-5">
-            <section className="rounded-xl border border-[#d8dcd7] bg-white p-5 sm:p-7">
+            <section className="aiio-panel-elevated p-5 sm:p-7">
               <div className="flex flex-col justify-between gap-4 border-b border-[#dce2dd] pb-5 md:flex-row md:items-start">
                 <div>
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#28766d]">Decision boundary brief</p>
@@ -112,6 +124,15 @@ export function DecisionWorkbench() {
               </div>
             </section>
             <HistoricalMarketEnvelope analysis={analysis} assetId={assetId} duration={duration} />
+            <HistoricalAnalogStressTest
+              analysis={analysis}
+              assetId={assetId}
+              budgetMillions={budgetMillions}
+              duration={duration}
+              priceBasisConfirmed={priceBasisConfirmed}
+              spendProfile={spendProfile}
+              startYear={startYear}
+            />
             <MarketAndPath analysis={analysis} />
             <EvidenceChannels analysis={analysis} />
           </div>
@@ -127,13 +148,13 @@ export function DecisionWorkbench() {
 function DecisionSignalRail() {
   const signals = [
     { label: 'Market context', value: 'Available', note: 'Observed + inferred', tone: 'border-t-[#2f8f83]' },
-    { label: 'Historical envelope', value: 'Available', note: 'Descriptive · not forecast', tone: 'border-t-[#57a8b2]' },
+    { label: 'Historical analog', value: 'Available', note: 'Stress test · not forecast', tone: 'border-t-[#57a8b2]' },
     { label: 'Future baseline', value: 'Withheld', note: 'Horizon gate failed', tone: 'border-t-[#d66b35]' },
     { label: 'AI cost increment', value: 'Unquantified', note: 'Calibration required', tone: 'border-t-[#d66b35]' },
     { label: 'Graph pathways', value: 'Inspectable', note: 'Assumed · low confidence', tone: 'border-t-[#57a8b2]' },
   ];
   return (
-    <div className="grid gap-px overflow-hidden rounded-[10px] border border-[#d8dcd7] bg-[#d8dcd7] sm:grid-cols-2 lg:col-span-2 lg:grid-cols-5" aria-label="Decision readiness signals">
+    <div className="grid gap-px overflow-hidden rounded-2xl border border-[#d8dcd7] bg-[#d8dcd7] shadow-[0_1px_2px_rgba(13,43,54,0.035)] sm:grid-cols-2 lg:col-span-2 lg:grid-cols-5" aria-label="Decision readiness signals">
       {signals.map((signal) => (
         <div className={`border-t-2 bg-white px-4 py-3 ${signal.tone}`} key={signal.label}>
           <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.11em] text-[#61736f]">{signal.label}</p>
@@ -174,27 +195,76 @@ function HistoricalMarketEnvelope({ analysis, assetId, duration }: { analysis: A
   </section>;
 }
 
+function HistoricalAnalogStressTest({ analysis, assetId, budgetMillions, duration, priceBasisConfirmed, spendProfile, startYear }: {
+  analysis: Analysis; assetId: AssetId; budgetMillions: number; duration: number;
+  priceBasisConfirmed: boolean; spendProfile: SpendProfileId; startYear: number;
+}) {
+  const referenceClass = ASSET_TO_HISTORICAL_CLASS[assetId];
+  const originYear = Number(historicalAnalogMatrix.as_of_date.slice(0, 4));
+  const startLag = startYear - originYear;
+  const series = historicalAnalogMatrix.reference_class_results.find(
+    (item) => item.asset_class === referenceClass && item.geography_id === analysis.metroId,
+  );
+  const row = series?.grid.find(
+    (item) => item.start_lag_years === startLag
+      && item.duration_years === duration
+      && item.profile_id === spendProfile,
+  );
+  if (!referenceClass || !series) {
+    return <section className="rounded-xl border border-[#dfb38f] bg-[#fff1e5] p-5 sm:p-6"><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#93491f]">Project historical analog</p><h2 className="mt-2 text-xl font-medium text-[#713c24]">No building-market analog for this asset</h2><p className="mt-3 text-sm leading-6 text-[#7d5946]">Road, water and regulated-utility projects need purpose-built civil or utility cost indexes. The product will not translate a building proxy into a dollar stress range.</p></section>;
+  }
+  if (!row || row.status === 'not_assessed' || !row.schedule_weighted_factor || !row.schedule_weighted_change_percent) {
+    return <section className="rounded-xl border border-[#dfb38f] bg-[#fff1e5] p-5 sm:p-6"><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#93491f]">Project historical analog</p><h2 className="mt-2 text-xl font-medium text-[#713c24]">Schedule extends beyond the governed analog grid</h2><p className="mt-3 text-sm leading-6 text-[#7d5946]">The current matrix supports expenditure horizons through ten years after the June 2026 price basis. This project reaches {startLag + duration - 1} years after that origin, so no value is shown.</p></section>;
+  }
+  const factor = row.schedule_weighted_factor;
+  const change = row.schedule_weighted_change_percent;
+  const estimateCad = budgetMillions * 1_000_000;
+  const limited = row.status === 'limited_history_only';
+  const budgetValue = (value: number) => priceBasisConfirmed ? formatCad(estimateCad * value) : 'Confirm basis';
+  return <section className={`rounded-xl border p-5 sm:p-6 ${limited ? 'border-[#dfb38f] bg-[#fff8ef]' : 'border-[#8fc0b6] bg-[#e9f3ef]'}`}>
+    <div className="flex flex-col justify-between gap-3 md:flex-row md:items-start"><div><div className="flex flex-wrap gap-2"><Badge className="border-[#87bfb4] bg-white text-[#155d56]">historical-path stress test</Badge><Badge variant="outline" className="border-[#9db7c4] bg-white text-[#365968]">{SPEND_PROFILE_LABELS[spendProfile]}</Badge>{limited ? <Badge variant="outline" className="border-[#dfb38f] bg-[#fff0e3] text-[#93491f]">limited independent windows</Badge> : null}</div><h2 className="mt-3 text-xl font-medium">What would this expenditure schedule look like under coherent past market paths?</h2><p className="mt-1 text-xs leading-5 text-[#5b6d69]">{series.reference_class_label} · {series.geography_label} · expenditure horizons {startLag}–{startLag + duration - 1} years from {historicalAnalogMatrix.as_of_date}</p></div><span className="font-mono text-[10px] text-[#5b6d69]">{row.overlapping_trajectory_count} historical origins</span></div>
+    <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <AnalogMetric label="Lower historical marker" value={formatPercent(change.p10)} budget={budgetValue(factor.p10)} />
+      <AnalogMetric label="Median historical marker" value={formatPercent(change.p50)} budget={budgetValue(factor.p50)} emphasis />
+      <AnalogMetric label="Upper historical marker" value={formatPercent(change.p90)} budget={budgetValue(factor.p90)} />
+    </div>
+    <div className="mt-4 grid gap-3 lg:grid-cols-[1.15fr_.85fr]">
+      <div className="rounded-lg border border-[#d3ddd7] bg-white p-4 text-xs leading-5 text-[#536863]"><p><strong>Schedule logic:</strong> the {SPEND_PROFILE_LABELS[spendProfile].toLowerCase()} profile shares are applied to each complete historical index trajectory, preserving the relationship among years instead of mixing independent horizon quantiles.</p><p className="mt-2">The history spans only <strong>{row.non_overlapping_trajectory_count}</strong> non-overlapping schedule-length windows; overlapping origins are serially dependent.</p></div>
+      <div className="rounded-lg border border-[#dfb38f] bg-[#fff0e3] p-4 text-[10px] leading-4 text-[#7d5946]"><strong>Not a forecast, probability range or recommended contingency.</strong> Dollar equivalents appear only after confirming the estimate is in the June 2026 price basis and excludes escalation. No AI increment or graph score is added.</div>
+    </div>
+    <p className="mt-3 text-[10px] leading-4 text-[#5a6c68]">Proxy status: {series.mapping_status.replaceAll('_', ' ')}. {series.mapping_note}</p>
+  </section>;
+}
+
+function AnalogMetric({ budget, emphasis = false, label, value }: { budget: string; emphasis?: boolean; label: string; value: string }) {
+  return <article className={`rounded-lg border bg-white p-4 ${emphasis ? 'border-[#6da99f]' : 'border-[#d3ddd7]'}`}><p className="font-mono text-xl font-semibold text-[#1f625b]">{value}</p><p className="mt-2 text-xs font-medium">{label}</p><p className="mt-2 border-t border-[#e0e6e1] pt-2 font-mono text-sm text-[#365f5b]">{budget}</p><p className="mt-1 text-[9px] uppercase tracking-[0.07em] text-[#697975]">historical analog budget equivalent</p></article>;
+}
+
 function HistoricalMetric({ emphasis = false, label, note, value }: { emphasis?: boolean; label: string; note: string; value: string }) {
   return <article className={`rounded-lg border bg-white p-4 ${emphasis ? 'border-[#6da99f]' : 'border-[#d3ddd7]'}`}><p className="font-mono text-xl font-semibold text-[#1f625b]">{value}</p><p className="mt-2 text-xs font-medium">{label}</p><p className="mt-1 text-[10px] leading-4 text-[#5a6c68]">{note}</p></article>;
 }
 
-function ProjectForm({ assetId, budgetMillions, duration, metroId, projectName, setAssetId, setBudgetMillions, setDuration, setMetroId, setProjectName, setStartYear, startYear }: {
+function ProjectForm({ assetId, budgetMillions, duration, metroId, priceBasisConfirmed, projectName, setAssetId, setBudgetMillions, setDuration, setMetroId, setPriceBasisConfirmed, setProjectName, setSpendProfile, setStartYear, spendProfile, startYear }: {
   assetId: AssetId; budgetMillions: number; duration: number; metroId: MetroId; projectName: string;
+  priceBasisConfirmed: boolean; spendProfile: SpendProfileId;
   setAssetId: (value: AssetId) => void; setBudgetMillions: (value: number) => void;
   setDuration: (value: number) => void; setMetroId: (value: MetroId) => void;
-  setProjectName: (value: string) => void; setStartYear: (value: number) => void; startYear: number;
+  setPriceBasisConfirmed: (value: boolean) => void; setProjectName: (value: string) => void;
+  setSpendProfile: (value: SpendProfileId) => void; setStartYear: (value: number) => void; startYear: number;
 }) {
-  return <aside className="self-start rounded-xl border border-[#d8dcd7] bg-white p-5 xl:sticky xl:top-24">
+  return <aside className="aiio-panel-elevated self-start p-5 xl:sticky xl:top-24">
     <div className="flex items-center justify-between"><div><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#28766d]">Project definition</p><h2 className="mt-1 text-lg font-medium">Your capital decision</h2></div><Building2 className="size-5 text-[#2b776e]" /></div>
     <div className="mt-6 space-y-5">
-      <Field label="Project name"><Input className="h-10 bg-white" onChange={(event) => setProjectName(event.target.value)} value={projectName} /></Field>
-      <Field label="Asset class"><NativeSelect className="w-full" onChange={(event) => setAssetId(event.target.value as AssetId)} value={assetId}>{Object.entries(ASSETS).map(([id, asset]) => <NativeSelectOption key={id} value={id}>{asset.label}</NativeSelectOption>)}</NativeSelect></Field>
-      <Field label="Market region"><NativeSelect className="w-full" onChange={(event) => setMetroId(event.target.value as MetroId)} value={metroId}>{Object.entries(METROS).map(([id, label]) => <NativeSelectOption key={id} value={id}>{label}</NativeSelectOption>)}</NativeSelect><p className="text-[10px] leading-4 text-[#596b67]">Full decision analysis is currently available for Alberta.</p></Field>
+      <Field label="Project name"><Input className="aiio-control h-10" onChange={(event) => setProjectName(event.target.value)} value={projectName} /></Field>
+      <Field label="Asset class"><NativeSelect className="w-full [&>select]:h-10 [&>select]:border-[#d8dcd7] [&>select]:bg-[#f8f8f4] [&>select]:hover:border-[#aebdb7] [&>select]:hover:bg-white" onChange={(event) => setAssetId(event.target.value as AssetId)} value={assetId}>{Object.entries(ASSETS).map(([id, asset]) => <NativeSelectOption key={id} value={id}>{asset.label}</NativeSelectOption>)}</NativeSelect></Field>
+      <Field label="Market region"><NativeSelect className="w-full [&>select]:h-10 [&>select]:border-[#d8dcd7] [&>select]:bg-[#f8f8f4] [&>select]:hover:border-[#aebdb7] [&>select]:hover:bg-white" onChange={(event) => setMetroId(event.target.value as MetroId)} value={metroId}>{Object.entries(METROS).map(([id, label]) => <NativeSelectOption key={id} value={id}>{label}</NativeSelectOption>)}</NativeSelect><p className="text-[10px] leading-4 text-[#596b67]">Full decision analysis is currently available for Alberta.</p></Field>
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Estimate ($M)"><Input className="h-10 bg-white font-mono" min="1" onChange={(event) => { const value = Number(event.target.value); if (Number.isFinite(value)) setBudgetMillions(Math.max(1, value)); }} type="number" value={budgetMillions} /></Field>
-        <Field label="Start year"><Input className="h-10 bg-white font-mono" max="2040" min="2026" onChange={(event) => { const value = Number(event.target.value); if (Number.isFinite(value)) setStartYear(value); }} type="number" value={startYear} /></Field>
+        <Field label="Estimate ($M)"><Input className="aiio-control h-10 font-mono" min="1" onChange={(event) => { const value = Number(event.target.value); if (Number.isFinite(value)) setBudgetMillions(Math.max(1, value)); }} type="number" value={budgetMillions} /></Field>
+        <Field label="Start year"><Input className="aiio-control h-10 font-mono" max="2040" min="2026" onChange={(event) => { const value = Number(event.target.value); if (Number.isFinite(value)) setStartYear(value); }} type="number" value={startYear} /></Field>
       </div>
-      <p className="-mt-3 text-[10px] leading-4 text-[#596b67]">Estimate is briefing context only. It does not enter a cost calculation until calibration is approved.</p>
+      <Field label="Annual expenditure shape"><NativeSelect className="w-full [&>select]:h-10 [&>select]:border-[#d8dcd7] [&>select]:bg-[#f8f8f4] [&>select]:hover:border-[#aebdb7] [&>select]:hover:bg-white" onChange={(event) => setSpendProfile(event.target.value as SpendProfileId)} value={spendProfile}>{Object.entries(SPEND_PROFILE_LABELS).map(([id, label]) => <NativeSelectOption key={id} value={id}>{label}</NativeSelectOption>)}</NativeSelect><p className="text-[10px] leading-4 text-[#596b67]">A declared stress-test schedule—not an inferred project cash flow.</p></Field>
+      <label className="flex cursor-pointer gap-3 rounded-lg border border-[#d8dfda] bg-[#f7f8f4] p-3 text-[11px] leading-5 text-[#52645f]"><input checked={priceBasisConfirmed} className="mt-1 size-4 accent-[#28766d]" onChange={(event) => setPriceBasisConfirmed(event.target.checked)} type="checkbox" /><span>The estimate is stated in the June 2026 price basis and excludes future escalation already embedded elsewhere.</span></label>
+      <p className="-mt-3 text-[10px] leading-4 text-[#596b67]">The estimate enters only the historical analog stress test after this basis is confirmed. It never enters the uncalibrated AI scenario.</p>
       <Field label={`Delivery duration · ${duration} years`}><input aria-label="Delivery duration in years" className="scenario-range mt-2 w-full" max="10" min="2" onChange={(event) => setDuration(Number(event.target.value))} type="range" value={duration} /><div className="flex justify-between font-mono text-[10px] text-[#5a6c68]"><span>2 years</span><span>10 years</span></div></Field>
     </div>
   </aside>;
@@ -270,5 +340,6 @@ function DecisionMetric({ evidence, icon: Icon, label, note, tone = 'default', v
 function ChannelCard({ children, icon: Icon, status, title, warning = false }: { children: React.ReactNode; icon: typeof Users; status: string; title: string; warning?: boolean }) { return <article className={`rounded-xl border p-4 ${warning ? 'border-[#dfb38f] bg-[#fff1e5]' : 'border-[#d5ddd8] bg-[#fbfaf5]'}`}><div className="flex items-center justify-between gap-2"><Icon className="size-4 text-[#28766d]" /><span className="font-mono text-[8px] uppercase text-[#5a6c68]">{status}</span></div><h3 className="mt-4 text-sm font-medium">{title}</h3><div className="mt-2 text-[11px] leading-5 text-[#5a6c68]">{children}</div></article>; }
 function CoverageRow({ label, status, warning = false }: { label: string; status: string; warning?: boolean }) { return <div className="flex items-center justify-between gap-4 border-b border-[#d6ded9] py-2 last:border-0"><span className="text-[#52645f]">{label}</span><span className={`font-mono text-[10px] font-semibold ${warning ? 'text-[#a04f27]' : 'text-[#28766d]'}`}>{status}</span></div>; }
 function formatPercent(value: number) { return Number.isFinite(value) ? `${value >= 0 ? '+' : ''}${value.toFixed(1)}%` : 'n/a'; }
+function formatCad(value: number) { if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`; if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`; return new Intl.NumberFormat('en-CA', { currency: 'CAD', maximumFractionDigits: 0, style: 'currency' }).format(value); }
 function formatMacroChange(value: number | null | undefined) { return value === null || value === undefined || !Number.isFinite(value) ? 'not published' : `${value >= 0 ? '+' : ''}${value.toFixed(1)}% YoY`; }
 function formatYears(years: number[]) { if (!years.length) return 'none'; if (years.length === 1) return String(years[0]); const consecutive = years.every((year, index) => index === 0 || year === years[index - 1] + 1); return consecutive ? `${years[0]}–${years.at(-1)}` : years.join(', '); }

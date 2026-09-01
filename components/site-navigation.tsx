@@ -44,7 +44,7 @@ export function DesktopNavigation() {
 
   return (
     <nav
-      className="hidden items-center gap-5 text-xs font-medium xl:flex"
+      className="hidden items-center gap-0.5 rounded-full border border-[#e1e2dd] bg-[#f2f2ed] p-1 text-xs font-medium xl:flex"
       aria-label="Primary navigation"
     >
       {primaryLinks.map((link) => {
@@ -52,10 +52,10 @@ export function DesktopNavigation() {
         return (
           <Link
             aria-current={active ? 'page' : undefined}
-            className={`border-b-2 py-1 transition-colors ${
+            className={`rounded-full px-3 py-1.5 transition-all ${
               active
-                ? 'border-[#28766d] text-[#174e4b]'
-                : 'border-transparent text-[#62716e] hover:text-[#143f42]'
+                ? 'bg-white text-[#174e4b] shadow-[0_1px_2px_rgba(13,43,54,0.08)]'
+                : 'text-[#62716e] hover:bg-white/70 hover:text-[#143f42]'
             }`}
             href={link.href}
             key={link.href}

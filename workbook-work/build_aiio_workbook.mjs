@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.22.0-dev';
+const workbookBuildVersion = '0.23.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -387,6 +387,17 @@ const historicalCostEnvelope = JSON.parse(
     'utf8',
   ),
 );
+const historicalAnalogMatrix = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'alberta_project_historical_analog_matrix_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
 const referenceCostReview = JSON.parse(
   await fs.readFile(
     path.join(
@@ -470,6 +481,7 @@ const projectExposure = workbook.worksheets.add('Project Exposure');
 const powerEvidence = workbook.worksheets.add('Power Evidence');
 const costBaselineSheet = workbook.worksheets.add('Cost Baseline');
 const historicalCostSheet = workbook.worksheets.add('Historical Envelope');
+const historicalAnalogSheet = workbook.worksheets.add('Historical Analog');
 const referenceReviewSheet = workbook.worksheets.add('Reference Review');
 const sectorCapexSheet = workbook.worksheets.add('Sector Capex');
 const cmaReferenceSheet = workbook.worksheets.add('CMA Reference');
@@ -524,6 +536,7 @@ for (const sheet of [
   powerEvidence,
   costBaselineSheet,
   historicalCostSheet,
+  historicalAnalogSheet,
   referenceReviewSheet,
   sectorCapexSheet,
   cmaReferenceSheet,
@@ -564,6 +577,7 @@ buildProjectExposure();
 buildPowerEvidence();
 buildCostBaseline();
 buildHistoricalCostEnvelope();
+buildHistoricalAnalog();
 buildReferenceReview();
 buildSectorCapex();
 buildCmaReference();
@@ -601,6 +615,14 @@ await workbook.comments.addThread(
 await workbook.comments.addThread(
   { cell: projectCost.getRange('B9') },
   'Version 0.1 requires the estimate price basis to match the latest observed baseline quarter. Rebasing is not yet implemented.',
+);
+await workbook.comments.addThread(
+  { cell: historicalAnalogSheet.getRange('B13') },
+  'Illustrative price-basis estimate. Replace only with an estimate stated in the June 2026 basis and excluding future escalation already embedded elsewhere.',
+);
+await workbook.comments.addThread(
+  { cell: historicalAnalogSheet.getRange('B14') },
+  'YES enables only the historical-path arithmetic translation. It does not authorize a forecast, recommended allowance or AI-attributable increment.',
 );
 
 await fs.mkdir(outputDir, { recursive: true });
@@ -659,6 +681,15 @@ const inspectHistoricalEnvelope = await workbook.inspect({
   tableMaxCols: 19,
 });
 console.log(inspectHistoricalEnvelope.ndjson);
+
+const inspectHistoricalAnalog = await workbook.inspect({
+  kind: 'table',
+  range: 'Historical Analog!A1:U38',
+  include: 'values,formulas',
+  tableMaxRows: 38,
+  tableMaxCols: 21,
+});
+console.log(inspectHistoricalAnalog.ndjson);
 
 const inspectReferenceReview = await workbook.inspect({
   kind: 'table',
@@ -805,6 +836,7 @@ const previewRanges = {
   'Power Evidence': 'A1:H28',
   'Cost Baseline': 'A1:P54',
   'Historical Envelope': 'A1:S55',
+  'Historical Analog': 'A1:U38',
   'Reference Review': 'A1:J40',
   'Sector Capex': 'A1:T45',
   'CMA Reference': 'A1:W32',
@@ -885,7 +917,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H51').values = [
+  readme.getRange('A18:H52').values = [
     [
       '1',
       'Dashboard',
@@ -1226,26 +1258,36 @@ function buildReadMe() {
       '',
       '',
     ],
-  ];
-  readme.getRange('A18:A51').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B51').format.font = { bold: true };
-  readme.getRange('C18:H51').merge(true);
-  readme.getRange('A53:H53').merge();
-  readme.getRange('A53').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A53:H53'), C.amber);
-  readme.getRange('A54:H54').merge();
-  readme.getRange('A54').values = [
     [
-      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 Alberta asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The CMA expansion adds 60 Vancouver, Toronto and Montréal horizon checks: 9 pass internally, 36 fail and 15 are not assessed. The Province Bridge transparently relabels 1,296 pre-2017 CMA-linked values as inferred, preserves 456 official provincial observations and reproduces the same nine internal British Columbia-linked passes; none is an official pre-2017 province observation or an authorized projection. The ${referenceCostReview.required_criteria.length}-criterion Alberta review packet is prepared but has no verdict, and both reviewer channels remain blocked. No public project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only; its quantiles are not forecasts, probabilities or project allowances. The NAICS 51 Sector Capex screen adds ${informationSectorCapex.observation_count} annual Canada/province cells and reports Alberta 2024 actual/revised construction capital of $458.6M, but ${informationSectorCapex.quality_flag_counts.suppressed_confidentiality} cells are suppressed and the broad industry cannot identify AI/data-centre treatment. The Regional Macro sheet adds ${regionalMacroReport.series_count} separate quarterly control series through ${regionalMacroReport.common_latest_period_end}; they are descriptive context, not a composite score, scenario calibration or AI effect. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
+      '35',
+      'Historical Analog',
+      'Translate a declared Alberta building-project schedule through coherent observed BCPI paths; dollar equivalents are historical stress tests, not forecasts or AI premiums.',
+      '',
+      '',
+      '',
+      '',
+      '',
     ],
   ];
-  readme.getRange('A54:H54').format = {
+  readme.getRange('A18:A52').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B52').format.font = { bold: true };
+  readme.getRange('C18:H52').merge(true);
+  readme.getRange('A54:H54').merge();
+  readme.getRange('A54').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A54:H54'), C.amber);
+  readme.getRange('A55:H55').merge();
+  readme.getRange('A55').values = [
+    [
+      `WITHHELD FORECAST + UNCALIBRATED AI DIAGNOSTIC. Only 1 of 40 Alberta asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The CMA expansion adds 60 Vancouver, Toronto and Montréal horizon checks: 9 pass internally, 36 fail and 15 are not assessed. The Province Bridge transparently relabels 1,296 pre-2017 CMA-linked values as inferred, preserves 456 official provincial observations and reproduces the same nine internal British Columbia-linked passes; none is an official pre-2017 province observation or an authorized projection. The ${referenceCostReview.required_criteria.length}-criterion Alberta review packet is prepared but has no verdict, and both reviewer channels remain blocked. No forward project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only. The Historical Analog sheet adds ${historicalAnalogMatrix.reference_class_results.reduce((total, item) => total + item.grid.length, 0)} coherent-path schedule combinations and may translate an explicitly confirmed price-basis estimate only as a historical what-if; its markers are not probabilities, forecasts, recommended allowances or AI premiums. The NAICS 51 Sector Capex screen adds ${informationSectorCapex.observation_count} annual Canada/province cells and reports Alberta 2024 actual/revised construction capital of $458.6M, but ${informationSectorCapex.quality_flag_counts.suppressed_confidentiality} cells are suppressed and the broad industry cannot identify AI/data-centre treatment. The Regional Macro sheet adds ${regionalMacroReport.series_count} separate quarterly control series through ${regionalMacroReport.common_latest_period_end}; they are descriptive context, not a composite score, scenario calibration or AI effect. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
+    ],
+  ];
+  readme.getRange('A55:H55').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A54').format.rowHeight = 245;
+  readme.getRange('A55').format.rowHeight = 260;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
@@ -3278,6 +3320,241 @@ function buildHistoricalCostEnvelope() {
       Q: 20, R: 18, S: 52,
     },
     historicalEndRow + 4,
+  );
+}
+
+function buildHistoricalAnalog() {
+  titleBand(
+    historicalAnalogSheet,
+    'Project historical-path stress test',
+    `Coherent observed BCPI trajectories · as of ${historicalAnalogMatrix.as_of_date} · not a forecast or AI premium`,
+    'U',
+  );
+  const sourceUrl = currentSourceRegistry.sources.find(
+    (item) => item.source_id === historicalAnalogMatrix.source_id,
+  )?.canonical_url ?? '';
+  const analogRows = historicalAnalogMatrix.reference_class_results.flatMap(
+    (reference) => reference.grid.map((item) => {
+      const factors = item.schedule_weighted_factor;
+      return [
+        reference.asset_class,
+        reference.asset_class_label,
+        reference.geography_id,
+        reference.geography_label,
+        item.start_lag_years,
+        item.duration_years,
+        item.profile_id,
+        item.status,
+        item.overlapping_trajectory_count,
+        item.non_overlapping_trajectory_count,
+        factors?.minimum ?? null,
+        factors?.p10 ?? null,
+        factors?.p25 ?? null,
+        factors?.p50 ?? null,
+        factors?.p75 ?? null,
+        factors?.p90 ?? null,
+        factors?.maximum ?? null,
+        sourceUrl,
+        reference.mapping_status,
+        item.expenditure_schedule
+          .map((entry) => `${entry.horizon_years}y:${(entry.share * 100).toFixed(1)}%`)
+          .join(' · '),
+        `${reference.asset_class}|${reference.geography_id}|${item.start_lag_years}|${item.duration_years}|${item.profile_id}`,
+      ];
+    }),
+  );
+  const boundary = historicalAnalogMatrix.publication_authorization;
+  historicalAnalogSheet.getRange('A5:B9').values = [
+    ['Matrix model ID', historicalAnalogMatrix.model_id],
+    ['Reference series', historicalAnalogMatrix.reference_class_results.length],
+    ['Schedule combinations', analogRows.length],
+    ['Latest observation', historicalAnalogMatrix.as_of_date],
+    ['Source ID', historicalAnalogMatrix.source_id],
+  ];
+  historicalAnalogSheet.getRange('A5:A9').format.font = { bold: true, color: C.ink };
+  historicalAnalogSheet.getRange('B5:B9').format = {
+    fill: C.soft,
+    borders: { preset: 'outside', style: 'thin', color: C.line },
+  };
+  historicalAnalogSheet.getRange('D5:E10').values = [
+    ['Historical stress test authorized', boundary.historical_analog_stress_test_authorized ? 'YES' : 'NO'],
+    ['Historical budget translation authorized', boundary.historical_analog_budget_translation_authorized ? 'YES' : 'NO'],
+    ['Future projection authorized', boundary.future_projection_authorized ? 'YES' : 'NO'],
+    ['Probability interval authorized', boundary.probability_interval_authorized ? 'YES' : 'NO'],
+    ['Recommended allowance authorized', boundary.recommended_escalation_allowance_authorized ? 'YES' : 'NO'],
+    ['AI-attributable effect authorized', boundary.ai_attributable_effect_authorized ? 'YES' : 'NO'],
+  ];
+  historicalAnalogSheet.getRange('D5:D10').format.font = { bold: true, color: C.ink };
+  historicalAnalogSheet.getRange('E5:E6').format = { fill: C.tealLight, font: { bold: true, color: C.tealDark } };
+  historicalAnalogSheet.getRange('E7:E10').format = { fill: C.amberLight, font: { bold: true, color: '#8A4826' } };
+  historicalAnalogSheet.getRange('G5:U10').merge();
+  historicalAnalogSheet.getRange('G5').values = [[
+    'HISTORICAL WHAT-IF ONLY. Each marker weights a complete observed price path through the declared expenditure schedule. The dollar equivalents are arithmetic translations of the illustrative June 2026 price-basis estimate. They are not probabilities, forecast bounds, recommended contingencies, realized project-cost estimates or an AI-attributable increment. Graph pressure scores are not added.',
+  ]];
+  historicalAnalogSheet.getRange('G5:U10').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529' },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  historicalAnalogSheet.getRange('A12:B12').merge();
+  historicalAnalogSheet.getRange('A12').values = [['Illustrative project inputs']];
+  sectionHeader(historicalAnalogSheet.getRange('A12:B12'));
+  historicalAnalogSheet.getRange('A13:B20').values = [
+    ['Price-basis estimate (CAD)', 1_200_000_000],
+    ['June 2026 basis confirmed', 'YES'],
+    ['Asset class', 'health_facilities'],
+    ['Geography ID', 'CMA_835'],
+    ['Start lag (years)', 3],
+    ['Duration (years)', 5],
+    ['Expenditure profile', 'even'],
+    ['Lookup key', null],
+  ];
+  historicalAnalogSheet.getRange('A13:A20').format.font = { bold: true, color: C.ink };
+  historicalAnalogSheet.getRange('B13:B19').format = {
+    fill: '#EAF4FB',
+    font: { color: C.blueInput },
+    borders: { preset: 'outside', style: 'thin', color: '#AFCBDD' },
+  };
+  historicalAnalogSheet.getRange('B13').format.numberFormat = '$#,##0';
+  historicalAnalogSheet.getRange('B20').formulas = [[
+    '=B15&"|"&B16&"|"&B17&"|"&B18&"|"&B19',
+  ]];
+  historicalAnalogSheet.getRange('B20').format = {
+    fill: C.soft,
+    font: { name: 'Aptos Mono', size: 8, color: C.muted },
+  };
+  historicalAnalogSheet.getRange('B14').dataValidation = { rule: { type: 'list', values: ['YES', 'NO'] } };
+  historicalAnalogSheet.getRange('B15').dataValidation = { rule: { type: 'list', values: historicalAnalogMatrix.reference_class_results.filter((item, index, list) => list.findIndex((candidate) => candidate.asset_class === item.asset_class) === index).map((item) => item.asset_class) } };
+  historicalAnalogSheet.getRange('B16').dataValidation = { rule: { type: 'list', values: ['CMA_825', 'CMA_835'] } };
+  historicalAnalogSheet.getRange('B17').dataValidation = { rule: { type: 'whole', operator: 'between', formula1: 0, formula2: 10 } };
+  historicalAnalogSheet.getRange('B18').dataValidation = { rule: { type: 'whole', operator: 'between', formula1: 1, formula2: 10 } };
+  historicalAnalogSheet.getRange('B19').dataValidation = { rule: { type: 'list', values: historicalAnalogMatrix.configuration.profile_ids } };
+
+  historicalAnalogSheet.getRange('D12:G12').merge();
+  historicalAnalogSheet.getRange('D12').values = [['Schedule-weighted historical markers']];
+  sectionHeader(historicalAnalogSheet.getRange('D12:G12'));
+  historicalAnalogSheet.getRange('D13:G17').values = [
+    ['', 'Lower · p10', 'Median', 'Upper · p90'],
+    ['Factor', null, null, null],
+    ['Change from price basis', null, null, null],
+    ['Budget equivalent', null, null, null],
+    ['Increment vs estimate', null, null, null],
+  ];
+  header(historicalAnalogSheet.getRange('D13:G13'));
+  historicalAnalogSheet.getRange('D14:D17').format.font = { bold: true, color: C.ink };
+  const analogEndRow = 23 + analogRows.length;
+  const analogCriteriaArgs = `$A$24:$A$${analogEndRow},$B$15,$C$24:$C$${analogEndRow},$B$16,$E$24:$E$${analogEndRow},$B$17,$F$24:$F$${analogEndRow},$B$18,$G$24:$G$${analogEndRow},$B$19`;
+  const factorColumns = ['L', 'N', 'P'];
+  factorColumns.forEach((sourceColumn, index) => {
+    const outputColumn = ['E', 'F', 'G'][index];
+    historicalAnalogSheet.getRange(`${outputColumn}14`).formulas = [[
+      `=IF(COUNTIFS(${analogCriteriaArgs})=1,SUMIFS($${sourceColumn}$24:$${sourceColumn}$${analogEndRow},${analogCriteriaArgs}),"")`,
+    ]];
+    historicalAnalogSheet.getRange(`${outputColumn}15`).formulas = [[
+      `=IF(ISNUMBER(${outputColumn}14),${outputColumn}14-1,"")`,
+    ]];
+    historicalAnalogSheet.getRange(`${outputColumn}16`).formulas = [[
+      `=IF(AND($B$14="YES",ISNUMBER(${outputColumn}14)),$B$13*${outputColumn}14,"")`,
+    ]];
+    historicalAnalogSheet.getRange(`${outputColumn}17`).formulas = [[
+      `=IF(ISNUMBER(${outputColumn}16),${outputColumn}16-$B$13,"")`,
+    ]];
+  });
+  historicalAnalogSheet.getRange('E14:G14').format.numberFormat = '0.000';
+  historicalAnalogSheet.getRange('E15:G15').format.numberFormat = '0.0%';
+  historicalAnalogSheet.getRange('E16:G17').format.numberFormat = '$#,##0';
+  historicalAnalogSheet.getRange('E14:G17').format = {
+    fill: C.white,
+    borders: { preset: 'all', style: 'thin', color: C.line },
+  };
+
+  historicalAnalogSheet.getRange('I12:J12').merge();
+  historicalAnalogSheet.getRange('I12').values = [['Selected-path diagnostics']];
+  sectionHeader(historicalAnalogSheet.getRange('I12:J12'));
+  historicalAnalogSheet.getRange('I13:J18').values = [
+    ['Status', null],
+    ['Overlapping origins', null],
+    ['Non-overlapping windows', null],
+    ['Future projection', 'NO'],
+    ['AI-attributable effect', 'NO'],
+    ['Source ID', historicalAnalogMatrix.source_id],
+  ];
+  historicalAnalogSheet.getRange('I13:I18').format.font = { bold: true, color: C.ink };
+  historicalAnalogSheet.getRange('J13').formulas = [[
+    `=IF(COUNTIFS(${analogCriteriaArgs},$H$24:$H$${analogEndRow},"historical_context_available")=1,"historical_context_available",IF(COUNTIFS(${analogCriteriaArgs},$H$24:$H$${analogEndRow},"limited_history_only")=1,"limited_history_only","not_assessed"))`,
+  ]];
+  historicalAnalogSheet.getRange('J14').formulas = [[
+    `=SUMIFS($I$24:$I$${analogEndRow},${analogCriteriaArgs})`,
+  ]];
+  historicalAnalogSheet.getRange('J15').formulas = [[
+    `=SUMIFS($J$24:$J$${analogEndRow},${analogCriteriaArgs})`,
+  ]];
+  historicalAnalogSheet.getRange('J13:J18').format = {
+    fill: C.soft,
+    borders: { preset: 'outside', style: 'thin', color: C.line },
+  };
+  historicalAnalogSheet.getRange('J13').conditionalFormats.add('containsText', {
+    text: 'historical_context_available',
+    format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+  });
+  historicalAnalogSheet.getRange('J13').conditionalFormats.add('containsText', {
+    text: 'limited_history_only',
+    format: { fill: C.amberLight, font: { color: '#8A4826', bold: true } },
+  });
+
+  historicalAnalogSheet.getRange('L12:U20').merge();
+  historicalAnalogSheet.getRange('L12').values = [[
+    'Reading the result: the illustrative $1.2B Edmonton health-facility estimate uses an even five-year expenditure profile beginning three years after the June 2026 price basis. The three outputs show what that schedule would equal under the lower, median and upper descriptive markers across coherent past paths. Six non-overlapping schedule-length windows make this a limited-history stress test. Change the blue inputs to audit another supported building schedule; unsupported or out-of-grid combinations remain blank.',
+  ]];
+  noteBlock(historicalAnalogSheet.getRange('L12:U20'));
+
+  historicalAnalogSheet.getRange('A23:U23').values = [[
+    'Asset class', 'Asset label', 'Geography ID', 'Geography', 'Start lag (years)',
+    'Duration (years)', 'Profile', 'Status', 'Overlapping origins',
+    'Non-overlapping windows', 'Minimum factor', 'P10 factor', 'P25 factor',
+    'Median factor', 'P75 factor', 'P90 factor', 'Maximum factor', 'Source URL',
+    'Mapping status', 'Expenditure schedule', 'Lookup key',
+  ]];
+  header(historicalAnalogSheet.getRange('A23:U23'));
+  historicalAnalogSheet.getRange(`A24:U${analogEndRow}`).values = analogRows;
+  historicalAnalogSheet.getRange(`E24:F${analogEndRow}`).format.numberFormat = '0';
+  historicalAnalogSheet.getRange(`I24:J${analogEndRow}`).format.numberFormat = '#,##0';
+  historicalAnalogSheet.getRange(`K24:Q${analogEndRow}`).format.numberFormat = '0.000';
+  historicalAnalogSheet.getRange(`H24:H${analogEndRow}`).conditionalFormats.add('containsText', {
+    text: 'historical_context_available',
+    format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+  });
+  historicalAnalogSheet.getRange(`H24:H${analogEndRow}`).conditionalFormats.add('containsText', {
+    text: 'limited_history_only',
+    format: { fill: C.amberLight, font: { color: '#8A4826', bold: true } },
+  });
+  historicalAnalogSheet.getRange(`H24:H${analogEndRow}`).conditionalFormats.add('containsText', {
+    text: 'not_assessed',
+    format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
+  });
+  historicalAnalogSheet.getRange(`L24:P${analogEndRow}`).conditionalFormats.add('dataBar', {
+    color: C.teal,
+    gradient: true,
+  });
+  const analogTable = historicalAnalogSheet.tables.add(
+    `A23:U${analogEndRow}`,
+    true,
+    'HistoricalAnalogMatrixTable',
+  );
+  analogTable.style = 'TableStyleMedium2';
+  historicalAnalogSheet.freezePanes.freezeRows(23);
+  historicalAnalogSheet.freezePanes.freezeColumns(4);
+  setWidths(
+    historicalAnalogSheet,
+    {
+      A: 30, B: 31, C: 15, D: 18, E: 16, F: 16, G: 18, H: 27,
+      I: 19, J: 23, K: 16, L: 15, M: 15, N: 17, O: 15, P: 15,
+      Q: 17, R: 52, S: 30, T: 58, U: 58,
+    },
+    analogEndRow,
   );
 }
 
@@ -6563,8 +6840,9 @@ function buildReleaseChecks() {
     ['CMA reference-cost expansion reconciles and remains withheld', 'PASS'],
     ['Regional macro controls reconcile and remain descriptive only', 'PASS'],
     ['Province-linked BCPI bridge reconciles and remains non-authorizing', 'PASS'],
+    ['Historical project analogs reconcile and remain non-forecasting', 'PASS'],
   ];
-  checks.getRange('A16:C50').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C51').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -6757,22 +7035,25 @@ function buildReleaseChecks() {
   checks.getRange('B50').formulas = [[
     '=IF(AND(\'Province Bridge\'!B6=1752,\'Province Bridge\'!B7=1296,\'Province Bridge\'!B8=456,\'Province Bridge\'!B9=12,\'Province Bridge\'!B10=9,\'Province Bridge\'!E5=12,\'Province Bridge\'!E6<3%,\'Province Bridge\'!E7="NO",\'Province Bridge\'!E8="YES",\'Province Bridge\'!E9="baseline_only",\'Province Bridge\'!E10="pending",ROWS(\'Province Bridge\'!$A$29:$A$88)=60,COUNTIF(\'Province Bridge\'!$J$29:$J$88,"gate_passed")=9,COUNTIF(\'Province Bridge\'!$J$29:$J$88,"gate_failed")=36,COUNTIF(\'Province Bridge\'!$J$29:$J$88,"not_assessed")=15,COUNTIF(\'Province Bridge\'!$J$14:$J$25,"PASS")=12,COUNTIF(\'Province Bridge\'!$U$29:$U$88,"NO")=60),"PASS","FAIL")',
   ]];
-  checks.getRange('B16:B50').conditionalFormats.add('containsText', {
+  checks.getRange('B51').formulas = [[
+    '=IF(AND(\'Historical Analog\'!B6=8,\'Historical Analog\'!B7=1560,\'Historical Analog\'!E5="YES",\'Historical Analog\'!E6="YES",COUNTIF(\'Historical Analog\'!E7:E10,"NO")=4,ROWS(\'Historical Analog\'!$A$24:$A$1583)=1560,\'Historical Analog\'!J13="limited_history_only",\'Historical Analog\'!J14=154,\'Historical Analog\'!J15=6,ABS(\'Historical Analog\'!F14-1.136742)<0.000001,ABS(\'Historical Analog\'!F15-(\'Historical Analog\'!F14-1))<0.000001,ABS(\'Historical Analog\'!F16-\'Historical Analog\'!B13*\'Historical Analog\'!F14)<1,\'Historical Analog\'!J16="NO",\'Historical Analog\'!J17="NO",COUNTIF(\'Historical Analog\'!$R$24:$R$1583,"")=0),"PASS","FAIL")',
+  ]];
+  checks.getRange('B16:B51').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B50').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B51').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A52:D54').merge();
-  checks.getRange('A52').values = [
+  checks.getRange('A53:D55').merge();
+  checks.getRange('A53').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A52:D54'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 56);
+  noteBlock(checks.getRange('A53:D55'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 57);
 }
 
 function buildDashboard() {

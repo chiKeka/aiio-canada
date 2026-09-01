@@ -63,6 +63,8 @@
   --aiio-amber-wash: #fff0e3;
   --aiio-midnight: #081e28;
   --aiio-midnight-raised: #103542;
+  --aiio-panel-shadow: 0 1px 2px rgba(13, 43, 54, 0.04),
+    0 12px 32px rgba(13, 43, 54, 0.035);
   --background: oklch(0.978 0.006 92);
   --foreground: oklch(0.22 0.018 205);
   --card: oklch(0.995 0.003 92);
@@ -95,6 +97,40 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+@layer components {
+  .aiio-panel {
+    border: 1px solid var(--aiio-hairline);
+    border-radius: 1rem;
+    background: var(--aiio-white);
+  }
+
+  .aiio-panel-elevated {
+    border: 1px solid var(--aiio-hairline);
+    border-radius: 1rem;
+    background: var(--aiio-white);
+    box-shadow: var(--aiio-panel-shadow);
+  }
+
+  .aiio-eyebrow {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .aiio-control {
+    border-color: #d8dcd7;
+    background: #f8f8f4;
+  }
+
+  .aiio-control:hover {
+    border-color: #aebdb7;
+    background: #ffffff;
+  }
 }
 
 .dark {

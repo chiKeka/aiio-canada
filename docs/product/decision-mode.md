@@ -92,6 +92,21 @@ CMA reference markets and may support validation research, but they must not be
 shown as official provincial observations or used for a project-cost result
 until the backcast and modelling review gate is independently passed.
 
+## Historical-path project stress test
+
+While the forward reference forecast is withheld, Decision Mode may translate a
+user-entered estimate under coherent historical Alberta BCPI trajectories. The
+user must select a supported building class and CMA, declare a start year,
+duration and annual expenditure shape, and confirm that the estimate is in the
+June 2026 price basis with no future escalation already embedded.
+
+The display reports historical p10, median and p90 schedule-weighted markers and
+their arithmetic budget equivalents. These are explicitly labelled as a
+historical-path stress test. They are not probabilities, forecast bounds,
+recommended contingencies or an AI increment. The graph may identify diligence
+channels beside the result but must never supply a multiplier or be added to the
+historical marker.
+
 ## Analysis channels
 
 The product distinguishes five channels:

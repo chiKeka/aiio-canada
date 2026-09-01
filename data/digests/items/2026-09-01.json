@@ -159,6 +159,25 @@
       "automatic_model_change": false
     },
     {
+      "item_id": "ALBERTA_PROJECT_HISTORICAL_ANALOG_2026_09",
+      "headline": "Coherent historical paths turn project schedules into transparent stress tests",
+      "sources": [
+        {
+          "source_id": "STATCAN_BCPI_18100289",
+          "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901"
+        }
+      ],
+      "observed_change": "The locked Calgary and Edmonton BCPI histories support 1,560 reproducible combinations across four public-building reference classes, two CMAs, three declared expenditure shapes and schedules ending up to ten years after the June 2026 price basis. Each combination weights a complete observed historical trajectory rather than combining independent horizon quantiles.",
+      "model_implication": "Decision Mode may show the resulting p10, median and p90 historical markers and arithmetic budget equivalents after the user confirms the estimate price basis. Label every value as a historical-path stress test; do not describe the markers as probabilities, forecast bounds, recommended contingencies or AI-attributable escalation, and do not add graph pressure scores.",
+      "evidence_status": "inferred",
+      "geography_ids": [
+        "CMA_825",
+        "CMA_835"
+      ],
+      "model_action": "review_candidate",
+      "automatic_model_change": false
+    },
+    {
       "item_id": "REGIONAL_MACRO_CONTROL_PANEL_2026_09",
       "headline": "Seven separate regional macro controls add context without manufacturing an AI effect",
       "sources": [

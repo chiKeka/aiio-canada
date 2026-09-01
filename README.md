@@ -64,6 +64,7 @@ npm run cost:baseline:cmas
 npm run cost:backcast:provinces
 npm run cost:review:province-bridge
 npm run cost:historical-envelope
+npm run cost:historical-analogs
 npm run cost:review-package
 npm run model:run
 npm run model:variants
