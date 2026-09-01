@@ -38,6 +38,9 @@ explanation when challenged.
    utility coordination, packaging strategy and contingency review dates.
 6. Switch to Research Mode for sources, assumptions, methods, limitations,
    version history and downloadable artifacts.
+7. Print an executive decision record that preserves the configured project,
+   dated observed signals, scenario boundary, explicit unknowns, decision gates,
+   release identity and source IDs on one auditable briefing surface.
 
 ## Output contract
 
@@ -51,6 +54,11 @@ Every executive result must include:
 - sources and release version;
 - decision triggers and mitigations;
 - explicit unknowns.
+
+The printable decision record is a point-in-time briefing artifact, not a
+model export or new evidence product. It repeats the same release-bound values
+and fail-closed language already visible in Decision Mode. Printing cannot
+unlock withheld fields, alter assumptions or authorize publication.
 
 ## Calibration guardrail
 

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowDown, ArrowRight, ArrowUp, Building2, CalendarRange, Construction,
-  Factory, LockKeyhole, MapPin, Network, ShieldCheck, Users, Zap,
+  Factory, LockKeyhole, MapPin, Network, Printer, ShieldCheck, Users, Zap,
 } from 'lucide-react';
 
 import { ImpactPathGraph } from '@/components/impact-path-graph';
@@ -123,6 +123,13 @@ export function DecisionWorkbench() {
                 </div>
               </div>
             </section>
+            <ExecutiveDecisionBrief
+              analysis={analysis}
+              budgetMillions={budgetMillions}
+              duration={duration}
+              projectName={projectName}
+              startYear={startYear}
+            />
             <HistoricalMarketEnvelope analysis={analysis} assetId={assetId} duration={duration} />
             <HistoricalAnalogStressTest
               analysis={analysis}
@@ -143,6 +150,96 @@ export function DecisionWorkbench() {
       <SiteFooter />
     </main>
   );
+}
+
+function ExecutiveDecisionBrief({ analysis, budgetMillions, duration, projectName, startYear }: {
+  analysis: Analysis; budgetMillions: number; duration: number; projectName: string; startYear: number;
+}) {
+  const projectLabel = projectName || 'Untitled project';
+  const scenarioIntersection = analysis.scenarioWindowYears.length
+    ? `${formatYears(analysis.scenarioWindowYears)} (${analysis.scenarioWindowYears.length} of ${duration} delivery years)`
+    : 'Outside the current scenario window';
+  const lead = analysis.dominantNode?.label ?? 'No ranked pathway';
+  const material = analysis.materials[0];
+  const labour = analysis.labourRows
+    .filter((row) => row.vacancies_per_1_000_2021_employed !== null)
+    .sort((left, right) => (right.vacancies_per_1_000_2021_employed ?? 0) - (left.vacancies_per_1_000_2021_employed ?? 0))[0];
+  const observedSignal = material
+    ? `${COMPONENT_LABELS[material.component] ?? material.component}: ${formatPercent(material.year_over_year_percent_change)} YoY`
+    : 'No matching component observation';
+  const labourSignal = labour
+    ? `${LABOUR_LABELS[labour.trade_node_id] ?? labour.trade_node_id}: ${labour.vacancies_per_1_000_2021_employed?.toFixed(1)}/1k employed`
+    : 'No complete matching trade diagnostic';
+  return <section className="aiio-panel-elevated overflow-hidden" id="executive-decision-brief">
+    <div className="border-b border-[#d8dfda] bg-[#12333d] px-5 py-5 text-white sm:px-7">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+        <div>
+          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[#8ed0c5]">Executive decision record · {analysis.analysisDate}</p>
+          <h2 className="mt-2 text-2xl font-medium tracking-[-0.025em]">Proceed with gated diligence—not an AI premium.</h2>
+          <p className="mt-2 max-w-3xl text-xs leading-5 text-[#c8d7d8]">The available evidence supports targeted market, procurement and utility diligence. It does not support an AI-attributable escalation percentage, dollar allowance, delay duration or transmission requirement.</p>
+        </div>
+        <Button className="print-hide shrink-0 border border-white/20 bg-white/10 text-white hover:bg-white/20" onClick={() => window.print()}>
+          <Printer data-icon="inline-start" /> Print brief
+        </Button>
+      </div>
+    </div>
+    <div className="p-5 sm:p-7">
+      <dl className="grid gap-px overflow-hidden rounded-xl border border-[#d9dfda] bg-[#d9dfda] sm:grid-cols-2 lg:grid-cols-4">
+        <BriefFact label="Project" value={projectLabel} note={`${analysis.asset.label} · ${METROS[analysis.metroId]}`} />
+        <BriefFact label="Capital decision" value={`$${budgetMillions.toLocaleString()}M`} note={`${startYear}–${analysis.endYear} · ${duration} years`} />
+        <BriefFact label="Scenario intersection" value={scenarioIntersection} note="Counterfactual input window—not a forecast" />
+        <BriefFact label="AI cost increment" value="Not quantified" note="0 of 8 screened sources qualify" warning />
+      </dl>
+      <div className="mt-5 grid gap-4 lg:grid-cols-3">
+        <BriefColumn eyebrow="Observed now" title="Dated market evidence" tone="teal">
+          <BriefLine label="Leading component movement" value={observedSignal} />
+          <BriefLine label="Leading complete labour screen" value={labourSignal} />
+          <BriefLine label="Concurrent same-class projects" value={`${analysis.concurrentProjectCount} schedule-complete records`} />
+        </BriefColumn>
+        <BriefColumn eyebrow="Scenario mechanism" title="Path to investigate" tone="blue">
+          <BriefLine label="Leading declared node" value={lead} />
+          <BriefLine label="Path status" value="Assumed · low confidence" />
+          <BriefLine label="Project-specific result" value="Not predicted" />
+        </BriefColumn>
+        <BriefColumn eyebrow="Unresolved" title="Values that remain withheld" tone="orange">
+          <BriefLine label="AI-attributable cost" value="No % or $ estimate" />
+          <BriefLine label="Schedule effect" value="No delay-day estimate" />
+          <BriefLine label="Power enabling scope" value="Project-specific need unknown" />
+        </BriefColumn>
+      </div>
+      <div className="mt-5 grid gap-4 border-t border-[#dce2dd] pt-5 lg:grid-cols-[1.2fr_.8fr]">
+        <div>
+          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-[#28766d]">Required decision gates</p>
+          <ol className="mt-3 grid gap-2 text-xs leading-5 text-[#516660] sm:grid-cols-2">
+            <li><strong>01 · Baseline:</strong> retain an independently prepared professional estimate; do not embed an AI premium.</li>
+            <li><strong>02 · Market:</strong> test {lead.toLowerCase()} availability, equipment lead times and bid conditions before design freeze.</li>
+            <li><strong>03 · Utilities:</strong> confirm connection, enabling-work and interface scope before procurement packaging.</li>
+            <li><strong>04 · Refresh:</strong> rerun the dated evidence screen at each estimate and approval gate.</li>
+          </ol>
+        </div>
+        <div className="rounded-lg border border-[#d8dfda] bg-[#f5f6f2] p-4 text-[10px] leading-4 text-[#566963]">
+          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-[#28766d]">Audit identity</p>
+          <p className="mt-2">Release: {releaseData.manifest.version}</p>
+          <p>Scenario: {analysis.scenarioId}</p>
+          <p>Analysis date: {analysis.analysisDate}</p>
+          <p className="mt-2 break-all">Sources: {analysis.sourceIds.join(' · ')}</p>
+        </div>
+      </div>
+    </div>
+  </section>;
+}
+
+function BriefFact({ label, note, value, warning = false }: { label: string; note: string; value: string; warning?: boolean }) {
+  return <div className={`min-w-0 bg-white p-4 ${warning ? 'border-t-2 border-t-[#d66b35]' : 'border-t-2 border-t-[#2f8f83]'}`}><dt className="font-mono text-[8px] font-semibold uppercase tracking-[0.1em] text-[#596a66]">{label}</dt><dd className={`mt-2 text-sm font-semibold ${warning ? 'text-[#9a4a25]' : 'text-[#173e45]'}`}>{value}</dd><dd className="mt-1 text-[9px] leading-4 text-[#596a66]">{note}</dd></div>;
+}
+
+function BriefColumn({ children, eyebrow, title, tone }: { children: React.ReactNode; eyebrow: string; title: string; tone: 'teal' | 'blue' | 'orange' }) {
+  const styles = tone === 'orange' ? 'border-[#e2b38e] bg-[#fff3e9]' : tone === 'blue' ? 'border-[#b8ccd4] bg-[#eff4f5]' : 'border-[#b9d4cd] bg-[#edf5f1]';
+  return <section className={`rounded-xl border p-4 ${styles}`}><p className="font-mono text-[8px] font-semibold uppercase tracking-[0.11em] text-[#60736f]">{eyebrow}</p><h3 className="mt-2 text-sm font-medium">{title}</h3><dl className="mt-4 space-y-3">{children}</dl></section>;
+}
+
+function BriefLine({ label, value }: { label: string; value: string }) {
+  return <div className="border-b border-black/8 pb-2 last:border-0 last:pb-0"><dt className="text-[9px] leading-4 text-[#586864]">{label}</dt><dd className="mt-0.5 text-xs font-medium leading-5 text-[#234a4e]">{value}</dd></div>;
 }
 
 function DecisionSignalRail() {
