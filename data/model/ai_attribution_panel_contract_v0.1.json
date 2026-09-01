@@ -126,7 +126,8 @@
         "GC_PROACTIVE_CONTRACTS",
         "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
         "QUEBEC_PQI_PROJECT_DASHBOARD",
-        "QUEBEC_PQI_DATA_DICTIONARY"
+        "QUEBEC_PQI_DATA_DICTIONARY",
+        "QUEBEC_PQI_ARCHIVE_CATALOG"
       ],
       "available_variables": [
         "tender_publication_and_close_dates",
@@ -144,8 +145,9 @@
         "baseline_and_current_authorized_cost_cad_for_reconciled_chains",
         "authorized_cost_variance_cad_and_fraction",
         "common_inferred_public_asset_class",
-        "threshold_aware_milestone_presence_pattern",
-        "interval_disappearance_and_reentry_diagnostics"
+        "complete_69_snapshot_presence_pattern",
+        "adjacent_snapshot_disappearance_and_reentry_diagnostics",
+        "publisher_declared_complete_service_and_retirement_marker"
       ],
       "missing_variables": [
         "independent_estimate_with_price_basis",
@@ -154,7 +156,7 @@
         "final_cost_outturn",
         "multi_region_revision_panel"
       ],
-      "limitation": "The federal feasibility intake still cannot reconcile a common estimate-to-outturn outcome. The Ontario Auditor General source adds two named audited references. The Quebec dashboard supplies stable lifecycle IDs, 141 parser-reconciled authorized-cost revision chains and a threshold-aware 10-vintage milestone panel that exposes survivor selection, but the milestones are not the complete 69-vintage archive, exit causes are unknown, authorized parameters are not final outturns, estimate price-basis dates are absent and independent parser review remains pending."
+      "limitation": "The federal feasibility intake still cannot reconcile a common estimate-to-outturn outcome. The Ontario Auditor General source adds two named audited references. The Quebec dashboard supplies stable lifecycle IDs, 141 parser-reconciled authorized-cost revision chains and all 69 official snapshot dates. The full panel identifies 510 disappearance events, 291 preceded by publisher-declared complete service and planned retirement, but those markers are not independently audited outturns; 219 disappearance causes remain unclassified, one malformed CSV requires its official paired XLSX, estimate price-basis dates are absent and independent parser review remains pending."
     },
     {
       "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
@@ -167,7 +169,8 @@
         "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
         "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
         "QUEBEC_PQI_PROJECT_DASHBOARD",
-        "QUEBEC_PQI_DATA_DICTIONARY"
+        "QUEBEC_PQI_DATA_DICTIONARY",
+        "QUEBEC_PQI_ARCHIVE_CATALOG"
       ],
       "available_variables": [
         "tender_publication_date",
@@ -182,9 +185,10 @@
         "authorized_completion_revision_effective_month",
         "baseline_and_current_completion_month_for_reconciled_chains",
         "authorized_schedule_change_months",
-        "fiscal_year_completion_marker"
-        ,"threshold_aware_milestone_presence_pattern"
-        ,"interval_disappearance_and_reentry_diagnostics"
+        "fiscal_year_completion_marker",
+        "complete_69_snapshot_presence_pattern",
+        "adjacent_snapshot_disappearance_and_reentry_diagnostics",
+        "publisher_declared_complete_service_and_retirement_marker"
       ],
       "missing_variables": [
         "baseline_start_date_and_vintage",
@@ -193,7 +197,7 @@
         "actual_completion_date_at_day_precision",
         "multi_region_schedule_panel"
       ],
-      "limitation": "Tender timing and procurement-instrument start/end dates are not physical schedule outcomes. The Ontario audit adds two named planned-to-actual substantial-completion references. The Quebec dashboard adds 168 parser-reconciled month-precision authorized completion-revision chains, 87 fiscal-year completion markers and a 10-vintage presence panel, but disappearance does not identify completion, exact baseline/actual start and completion dates remain unavailable, and there is no complete monthly, multi-region or independently reviewed outcome panel."
+      "limitation": "Tender timing and procurement-instrument start/end dates are not physical schedule outcomes. The Ontario audit adds two named planned-to-actual substantial-completion references. The Quebec dashboard adds 168 parser-reconciled month-precision authorized completion-revision chains, 87 fiscal-year completion markers and all 69 official snapshot dates. Publisher-declared complete service precedes 291 disappearance events, but exact baseline/actual start and completion dates remain unavailable, 219 disappearance events remain unclassified, and there is no multi-region or independently reviewed outcome panel."
     },
     {
       "domain_id": "REGIONAL_CONSTRUCTION_ACTIVITY_CONTROLS",

@@ -10,6 +10,7 @@ from aiio.quebec_longitudinal import run_quebec_milestone_longitudinal
 from aiio.quebec_vintages import (
     inventory_csv_resources,
     parse_snapshot_date,
+    profile_csv_content,
     select_milestone_resources,
     sha256_file,
 )
@@ -80,6 +81,32 @@ class QuebecVintageTests(unittest.TestCase):
         }
         with self.assertRaises(ValidationError):
             inventory_csv_resources(payload)
+
+    def test_profiles_canonical_legacy_and_wrapped_csv_schemas(self) -> None:
+        canonical_header = (
+            "no_projet,nom_projet,description,cout_total,date_fin_mise_en_service,"
+            "etat_avancement,suivi_modifications,secteur_activite,region,"
+            "localisation,nature_travaux\n"
+        )
+        canonical_row = "1,Projet,Description,20,2025-01-01,Actif,Historique,Santé,Région,Ville,Construction\n"
+        self.assertEqual(
+            profile_csv_content((canonical_header + canonical_row).encode())["schema_profile"],
+            "canonical_csv",
+        )
+        legacy_header = (
+            "#_de_projet,Nom_du_projet,Description,Cout_total,"
+            "Date_de_mise_en service,Etat_d’avancement,Suivi_des_modifications,"
+            "Secteur_d_activite,Region,Localisation,Nature_des_travaux\n"
+        )
+        self.assertEqual(
+            profile_csv_content((legacy_header + canonical_row).encode())["schema_profile"],
+            "legacy_header_aliases",
+        )
+        wrapped = b'"no_projet,""nom_projet"",""description""";;;;;;;;\n'
+        self.assertEqual(
+            profile_csv_content(wrapped)["schema_profile"],
+            "publisher_wrapped_csv_unusable",
+        )
 
     def test_committed_longitudinal_panel_reproduces_and_fails_closed(self) -> None:
         expected = json.loads(REPORT_PATH.read_text(encoding="utf-8"))

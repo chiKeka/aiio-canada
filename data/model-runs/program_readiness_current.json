@@ -21,7 +21,7 @@
       "check_id": "public_evidence_registry",
       "evidence": [
         "data/registry/sources.json",
-        "raw_manifest_count=34"
+        "raw_manifest_count=94"
       ],
       "release_gate": true,
       "status": "pass",
@@ -138,6 +138,21 @@
       "summary": "The Quebec archive selection, milestone lifecycle diagnostics and stratified parser-review package reproduce and remain explicitly non-authorizing."
     },
     {
+      "category": "evidence_pipeline",
+      "check_id": "quebec_complete_catalog_longitudinal_panel",
+      "evidence": [
+        "data/model/quebec_pqi_full_archive_contract_v0.1.json",
+        "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json",
+        "data/processed/quebec_pqi_full_archive_project_vintages.csv",
+        "data/processed/quebec_pqi_full_archive_project_lifecycles.csv",
+        "data/processed/quebec_pqi_full_archive_transitions.csv",
+        "docs/methodology/quebec-full-archive-longitudinal-panel.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "All 69 Quebec catalog dates, stable-ID transitions and the official paired-XLSX fallback reproduce while outcome and AI-effect claims remain closed."
+    },
+    {
       "category": "living_program",
       "check_id": "weekly_evidence_operation",
       "evidence": [
@@ -176,9 +191,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.14.0-dev.xlsx",
-        "workbook_sha256=sha256:440f8f6b73d4edad8f88d99abe9deb23f51f5ef71918b39731309565facf76e0",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.14.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.15.0-dev.xlsx",
+        "workbook_sha256=sha256:34500a14ddefad0e992074d48216f7d41eeb1fe0f0cb080e4b62607492f8e499",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.15.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",
@@ -269,7 +284,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 15,
+    "pass": 16,
     "pending": 3
   },
   "structural_integrity": true

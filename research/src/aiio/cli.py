@@ -34,9 +34,13 @@ from .quebec_revisions import (
     DICTIONARY_SOURCE_ID as QUEBEC_DICTIONARY_SOURCE_ID,
     run_quebec_authorized_revisions,
 )
-from .quebec_vintages import retrieve_milestone_resources
+from .quebec_vintages import (
+    retrieve_full_archive_resources,
+    retrieve_milestone_resources,
+)
 from .quebec_longitudinal import run_quebec_milestone_longitudinal
 from .quebec_review import build_quebec_parser_review_package
+from .quebec_full_archive import run_quebec_full_archive_longitudinal
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .adapters.provincial_projects import (
     BC_SOURCE_ID,
@@ -161,6 +165,18 @@ def main() -> None:
         help="build a deterministic, still-unauthorized independent parser-review package",
     )
     quebec_review_parser.add_argument("dashboard_csv_path", type=Path)
+
+    quebec_full_archive_parser = subparsers.add_parser(
+        "fetch-quebec-full-archive",
+        help="hash-lock every official Quebec dashboard CSV date and any required paired-workbook fallback",
+    )
+    quebec_full_archive_parser.add_argument("catalog_json_path", type=Path)
+
+    quebec_full_normalize_parser = subparsers.add_parser(
+        "normalize-quebec-full-archive",
+        help="build the complete-catalog stable-ID Quebec longitudinal selection panel",
+    )
+    quebec_full_normalize_parser.add_argument("contract_path", type=Path)
 
     subparsers.add_parser(
         "fetch-census-workforce",
@@ -682,6 +698,81 @@ def main() -> None:
                         "independent_parser_review_complete": report[
                             "publication_boundary"
                         ]["independent_parser_review_complete"],
+                    }
+                )
+            )
+        elif args.command == "fetch-quebec-full-archive":
+            report = retrieve_full_archive_resources(
+                args.catalog_json_path.resolve(),
+                root
+                / "data"
+                / "model"
+                / "quebec_pqi_milestone_vintage_contract_v0.1.json",
+                root / "data" / "raw" / "quebec_pqi_project_dashboard_full_archive",
+                root
+                / "data"
+                / "model"
+                / "quebec_pqi_full_archive_contract_v0.1.json",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "contract_id": report["contract_id"],
+                        "snapshot_date_count": report["snapshot_date_count"],
+                        "direct_csv_snapshot_count": report[
+                            "direct_csv_snapshot_count"
+                        ],
+                        "paired_xlsx_fallback_count": report[
+                            "paired_xlsx_fallback_count"
+                        ],
+                        "project_exit_outcome_authorized": report[
+                            "publication_boundary"
+                        ]["project_exit_outcome_authorized"],
+                    }
+                )
+            )
+        elif args.command == "normalize-quebec-full-archive":
+            report = run_quebec_full_archive_longitudinal(
+                args.contract_path.resolve(),
+                root,
+                root
+                / "data"
+                / "model-runs"
+                / "quebec_pqi_milestone_longitudinal_v0.1.json",
+                root
+                / "data"
+                / "model-runs"
+                / "quebec_pqi_full_archive_longitudinal_v0.1.json",
+                root
+                / "data"
+                / "processed"
+                / "quebec_pqi_full_archive_project_vintages.csv",
+                root
+                / "data"
+                / "processed"
+                / "quebec_pqi_full_archive_project_lifecycles.csv",
+                root
+                / "data"
+                / "processed"
+                / "quebec_pqi_full_archive_transitions.csv",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": report["model_id"],
+                        "snapshot_date_count": report["snapshot_date_count"],
+                        "snapshot_observation_count": report[
+                            "snapshot_observation_count"
+                        ],
+                        "unique_project_count": report["unique_project_count"],
+                        "additional_unique_projects_observed": report[
+                            "milestone_comparison"
+                        ]["additional_unique_projects_observed"],
+                        "project_exit_outcome_authorized": report[
+                            "publication_boundary"
+                        ]["project_exit_outcome_authorized"],
                     }
                 )
             )

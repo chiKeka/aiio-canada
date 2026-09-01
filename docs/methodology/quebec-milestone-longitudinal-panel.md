@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This module measures selection and continuity in Quebec's official public-infrastructure dashboard before AIIO treats its authorized-revision histories as a reference candidate. It uses publisher-stable project IDs across archived dashboard snapshots. It does not infer why a project entered, disappeared or reappeared, and it does not convert authorized cost or completion plans into final outcomes.
+This module measures selection and continuity in Quebec's official public-infrastructure dashboard before AIIO treats its authorized-revision histories as a reference candidate. It uses publisher-stable project IDs across archived dashboard snapshots. It does not infer why a project entered, disappeared or reappeared, and it does not convert authorized cost or completion plans into final outcomes. The later complete-catalog panel now supersedes this milestone sample for authoritative selection diagnostics; the milestone artifact remains as a documented sampling comparison.
 
 The official Données Québec catalog exposes 69 CSV resources dated from 2020-05-19 through 2026-08-20. AIIO inventories the complete catalog metadata and hash-locks a reproducible ten-vintage milestone sample:
 
@@ -64,4 +64,4 @@ public-project schedule outcome panel: not authorized
 AI-attributable effect: not authorized
 ```
 
-The next evidence step is to complete the independent parser review, then assess whether the full 69-vintage panel materially changes entry, disappearance, revision-chain or asset-class coverage diagnostics.
+The complete 69-date panel is now implemented in `docs/methodology/quebec-full-archive-longitudinal-panel.md`. It shows that milestone sampling captured all but one unique ID but understated reentry projects (2 versus 36). The remaining evidence step is independent parser and extraction review.

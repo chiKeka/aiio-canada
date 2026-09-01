@@ -73,11 +73,14 @@ cost and `suivi_modifications` as authorized lifecycle changes with effective
 dates. AIIO uses those definitions to build a research-only revision panel with
 141 reconciled cost chains and 168 reconciled completion-month chains. The
 official archive catalog is also registered and hash-locked. It inventories 69
-CSV vintages and supports a threshold-aware ten-vintage milestone panel with
-1,121 stable project IDs; 472 are absent from the latest snapshot. The panel
-remains non-authorizing because the milestone sample is not the complete archive,
-disappearance causes are unknown, authorized cost is not final outturn,
-estimate price-basis dates are absent and independent parser review is pending.
+CSV vintages. All 69 snapshot dates are now represented in a complete-catalog
+panel with 1,122 stable project IDs and 43,044 project observations. One malformed
+publisher CSV uses its official paired XLSX for the same date; the raw CSV is
+still retained. Of 510 disappearance events, 291 follow publisher-declared
+complete service and planned dashboard retirement while 219 remain unclassified.
+The panel remains non-authorizing because those statements are not independently
+audited final outcomes, authorized cost lacks estimate price-basis dates and
+independent parser review is pending.
 
 The normalized file retains publisher category, type, stage, location, funding signal, cost status and original schedule text. Asset classes are explicit inferences. British Columbia and Quebec costs are converted from millions of Canadian dollars; Ontario zero budget values are treated as unavailable because the dataset uses them as placeholders. Missing values remain null.
 

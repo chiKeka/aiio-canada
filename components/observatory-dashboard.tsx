@@ -38,7 +38,7 @@ import procurementOutcomeFeasibility from '@/data/model-runs/canadabuys_construc
 import edmontonPermitProxy from '@/data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json';
 import auditedProjectOutcomes from '@/data/model-runs/oago_audited_project_outcomes_v0.1.json';
 import quebecProjectRevisions from '@/data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json';
-import quebecLongitudinal from '@/data/model-runs/quebec_pqi_milestone_longitudinal_v0.1.json';
+import quebecFullArchive from '@/data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json';
 import quebecParserReview from '@/data/model-runs/quebec_pqi_parser_review_package_v0.1.json';
 import { ModeToggle } from '@/components/mode-toggle';
 import { boundedDisplayScore } from '@/lib/decision-analysis';
@@ -99,13 +99,13 @@ const attributionDomainMeta = [
     id: 'PUBLIC_PROJECT_COST_OUTCOMES',
     label: 'Public cost outcome',
     role: 'Authorizing outcome',
-    summary: `CanadaBuys linkages and ${auditedProjectOutcomes.coverage_summary.named_completed_project_count} audited named cases remain incomplete. Quebec now contributes ${quebecProjectRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost revision chains, making this a candidate domain—but price basis, final outturn and multi-region coverage remain missing.`,
+    summary: `CanadaBuys linkages and ${auditedProjectOutcomes.coverage_summary.named_completed_project_count} audited named cases remain incomplete. Quebec now contributes ${quebecProjectRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost revision chains plus ${quebecFullArchive.snapshot_date_count} complete-catalog selection snapshots, making this a candidate domain—but price basis, final outturn and multi-region coverage remain missing.`,
   },
   {
     id: 'PUBLIC_PROJECT_SCHEDULE_OUTCOMES',
     label: 'Public schedule outcome',
     role: 'Authorizing outcome',
-    summary: `The audited intake supplies ${auditedProjectOutcomes.coverage_summary.exact_day_substantial_completion_pair_count} exact-day planned/actual pair. Quebec adds ${quebecProjectRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} reconciled month-precision authorized completion chains, but exact actual start/completion histories and multi-region coverage remain missing.`,
+    summary: `The audited intake supplies ${auditedProjectOutcomes.coverage_summary.exact_day_substantial_completion_pair_count} exact-day planned/actual pair. Quebec adds ${quebecProjectRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} reconciled month-precision authorized completion chains and ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count} source-declared retirement transitions, but those transitions are not audited completions and exact actual histories remain missing.`,
   },
   {
     id: 'REGIONAL_CONSTRUCTION_ACTIVITY_CONTROLS',
@@ -433,13 +433,14 @@ export function ObservatoryDashboard() {
 
           <div className="mt-5 grid gap-5 rounded-xl border border-[#9fb9c5] bg-[#eaf1f4] p-5 lg:grid-cols-[minmax(0,.9fr)_minmax(520px,1.1fr)] lg:items-center sm:p-6">
             <div>
-              <div className="flex items-center gap-2 text-[#365d6d]"><GitBranch className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Quebec longitudinal + revision panel · candidate</p></div>
-              <p className="mt-2 text-sm leading-6 text-[#526b76]">Ten threshold-aware milestones reveal how much a current dashboard omits, while the latest lifecycle history yields chain-reconciled authorized revisions. A {quebecParserReview.sample_project_count}-project stratified review packet is prepared; independent review is still pending.</p>
+              <div className="flex items-center gap-2 text-[#365d6d]"><GitBranch className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Quebec complete archive + revision panel · candidate</p></div>
+              <p className="mt-2 text-sm leading-6 text-[#526b76]">All {quebecFullArchive.snapshot_date_count} official catalog dates expose {quebecFullArchive.disappearance_event_count.toLocaleString('en-CA')} adjacent-snapshot disappearances and {quebecFullArchive.project_with_catalog_reentry_count} re-entering projects. Publisher-declared service-and-retirement markers precede {quebecFullArchive.publisher_declared_retirement_disappearance_event_count.toLocaleString('en-CA')} transitions; {quebecFullArchive.unclassified_disappearance_event_count.toLocaleString('en-CA')} remain unclassified. A {quebecParserReview.sample_project_count}-project review packet is prepared; independent review is still pending.</p>
             </div>
-            <dl className="grid grid-cols-2 gap-5 border-t border-[#bdced5] pt-5 sm:grid-cols-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-              <ContractMetric label="Milestone vintages" value={quebecLongitudinal.vintage_count.toString()} />
-              <ContractMetric label="Unique projects" value={quebecLongitudinal.unique_project_count.toLocaleString('en-CA')} />
-              <ContractMetric label="Absent from latest" value={quebecLongitudinal.absent_from_latest_project_count.toLocaleString('en-CA')} />
+            <dl className="grid grid-cols-2 gap-5 border-t border-[#bdced5] pt-5 sm:grid-cols-3 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+              <ContractMetric label="Archive dates" value={quebecFullArchive.snapshot_date_count.toString()} />
+              <ContractMetric label="Unique projects" value={quebecFullArchive.unique_project_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Disappearances" value={quebecFullArchive.disappearance_event_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Declared retirements" value={quebecFullArchive.publisher_declared_retirement_disappearance_event_count.toLocaleString('en-CA')} />
               <ContractMetric label="Cost chains" value={quebecProjectRevisions.coverage_summary.cost_revision_chain_reconciled_project_count.toLocaleString('en-CA')} />
               <ContractMetric label="Schedule chains" value={quebecProjectRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count.toLocaleString('en-CA')} />
             </dl>

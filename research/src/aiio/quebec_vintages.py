@@ -50,6 +50,16 @@ REQUIRED_DASHBOARD_FIELDS = {
     "localisation",
     "nature_travaux",
 }
+CANONICAL_HEADER_ALIASES = {
+    "de_projet": "no_projet",
+    "nom_du_projet": "nom_projet",
+    "date_de_mise_en_service": "date_fin_mise_en_service",
+    "etat_d_avancement": "etat_avancement",
+    "suivi_des_modifications": "suivi_modifications",
+    "secteur_d_activite": "secteur_activite",
+    "nom_de_l_infrastructure": "nom_infrastructure",
+    "nature_des_travaux": "nature_travaux",
+}
 
 
 def sha256_bytes(content: bytes) -> str:
@@ -140,6 +150,229 @@ def inventory_csv_resources(catalog_payload: dict[str, Any]) -> list[dict[str, A
     if not inventory or len(dates) != len(set(dates)):
         raise ValidationError("Quebec CSV resource snapshot dates must be unique")
     return inventory
+
+
+def inventory_tabular_resources(
+    catalog_payload: dict[str, Any], formats: set[str]
+) -> list[dict[str, Any]]:
+    resources = catalog_payload.get("result", {}).get("resources", [])
+    if not isinstance(resources, list):
+        raise ValidationError("Quebec archive catalog resources must be a list")
+    output: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    for resource in resources:
+        if not isinstance(resource, dict):
+            continue
+        resource_format = str(resource.get("format", "")).upper()
+        if resource_format not in formats:
+            continue
+        resource_id = str(resource.get("id", "")).strip()
+        url = str(resource.get("url", "")).strip()
+        if not resource_id or resource_id in seen_ids:
+            raise ValidationError("Quebec archive catalog has a missing or duplicate resource ID")
+        if DATASET_ID not in url or not url.startswith("https://www.donneesquebec.ca/"):
+            raise ValidationError(f"unexpected Quebec dashboard resource URL: {url!r}")
+        seen_ids.add(resource_id)
+        snapshot_date = parse_snapshot_date(resource)
+        output.append(
+            {
+                "resource_id": resource_id,
+                "resource_name": str(resource.get("name", "")).strip(),
+                "snapshot_date": snapshot_date.isoformat(),
+                "created": resource.get("created"),
+                "last_modified": resource.get("last_modified"),
+                "url": url,
+                "format": resource_format,
+            }
+        )
+    return sorted(output, key=lambda item: (item["snapshot_date"], item["resource_id"]))
+
+
+def canonical_field_name(value: str) -> str:
+    normalized = _normalize_french(unicodedata.normalize("NFKC", value)).casefold()
+    normalized = re.sub(r"[^a-z0-9]+", "_", normalized).strip("_")
+    return CANONICAL_HEADER_ALIASES.get(normalized, normalized)
+
+
+def profile_csv_content(content: bytes) -> dict[str, Any]:
+    text = _decode_csv(content)
+    first_line = text.splitlines()[0] if text.splitlines() else ""
+    delimiter = ";" if first_line.count(";") > first_line.count(",") else ","
+    reader = csv.DictReader(io.StringIO(text), delimiter=delimiter)
+    original_fields = [field.strip() for field in (reader.fieldnames or [])]
+    canonical_fields = [canonical_field_name(field) for field in original_fields]
+    missing_fields = REQUIRED_DASHBOARD_FIELDS - set(canonical_fields)
+    if missing_fields:
+        if (
+            original_fields
+            and "no_projet" in original_fields[0]
+            and all(not field for field in original_fields[1:])
+        ):
+            profile = "publisher_wrapped_csv_unusable"
+        else:
+            profile = "unsupported_schema"
+        return {
+            "schema_profile": profile,
+            "delimiter": delimiter,
+            "original_fields": original_fields,
+            "canonical_fields": canonical_fields,
+            "missing_fields": sorted(missing_fields),
+            "row_count": None,
+        }
+    rows = list(reader)
+    if not rows:
+        raise ValidationError("Quebec dashboard CSV contains no records")
+    if any(None in row for row in rows):
+        raise ValidationError("Quebec dashboard CSV contains over-wide records")
+    return {
+        "schema_profile": (
+            "canonical_csv"
+            if original_fields == canonical_fields
+            else "legacy_header_aliases"
+        ),
+        "delimiter": delimiter,
+        "original_fields": original_fields,
+        "canonical_fields": canonical_fields,
+        "missing_fields": [],
+        "row_count": len(rows),
+    }
+
+
+def retrieve_full_archive_resources(
+    catalog_path: Path,
+    milestone_contract_path: Path,
+    raw_root: Path,
+    contract_path: Path,
+) -> dict[str, Any]:
+    payload = verify_catalog_retrieval(catalog_path)
+    csv_inventory = inventory_csv_resources(payload)
+    xlsx_inventory = inventory_tabular_resources(payload, {"XLSX"})
+    xlsx_by_date = {item["snapshot_date"]: item for item in xlsx_inventory}
+    try:
+        milestone_contract = json.loads(milestone_contract_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValidationError(f"unable to read Quebec milestone contract: {exc}") from exc
+    reused_by_id = {
+        item["resource_id"]: item
+        for item in milestone_contract.get("selected_vintages", [])
+    }
+    project_root = contract_path.resolve().parents[2]
+
+    def contract_path_value(value: str) -> str:
+        resolved = Path(value).resolve()
+        try:
+            return str(resolved.relative_to(project_root))
+        except ValueError:
+            return str(resolved)
+
+    raw_root.mkdir(parents=True, exist_ok=True)
+    resources: list[dict[str, Any]] = []
+    for item in csv_inventory:
+        reused = reused_by_id.get(item["resource_id"])
+        if reused:
+            archive_path = Path(str(reused["archive_path"]))
+            manifest_path = archive_path.with_suffix(".csv.manifest.json")
+            if sha256_file(archive_path) != reused.get("content_hash"):
+                raise ValidationError(
+                    f"reused Quebec archive hash mismatch: {item['snapshot_date']}"
+                )
+            content = archive_path.read_bytes()
+            csv_record = {
+                "archive_path": str(archive_path),
+                "manifest_path": str(manifest_path),
+                "content_hash": reused["content_hash"],
+                "byte_length": reused["byte_length"],
+                "retrieved_at": reused["retrieved_at"],
+                "reused_milestone_archive": True,
+            }
+        else:
+            downloaded = _download_catalog_resource(
+                item,
+                raw_root,
+                suffix=".csv",
+                source_id=DASHBOARD_SOURCE_ID,
+            )
+            archive_path = Path(downloaded["archive_path"])
+            content = archive_path.read_bytes()
+            csv_record = {**downloaded, "reused_milestone_archive": False}
+        profile = profile_csv_content(content)
+        fallback: dict[str, Any] | None = None
+        if profile["schema_profile"] in {
+            "publisher_wrapped_csv_unusable",
+            "unsupported_schema",
+        }:
+            xlsx_item = xlsx_by_date.get(item["snapshot_date"])
+            if xlsx_item is None:
+                raise ValidationError(
+                    "Quebec CSV requires a fallback but no paired XLSX exists: "
+                    + item["snapshot_date"]
+                )
+            fallback = _download_catalog_resource(
+                xlsx_item,
+                raw_root,
+                suffix=".xlsx",
+                source_id=DASHBOARD_SOURCE_ID,
+            )
+            fallback = {
+                **xlsx_item,
+                **fallback,
+                "substitution_reason": profile["schema_profile"],
+            }
+        resources.append(
+            {
+                **item,
+                **{
+                    **csv_record,
+                    "archive_path": contract_path_value(csv_record["archive_path"]),
+                    "manifest_path": contract_path_value(csv_record["manifest_path"]),
+                },
+                "schema_profile": profile["schema_profile"],
+                "source_row_count": profile["row_count"],
+                "original_fields": profile["original_fields"],
+                "canonical_fields": profile["canonical_fields"],
+                "missing_fields": profile["missing_fields"],
+                "fallback_xlsx": (
+                    {
+                        **fallback,
+                        "archive_path": contract_path_value(fallback["archive_path"]),
+                        "manifest_path": contract_path_value(fallback["manifest_path"]),
+                    }
+                    if fallback
+                    else None
+                ),
+            }
+        )
+
+    if len(resources) != 69 or len({item["snapshot_date"] for item in resources}) != 69:
+        raise ValidationError("Quebec full archive contract must cover exactly 69 dates")
+    fallback_count = sum(1 for item in resources if item["fallback_xlsx"])
+    result = {
+        "schema_version": "1.0.0",
+        "contract_id": "AIIO_QUEBEC_PQI_FULL_ARCHIVE_0_1",
+        "catalog_source_id": CATALOG_SOURCE_ID,
+        "dashboard_source_id": DASHBOARD_SOURCE_ID,
+        "catalog_content_hash": sha256_file(catalog_path),
+        "catalog_csv_resource_count": len(csv_inventory),
+        "snapshot_start_date": resources[0]["snapshot_date"],
+        "snapshot_end_date": resources[-1]["snapshot_date"],
+        "snapshot_date_count": len(resources),
+        "direct_csv_snapshot_count": len(resources) - fallback_count,
+        "paired_xlsx_fallback_count": fallback_count,
+        "resources": resources,
+        "publication_boundary": {
+            "catalog_snapshot_coverage_contract_complete": True,
+            "all_snapshots_parsed_directly_from_csv": fallback_count == 0,
+            "project_exit_outcome_authorized": False,
+            "public_project_cost_outcome_authorized": False,
+            "public_project_schedule_outcome_authorized": False,
+            "ai_attributable_effect_authorized": False,
+            "status": "complete_catalog_intake_pending_normalization",
+            "reason": "All 69 catalog dates are hash-locked. One malformed publisher CSV requires its official paired XLSX representation; normalization and outcome interpretation remain separate gates.",
+        },
+    }
+    contract_path.parent.mkdir(parents=True, exist_ok=True)
+    contract_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return result
 
 
 def select_milestone_resources(inventory: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -340,6 +573,101 @@ def _retrieve_resource(item: dict[str, Any], raw_root: Path) -> dict[str, Any]:
         "content_hash": digest,
         "byte_length": len(content),
         "row_count": len(rows),
+        "retrieved_at": retrieved_at,
+    }
+
+
+def _download_catalog_resource(
+    item: dict[str, Any],
+    raw_root: Path,
+    *,
+    suffix: str,
+    source_id: str,
+) -> dict[str, Any]:
+    for manifest_path in sorted(raw_root.glob(f"*{suffix}.manifest.json")):
+        try:
+            existing_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if existing_manifest.get("resource_id") != item["resource_id"]:
+            continue
+        destination = Path(str(existing_manifest.get("archive_path", "")))
+        if not destination.is_absolute():
+            destination = raw_root / destination.name
+        if not destination.exists():
+            raise ValidationError(
+                f"existing Quebec full-archive file is missing: {destination}"
+            )
+        digest = sha256_file(destination)
+        if existing_manifest.get("content_hash") != digest:
+            raise ValidationError(
+                f"existing Quebec full-archive manifest hash mismatch: {manifest_path}"
+            )
+        if existing_manifest.get("effective_url") != item["url"]:
+            raise ValidationError(
+                f"existing Quebec full-archive URL mismatch: {manifest_path}"
+            )
+        return {
+            "archive_path": str(destination),
+            "manifest_path": str(manifest_path),
+            "content_hash": digest,
+            "byte_length": destination.stat().st_size,
+            "retrieved_at": existing_manifest["retrieved_at"],
+        }
+    request = urllib.request.Request(
+        item["url"],
+        headers={"User-Agent": "AIIO-Canada-Research/0.1 (+public research retrieval)"},
+    )
+    with urllib.request.urlopen(request, timeout=90) as response:
+        content = response.read()
+        effective_url = response.geturl()
+        content_type = response.headers.get_content_type()
+    if effective_url != item["url"]:
+        raise ValidationError("Quebec full-archive resource redirected unexpectedly")
+    digest = sha256_bytes(content)
+    destination = raw_root / f"{item['snapshot_date']}_{digest.split(':', 1)[1][:12]}{suffix}"
+    manifest_path = destination.with_suffix(destination.suffix + ".manifest.json")
+    if destination.exists() and sha256_file(destination) != digest:
+        raise ValidationError(f"existing Quebec full-archive hash mismatch: {destination}")
+    if not destination.exists():
+        destination.write_bytes(content)
+    retrieved_at = datetime.now(UTC).replace(microsecond=0).isoformat()
+    if manifest_path.exists():
+        try:
+            existing_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ValidationError(
+                f"unable to read existing Quebec full-archive manifest: {exc}"
+            ) from exc
+        if existing_manifest.get("content_hash") != digest:
+            raise ValidationError(
+                f"existing Quebec full-archive manifest hash mismatch: {manifest_path}"
+            )
+        retrieved_at = existing_manifest["retrieved_at"]
+    manifest = {
+        "retrieval_id": f"RET_{source_id}_{item['resource_id'].replace('-', '')[:12]}",
+        "source_id": source_id,
+        "archive_catalog_source_id": CATALOG_SOURCE_ID,
+        "resource_id": item["resource_id"],
+        "resource_name": item["resource_name"],
+        "snapshot_date": item["snapshot_date"],
+        "format": str(item.get("format", suffix.lstrip("."))).upper(),
+        "retrieved_at": retrieved_at,
+        "effective_url": effective_url,
+        "content_hash": digest,
+        "content_type": content_type,
+        "byte_length": len(content),
+        "archive_path": str(destination),
+        "result": "success",
+    }
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return {
+        "archive_path": str(destination),
+        "manifest_path": str(manifest_path),
+        "content_hash": digest,
+        "byte_length": len(content),
         "retrieved_at": retrieved_at,
     }
 

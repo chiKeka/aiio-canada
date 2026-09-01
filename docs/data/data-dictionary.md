@@ -216,6 +216,21 @@ parsed summary fields and event JSON, plus blank reviewer identity, date, status
 notes and reviewed-value fields. Blank reviewer fields are a release invariant
 until a documented independent review is completed.
 
+## Quebec complete-catalog transitions
+
+The complete-catalog snapshot table extends the milestone schema with
+`publisher_retirement_marker`, `publisher_complete_service_marker`,
+`representation_type` and `representation_hash`. The lifecycle table records
+69-position presence patterns, disappearance and reentry counts,
+publisher-declared-retirement-backed disappearances, unclassified
+disappearances and adjacent authorized-field change counts.
+
+The transition table requires prior/current snapshot dates and project counts,
+continuing, newly observed, disappeared and reentered ID counts, publisher-
+declared retirement disappearances, unclassified disappearances, a threshold-
+transition flag, source ID and evidence status. A publisher retirement marker is
+an observed source statement, not an independently verified final outcome.
+
 ## Conventions
 
 - Currency is CAD and carries a price year.

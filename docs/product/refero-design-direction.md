@@ -2,7 +2,7 @@
 
 Status: adopted for the local AIIO Canada interface on 2026-08-31.
 
-Sources of inspiration: [Refero Styles](https://styles.refero.design/), its [Seline Analytics](https://styles.refero.design/style/7967c6d9-e50c-42b5-b4d1-74003ba41781) reference, and its [Decide AI](https://styles.refero.design/style/5d9e1cc2-4b81-40fe-aa92-640f2e1d7420) reference. This is a translation of general design patterns, not a copy of Refero, Seline, Decide AI, or their assets.
+Sources of inspiration: [Refero Styles](https://styles.refero.design/), its [Seline Analytics](https://styles.refero.design/style/7967c6d9-e50c-42b5-b4d1-74003ba41781), [Ventriloc](https://styles.refero.design/style/f99aca3e-5289-4595-a7cc-77a72052f4b8), and [Decide AI](https://styles.refero.design/style/5d9e1cc2-4b81-40fe-aa92-640f2e1d7420) references. This is a translation of general design patterns, not a copy of Refero or any referenced brand or asset.
 
 ## Product expression
 

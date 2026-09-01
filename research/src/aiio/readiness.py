@@ -477,6 +477,80 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    quebec_full_contract_path = (
+        root / "data/model/quebec_pqi_full_archive_contract_v0.1.json"
+    )
+    quebec_full_report_path = (
+        root / "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json"
+    )
+    quebec_full_snapshot_path = (
+        root / "data/processed/quebec_pqi_full_archive_project_vintages.csv"
+    )
+    quebec_full_lifecycle_path = (
+        root / "data/processed/quebec_pqi_full_archive_project_lifecycles.csv"
+    )
+    quebec_full_transition_path = (
+        root / "data/processed/quebec_pqi_full_archive_transitions.csv"
+    )
+    quebec_full_contract = load_json_or_empty(quebec_full_contract_path)
+    quebec_full_report = load_json_or_empty(quebec_full_report_path)
+    quebec_full_boundary = quebec_full_report.get("publication_boundary", {})
+    quebec_full_snapshot_rows = csv_row_count(quebec_full_snapshot_path)
+    quebec_full_lifecycle_rows = csv_row_count(quebec_full_lifecycle_path)
+    quebec_full_transition_rows = csv_row_count(quebec_full_transition_path)
+    quebec_full_archive_ready = (
+        quebec_full_contract_path.exists()
+        and quebec_full_report_path.exists()
+        and quebec_full_snapshot_path.exists()
+        and quebec_full_lifecycle_path.exists()
+        and quebec_full_transition_path.exists()
+        and quebec_full_contract.get("snapshot_date_count") == 69
+        and quebec_full_contract.get("direct_csv_snapshot_count") == 68
+        and quebec_full_contract.get("paired_xlsx_fallback_count") == 1
+        and quebec_full_report.get("snapshot_date_count") == 69
+        and quebec_full_report.get("snapshot_observation_count")
+        == quebec_full_snapshot_rows
+        and quebec_full_report.get("unique_project_count")
+        == quebec_full_lifecycle_rows
+        and quebec_full_transition_rows == 68
+        and quebec_full_report.get("outputs", {}).get("snapshot_csv_sha256")
+        == sha256_file(quebec_full_snapshot_path)
+        and quebec_full_report.get("outputs", {}).get("lifecycle_csv_sha256")
+        == sha256_file(quebec_full_lifecycle_path)
+        and quebec_full_report.get("outputs", {}).get("transition_csv_sha256")
+        == sha256_file(quebec_full_transition_path)
+        and quebec_full_boundary.get("catalog_snapshot_coverage_complete") is True
+        and quebec_full_boundary.get("all_snapshots_parsed_directly_from_csv")
+        is False
+        and quebec_full_boundary.get("publisher_declared_retirement_is_final_outcome")
+        is False
+        and quebec_full_boundary.get("project_exit_outcome_authorized") is False
+        and quebec_full_boundary.get("public_project_cost_outcome_authorized")
+        is False
+        and quebec_full_boundary.get("public_project_schedule_outcome_authorized")
+        is False
+        and quebec_full_boundary.get("ai_attributable_effect_authorized") is False
+    )
+    record(
+        "quebec_complete_catalog_longitudinal_panel",
+        "evidence_pipeline",
+        PASS if quebec_full_archive_ready else FAIL,
+        (
+            "All 69 Quebec catalog dates, stable-ID transitions and the official paired-XLSX fallback reproduce while outcome and AI-effect claims remain closed."
+            if quebec_full_archive_ready
+            else "The Quebec complete-catalog panel is missing, unreconciled or has an unsafe publication boundary."
+        ),
+        [
+            "data/model/quebec_pqi_full_archive_contract_v0.1.json",
+            "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json",
+            "data/processed/quebec_pqi_full_archive_project_vintages.csv",
+            "data/processed/quebec_pqi_full_archive_project_lifecycles.csv",
+            "data/processed/quebec_pqi_full_archive_transitions.csv",
+            "docs/methodology/quebec-full-archive-longitudinal-panel.md",
+        ],
+        release_gate=True,
+    )
+
     digest_status, digest_summary, digest_evidence = audit_digest_artifacts(
         root, as_of_date=as_of_date
     )

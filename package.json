@@ -50,6 +50,8 @@
     "outcomes:quebec:vintages:fetch": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch-quebec-milestone-vintages data/raw/quebec_pqi_archive_catalog/2026-09-01_c3a16c24dbe0.json",
     "outcomes:quebec:vintages:normalize": "PYTHONPATH=research/src python3 -m aiio.cli --root . normalize-quebec-milestone-vintages data/model/quebec_pqi_milestone_vintage_contract_v0.1.json",
     "outcomes:quebec:review": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-quebec-parser-review data/raw/quebec_pqi_project_dashboard/2026-09-01_a437f7ba9a74.csv",
+    "outcomes:quebec:archive:fetch": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch-quebec-full-archive data/raw/quebec_pqi_archive_catalog/2026-09-01_c3a16c24dbe0.json",
+    "outcomes:quebec:archive:normalize": "PYTHONPATH=research/src python3 -m aiio.cli --root . normalize-quebec-full-archive data/model/quebec_pqi_full_archive_contract_v0.1.json",
     "model:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-scenario data/model/alberta_graph_v0.2.json data/scenarios/alberta_50b_counterfactual_v0.2.json data/model-runs/alberta_50b_counterfactual_v0.2.json",
     "power:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-power-overlay data/scenarios/alberta_power_overlay_v0.1.json data/model-runs/alberta_power_overlay_v0.1.json",
     "workbook:build": "node workbook-work/build_aiio_workbook.mjs",
