@@ -57,6 +57,14 @@ passes the protocol in
 [`docs/methodology/calibration-protocol.md`](methodology/calibration-protocol.md).
 The graph never supplies a multiplier for the reference baseline.
 
+A separate historical envelope publishes descriptive one- through five-year
+BCPI change distributions for the Alberta model-building reference classes. It
+is available for decision context even when the forecast gate fails because it
+does not project the next period or translate an index into project cost. The
+product reports overlapping- and non-overlapping-window counts and labels short
+histories explicitly. Its method is documented in
+[`docs/methodology/historical-cost-envelope.md`](methodology/historical-cost-envelope.md).
+
 The E2 readiness pipeline validates a locked regional panel contract against the
 source registry and writes an explicit missing-data/gate artifact. It separates
 authorizing realized treatment measures from permit, announcement and grid
@@ -101,7 +109,7 @@ All outputs read an immutable release manifest containing input hashes, code ver
 ## Release gates
 
 1. Schema and source validation.
-2. Baseline series integrity, rolling-origin partition and fail-closed output checks.
+2. Baseline series integrity, historical-window reconciliation, rolling-origin partition and fail-closed output checks.
 3. Labour geography/NOC coverage, missingness, zero-filler and cross-vintage formula checks.
 4. Material-series coverage and aligned-period checks.
 5. Public-project classification, schedule-missingness and cost-allocation checks.

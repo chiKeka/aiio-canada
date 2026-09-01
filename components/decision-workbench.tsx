@@ -17,6 +17,7 @@ import {
   ASSETS, buildDecisionAnalysis, METROS, type AssetId, type MetroId,
 } from '@/lib/decision-analysis';
 import releaseData from '@/public/data/latest.json';
+import historicalEnvelope from '@/data/model-runs/alberta_bcpi_historical_envelope_v0.1.json';
 import auditedProjectOutcomes from '@/data/model-runs/oago_audited_project_outcomes_v0.1.json';
 import quebecFullArchive from '@/data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json';
 import quebecProjectRevisions from '@/data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json';
@@ -28,6 +29,12 @@ const COMPONENT_LABELS: Record<string, string> = {
 const LABOUR_LABELS: Record<string, string> = {
   trade_concrete: 'Concrete trades', trade_electricians: 'Building electricians',
   trade_hvac: 'HVAC mechanics', trade_power_line: 'Power-line trades',
+};
+const ASSET_TO_HISTORICAL_CLASS: Partial<Record<AssetId, string>> = {
+  hospital: 'health_facilities',
+  school: 'schools_and_postsecondary',
+  government: 'government_and_civic_facilities',
+  municipal: 'municipal_operations_facilities',
 };
 
 export function DecisionWorkbench() {
@@ -103,6 +110,7 @@ export function DecisionWorkbench() {
                 </div>
               </div>
             </section>
+            <HistoricalMarketEnvelope analysis={analysis} assetId={assetId} duration={duration} />
             <MarketAndPath analysis={analysis} />
             <EvidenceChannels analysis={analysis} />
           </div>
@@ -118,12 +126,13 @@ export function DecisionWorkbench() {
 function DecisionSignalRail() {
   const signals = [
     { label: 'Market context', value: 'Available', note: 'Observed + inferred', tone: 'border-t-[#2f8f83]' },
-    { label: 'Baseline outlook', value: 'Withheld', note: 'Horizon gate failed', tone: 'border-t-[#d66b35]' },
+    { label: 'Historical envelope', value: 'Available', note: 'Descriptive · not forecast', tone: 'border-t-[#57a8b2]' },
+    { label: 'Future baseline', value: 'Withheld', note: 'Horizon gate failed', tone: 'border-t-[#d66b35]' },
     { label: 'AI cost increment', value: 'Unquantified', note: 'Calibration required', tone: 'border-t-[#d66b35]' },
     { label: 'Graph pathways', value: 'Inspectable', note: 'Assumed · low confidence', tone: 'border-t-[#57a8b2]' },
   ];
   return (
-    <div className="grid gap-px overflow-hidden rounded-[10px] border border-[#d8dcd7] bg-[#d8dcd7] sm:grid-cols-2 lg:col-span-2 lg:grid-cols-4" aria-label="Decision readiness signals">
+    <div className="grid gap-px overflow-hidden rounded-[10px] border border-[#d8dcd7] bg-[#d8dcd7] sm:grid-cols-2 lg:col-span-2 lg:grid-cols-5" aria-label="Decision readiness signals">
       {signals.map((signal) => (
         <div className={`border-t-2 bg-white px-4 py-3 ${signal.tone}`} key={signal.label}>
           <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.11em] text-[#61736f]">{signal.label}</p>
@@ -138,6 +147,35 @@ function DecisionSignalRail() {
 }
 
 type Analysis = ReturnType<typeof buildDecisionAnalysis>;
+
+function HistoricalMarketEnvelope({ analysis, assetId, duration }: { analysis: Analysis; assetId: AssetId; duration: number }) {
+  const referenceClass = ASSET_TO_HISTORICAL_CLASS[assetId];
+  const result = historicalEnvelope.reference_class_results.find((item) => item.asset_class === referenceClass && item.geography_id === analysis.metroId);
+  const horizon = result?.horizons.find((item) => item.horizon_years === duration);
+  if (!referenceClass || !result) {
+    return <section className="rounded-xl border border-[#dfb38f] bg-[#fff1e5] p-5 sm:p-6"><div className="flex items-center justify-between gap-3"><div><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#93491f]">Historical market envelope</p><h2 className="mt-2 text-xl font-medium text-[#713c24]">No fit-for-purpose building reference</h2></div><Badge variant="outline" className="border-[#dfb38f] text-[#93491f]">not assessed</Badge></div><p className="mt-3 max-w-3xl text-sm leading-6 text-[#7d5946]">The BCPI model-building classes do not represent {analysis.asset.label.toLowerCase()} costs. A building proxy would create false precision, so the historical escalation summary is withheld for this asset.</p></section>;
+  }
+  if (!horizon) {
+    return <section className="rounded-xl border border-[#dfb38f] bg-[#fff1e5] p-5 sm:p-6"><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#93491f]">Historical market envelope</p><h2 className="mt-2 text-xl font-medium text-[#713c24]">{duration}-year history not summarized</h2><p className="mt-3 text-sm leading-6 text-[#7d5946]">The governed artifact currently covers one- through five-year windows. This project duration remains outside that descriptive scope.</p></section>;
+  }
+  const distribution = horizon.historical_cumulative_change_percent;
+  const limited = horizon.interpretation_status === 'limited_history_only';
+  return <section className={`rounded-xl border p-5 sm:p-6 ${limited ? 'border-[#dfb38f] bg-[#fff8ef]' : 'border-[#b8d4cc] bg-[#edf5f1]'}`}>
+    <div className="flex flex-col justify-between gap-3 md:flex-row md:items-start"><div><div className="flex flex-wrap gap-2"><Badge className="border-[#87bfb4] bg-white text-[#155d56]">observed history</Badge><Badge variant="outline" className="border-[#9db7c4] bg-white text-[#365968]">inferred distribution</Badge>{limited ? <Badge variant="outline" className="border-[#dfb38f] bg-[#fff0e3] text-[#93491f]">limited history</Badge> : null}</div><h2 className="mt-3 text-xl font-medium">What did comparable index windows look like historically?</h2><p className="mt-1 text-xs leading-5 text-[#5b6d69]">{result.reference_class_label} · {result.geography_label} · {duration}-year cumulative index change</p></div><span className="font-mono text-[10px] text-[#5b6d69]">through {historicalEnvelope.as_of_date}</span></div>
+    <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <HistoricalMetric label="Historical p10" value={formatPercent(distribution.p10)} note="Lower descriptive marker" />
+      <HistoricalMetric label="Historical median" value={formatPercent(distribution.p50)} note={`${formatPercent(horizon.historical_median_annualized_change_percent)} median annualized`} emphasis />
+      <HistoricalMetric label="Historical p90" value={formatPercent(distribution.p90)} note="Upper descriptive marker" />
+      <HistoricalMetric label="Latest realized window" value={formatPercent(horizon.latest_realized_cumulative_change_percent)} note={`${horizon.latest_window_origin_period_end} to ${horizon.latest_window_target_period_end}`} />
+    </div>
+    <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_auto]"><p className="rounded-lg border border-[#d3ddd7] bg-white p-4 text-xs leading-5 text-[#536863]">Across <strong>{horizon.overlapping_window_count}</strong> overlapping quarterly-origin windows, the middle 80% of realized changes ran from <strong>{formatPercent(distribution.p10)}</strong> to <strong>{formatPercent(distribution.p90)}</strong>. The history spans {horizon.non_overlapping_window_count} non-overlapping windows. Overlap makes the observations serially dependent.</p><div className="rounded-lg border border-[#dfb38f] bg-[#fff0e3] p-4 text-[10px] leading-4 text-[#7d5946] lg:max-w-xs"><strong>Not a forecast or allowance.</strong> These markers are not probabilities and are not multiplied by the project estimate. They contain no AI-attributable increment and do not replace a professional cost plan.</div></div>
+    <p className="mt-3 text-[10px] leading-4 text-[#5a6c68]">Proxy status: {result.mapping_status.replaceAll('_', ' ')}. {result.mapping_note}</p>
+  </section>;
+}
+
+function HistoricalMetric({ emphasis = false, label, note, value }: { emphasis?: boolean; label: string; note: string; value: string }) {
+  return <article className={`rounded-lg border bg-white p-4 ${emphasis ? 'border-[#6da99f]' : 'border-[#d3ddd7]'}`}><p className="font-mono text-xl font-semibold text-[#1f625b]">{value}</p><p className="mt-2 text-xs font-medium">{label}</p><p className="mt-1 text-[10px] leading-4 text-[#5a6c68]">{note}</p></article>;
+}
 
 function ProjectForm({ assetId, budgetMillions, duration, metroId, projectName, setAssetId, setBudgetMillions, setDuration, setMetroId, setProjectName, setStartYear, startYear }: {
   assetId: AssetId; budgetMillions: number; duration: number; metroId: MetroId; projectName: string;
@@ -203,7 +241,7 @@ function DecisionActions({ analysis }: { analysis: Analysis }) {
     { timing: 'At each estimate gate', title: 'Re-run the dated evidence screen', text: `Refresh the ${METROS[analysis.metroId]} material, labour and public-project signals through ${analysis.scenarioWindowYears.length ? formatYears(analysis.scenarioWindowYears) : 'the applicable delivery window'}.` },
   ];
   return <section className="bg-[#f7f6f1]"><div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
-    <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr]"><div><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#28766d]">Decision actions</p><h2 className="mt-3 text-3xl font-medium tracking-[-0.035em]">Turn evidence into a gate, not a guess.</h2><p className="mt-4 max-w-md text-sm leading-6 text-[#5c706b]">The evidence can change diligence and sequencing today. It cannot yet produce an AI-specific dollar contingency.</p><div className="mt-6 grid gap-2 text-xs"><CoverageRow label="Observed market screen" status="Available" /><CoverageRow label="Structural pathway" status="Assumed · low confidence" /><CoverageRow label="Project cost translation" status="Calibration pending" warning /><CoverageRow label="Regional macro spillover" status="Research stream pending" warning /></div></div>
+    <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr]"><div><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#28766d]">Decision actions</p><h2 className="mt-3 text-3xl font-medium tracking-[-0.035em]">Turn evidence into a gate, not a guess.</h2><p className="mt-4 max-w-md text-sm leading-6 text-[#5c706b]">The evidence can change diligence and sequencing today. It cannot yet produce an AI-specific dollar contingency.</p><div className="mt-6 grid gap-2 text-xs"><CoverageRow label="Observed market screen" status="Available" /><CoverageRow label="Historical index envelope" status="Available · descriptive" /><CoverageRow label="Structural pathway" status="Assumed · low confidence" /><CoverageRow label="Project cost translation" status="Calibration pending" warning /><CoverageRow label="Regional macro spillover" status="Research stream pending" warning /></div></div>
       <ol className="grid gap-3 sm:grid-cols-2">{actions.map((action, index) => <li className="rounded-xl border border-[#ced8d1] bg-[#fbfaf5] p-5" key={action.title}><div className="flex items-center justify-between gap-3"><span className="font-mono text-[10px] font-semibold text-[#28766d]">0{index + 1}</span><span className="rounded-full bg-[#e5efeb] px-2 py-1 text-[9px] font-medium text-[#285d58]">{action.timing}</span></div><h3 className="mt-5 font-medium">{action.title}</h3><p className="mt-2 text-xs leading-5 text-[#62736f]">{action.text}</p></li>)}</ol>
     </div>
     <div className="mt-8 flex flex-col justify-between gap-4 rounded-xl border border-[#cbd5cf] bg-[#e8ece7] p-5 sm:flex-row sm:items-center"><div className="flex gap-3"><MapPin className="mt-0.5 size-4 shrink-0 text-[#28766d]" /><div><p className="max-w-3xl text-xs leading-5 text-[#576c67]">Research Mode provides the evidence register, assumptions, uncertainty, source links and downloads. Source IDs used here:</p><p className="mt-1 break-all font-mono text-[9px] leading-4 text-[#5a6c68]">{analysis.sourceIds.join(' · ')}</p></div></div><Link className="shrink-0 text-xs font-semibold text-[#1c665f] hover:underline" href="/research">Open Research Mode →</Link></div>

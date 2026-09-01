@@ -682,6 +682,42 @@ def audit_program_readiness(
     alberta_baseline = load_json_or_empty(
         root / "data/model-runs/alberta_bcpi_reference_baseline_v0.1.json"
     )
+    historical_envelope_path = (
+        root / "data/model-runs/alberta_bcpi_historical_envelope_v0.1.json"
+    )
+    historical_envelope = load_json_or_empty(historical_envelope_path)
+    historical_boundary = historical_envelope.get("publication_authorization", {})
+    historical_results = historical_envelope.get("reference_class_results", [])
+    historical_envelope_ready = (
+        historical_envelope_path.exists()
+        and historical_envelope.get("input_sha256")
+        == sha256_file(root / "data/processed/bcpi_alberta.csv").removeprefix("sha256:")
+        and historical_envelope.get("code_sha256")
+        == sha256_file(root / "research/src/aiio/historical_envelope.py").removeprefix(
+            "sha256:"
+        )
+        and historical_boundary.get("historical_summary_authorized") is True
+        and historical_boundary.get("future_projection_authorized") is False
+        and historical_boundary.get("ai_attributable_effect_authorized") is False
+        and historical_boundary.get("project_cost_translation_authorized") is False
+        and len(historical_results) == 8
+        and all(len(item.get("horizons", [])) == 5 for item in historical_results)
+    )
+    record(
+        "alberta_historical_cost_envelope",
+        "decision_support",
+        PASS if historical_envelope_ready else FAIL,
+        "The Alberta product exposes hash-locked descriptive 1-5 year BCPI history while future, AI-effect and project-cost translations remain closed."
+        if historical_envelope_ready
+        else "The Alberta historical cost envelope is missing, unreconciled or has an unsafe publication boundary.",
+        [
+            "data/processed/bcpi_alberta.csv",
+            "data/model-runs/alberta_bcpi_historical_envelope_v0.1.json",
+            "research/src/aiio/historical_envelope.py",
+            "docs/methodology/historical-cost-envelope.md",
+        ],
+        release_gate=True,
+    )
     projection_authorized = alberta_baseline.get("publication_authorization", {}).get(
         "public_projection_authorized"
     ) is True

@@ -7,6 +7,7 @@ import {
   SiteHeader,
 } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
+import historicalEnvelope from '@/data/model-runs/alberta_bcpi_historical_envelope_v0.1.json';
 
 const methodSteps = [
   [
@@ -53,6 +54,7 @@ export default function MethodsPage() {
     ...(evidenceScreens.material_cost_screen?.limitations ?? []),
     ...(evidenceScreens.public_project_exposure?.limitations ?? []),
     ...(evidenceScreens.power_evidence?.limitations ?? []),
+    ...historicalEnvelope.limitations,
   ];
   return (
     <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">
@@ -103,7 +105,7 @@ export default function MethodsPage() {
               'Absorption and retention receive explicit sensitivity tests.',
               'Raw pressure is transformed as raw ÷ (1 + raw) for bounded public display only.',
               'CAD pressure and MW power quantities use separate artifacts.',
-              'Temporal and empirical calibration layers remain declared future work.',
+              'Historical index envelopes are descriptive; predictive and causal calibration remain gated.',
             ].map((item) => (
               <div
                 className="flex gap-3 rounded-lg border border-white/10 bg-white/4 p-4 text-sm leading-5 text-[#d6e1e4]"

@@ -209,9 +209,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.16.0-dev.xlsx",
-        "workbook_sha256=sha256:70cc51a768707d55f672e163a7e1443852b517e9c2a5176c6d8786ce0097d482",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.16.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.17.0-dev.xlsx",
+        "workbook_sha256=sha256:80e850230eb23cfa92a1607ec9a64eec78a640a91521b619685d411711b20b91",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.17.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",
@@ -228,6 +228,19 @@
       "release_gate": true,
       "status": "pass",
       "summary": "The frozen public release 0.6.0-dev reconciles to its immutable manifest and output hashes."
+    },
+    {
+      "category": "decision_support",
+      "check_id": "alberta_historical_cost_envelope",
+      "evidence": [
+        "data/processed/bcpi_alberta.csv",
+        "data/model-runs/alberta_bcpi_historical_envelope_v0.1.json",
+        "research/src/aiio/historical_envelope.py",
+        "docs/methodology/historical-cost-envelope.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The Alberta product exposes hash-locked descriptive 1-5 year BCPI history while future, AI-effect and project-cost translations remain closed."
     },
     {
       "category": "decision_grade_outputs",
@@ -302,7 +315,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 17,
+    "pass": 18,
     "pending": 3
   },
   "structural_integrity": true

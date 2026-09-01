@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.16.0-dev';
+const workbookBuildVersion = '0.17.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -354,6 +354,17 @@ const scenarioSuite = JSON.parse(
     'utf8',
   ),
 );
+const historicalCostEnvelope = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'alberta_bcpi_historical_envelope_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -375,6 +386,7 @@ const materialScreen = workbook.worksheets.add('Material Screen');
 const projectExposure = workbook.worksheets.add('Project Exposure');
 const powerEvidence = workbook.worksheets.add('Power Evidence');
 const costBaselineSheet = workbook.worksheets.add('Cost Baseline');
+const historicalCostSheet = workbook.worksheets.add('Historical Envelope');
 const projectCost = workbook.worksheets.add('Project Cost Check');
 const canadaExpansion = workbook.worksheets.add('Canada Expansion');
 const attributionGate = workbook.worksheets.add('Attribution Gate');
@@ -423,6 +435,7 @@ for (const sheet of [
   projectExposure,
   powerEvidence,
   costBaselineSheet,
+  historicalCostSheet,
   projectCost,
   canadaExpansion,
   attributionGate,
@@ -457,6 +470,7 @@ buildMaterialScreen();
 buildProjectExposure();
 buildPowerEvidence();
 buildCostBaseline();
+buildHistoricalCostEnvelope();
 buildProjectCostCheck();
 buildCanadaExpansion();
 buildAttributionGate();
@@ -505,9 +519,9 @@ console.log(inspectDashboard.ndjson);
 
 const inspectReadMe = await workbook.inspect({
   kind: 'table',
-  range: 'Read Me!A1:H50',
+  range: 'Read Me!A1:H51',
   include: 'values,formulas',
-  tableMaxRows: 50,
+  tableMaxRows: 51,
   tableMaxCols: 8,
 });
 console.log(inspectReadMe.ndjson);
@@ -523,9 +537,9 @@ console.log(inspectProjectCost.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D50',
+  range: 'Release Checks!A1:D51',
   include: 'values,formulas',
-  tableMaxRows: 48,
+  tableMaxRows: 51,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
@@ -538,6 +552,15 @@ const inspectScenarioVariants = await workbook.inspect({
   tableMaxCols: 15,
 });
 console.log(inspectScenarioVariants.ndjson);
+
+const inspectHistoricalEnvelope = await workbook.inspect({
+  kind: 'table',
+  range: 'Historical Envelope!A1:S55',
+  include: 'values,formulas',
+  tableMaxRows: 55,
+  tableMaxCols: 19,
+});
+console.log(inspectHistoricalEnvelope.ndjson);
 
 const inspectCanadaExpansion = await workbook.inspect({
   kind: 'table',
@@ -620,7 +643,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H50',
+  'Read Me': 'A1:H51',
   Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -638,6 +661,7 @@ const previewRanges = {
   'Project Exposure': 'A1:Y24',
   'Power Evidence': 'A1:H28',
   'Cost Baseline': 'A1:P54',
+  'Historical Envelope': 'A1:S55',
   'Project Cost Check': 'A1:L38',
   'Canada Expansion': 'A1:J48',
   'Attribution Gate': 'A1:J48',
@@ -648,7 +672,7 @@ const previewRanges = {
   'Quebec Revisions': 'A1:R38',
   'Quebec Vintages': 'A1:V42',
   Sources: 'A1:J34',
-  'Release Checks': 'A1:D52',
+  'Release Checks': 'A1:D53',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -713,7 +737,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H45').values = [
+  readme.getRange('A18:H46').values = [
     [
       '1',
       'Dashboard',
@@ -976,6 +1000,16 @@ function buildReadMe() {
     ],
     [
       '27',
+      'Historical Envelope',
+      'Inspect realized one- through five-year BCPI distributions; these are descriptive history, not forecasts or project allowances.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '28',
       'Sources',
       'Open the current research source register, distinguish release sources and check source vintages.',
       '',
@@ -985,7 +1019,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '28',
+      '29',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -995,25 +1029,25 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A45').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B45').format.font = { bold: true };
-  readme.getRange('C18:H45').merge(true);
-  readme.getRange('A47:H47').merge();
-  readme.getRange('A47').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A47:H47'), C.amber);
+  readme.getRange('A18:A46').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B46').format.font = { bold: true };
+  readme.getRange('C18:H46').merge(true);
   readme.getRange('A48:H48').merge();
-  readme.getRange('A48').values = [
+  readme.getRange('A48').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A48:H48'), C.amber);
+  readme.getRange('A49:H49').merge();
+  readme.getRange('A49').values = [
     [
-      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
+      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only; its quantiles are not forecasts, probabilities or project allowances. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
     ],
   ];
-  readme.getRange('A48:H48').format = {
+  readme.getRange('A49:H49').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A48').format.rowHeight = 156;
+  readme.getRange('A49').format.rowHeight = 174;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
@@ -2929,6 +2963,123 @@ function buildCostBaseline() {
       P: 16,
     },
     baselineEndRow + 4,
+  );
+}
+
+function buildHistoricalCostEnvelope() {
+  titleBand(
+    historicalCostSheet,
+    'Historical construction-cost envelope',
+    `Observed BCPI history + inferred descriptive summaries · as of ${historicalCostEnvelope.as_of_date} · not a forecast`,
+    'S',
+  );
+  const historicalRows = historicalCostEnvelope.reference_class_results.flatMap(
+    (reference) => reference.horizons.map((horizon) => [
+      reference.asset_class,
+      reference.asset_class_label,
+      reference.geography_id,
+      reference.geography_label,
+      horizon.horizon_years,
+      horizon.interpretation_status,
+      horizon.overlapping_window_count,
+      horizon.non_overlapping_window_count,
+      horizon.historical_cumulative_change_percent.minimum,
+      horizon.historical_cumulative_change_percent.p10,
+      horizon.historical_cumulative_change_percent.p25,
+      horizon.historical_cumulative_change_percent.p50,
+      horizon.historical_cumulative_change_percent.p75,
+      horizon.historical_cumulative_change_percent.p90,
+      horizon.historical_cumulative_change_percent.maximum,
+      horizon.latest_realized_cumulative_change_percent,
+      horizon.latest_realized_percentile_rank,
+      null,
+      currentSourceRegistry.sources.find(
+        (item) => item.source_id === historicalCostEnvelope.source_id,
+      )?.canonical_url ?? '',
+    ]),
+  );
+  historicalCostSheet.getRange('A5:B9').values = [
+    ['Envelope model ID', historicalCostEnvelope.model_id],
+    ['Reference series', historicalCostEnvelope.reference_class_results.length],
+    ['Horizon summaries', historicalRows.length],
+    ['Latest observation', historicalCostEnvelope.as_of_date],
+    ['Source ID', historicalCostEnvelope.source_id],
+  ];
+  historicalCostSheet.getRange('A5:A9').format.font = { bold: true, color: C.ink };
+  historicalCostSheet.getRange('B5:B9').format = {
+    fill: C.soft,
+    borders: { preset: 'outside', style: 'thin', color: C.line },
+  };
+  historicalCostSheet.getRange('D5:E8').values = [
+    ['Historical summary authorized', historicalCostEnvelope.publication_authorization.historical_summary_authorized ? 'YES' : 'NO'],
+    ['Future projection authorized', historicalCostEnvelope.publication_authorization.future_projection_authorized ? 'YES' : 'NO'],
+    ['Project-cost translation authorized', historicalCostEnvelope.publication_authorization.project_cost_translation_authorized ? 'YES' : 'NO'],
+    ['AI-attributable effect authorized', historicalCostEnvelope.publication_authorization.ai_attributable_effect_authorized ? 'YES' : 'NO'],
+  ];
+  historicalCostSheet.getRange('D5:D8').format.font = { bold: true, color: C.ink };
+  historicalCostSheet.getRange('E5').format = { fill: C.tealLight, font: { bold: true, color: C.tealDark } };
+  historicalCostSheet.getRange('E6:E8').format = { fill: C.amberLight, font: { bold: true, color: '#8A4826' } };
+  historicalCostSheet.getRange('G5:S9').merge();
+  historicalCostSheet.getRange('G5').values = [[
+    'DESCRIPTIVE HISTORY ONLY. Quantiles summarize realized changes across overlapping historical windows. They are not probabilities, forecasts or project allowances. The existing held-out forecast gate remains unchanged, project-cost translation remains blank and no AI-attributable increment is estimated.',
+  ]];
+  historicalCostSheet.getRange('G5:S9').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529' },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  historicalCostSheet.getRange('A11:S11').values = [[
+    'Asset class', 'Asset label', 'Geography ID', 'Geography', 'Horizon (years)',
+    'History status', 'Overlapping windows', 'Non-overlapping windows',
+    'Minimum change (%)', 'P10 change (%)', 'P25 change (%)', 'Median change (%)',
+    'P75 change (%)', 'P90 change (%)', 'Maximum change (%)',
+    'Latest realized change (%)', 'Latest percentile rank', 'Median annualized', 'Source URL',
+  ]];
+  header(historicalCostSheet.getRange('A11:S11'));
+  const historicalEndRow = 11 + historicalRows.length;
+  historicalCostSheet.getRange(`A12:S${historicalEndRow}`).values = historicalRows;
+  for (let row = 12; row <= historicalEndRow; row += 1) {
+    historicalCostSheet.getRange(`R${row}`).formulas = [[`=(1+L${row}/100)^(1/E${row})-1`]];
+  }
+  historicalCostSheet.getRange(`E12:E${historicalEndRow}`).format.numberFormat = '0';
+  historicalCostSheet.getRange(`G12:H${historicalEndRow}`).format.numberFormat = '#,##0';
+  historicalCostSheet.getRange(`I12:Q${historicalEndRow}`).format.numberFormat = '0.0';
+  historicalCostSheet.getRange(`R12:R${historicalEndRow}`).format.numberFormat = '0.0%';
+  historicalCostSheet.getRange(`F12:F${historicalEndRow}`).conditionalFormats.add('containsText', {
+    text: 'historical_context_available',
+    format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+  });
+  historicalCostSheet.getRange(`F12:F${historicalEndRow}`).conditionalFormats.add('containsText', {
+    text: 'limited_history_only',
+    format: { fill: C.amberLight, font: { color: '#8A4826', bold: true } },
+  });
+  historicalCostSheet.getRange(`J12:N${historicalEndRow}`).conditionalFormats.add('dataBar', {
+    color: C.teal,
+    gradient: true,
+  });
+  const historicalTable = historicalCostSheet.tables.add(
+    `A11:S${historicalEndRow}`,
+    true,
+    'HistoricalCostEnvelopeTable',
+  );
+  historicalTable.style = 'TableStyleMedium2';
+  historicalCostSheet.getRange(`A${historicalEndRow + 2}:S${historicalEndRow + 4}`).merge();
+  historicalCostSheet.getRange(`A${historicalEndRow + 2}`).values = [[
+    'Interpretation: p10 and p90 mark the middle 80% of realized historical changes, not an 80% prediction interval. Overlapping windows are serially dependent. Roads, water/resilience and regulated utilities remain not assessed because the available BCPI model-building references are not fit-for-purpose cost indexes for those assets.',
+  ]];
+  noteBlock(historicalCostSheet.getRange(`A${historicalEndRow + 2}:S${historicalEndRow + 4}`));
+  historicalCostSheet.freezePanes.freezeRows(11);
+  historicalCostSheet.freezePanes.freezeColumns(4);
+  setWidths(
+    historicalCostSheet,
+    {
+      A: 30, B: 31, C: 15, D: 18, E: 14, F: 27, G: 20, H: 22,
+      I: 18, J: 16, K: 16, L: 18, M: 16, N: 16, O: 18, P: 23,
+      Q: 20, R: 18, S: 52,
+    },
+    historicalEndRow + 4,
   );
 }
 
@@ -5187,8 +5338,9 @@ function buildReleaseChecks() {
     ['Quebec authorized-revision chains reconcile and remain non-authorizing', 'PASS'],
     ['Quebec complete archive reconciles and remains non-authorizing', 'PASS'],
     ['Alberta scenario variants reconcile and remain non-authorizing', 'PASS'],
+    ['Historical cost envelope reconciles and remains non-forecasting', 'PASS'],
   ];
-  checks.getRange('A16:C44').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C45').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -5352,22 +5504,27 @@ function buildReleaseChecks() {
       '=IF(AND(COUNTA(\'Scenario Variants\'!$A$5:$A$8)=4,COUNTIF(\'Scenario Variants\'!$K$5:$K$8,"NO")=4,COUNTIF(\'Scenario Variants\'!$L$5:$L$8,"NO")=4,COUNTIF(\'Scenario Variants\'!$E$5:$E$8,10)=3,COUNTIF(\'Scenario Variants\'!$E$5:$E$8,15)=1,COUNTIF(\'Scenario Variants\'!$G$5:$G$8,72%)=3,COUNTIF(\'Scenario Variants\'!$G$5:$G$8,90%)=1,ABS(\'Scenario Variants\'!E12-\'Scenario Variants\'!D12/(1+ABS(\'Scenario Variants\'!D12)))<0.000001),"PASS","FAIL")',
     ],
   ];
-  checks.getRange('B16:B44').conditionalFormats.add('containsText', {
+  checks.getRange('B45').formulas = [
+    [
+      '=IF(AND(ROWS(\'Historical Envelope\'!$A$12:$A$51)=40,COUNTIF(\'Historical Envelope\'!$F$12:$F$51,"")=0,\'Historical Envelope\'!E5="YES",COUNTIF(\'Historical Envelope\'!$E$6:$E$8,"NO")=3,COUNTIF(\'Historical Envelope\'!$S$12:$S$51,"")=0,ABS(\'Historical Envelope\'!R12-((1+\'Historical Envelope\'!L12/100)^(1/\'Historical Envelope\'!E12)-1))<0.000001),"PASS","FAIL")',
+    ],
+  ];
+  checks.getRange('B16:B45').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B44').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B45').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A46:D48').merge();
-  checks.getRange('A46').values = [
+  checks.getRange('A47:D49').merge();
+  checks.getRange('A47').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A46:D48'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 52);
+  noteBlock(checks.getRange('A47:D49'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 53);
 }
 
 function buildDashboard() {
