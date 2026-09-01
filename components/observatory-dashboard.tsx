@@ -210,7 +210,7 @@ export function ObservatoryDashboard() {
         </div>
       </section>
 
-      <section id="pressure" className="bg-[#0b2a36] text-white">
+      <section id="pressure" className="aiio-command-grid text-white">
         <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
           <div className="flex flex-col justify-between gap-5 border-b border-white/10 pb-8 md:flex-row md:items-end">
             <div>

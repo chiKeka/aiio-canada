@@ -60,7 +60,7 @@ export function ImpactPathGraph({
 
   return (
     <section
-      className="border-y border-white/10 bg-[#0a2834] text-white"
+      className="aiio-command-grid border-y border-white/10 text-white"
       id="dependency-graph"
     >
       <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">

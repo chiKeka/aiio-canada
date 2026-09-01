@@ -53,9 +53,10 @@ export function DecisionWorkbench() {
             <h1 className="max-w-4xl text-balance text-4xl font-normal leading-[1.04] tracking-[-0.05em] text-[#112f37] sm:text-6xl">What do we <span className="editorial-highlight">know</span>—and what must we resolve—before this project goes to market?</h1>
             <p className="mt-5 max-w-3xl text-sm leading-6 text-[#596d69] sm:text-base">Define a capital project, separate observed market conditions from the Alberta $50B counterfactual, inspect relevant model paths, and turn evidence gaps into decision gates.</p>
           </div>
-          <div className="self-end rounded-[10px] border border-[#dfb38f] bg-white px-5 py-4 text-xs leading-5 text-[#774a35] shadow-[0_12px_36px_rgba(40,50,45,.06)]">
+          <div className="self-end rounded-[10px] border border-[#dfc5b3] border-l-4 border-l-[#d66b35] bg-white px-5 py-4 text-xs leading-5 text-[#774a35]">
             <span className="font-semibold text-[#984b27]">Decision boundary:</span> AI-attributable cost escalation remains unquantified. No number on this page is an AI cost forecast for the project.
           </div>
+          <DecisionSignalRail />
         </div>
       </section>
 
@@ -108,6 +109,28 @@ export function DecisionWorkbench() {
       <DecisionActions analysis={analysis} />
       <SiteFooter />
     </main>
+  );
+}
+
+function DecisionSignalRail() {
+  const signals = [
+    { label: 'Market context', value: 'Available', note: 'Observed + inferred', tone: 'border-t-[#2f8f83]' },
+    { label: 'Baseline outlook', value: 'Withheld', note: 'Horizon gate failed', tone: 'border-t-[#d66b35]' },
+    { label: 'AI cost increment', value: 'Unquantified', note: 'Calibration required', tone: 'border-t-[#d66b35]' },
+    { label: 'Graph pathways', value: 'Inspectable', note: 'Assumed · low confidence', tone: 'border-t-[#57a8b2]' },
+  ];
+  return (
+    <div className="grid gap-px overflow-hidden rounded-[10px] border border-[#d8dcd7] bg-[#d8dcd7] sm:grid-cols-2 lg:col-span-2 lg:grid-cols-4" aria-label="Decision readiness signals">
+      {signals.map((signal) => (
+        <div className={`border-t-2 bg-white px-4 py-3 ${signal.tone}`} key={signal.label}>
+          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.11em] text-[#6a7b77]">{signal.label}</p>
+          <div className="mt-1 flex items-baseline justify-between gap-3">
+            <p className="text-sm font-semibold text-[#17343d]">{signal.value}</p>
+            <p className="text-right text-[10px] text-[#697a76]">{signal.note}</p>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 

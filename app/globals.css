@@ -49,6 +49,20 @@
 }
 
 :root {
+  --aiio-paper: #f7f6f1;
+  --aiio-paper-raised: #fbfaf5;
+  --aiio-white: #ffffff;
+  --aiio-hairline: #d8dcd7;
+  --aiio-ink: #0d2b36;
+  --aiio-body: #536764;
+  --aiio-teal: #145f59;
+  --aiio-teal-wash: #dceee8;
+  --aiio-cyan: #57c6c0;
+  --aiio-steel: #6b8798;
+  --aiio-amber: #d66b35;
+  --aiio-amber-wash: #fff0e3;
+  --aiio-midnight: #081e28;
+  --aiio-midnight-raised: #103542;
   --background: oklch(0.978 0.006 92);
   --foreground: oklch(0.22 0.018 205);
   --card: oklch(0.995 0.003 92);
@@ -147,6 +161,14 @@
     linear-gradient(90deg, rgba(33, 88, 84, 0.065) 1px, transparent 1px);
   background-size: 42px 42px;
   mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.aiio-command-grid {
+  background-color: var(--aiio-midnight);
+  background-image:
+    linear-gradient(rgba(87, 198, 192, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(87, 198, 192, 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 .scenario-range {

@@ -49,7 +49,7 @@ npm run release:build
 npm run release:verify
 ```
 
-Research architecture and protocols live in `docs/`. The public application lives in `app/` and `components/`. Data, model, workbook and digest packages are added as the build advances.
+Research architecture and protocols live in `docs/`. The public application lives in `app/` and `components/`, with its evidence-led product language and visual rules in [`DESIGN.md`](DESIGN.md). Data, model, workbook and digest packages are added as the build advances.
 
 The committed labour extracts contain graph-relevant NOC vacancy and
 offered-wage observations from Statistics Canada table 14-10-0444-01. One file
