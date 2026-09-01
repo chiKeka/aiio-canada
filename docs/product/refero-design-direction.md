@@ -2,11 +2,16 @@
 
 Status: adopted for the local AIIO Canada interface on 2026-08-31.
 
-Source of inspiration: [Refero Styles](https://styles.refero.design/) and its “Seline Analytics” style reference. This is a translation of general design patterns, not a copy of Refero, Seline, or their assets.
+Sources of inspiration: [Refero Styles](https://styles.refero.design/), its [Seline Analytics](https://styles.refero.design/style/7967c6d9-e50c-42b5-b4d1-74003ba41781) reference, and its [Decide AI](https://styles.refero.design/style/5d9e1cc2-4b81-40fe-aa92-640f2e1d7420) reference. This is a translation of general design patterns, not a copy of Refero, Seline, Decide AI, or their assets.
 
 ## Product expression
 
 AIIO should feel like a quiet analyst's desk built for consequential public decisions: calm, precise, dated, and inspectable. The product surface is the proof. Decorative marketing treatments should never compete with evidence status, uncertainty, or the project decision.
+
+The two interface modes now use distinct but related visual voices:
+
+- Decision Mode is the warm-paper executive briefing: quiet, legible and oriented around a project decision.
+- Research Mode is the dark observatory console: instrument-like, explicitly exploratory and oriented around mechanisms, evidence gates and model state.
 
 ## Adopted principles
 
@@ -16,7 +21,8 @@ AIIO should feel like a quiet analyst's desk built for consequential public deci
 - Use deep teal as the single brand/action accent.
 - Keep amber and rust only for analytical warnings, assumptions, and negative movements.
 - Use compact pill controls for modes, branches, evidence classes, and dated states.
-- Keep one dark, inverted analytical surface: the dependency graph.
+- Use dark, inverted analytical surfaces for the Research Mode header, framing question and graph; return to warm paper for long-form methodology and tables.
+- Reserve mint in Research Mode for active-state and signal punctuation. It must not replace amber/rust warning semantics.
 - Prefer generous section rhythm around dense, compact evidence cards.
 
 ## AIIO-specific constraints
@@ -33,6 +39,8 @@ AIIO should feel like a quiet analyst's desk built for consequential public deci
 - Cards: white or near-white, 1px warm-grey border, 10px radius.
 - Primary action: deep teal filled pill; use sparingly.
 - Secondary action: white or transparent pill with a hairline border.
+- Research canvas: near-black with white type, mint signal punctuation and sharp-edged light instrument cards.
+- Research actions: white or transparent pills; mint denotes active research state, not a positive finding.
 - Display headings: regular weight, tight tracking, short line length.
 - Metadata: compact mono, uppercase only for short labels.
 - Shadows: one soft workbench elevation; otherwise rely on borders.

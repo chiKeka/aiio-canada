@@ -155,12 +155,29 @@
   padding: 0 0.12em 0.04em;
 }
 
+.research-signal-highlight {
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  border-radius: 0.12em;
+  background: #73ffb9;
+  color: #06130f;
+  padding: 0 0.1em 0.035em;
+}
+
 .observatory-grid {
   background-image:
     linear-gradient(rgba(33, 88, 84, 0.065) 1px, transparent 1px),
     linear-gradient(90deg, rgba(33, 88, 84, 0.065) 1px, transparent 1px);
   background-size: 42px 42px;
   mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.research-observatory-grid {
+  background-image:
+    linear-gradient(rgba(115, 255, 185, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(115, 255, 185, 0.055) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 92%);
 }
 
 .aiio-command-grid {

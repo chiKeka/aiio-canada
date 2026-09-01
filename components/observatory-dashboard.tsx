@@ -151,29 +151,29 @@ export function ObservatoryDashboard() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-[#e2e0d9] bg-[#faf9f5]/95 text-[#172f35] backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#071116]/95 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <Link className="group flex items-center gap-3" href="/research" aria-label="AIIO Canada research home">
-            <span className="grid size-9 place-items-center rounded-full border border-[#bdd5ce] bg-white font-mono text-xs font-semibold text-[#17665f] shadow-[0_1px_2px_rgba(18,53,52,.06)]">
+            <span className="grid size-9 place-items-center rounded-full border border-[#73ffb9]/35 bg-[#0d1c21] font-mono text-xs font-semibold text-[#73ffb9]">
               AI
             </span>
             <span>
               <span className="block text-sm font-semibold tracking-[0.02em]">AIIO Canada</span>
-              <span className="hidden text-[9px] uppercase tracking-[0.16em] text-[#536864] sm:block">
+              <span className="hidden text-[9px] uppercase tracking-[0.16em] text-[#8ca0a5] sm:block">
                 Infrastructure impact observatory
               </span>
             </span>
           </Link>
-          <nav className="hidden items-center gap-5 text-xs font-medium text-[#62716e] md:flex" aria-label="Primary navigation">
-            <Link className="transition-colors hover:text-[#143f42]" href="/evidence">Evidence</Link>
-            <Link className="transition-colors hover:text-[#143f42]" href="/pressure">Pressure monitor</Link>
-            <Link className="transition-colors hover:text-[#143f42]" href="/scenario">Scenario lab</Link>
-            <Link className="transition-colors hover:text-[#143f42]" href="/methods">Methods</Link>
+          <nav className="hidden items-center gap-5 text-xs font-medium text-[#a9b9bd] md:flex" aria-label="Primary navigation">
+            <Link className="transition-colors hover:text-white" href="/evidence">Evidence</Link>
+            <Link className="transition-colors hover:text-white" href="/pressure">Pressure monitor</Link>
+            <Link className="transition-colors hover:text-white" href="/scenario">Scenario lab</Link>
+            <Link className="transition-colors hover:text-white" href="/methods">Methods</Link>
           </nav>
           <div className="flex items-center gap-2">
             <ModeToggle compact />
             <Link
-              className="hidden h-8 items-center gap-1.5 rounded-full border border-[#d5d9d4] bg-white px-3 text-xs font-medium text-[#294a49] shadow-[0_1px_2px_rgba(18,53,52,.05)] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] sm:inline-flex"
+              className="hidden h-8 items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 text-xs font-medium text-[#dce7e9] transition-colors hover:border-[#73ffb9]/45 hover:text-white sm:inline-flex"
               href="/evidence"
             >
               Evidence register <ChevronRight className="size-3.5" />
@@ -182,40 +182,40 @@ export function ObservatoryDashboard() {
         </div>
       </header>
 
-      <section id="top" className="relative border-b border-[#e2e0d9] bg-[#faf9f5]">
-        <div className="observatory-grid absolute inset-0 opacity-65" aria-hidden="true" />
+      <section id="top" className="relative border-b border-white/10 bg-[#071116] text-white">
+        <div className="research-observatory-grid absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-[1440px] gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[minmax(0,1.2fr)_minmax(390px,.8fr)] lg:px-12 lg:py-20">
-          <div className="inline-flex items-center gap-2 rounded-lg border border-[#d7a47f] bg-[#fff0e4] px-3 py-2 text-xs font-semibold text-[#8d421e] lg:col-span-2">
+          <div className="inline-flex items-center gap-2 border border-[#d88755]/55 bg-[#2a1c17] px-3 py-2 text-xs font-semibold text-[#f2b58a] lg:col-span-2">
             <AlertTriangle className="size-4" /> Counterfactual structural diagnostic · not a finding or forecast
           </div>
           <div className="max-w-4xl">
             <div className="mb-7 flex flex-wrap items-center gap-2">
-              <Badge className="border-[#2f8f83]/30 bg-[#dff0eb] text-[#175e56]">Alberta pilot</Badge>
-              <Badge variant="outline" className="border-[#bdc9c3] bg-white/65 text-[#4c625f]">Release {releaseData.manifest.version}</Badge>
-              <span className="ml-1 inline-flex items-center gap-1.5 text-xs text-[#526560]">
-                <span className="size-1.5 rounded-full bg-[#2f8f83]" /> Canada expansion plan documented
+              <Badge className="border-[#73ffb9]/30 bg-[#73ffb9]/10 text-[#9fffc9]">Alberta pilot</Badge>
+              <Badge variant="outline" className="border-white/20 bg-white/5 text-[#c5d1d4]">Release {releaseData.manifest.version}</Badge>
+              <span className="ml-1 inline-flex items-center gap-1.5 text-xs text-[#a7b8bc]">
+                <span className="size-1.5 rounded-full bg-[#73ffb9]" /> Canada expansion plan documented
               </span>
             </div>
-            <p className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-[#30786e]">
+            <p className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-[#73ffb9]">
               Framing question
             </p>
-            <h1 className="max-w-[950px] text-balance font-heading text-[clamp(2.5rem,5.4vw,5.35rem)] font-normal leading-[0.98] tracking-[-0.055em] text-[#0c2935]">
-              Where could AI capital spending create <span className="editorial-highlight">pressure</span> on public infrastructure delivery?
+            <h1 className="max-w-[950px] text-balance font-heading text-[clamp(2.5rem,5.4vw,5.35rem)] font-normal leading-[0.98] tracking-[-0.055em] text-white">
+              Where could AI capital spending create <span className="research-signal-highlight">pressure</span> on public infrastructure delivery?
             </h1>
-            <p className="mt-7 max-w-2xl text-pretty text-base leading-7 text-[#49605f] sm:text-lg">
+            <p className="mt-7 max-w-2xl text-pretty text-base leading-7 text-[#b5c3c7] sm:text-lg">
               An uncalibrated research prototype for testing possible mechanisms through labour, materials and project schedules—beginning in Alberta, then expanding across Canada. It does not measure realized effects.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Button size="lg" className="h-11 bg-[#0d5760] px-4 text-white hover:bg-[#174750]" onClick={() => document.querySelector('#scenario')?.scrollIntoView({ behavior: 'smooth' })}>
+              <Button size="lg" className="h-11 bg-white px-4 text-[#071116] hover:bg-[#dfe7e8]" onClick={() => document.querySelector('#scenario')?.scrollIntoView({ behavior: 'smooth' })}>
                 Explore Alberta scenario <ArrowRight data-icon="inline-end" />
               </Button>
-              <Button size="lg" variant="outline" className="h-11 border-[#b7c5c0] bg-white/70 px-4 text-[#294b4c]" onClick={() => document.querySelector('#method')?.scrollIntoView({ behavior: 'smooth' })}>
+              <Button size="lg" variant="outline" className="h-11 border-white/25 bg-transparent px-4 text-[#dce7e9] hover:border-[#73ffb9]/55 hover:bg-white/5 hover:text-white" onClick={() => document.querySelector('#method')?.scrollIntoView({ behavior: 'smooth' })}>
                 Read the research method
               </Button>
             </div>
           </div>
 
-          <Card id="scenario" className="self-end border-[#bdc8c1] bg-[#fbfaf5]/95 shadow-[0_26px_80px_rgba(14,44,53,.12)] ring-0">
+          <Card id="scenario" className="self-end rounded-none border-[#cfd6d2] bg-[#fbfaf5] shadow-none ring-0">
             <CardHeader className="border-b border-[#dde2dc] pb-4">
               <CardTitle className="flex items-center gap-2 text-[#102f39]">
                 <Sparkles className="size-4 text-[#c05f32]" /> Alberta counterfactual sandbox
@@ -241,7 +241,7 @@ export function ObservatoryDashboard() {
                   type="range"
                   value={capex}
                 />
-                <span className="mt-2 flex justify-between font-mono text-[10px] text-[#7a8a86]"><span>$10B</span><span>$100B</span></span>
+                <span className="mt-2 flex justify-between font-mono text-[10px] text-[#5e6f6b]"><span>$10B</span><span>$100B</span></span>
               </label>
               <div>
                 <span className="mb-3 block text-xs font-semibold uppercase tracking-[0.08em] text-[#596a67]">Delivery window</span>
@@ -507,7 +507,7 @@ export function ObservatoryDashboard() {
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
-  return <div><p className="font-mono text-lg font-semibold text-[#133c44]">{value}</p><p className="mt-1 text-[10px] leading-4 text-[#74827e]">{label}</p></div>;
+  return <div><p className="font-mono text-lg font-semibold text-[#133c44]">{value}</p><p className="mt-1 text-[10px] leading-4 text-[#5e6f6b]">{label}</p></div>;
 }
 
 function FlowNode({ active, eyebrow, icon: Icon, label }: { active?: boolean; eyebrow: string; icon: typeof Zap; label: string }) {
