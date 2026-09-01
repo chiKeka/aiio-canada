@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.15.0-dev';
+const workbookBuildVersion = '0.16.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -343,6 +343,17 @@ const quebecParserReview = JSON.parse(
     'utf8',
   ),
 );
+const scenarioSuite = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'alberta_50b_scenario_suite_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -352,6 +363,7 @@ const assumptions = workbook.worksheets.add('Assumptions');
 const timeline = workbook.worksheets.add('Scenario Timeline');
 const pressure = workbook.worksheets.add('Pressure Results');
 const sensitivity = workbook.worksheets.add('Sensitivity');
+const scenarioVariants = workbook.worksheets.add('Scenario Variants');
 const powerOverlay = workbook.worksheets.add('Power Overlay');
 const projects = workbook.worksheets.add('AI Projects');
 const bcpi = workbook.worksheets.add('BCPI Data');
@@ -399,6 +411,7 @@ for (const sheet of [
   timeline,
   pressure,
   sensitivity,
+  scenarioVariants,
   powerOverlay,
   projects,
   bcpi,
@@ -432,6 +445,7 @@ buildAssumptions();
 buildScenarioTimeline();
 buildPressureResults();
 buildSensitivity();
+buildScenarioVariants();
 buildPowerOverlay();
 buildProjects();
 buildBcpi();
@@ -509,12 +523,21 @@ console.log(inspectProjectCost.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D48',
+  range: 'Release Checks!A1:D50',
   include: 'values,formulas',
   tableMaxRows: 48,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
+
+const inspectScenarioVariants = await workbook.inspect({
+  kind: 'table',
+  range: 'Scenario Variants!A1:O42',
+  include: 'values,formulas',
+  tableMaxRows: 42,
+  tableMaxCols: 15,
+});
+console.log(inspectScenarioVariants.ndjson);
 
 const inspectCanadaExpansion = await workbook.inspect({
   kind: 'table',
@@ -603,6 +626,7 @@ const previewRanges = {
   'Scenario Timeline': 'A1:H17',
   'Pressure Results': 'A1:L20',
   Sensitivity: 'A1:M18',
+  'Scenario Variants': 'A1:O42',
   'Power Overlay': 'A1:J36',
   'AI Projects': 'A1:Q18',
   'BCPI Data': 'A1:I24',
@@ -624,7 +648,7 @@ const previewRanges = {
   'Quebec Revisions': 'A1:R38',
   'Quebec Vintages': 'A1:V42',
   Sources: 'A1:J34',
-  'Release Checks': 'A1:D50',
+  'Release Checks': 'A1:D52',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -689,7 +713,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H44').values = [
+  readme.getRange('A18:H45').values = [
     [
       '1',
       'Dashboard',
@@ -942,6 +966,16 @@ function buildReadMe() {
     ],
     [
       '26',
+      'Scenario Variants',
+      'Compare four invariant-controlled Alberta $50B stress runs across timing and local capture.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '27',
       'Sources',
       'Open the current research source register, distinguish release sources and check source vintages.',
       '',
@@ -951,7 +985,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '27',
+      '28',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -961,25 +995,25 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A44').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B44').format.font = { bold: true };
-  readme.getRange('C18:H44').merge(true);
-  readme.getRange('A46:H46').merge();
-  readme.getRange('A46').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A46:H46'), C.amber);
+  readme.getRange('A18:A45').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B45').format.font = { bold: true };
+  readme.getRange('C18:H45').merge(true);
   readme.getRange('A47:H47').merge();
-  readme.getRange('A47').values = [
+  readme.getRange('A47').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A47:H47'), C.amber);
+  readme.getRange('A48:H48').merge();
+  readme.getRange('A48').values = [
     [
       `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
     ],
   ];
-  readme.getRange('A47:H47').format = {
+  readme.getRange('A48:H48').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A47').format.rowHeight = 156;
+  readme.getRange('A48').format.rowHeight = 156;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
@@ -1338,6 +1372,154 @@ function buildSensitivity() {
       M: 12,
     },
     18,
+  );
+}
+
+function buildScenarioVariants() {
+  titleBand(
+    scenarioVariants,
+    'Alberta $50B controlled scenario variants',
+    'Four versioned stress tests · fixed total and graph · not forecasts or project cost estimates',
+    'O',
+  );
+  scenarioVariants.getRange('A4:L4').values = [[
+    'Variant ID',
+    'Label',
+    'Start year',
+    'End year',
+    'Delivery years',
+    'First-five-year share',
+    'Local capture',
+    'Peak annual capex (CAD)',
+    'Peak year',
+    'Local modelled capex (CAD)',
+    'Forecast authorized',
+    'Cost/delay translation authorized',
+  ]];
+  header(scenarioVariants.getRange('A4:L4'));
+  scenarioVariants.getRange('A5:L8').values = scenarioSuite.variant_summaries.map((item) => [
+    item.variant_id,
+    item.label,
+    item.delivery_start_year,
+    item.delivery_end_year,
+    null,
+    item.first_five_year_capex_share,
+    item.local_capture_share,
+    item.peak_annual_capex_cad,
+    item.peak_annual_capex_year,
+    item.local_modelled_capex_cad,
+    scenarioSuite.publication_boundary.forecast_authorized ? 'YES' : 'NO',
+    scenarioSuite.publication_boundary.project_cost_or_delay_translation_authorized ? 'YES' : 'NO',
+  ]);
+  scenarioVariants.getRange('E5').formulas = [['=D5-C5+1']];
+  scenarioVariants.getRange('E5:E8').fillDown();
+  scenarioVariants.getRange('F5:G8').format.numberFormat = '0.0%';
+  scenarioVariants.getRange('H5:H8').format.numberFormat = '$#,##0';
+  scenarioVariants.getRange('J5:J8').format.numberFormat = '$#,##0';
+  scenarioVariants.getRange('K5:L8').format = {
+    fill: C.amberLight,
+    font: { color: '#8A4826', bold: true },
+  };
+
+  scenarioVariants.getRange('A10:O10').merge();
+  scenarioVariants.getRange('A10').values = [[
+    'Pressure comparison · bounded display = raw / (1 + ABS(raw)); raw scores are dimensionless and unbounded',
+  ]];
+  sectionHeader(scenarioVariants.getRange('A10:O10'));
+  scenarioVariants.getRange('A11:O11').values = [[
+    'Node ID', 'Node', 'Type',
+    'Staggered raw', 'Staggered display', 'Peak',
+    'Front-loaded raw', 'Front-loaded display', 'Peak',
+    'Constrained raw', 'Constrained display', 'Peak',
+    'High-capture raw', 'High-capture display', 'Peak',
+  ]];
+  header(scenarioVariants.getRange('A11:O11'));
+  scenarioSuite.comparison_matrix.forEach((item, index) => {
+    const row = 12 + index;
+    const values = Object.fromEntries(item.values.map((value) => [value.variant_id, value]));
+    scenarioVariants.getRange(`A${row}:O${row}`).values = [[
+      item.node_id,
+      item.label,
+      item.node_type,
+      values.staggered.raw_central_pressure_score,
+      null,
+      values.staggered.central_peak_year,
+      values.front_loaded.raw_central_pressure_score,
+      null,
+      values.front_loaded.central_peak_year,
+      values.constrained_delivery.raw_central_pressure_score,
+      null,
+      values.constrained_delivery.central_peak_year,
+      values.high_local_capture.raw_central_pressure_score,
+      null,
+      values.high_local_capture.central_peak_year,
+    ]];
+    scenarioVariants.getRange(`E${row}`).formulas = [[`=D${row}/(1+ABS(D${row}))`]];
+    scenarioVariants.getRange(`H${row}`).formulas = [[`=G${row}/(1+ABS(G${row}))`]];
+    scenarioVariants.getRange(`K${row}`).formulas = [[`=J${row}/(1+ABS(J${row}))`]];
+    scenarioVariants.getRange(`N${row}`).formulas = [[`=M${row}/(1+ABS(M${row}))`]];
+  });
+  scenarioVariants.getRange('D12:E21').format.numberFormat = '0.000';
+  scenarioVariants.getRange('G12:H21').format.numberFormat = '0.000';
+  scenarioVariants.getRange('J12:K21').format.numberFormat = '0.000';
+  scenarioVariants.getRange('M12:N21').format.numberFormat = '0.000';
+  for (const range of ['E12:E21', 'H12:H21', 'K12:K21', 'N12:N21']) {
+    scenarioVariants.getRange(range).conditionalFormats.add('dataBar', {
+      color: C.teal,
+      gradient: true,
+    });
+  }
+
+  scenarioVariants.getRange('A24:E24').merge();
+  scenarioVariants.getRange('A24').values = [['Annual capex profiles (CAD billions)']];
+  sectionHeader(scenarioVariants.getRange('A24:E24'));
+  scenarioVariants.getRange('A25:E25').values = [[
+    'Year', 'Staggered', 'Front-loaded', 'Constrained delivery', 'High local capture',
+  ]];
+  header(scenarioVariants.getRange('A25:E25'));
+  const annualByVariant = Object.fromEntries(
+    scenarioSuite.variant_summaries.map((item) => [
+      item.variant_id,
+      Object.fromEntries(item.annual_capex_profile.map((flow) => [flow.year, flow.total_capex_cad])),
+    ]),
+  );
+  for (let year = 2027; year <= 2041; year += 1) {
+    const row = 26 + (year - 2027);
+    scenarioVariants.getRange(`A${row}:E${row}`).values = [[
+      year,
+      annualByVariant.staggered[year] ?? null,
+      annualByVariant.front_loaded[year] ?? null,
+      annualByVariant.constrained_delivery[year] ?? null,
+      annualByVariant.high_local_capture[year] ?? null,
+    ]];
+  }
+  scenarioVariants.getRange('B26:E40').format.numberFormat = '$0.00,,,"B"';
+  scenarioVariants.getRange('B26:E40').conditionalFormats.add('dataBar', {
+    color: C.teal,
+    gradient: true,
+  });
+  scenarioVariants.getRange('G24:O24').merge();
+  scenarioVariants.getRange('G24').values = [['Executive interpretation boundary']];
+  sectionHeader(scenarioVariants.getRange('G24:O24'), C.amber);
+  scenarioVariants.getRange('G25:O31').merge();
+  scenarioVariants.getRange('G25').values = [[
+    'Building electricians are the highest-pressure trade in all four declared runs. Front-loading moves their graph peak two years earlier; constrained delivery spreads and delays the peak; high local capture raises the local modelled envelope. These are structural comparisons inside the declared graph. They do not estimate inflation, workforce shortages, project cost escalation, delay duration, probability, power demand or transmission need.',
+  ]];
+  noteBlock(scenarioVariants.getRange('G25:O31'));
+  scenarioVariants.getRange('G33:O38').merge();
+  scenarioVariants.getRange('G33').values = [[
+    `Source artifact: data/model-runs/alberta_50b_scenario_suite_v0.1.json · suite ${scenarioSuite.suite_id}. The constrained 7.5% annual share is a scenario rule, not a measured Alberta capacity estimate. Power remains in the independent MW overlay.`,
+  ]];
+  noteBlock(scenarioVariants.getRange('G33:O38'));
+  scenarioVariants.freezePanes.freezeRows(11);
+  setWidths(
+    scenarioVariants,
+    {
+      A: 31, B: 31, C: 13, D: 15, E: 18,
+      F: 13, G: 18, H: 20, I: 11, J: 20,
+      K: 13, L: 15, M: 18, N: 18, O: 11,
+    },
+    42,
   );
 }
 
@@ -5004,8 +5186,9 @@ function buildReleaseChecks() {
     ['Audited outcome references reconcile and remain non-authorizing', 'PASS'],
     ['Quebec authorized-revision chains reconcile and remain non-authorizing', 'PASS'],
     ['Quebec complete archive reconciles and remains non-authorizing', 'PASS'],
+    ['Alberta scenario variants reconcile and remain non-authorizing', 'PASS'],
   ];
-  checks.getRange('A16:C43').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C44').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -5164,22 +5347,27 @@ function buildReleaseChecks() {
       `=IF(AND('Quebec Vintages'!B6=${quebecFullArchive.snapshot_date_count},'Quebec Vintages'!D6=${quebecFullArchive.snapshot_observation_count},'Quebec Vintages'!B7=${quebecFullArchive.unique_project_count},'Quebec Vintages'!D7=${quebecFullArchive.latest_snapshot_project_count},'Quebec Vintages'!B8=${quebecFullArchive.disappearance_event_count},'Quebec Vintages'!D8=${quebecFullArchive.publisher_declared_retirement_disappearance_event_count},'Quebec Vintages'!B9=${quebecFullArchive.unclassified_disappearance_event_count},'Quebec Vintages'!D9=${quebecFullArchive.project_with_catalog_reentry_count},'Quebec Vintages'!B10=${quebecFullArchiveContract.direct_csv_snapshot_count},'Quebec Vintages'!D10=${quebecFullArchiveContract.paired_xlsx_fallback_count},'Quebec Vintages'!B11="NO",'Quebec Vintages'!D11="NO",ROWS('Quebec Vintages'!$A$15:$A$${quebecSnapshotLastRow})=${quebecFullArchive.snapshot_date_count},ROWS('Quebec Vintages'!$J$15:$J$${quebecTransitionLastRow})=${quebecFullTransitionRows.length},ROWS('Quebec Vintages'!$A$87:$A$${quebecLifecycleLastRow})=${quebecFullLifecycleRows.length},COUNTIF('Quebec Vintages'!$H$87:$H$${quebecLifecycleLastRow},"YES")=${quebecFullArchive.present_in_latest_project_count},SUM('Quebec Vintages'!$M$87:$M$${quebecLifecycleLastRow})=${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}),"PASS","FAIL")`,
     ],
   ];
-  checks.getRange('B16:B43').conditionalFormats.add('containsText', {
+  checks.getRange('B44').formulas = [
+    [
+      '=IF(AND(COUNTA(\'Scenario Variants\'!$A$5:$A$8)=4,COUNTIF(\'Scenario Variants\'!$K$5:$K$8,"NO")=4,COUNTIF(\'Scenario Variants\'!$L$5:$L$8,"NO")=4,COUNTIF(\'Scenario Variants\'!$E$5:$E$8,10)=3,COUNTIF(\'Scenario Variants\'!$E$5:$E$8,15)=1,COUNTIF(\'Scenario Variants\'!$G$5:$G$8,72%)=3,COUNTIF(\'Scenario Variants\'!$G$5:$G$8,90%)=1,ABS(\'Scenario Variants\'!E12-\'Scenario Variants\'!D12/(1+ABS(\'Scenario Variants\'!D12)))<0.000001),"PASS","FAIL")',
+    ],
+  ];
+  checks.getRange('B16:B44').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B43').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B44').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A45:D47').merge();
-  checks.getRange('A45').values = [
+  checks.getRange('A46:D48').merge();
+  checks.getRange('A46').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A45:D47'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 51);
+  noteBlock(checks.getRange('A46:D48'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 52);
 }
 
 function buildDashboard() {

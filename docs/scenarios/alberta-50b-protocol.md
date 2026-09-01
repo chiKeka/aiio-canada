@@ -22,16 +22,16 @@ The headline value cannot enter the graph as a single undifferentiated shock. It
 - construction versus operating expenditure;
 - committed, probable and speculative project stages.
 
-## Implemented diagnostic and future variants
+## Implemented diagnostic and controlled variants
 
 The implemented v0.2 diagnostic uses a staggered ten-year profile, 72% uniform local capture and a graph that receives 46% of total capex. Computing/networking plus professional/other costs—54% of capex—are excluded from propagation. Normalization denominators, capture, absorption and retention are explicit assumptions with one-at-a-time and joint sensitivity tests.
 
-- **Staggered:** $50B distributed over ten years with gradual ramp-up.
-- **Front-loaded:** the same total with peak construction concentrated in the first five years.
-- **Constrained:** project realization is capped by connection, labour and delivery limits.
-- **High-local-capture:** a larger share reaches Alberta construction and service industries.
+- **Staggered reference:** $50B distributed over ten years with 47% in 2027-2031 and 72% local capture.
+- **Front-loaded:** the same total, components, denominators and capture with 67% in 2027-2031.
+- **Constrained delivery:** the same total, components, denominators and capture spread over 15 years with a declared 7.5% maximum annual share.
+- **High local capture:** the reference timing and component mix with capture increased to 90%.
 
-Future variants will have low, central and high parameter sets. Scenario comparisons hold the baseline constant. In v0.2, low/central/high are co-moving structural cases, not uncertainty intervals.
+The four runs and their comparison matrix are governed by `alberta_50b_scenario_suite_contract_v0.1.json` and documented in [the variant-suite method](alberta-50b-variant-suite.md). The constrained cap is a scenario rule, not a measured capacity constraint. The existing low/central/high parameter sets remain co-moving structural cases, not uncertainty intervals.
 
 ## Required outputs
 

@@ -58,6 +58,7 @@ npm run digest:audit
 npm run program:audit
 npm run attribution:readiness
 npm run model:run
+npm run model:variants
 npm run power:run
 npm run research:test
 npm run release:build

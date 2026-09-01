@@ -29,8 +29,8 @@ export default function ScenarioPage() {
       <SiteHeader />
       <PageIntro
         eyebrow="Scenario laboratory"
-        title="What if $50B lands in Alberta over a decade?"
-        description="Explore the published counterfactual diagnostic while keeping capex, local capture, graph pressure and the independent power overlay distinct. Moving a control creates an interpolation for learning—not a new forecast, finding or research release."
+        title="What changes when $50B lands in Alberta?"
+        description="Compare four versioned stress cases that isolate timing and local capture while keeping the total program, component mix and graph fixed. Each choice is a reproducible structural run—not a forecast, finding, cost-escalation estimate or project-delay prediction."
       />
       {evidence ? <ObservedPowerBoundary evidence={evidence} /> : null}
       <section className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">

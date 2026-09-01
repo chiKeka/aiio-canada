@@ -82,7 +82,7 @@ Nodes represent shocks, resources, materials, cost signals and public-delivery d
 
 ### 6. Scenario layer
 
-A scenario is an explicit set of non-observed inputs: investment quantum, timing, construction share, local capture and normalization denominators. It produces a versioned structural diagnostic against a named graph. The first Alberta run also tests denominators, absorption, local capture and retention one at a time and in joint lower-/higher-pressure cases. These cases are not probability intervals.
+A scenario is an explicit set of non-observed inputs: investment quantum, timing, construction share, local capture and normalization denominators. It produces a versioned structural diagnostic against a named graph. The Alberta suite adds four full model runs that hold the $50 billion total and graph constant while isolating timing concentration, timing extension and local capture. Their comparison matrix is the product-facing stress-test layer; the existing denominator, absorption and retention sensitivities remain research-facing diagnostics. Neither is a probability interval.
 
 Power-system quantities are deliberately separate. An observed evidence screen records AESO request, allocation and contract quantities without turning them into a forecast. An independent scenario overlay starts with IT load in MW, uses energy PUE only for annual energy, applies a distinct peak-to-IT factor to peak demand, and stages load using an annual commissioning profile. It cannot be inferred from the CAD scenario and is not an AESO needs assessment.
 

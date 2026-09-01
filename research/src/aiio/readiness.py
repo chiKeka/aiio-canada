@@ -151,6 +151,56 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    scenario_suite_paths = [
+        "data/model/alberta_50b_scenario_suite_contract_v0.1.json",
+        "data/scenarios/alberta_50b_front_loaded_v0.1.json",
+        "data/scenarios/alberta_50b_constrained_delivery_v0.1.json",
+        "data/scenarios/alberta_50b_high_local_capture_v0.1.json",
+        "data/model-runs/alberta_50b_front_loaded_v0.1.json",
+        "data/model-runs/alberta_50b_constrained_delivery_v0.1.json",
+        "data/model-runs/alberta_50b_high_local_capture_v0.1.json",
+        "data/model-runs/alberta_50b_scenario_suite_v0.1.json",
+        "docs/scenarios/alberta-50b-variant-suite.md",
+    ]
+    scenario_suite_missing = missing_paths(root, scenario_suite_paths)
+    suite_report_path = root / "data/model-runs/alberta_50b_scenario_suite_v0.1.json"
+    suite_report = load_json_or_empty(suite_report_path)
+    suite_boundary = suite_report.get("publication_boundary", {})
+    suite_receipts = suite_report.get("variant_run_receipts", [])
+    receipt_hashes_valid = bool(suite_receipts) and all(
+        isinstance(receipt, dict)
+        and (root / str(receipt.get("scenario_path", ""))).is_file()
+        and receipt.get("scenario_sha256")
+        == sha256_file(root / str(receipt.get("scenario_path", "")))
+        and (root / str(receipt.get("model_run_path", ""))).is_file()
+        and receipt.get("model_run_sha256")
+        == sha256_file(root / str(receipt.get("model_run_path", "")))
+        for receipt in suite_receipts
+    )
+    scenario_suite_ready = (
+        not scenario_suite_missing
+        and suite_report.get("variant_count") == 4
+        and len(suite_report.get("variant_summaries", [])) == 4
+        and len(suite_report.get("comparison_matrix", [])) == 10
+        and suite_report.get("contract_sha256")
+        == sha256_file(root / scenario_suite_paths[0])
+        and receipt_hashes_valid
+        and suite_boundary.get("forecast_authorized") is False
+        and suite_boundary.get("ai_attributable_effect_authorized") is False
+        and suite_boundary.get("project_cost_or_delay_translation_authorized") is False
+        and suite_boundary.get("power_requirement_inference_authorized") is False
+    )
+    record(
+        "alberta_scenario_variant_suite",
+        "analysis_engine",
+        PASS if scenario_suite_ready else FAIL,
+        "Four invariant-controlled Alberta scenario runs are hash-locked in a fail-closed comparison suite."
+        if scenario_suite_ready
+        else "The Alberta scenario comparison suite is incomplete, unreconciled or has an unsafe publication boundary.",
+        scenario_suite_paths if scenario_suite_ready else scenario_suite_missing or scenario_suite_paths,
+        release_gate=True,
+    )
+
     alberta_evidence_paths = [
         "data/processed/alberta_ai_projects.csv",
         "data/processed/bcpi_alberta.csv",

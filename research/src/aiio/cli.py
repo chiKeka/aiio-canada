@@ -67,6 +67,7 @@ from .readiness import audit_program_readiness, require_release_ready
 from .retrieval import retrieve
 from .schemas import ValidationError
 from .scenario import run_scenario
+from .scenario_suite import run_scenario_suite
 from .power import run_power_overlay
 from .release import build_publication_artifacts, build_release, verify_manifest
 
@@ -320,6 +321,13 @@ def main() -> None:
     scenario_parser.add_argument("graph_path", type=Path)
     scenario_parser.add_argument("scenario_path", type=Path)
     scenario_parser.add_argument("output_path", type=Path)
+
+    scenario_suite_parser = subparsers.add_parser(
+        "run-scenario-suite",
+        help="run and compare the versioned Alberta scenario variants",
+    )
+    scenario_suite_parser.add_argument("contract_path", type=Path)
+    scenario_suite_parser.add_argument("output_path", type=Path)
 
     power_parser = subparsers.add_parser(
         "run-power-overlay", help="run the independent MW-based power overlay"
@@ -1085,6 +1093,22 @@ def main() -> None:
                         "status": "passed",
                         "scenario_id": output["scenario_id"],
                         "pressure_node_count": len(output["pressure_peaks"]),
+                    }
+                )
+            )
+        elif args.command == "run-scenario-suite":
+            output = run_scenario_suite(
+                root,
+                args.contract_path.resolve(),
+                args.output_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "suite_id": output["suite_id"],
+                        "variant_count": output["variant_count"],
+                        "comparison_node_count": len(output["comparison_matrix"]),
                     }
                 )
             )
