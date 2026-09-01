@@ -11,6 +11,7 @@ import historicalEnvelope from '@/data/model-runs/alberta_bcpi_historical_envelo
 import referenceCostReview from '@/data/model-runs/alberta_reference_cost_review_package_v0.1.json';
 import programGates from '@/data/governance/program-gates.json';
 import informationSectorCapex from '@/data/model-runs/information_sector_construction_capex_screen_v0.1.json';
+import cmaReferenceBaseline from '@/data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json';
 
 const methodSteps = [
   [
@@ -60,6 +61,7 @@ export default function MethodsPage() {
     ...(evidenceScreens.power_evidence?.limitations ?? []),
     ...historicalEnvelope.limitations,
     ...informationSectorCapex.limitations,
+    ...cmaReferenceBaseline.limitations,
   ];
   return (
     <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">

@@ -147,6 +147,18 @@ preserved; suppressed values remain blank. NAICS 51 is a broad information and
 cultural industry aggregate, so every row is a research-only contextual proxy
 and `ai_construction_treatment_authorized` is false.
 
+## CMA public-building reference cost panel
+
+Required fields: `observation_id`, `indicator_id`, `geography_id`,
+`geography_label`, `statcan_dguid`, `value`, `unit`, `period_start`,
+`period_end`, `source_id`, `evidence_status`, `as_of_date`,
+`transformation_id` and `quality_flags`.
+
+The locked geography IDs are `CMA_933` (Vancouver), `CMA_535` (Toronto) and
+`CMA_462` (Montréal). Each retains institutional, school, office and bus-depot
+reference classes separately. CMA observations may not be recoded to `PR_*`
+geographies or described as province-wide indexes.
+
 ## Regional building-investment control
 
 Required fields: `observation_id`, `indicator_id`, `geography_label`,

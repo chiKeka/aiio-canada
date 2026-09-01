@@ -889,6 +889,75 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    cma_baseline_path = (
+        root
+        / "data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json"
+    )
+    cma_baseline = load_json_or_empty(cma_baseline_path)
+    cma_csv_path = root / "data/processed/bcpi_reference_van_tor_mtl.csv"
+    cma_code_manifest = cma_baseline.get("code_manifest", {})
+    expected_cma_code_manifest = {
+        "adapter_sha256": sha256_file(
+            root / "research/src/aiio/adapters/statcan.py"
+        ).removeprefix("sha256:"),
+        "calibration_sha256": sha256_file(
+            root / "research/src/aiio/calibration.py"
+        ).removeprefix("sha256:"),
+        "cma_wrapper_sha256": sha256_file(
+            root / "research/src/aiio/cma_calibration.py"
+        ).removeprefix("sha256:"),
+    }
+    expected_cma_code_sha = hashlib.sha256(
+        json.dumps(
+            expected_cma_code_manifest, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest()
+    cma_status_counts = cma_baseline.get("publication_summary", {}).get(
+        "horizon_status_counts", {}
+    )
+    cma_results = cma_baseline.get("reference_class_results", [])
+    cma_baseline_ready = (
+        cma_baseline_path.exists()
+        and cma_csv_path.exists()
+        and cma_baseline.get("input_sha256")
+        == sha256_file(cma_csv_path).removeprefix("sha256:")
+        and cma_code_manifest == expected_cma_code_manifest
+        and cma_baseline.get("code_sha256") == expected_cma_code_sha
+        and cma_baseline.get("release_state") == "baseline_only"
+        and cma_baseline.get("publication_authorization", {}).get(
+            "public_projection_authorized"
+        )
+        is False
+        and cma_status_counts
+        == {"gate_failed": 36, "gate_passed": 9, "not_assessed": 15}
+        and len(cma_results) == 12
+        and {
+            item.get("geography_id")
+            for item in cma_results
+            if any(
+                horizon.get("status") == "gate_passed"
+                for horizon in item.get("horizons", [])
+            )
+        }
+        == {"CMA_933"}
+    )
+    record(
+        "cma_reference_cost_expansion",
+        "canada_expansion",
+        PASS if cma_baseline_ready else FAIL,
+        "The Vancouver, Toronto and Montréal CMA baseline is hash-locked; nine Vancouver horizons pass internally while every result remains withheld pending review."
+        if cma_baseline_ready
+        else "The long-history CMA reference-cost artifact is missing, stale, structurally inconsistent or prematurely authorized.",
+        [
+            "data/processed/bcpi_reference_van_tor_mtl.csv",
+            "data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json",
+            "research/src/aiio/adapters/statcan.py",
+            "research/src/aiio/cma_calibration.py",
+            "docs/methodology/cma-reference-cost-expansion.md",
+        ],
+        release_gate=True,
+    )
+
     provincial_baseline = load_json_or_empty(
         root / "data/model-runs/bc_on_qc_bcpi_reference_baseline_v0.1.json"
     )
@@ -901,7 +970,7 @@ def audit_program_readiness(
         PASS if province_projection_authorized else PENDING,
         "Comparable provincial decision models are independently authorized."
         if province_projection_authorized
-        else "BC, Ontario and Quebec evidence exists, but the locked history gate leaves all provincial projections unassessed and null.",
+        else "BC, Ontario and Quebec province-level evidence remains too short and null. A separate CMA artifact does not substitute for provincial decision models.",
         ["data/model-runs/bc_on_qc_bcpi_reference_baseline_v0.1.json"],
         release_gate=True,
     )

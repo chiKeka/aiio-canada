@@ -46,6 +46,9 @@ BCPI_PROVINCIAL_TRANSFORMATION_ID = "TR_STATCAN_BCPI_CA_PROVINCES_MATERIALS_1_0_
 BCPI_REFERENCE_PROVINCIAL_TRANSFORMATION_ID = (
     "TR_STATCAN_BCPI_BC_ON_QC_REFERENCE_CLASSES_1_0_0"
 )
+BCPI_REFERENCE_CMA_TRANSFORMATION_ID = (
+    "TR_STATCAN_BCPI_VAN_TOR_MTL_REFERENCE_CLASSES_1_0_0"
+)
 BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID = {
     key: PROVINCE_DGUID_TO_GEOGRAPHY_ID[key]
     for key in (
@@ -64,6 +67,11 @@ BCPI_REFERENCE_PROVINCE_DGUID_TO_GEOGRAPHY_ID = {
     "2021A000224": "PR_24",
     "2021A000235": "PR_35",
     "2021A000259": "PR_59",
+}
+BCPI_REFERENCE_CMA_DGUID_TO_GEOGRAPHY_ID = {
+    "2021S0503462": "CMA_462",
+    "2021S0503535": "CMA_535",
+    "2021S0503933": "CMA_933",
 }
 BCPI_REFERENCE_INDICATOR_IDS = {
     "BCPI_INSTITUTIONAL_BUILDINGS_62213_DIVISION_COMPOSITE",
@@ -465,6 +473,168 @@ def normalize_bcpi_reference_provinces(
     )
     with output_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        for item, dimensions in observations:
+            writer.writerow(
+                {
+                    **item.__dict__,
+                    **dimensions,
+                    "evidence_status": item.evidence_status.value,
+                    "quality_flags": "|".join(item.quality_flags),
+                }
+            )
+    return [item for item, _ in observations]
+
+
+def normalize_bcpi_reference_cmas(
+    zip_path: Path, output_path: Path
+) -> list[ObservationRecord]:
+    """Normalize public-building reference classes for three long-history CMAs.
+
+    Vancouver, Toronto and Montréal are selected because the current official
+    table publishes the same building reference classes used by the Alberta
+    pilot, with 1981-onward histories for health, school and office proxies.
+    The output remains city-market evidence and never substitutes for a
+    province-wide index.
+    """
+    with zipfile.ZipFile(zip_path) as archive:
+        csv_names = [
+            name
+            for name in archive.namelist()
+            if name.endswith(".csv") and "MetaData" not in name
+        ]
+        if len(csv_names) != 1:
+            raise ValidationError(f"expected one BCPI data CSV, found {csv_names}")
+        with closing(archive.open(csv_names[0])) as binary_handle:
+            with TextIOWrapper(
+                binary_handle, encoding="utf-8-sig", newline=""
+            ) as text_handle:
+                reader = csv.DictReader(text_handle)
+                required = {
+                    "REF_DATE",
+                    "GEO",
+                    "DGUID",
+                    "Type of building",
+                    "Division",
+                    "UOM",
+                    "VALUE",
+                    "STATUS",
+                    "SYMBOL",
+                }
+                if not reader.fieldnames or not required.issubset(reader.fieldnames):
+                    raise ValidationError(
+                        "BCPI schema changed; missing "
+                        f"{sorted(required - set(reader.fieldnames or []))}"
+                    )
+                observations: list[tuple[ObservationRecord, dict[str, str]]] = []
+                series_keys: set[tuple[str, str]] = set()
+                for raw in reader:
+                    statcan_dguid = raw["DGUID"].strip()
+                    if statcan_dguid not in BCPI_REFERENCE_CMA_DGUID_TO_GEOGRAPHY_ID:
+                        continue
+                    building = raw["Type of building"].strip()
+                    division = raw["Division"].strip()
+                    indicator_id = f"BCPI_{slug(building)}_{slug(division)}"
+                    if indicator_id not in BCPI_REFERENCE_INDICATOR_IDS:
+                        continue
+                    value_text = raw["VALUE"].strip()
+                    if not value_text:
+                        raise ValidationError(
+                            "BCPI CMA reference series contains a missing or suppressed value"
+                        )
+                    period_start, period_end = quarter_bounds(raw["REF_DATE"].strip())
+                    geography_id = BCPI_REFERENCE_CMA_DGUID_TO_GEOGRAPHY_ID[
+                        statcan_dguid
+                    ]
+                    quality_flags = tuple(
+                        flag
+                        for flag in (
+                            f"status:{raw['STATUS'].strip()}"
+                            if raw["STATUS"].strip()
+                            else "",
+                            f"symbol:{raw['SYMBOL'].strip()}"
+                            if raw["SYMBOL"].strip()
+                            else "",
+                        )
+                        if flag
+                    )
+                    identity = "|".join(
+                        (
+                            raw["REF_DATE"].strip(),
+                            statcan_dguid,
+                            building,
+                            division,
+                            raw["UOM"].strip(),
+                        )
+                    )
+                    observation = ObservationRecord(
+                        observation_id=(
+                            "OBS_BCPI_"
+                            f"{hashlib.sha256(identity.encode()).hexdigest()[:20].upper()}"
+                        ),
+                        indicator_id=indicator_id,
+                        value=float(value_text),
+                        unit=raw["UOM"].strip(),
+                        geography_id=geography_id,
+                        period_start=period_start,
+                        period_end=period_end,
+                        source_id="STATCAN_BCPI_18100289",
+                        evidence_status=EvidenceStatus.OBSERVED,
+                        as_of_date=period_end,
+                        transformation_id=BCPI_REFERENCE_CMA_TRANSFORMATION_ID,
+                        quality_flags=quality_flags,
+                    )
+                    observation.validate()
+                    observations.append(
+                        (
+                            observation,
+                            {
+                                "geography_label": raw["GEO"]
+                                .replace("\xa0", " ")
+                                .strip(),
+                                "statcan_dguid": statcan_dguid,
+                            },
+                        )
+                    )
+                    series_keys.add((indicator_id, geography_id))
+
+    expected_series_keys = {
+        (indicator_id, geography_id)
+        for indicator_id in BCPI_REFERENCE_INDICATOR_IDS
+        for geography_id in BCPI_REFERENCE_CMA_DGUID_TO_GEOGRAPHY_ID.values()
+    }
+    if series_keys != expected_series_keys:
+        raise ValidationError(
+            "BCPI CMA reference-class coverage changed; missing="
+            f"{sorted(expected_series_keys - series_keys)}, unexpected="
+            f"{sorted(series_keys - expected_series_keys)}"
+        )
+    observations.sort(
+        key=lambda item: (
+            item[0].geography_id,
+            item[0].indicator_id,
+            item[0].period_end,
+        )
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fields = (
+        "observation_id",
+        "indicator_id",
+        "geography_id",
+        "geography_label",
+        "statcan_dguid",
+        "value",
+        "unit",
+        "period_start",
+        "period_end",
+        "source_id",
+        "evidence_status",
+        "as_of_date",
+        "transformation_id",
+        "quality_flags",
+    )
+    with output_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for item, dimensions in observations:
             writer.writerow(

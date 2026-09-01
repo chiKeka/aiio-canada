@@ -117,6 +117,26 @@
       ],
       "model_action": "no_change",
       "automatic_model_change": false
+    },
+    {
+      "item_id": "CMA_REFERENCE_COST_EXPANSION_2026_09",
+      "headline": "Long CMA price histories support nine Vancouver horizons without authorizing national transfer",
+      "sources": [
+        {
+          "source_id": "STATCAN_BCPI_18100289",
+          "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901"
+        }
+      ],
+      "observed_change": "The current Statistics Canada BCPI cube provides 182 contiguous quarterly observations from 1981 Q1 through 2026 Q2 for institutional, school and office reference classes in Vancouver, Toronto and Montréal. Bus-depot histories begin in 2017. The unchanged locked validation protocol produces 9 gate-passing, 36 gate-failed and 15 not-assessed horizons; all nine passing horizons are Vancouver results.",
+      "model_implication": "Preserve city-market and province-level artifacts separately. Keep Toronto, Montréal and every failed or short-history result null, do not relabel Vancouver as British Columbia evidence, and withhold all nine internal Vancouver projections until independent modelling review authorizes individual horizons.",
+      "evidence_status": "inferred",
+      "geography_ids": [
+        "CMA_933",
+        "CMA_535",
+        "CMA_462"
+      ],
+      "model_action": "review_candidate",
+      "automatic_model_change": false
     }
   ]
 }

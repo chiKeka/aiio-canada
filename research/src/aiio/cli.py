@@ -9,6 +9,7 @@ from pathlib import Path
 from .adapters.statcan import (
     normalize_bcpi_alberta,
     normalize_bcpi_provinces,
+    normalize_bcpi_reference_cmas,
     normalize_bcpi_reference_provinces,
     normalize_jvws_alberta,
     normalize_jvws_canada,
@@ -55,6 +56,7 @@ from .calibration import (
     PROVINCIAL_REFERENCE_MODEL_ID,
     run_reference_class_baseline,
 )
+from .cma_calibration import run_cma_reference_class_baseline
 from .attribution import build_attribution_readiness
 from .digest import build_digest, validate_digest_cadence
 from .historical_envelope import run_historical_reference_envelope
@@ -103,6 +105,12 @@ def main() -> None:
         help="normalize BC, Ontario and Quebec public-building BCPI reference classes",
     )
     bcpi_reference_provinces_parser.add_argument("zip_path", type=Path)
+
+    bcpi_reference_cmas_parser = subparsers.add_parser(
+        "normalize-bcpi-reference-cmas",
+        help="normalize Vancouver, Toronto and Montréal public-building BCPI reference classes",
+    )
+    bcpi_reference_cmas_parser.add_argument("zip_path", type=Path)
 
     labour_parser = subparsers.add_parser(
         "normalize-jvws",
@@ -258,6 +266,13 @@ def main() -> None:
     )
     provincial_cost_baseline_parser.add_argument("bcpi_path", type=Path)
     provincial_cost_baseline_parser.add_argument("output_path", type=Path)
+
+    cma_cost_baseline_parser = subparsers.add_parser(
+        "run-cost-baseline-cmas",
+        help="run the held-out Vancouver, Toronto and Montréal BCPI reference baseline",
+    )
+    cma_cost_baseline_parser.add_argument("bcpi_path", type=Path)
+    cma_cost_baseline_parser.add_argument("output_path", type=Path)
 
     project_cost_parser = subparsers.add_parser(
         "run-project-reference-cost",
@@ -429,6 +444,22 @@ def main() -> None:
                 / "data"
                 / "processed"
                 / "bcpi_reference_bc_on_qc.csv",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "observation_count": len(observations),
+                        "geography_count": len(
+                            {item.geography_id for item in observations}
+                        ),
+                    }
+                )
+            )
+        elif args.command == "normalize-bcpi-reference-cmas":
+            observations = normalize_bcpi_reference_cmas(
+                args.zip_path.resolve(),
+                root / "data" / "processed" / "bcpi_reference_van_tor_mtl.csv",
             )
             print(
                 json.dumps(
@@ -1003,6 +1034,23 @@ def main() -> None:
                 geography_labels=PROVINCIAL_REFERENCE_GEOGRAPHY_LABELS,
                 model_id=PROVINCIAL_REFERENCE_MODEL_ID,
                 limitations=PROVINCIAL_REFERENCE_LIMITATIONS,
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "release_state": output["release_state"],
+                        "reference_class_count": len(
+                            output["reference_class_results"]
+                        ),
+                    }
+                )
+            )
+        elif args.command == "run-cost-baseline-cmas":
+            output = run_cma_reference_class_baseline(
+                args.bcpi_path.resolve(),
+                args.output_path.resolve(),
             )
             print(
                 json.dumps(

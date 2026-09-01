@@ -1,10 +1,11 @@
-import { BriefcaseBusiness, Database, ExternalLink, ShieldCheck, TrendingUp } from 'lucide-react';
+import { Building2, BriefcaseBusiness, Database, ExternalLink, ShieldCheck, TrendingUp } from 'lucide-react';
 
 import { EvidenceExplorer } from '@/components/evidence-explorer';
 import { LabourMarketExplorer, type NationalLabourAvailability, type NationalLabourPressure, type NationalWorkforceStock } from '@/components/labour-market-explorer';
 import { EvidencePill, PageIntro, SiteFooter, SiteHeader } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
 import informationSectorCapex from '@/data/model-runs/information_sector_construction_capex_screen_v0.1.json';
+import cmaReferenceBaseline from '@/data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json';
 
 export default function EvidencePage() {
   const pipeline = releaseData.baseline.ai_project_pipeline;
@@ -48,6 +49,7 @@ export default function EvidencePage() {
       </section>
       {labourCanada ? <LabourMarketExplorer labour={labourCanada} pressure={labourPressure} workforce={workforceCanada} /> : labour ? <LabourAvailabilityPanel labour={labour} /> : null}
       <InformationSectorCapexPanel />
+      <CmaReferenceCostPanel />
       <section className="border-t border-[#d5ddd8] bg-[#e9ebe5]">
         <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
           <div className="mb-6 flex items-center gap-2"><Database className="size-4 text-[#24746c]" /><h2 className="text-xl font-medium">Registered public sources</h2></div>
@@ -64,6 +66,72 @@ export default function EvidencePage() {
       </section>
       <SiteFooter />
     </main>
+  );
+}
+
+function CmaReferenceCostPanel() {
+  const geographies = ['CMA_933', 'CMA_535', 'CMA_462'].map((geographyId) => {
+    const results = cmaReferenceBaseline.reference_class_results.filter(
+      (item) => item.geography_id === geographyId,
+    );
+    let passedHorizons = 0;
+    for (const result of results) {
+      for (const horizon of result.horizons) {
+        if (horizon.status === 'gate_passed') passedHorizons += 1;
+      }
+    }
+    return {
+      geographyId,
+      geographyLabel: results[0]?.geography_label ?? geographyId,
+      passedHorizons,
+      seriesCount: results.length,
+      firstLongHistoryQuarter: results
+        .filter((item) => item.observation_count > 100)
+        .map((item) => item.first_period_end)
+        .sort()[0],
+    };
+  });
+  const statusCounts = cmaReferenceBaseline.publication_summary.horizon_status_counts;
+  return (
+    <section className="border-t border-[#d5ddd8] bg-[#eef1ec]">
+      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
+        <div className="flex items-center gap-2 text-[#24746c]">
+          <Building2 className="size-4" />
+          <h2 className="text-xl font-medium">City-market reference-cost validation</h2>
+        </div>
+        <p className="mt-3 max-w-4xl text-sm leading-6 text-[#52645f]">
+          The same locked BCPI validation protocol used for Alberta now runs on
+          long Vancouver, Toronto and Montréal histories. These are CMA market
+          references, not provincial forecasts or AI-attributable effects.
+        </p>
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
+          {geographies.map((item) => (
+            <article
+              className="rounded-xl border border-[#d2dad5] bg-white p-5"
+              key={item.geographyId}
+            >
+              <p className="text-xs text-[#667873]">{item.geographyLabel}</p>
+              <p className="mt-2 font-mono text-2xl font-semibold text-[#17343d]">
+                {item.passedHorizons} / 20
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[#667873]">
+                internally gate-passing horizons · {item.seriesCount} reference
+                classes · long histories begin {item.firstLongHistoryQuarter}
+              </p>
+            </article>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-4 text-sm leading-6 text-[#825a47] sm:grid-cols-[auto_1fr]">
+          <span className="font-mono font-semibold">WITHHELD</span>
+          <span>
+            {statusCounts.gate_passed} horizons pass internally,{' '}
+            {statusCounts.gate_failed} fail and {statusCounts.not_assessed} are
+            not assessed. All nine passes are Vancouver results, but no public
+            projection is authorized until independent modelling review.
+          </span>
+        </div>
+      </div>
+    </section>
   );
 }
 

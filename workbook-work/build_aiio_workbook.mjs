@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.19.0-dev';
+const workbookBuildVersion = '0.20.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -404,6 +404,17 @@ const informationSectorCapexRows = parseCsv(
     'utf8',
   ),
 );
+const cmaReferenceBaseline = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -428,6 +439,7 @@ const costBaselineSheet = workbook.worksheets.add('Cost Baseline');
 const historicalCostSheet = workbook.worksheets.add('Historical Envelope');
 const referenceReviewSheet = workbook.worksheets.add('Reference Review');
 const sectorCapexSheet = workbook.worksheets.add('Sector Capex');
+const cmaReferenceSheet = workbook.worksheets.add('CMA Reference');
 const projectCost = workbook.worksheets.add('Project Cost Check');
 const canadaExpansion = workbook.worksheets.add('Canada Expansion');
 const attributionGate = workbook.worksheets.add('Attribution Gate');
@@ -479,6 +491,7 @@ for (const sheet of [
   historicalCostSheet,
   referenceReviewSheet,
   sectorCapexSheet,
+  cmaReferenceSheet,
   projectCost,
   canadaExpansion,
   attributionGate,
@@ -516,6 +529,7 @@ buildCostBaseline();
 buildHistoricalCostEnvelope();
 buildReferenceReview();
 buildSectorCapex();
+buildCmaReference();
 buildProjectCostCheck();
 buildCanadaExpansion();
 buildAttributionGate();
@@ -564,9 +578,9 @@ console.log(inspectDashboard.ndjson);
 
 const inspectReadMe = await workbook.inspect({
   kind: 'table',
-  range: 'Read Me!A1:H53',
+  range: 'Read Me!A1:H54',
   include: 'values,formulas',
-  tableMaxRows: 53,
+  tableMaxRows: 54,
   tableMaxCols: 8,
 });
 console.log(inspectReadMe.ndjson);
@@ -582,9 +596,9 @@ console.log(inspectProjectCost.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D52',
+  range: 'Release Checks!A1:D53',
   include: 'values,formulas',
-  tableMaxRows: 52,
+  tableMaxRows: 53,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
@@ -624,6 +638,15 @@ const inspectSectorCapex = await workbook.inspect({
   tableMaxCols: 20,
 });
 console.log(inspectSectorCapex.ndjson);
+
+const inspectCmaReference = await workbook.inspect({
+  kind: 'table',
+  range: 'CMA Reference!A1:W76',
+  include: 'values,formulas',
+  tableMaxRows: 76,
+  tableMaxCols: 23,
+});
+console.log(inspectCmaReference.ndjson);
 
 const inspectCanadaExpansion = await workbook.inspect({
   kind: 'table',
@@ -706,7 +729,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H53',
+  'Read Me': 'A1:H54',
   Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -727,6 +750,7 @@ const previewRanges = {
   'Historical Envelope': 'A1:S55',
   'Reference Review': 'A1:J40',
   'Sector Capex': 'A1:T45',
+  'CMA Reference': 'A1:W32',
   'Project Cost Check': 'A1:L38',
   'Canada Expansion': 'A1:J48',
   'Attribution Gate': 'A1:J48',
@@ -737,7 +761,7 @@ const previewRanges = {
   'Quebec Revisions': 'A1:R38',
   'Quebec Vintages': 'A1:V42',
   Sources: 'A1:J34',
-  'Release Checks': 'A1:D54',
+  'Release Checks': 'A1:D55',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -802,7 +826,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H48').values = [
+  readme.getRange('A18:H49').values = [
     [
       '1',
       'Dashboard',
@@ -1095,6 +1119,16 @@ function buildReadMe() {
     ],
     [
       '30',
+      'CMA Reference',
+      'Inspect the Vancouver, Toronto and Montréal held-out reference-cost results; all values remain withheld pending review.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '31',
       'Sources',
       'Open the current research source register, distinguish release sources and check source vintages.',
       '',
@@ -1104,7 +1138,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '31',
+      '32',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -1114,29 +1148,29 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A48').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B48').format.font = { bold: true };
-  readme.getRange('C18:H48').merge(true);
-  readme.getRange('A50:H50').merge();
-  readme.getRange('A50').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A50:H50'), C.amber);
+  readme.getRange('A18:A49').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B49').format.font = { bold: true };
+  readme.getRange('C18:H49').merge(true);
   readme.getRange('A51:H51').merge();
-  readme.getRange('A51').values = [
+  readme.getRange('A51').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A51:H51'), C.amber);
+  readme.getRange('A52:H52').merge();
+  readme.getRange('A52').values = [
     [
-      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The ${referenceCostReview.required_criteria.length}-criterion independent-review packet is prepared but has no verdict, and both reviewer channels remain blocked. No public project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only; its quantiles are not forecasts, probabilities or project allowances. The NAICS 51 Sector Capex screen adds ${informationSectorCapex.observation_count} annual Canada/province cells and reports Alberta 2024 actual/revised construction capital of $458.6M, but ${informationSectorCapex.quality_flag_counts.suppressed_confidentiality} cells are suppressed and the broad industry cannot identify AI/data-centre treatment. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
+      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 Alberta asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The CMA expansion adds 60 Vancouver, Toronto and Montréal horizon checks: 9 pass internally, 36 fail and 15 are not assessed. All nine passes are Vancouver results, but every value remains withheld pending independent review and no CMA result is province-wide evidence. The ${referenceCostReview.required_criteria.length}-criterion Alberta review packet is prepared but has no verdict, and both reviewer channels remain blocked. No public project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only; its quantiles are not forecasts, probabilities or project allowances. The NAICS 51 Sector Capex screen adds ${informationSectorCapex.observation_count} annual Canada/province cells and reports Alberta 2024 actual/revised construction capital of $458.6M, but ${informationSectorCapex.quality_flag_counts.suppressed_confidentiality} cells are suppressed and the broad industry cannot identify AI/data-centre treatment. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
     ],
   ];
-  readme.getRange('A51:H51').format = {
+  readme.getRange('A52:H52').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A51').format.rowHeight = 210;
+  readme.getRange('A52').format.rowHeight = 230;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
-    53,
+    54,
   );
 }
 
@@ -3535,6 +3569,208 @@ function buildSectorCapex() {
   );
 }
 
+function buildCmaReference() {
+  titleBand(
+    cmaReferenceSheet,
+    'Vancouver, Toronto and Montréal reference-cost validation',
+    'Unchanged held-out BCPI protocol · city-market evidence · all projections withheld pending review',
+    'W',
+  );
+  const publicAuthorized =
+    cmaReferenceBaseline.publication_authorization
+      .public_projection_authorized;
+  const cmaRows = cmaReferenceBaseline.reference_class_results.flatMap(
+    (result) =>
+      result.horizons.map((horizon) => {
+        const failedGates = Object.entries(horizon.gates ?? {})
+          .filter(([, passed]) => !passed)
+          .map(([gate]) => gate)
+          .join(' | ');
+        return [
+          result.geography_id,
+          result.geography_label,
+          labelize(result.asset_class),
+          result.reference_class_label,
+          result.observation_count,
+          new Date(`${result.first_period_end}T00:00:00Z`),
+          new Date(`${result.latest_period_end}T00:00:00Z`),
+          result.latest_index,
+          horizon.horizon_years,
+          horizon.status,
+          horizon.selected_method ?? '',
+          horizon.projected_cumulative_change_percent,
+          horizon.empirical_error_band_low_change_percent,
+          horizon.empirical_error_band_high_change_percent,
+          horizon.calibration_period?.origin_count ?? 0,
+          horizon.validation_period?.origin_count ?? 0,
+          horizon.validation_period?.selected_method_metrics
+            ?.mean_absolute_percentage_error ?? null,
+          horizon.validation_period?.selected_method_metrics
+            ?.mean_percentage_error ?? null,
+          horizon.validation_period?.empirical_interval_coverage_percent ?? null,
+          failedGates || (horizon.status === 'gate_passed' ? 'none' : horizon.reason),
+          publicAuthorized ? 'YES' : 'NO',
+          cmaReferenceBaseline.source_id,
+          'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901',
+        ];
+      }),
+  );
+  const dataStart = 13;
+  const dataEnd = dataStart + cmaRows.length - 1;
+
+  cmaReferenceSheet.getRange('A5:B10').values = [
+    ['Model ID', cmaReferenceBaseline.model_id],
+    ['Normalized observations', null],
+    ['Reference series', null],
+    ['Horizon results', null],
+    ['Gate passed', null],
+    ['Gate failed', null],
+  ];
+  cmaReferenceSheet.getRange('B6').formulas = [[`=SUM(E${dataStart}:E${dataEnd})/5`]];
+  cmaReferenceSheet.getRange('B7').formulas = [[`=ROWS(A${dataStart}:A${dataEnd})/5`]];
+  cmaReferenceSheet.getRange('B8').formulas = [[`=ROWS(A${dataStart}:A${dataEnd})`]];
+  cmaReferenceSheet.getRange('B9').formulas = [[`=COUNTIF(J${dataStart}:J${dataEnd},"gate_passed")`]];
+  cmaReferenceSheet.getRange('B10').formulas = [[`=COUNTIF(J${dataStart}:J${dataEnd},"gate_failed")`]];
+  cmaReferenceSheet.getRange('A5:A10').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  cmaReferenceSheet.getRange('B5:B10').format = {
+    fill: C.soft,
+    borders: { preset: 'outside', style: 'thin', color: C.line },
+  };
+
+  cmaReferenceSheet.getRange('D5:E10').values = [
+    ['Not assessed', null],
+    ['Public projection authorized', publicAuthorized ? 'YES' : 'NO'],
+    ['Passing geography', 'Vancouver CMA only'],
+    ['Latest quarter', new Date(`${cmaReferenceBaseline.as_of_date}T00:00:00Z`)],
+    ['Release state', cmaReferenceBaseline.release_state],
+    ['Independent review', 'pending'],
+  ];
+  cmaReferenceSheet.getRange('E5').formulas = [[`=COUNTIF(J${dataStart}:J${dataEnd},"not_assessed")`]];
+  cmaReferenceSheet.getRange('E8').format.numberFormat = 'yyyy-mm-dd';
+  cmaReferenceSheet.getRange('D5:D10').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  cmaReferenceSheet.getRange('E6:E10').format = {
+    fill: C.amberLight,
+    font: { color: '#8A4826', bold: true },
+  };
+
+  cmaReferenceSheet.getRange('G5:W10').merge();
+  cmaReferenceSheet.getRange('G5').values = [[
+    'WITHHELD. Nine Vancouver horizons pass the internal validation gates, but no CMA projection is authorized until independent modelling review. Toronto and Montréal have zero passing horizons. The three bus-depot histories are too short. CMA results are local model-building reference indexes, not province-wide forecasts, AI increments or project budget allowances.',
+  ]];
+  cmaReferenceSheet.getRange('G5:W10').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529' },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  cmaReferenceSheet.getRange('A12:W12').values = [[
+    'Geography ID',
+    'Geography',
+    'Asset class',
+    'Reference class',
+    'Observations',
+    'First quarter',
+    'Latest quarter',
+    'Latest index',
+    'Horizon (years)',
+    'Validation status',
+    'Selected method',
+    'Projected change (%)',
+    'Band low (%)',
+    'Band high (%)',
+    'Calibration origins',
+    'Validation origins',
+    'Validation MAPE (%)',
+    'Validation bias (%)',
+    'Interval coverage (%)',
+    'Failed gate(s)',
+    'Public projection authorized',
+    'Source ID',
+    'Source URL',
+  ]];
+  header(cmaReferenceSheet.getRange('A12:W12'));
+  cmaReferenceSheet.getRange(`A${dataStart}:W${dataEnd}`).values = cmaRows;
+  cmaReferenceSheet.getRange(`E${dataStart}:E${dataEnd}`).format.numberFormat = '0';
+  cmaReferenceSheet.getRange(`F${dataStart}:G${dataEnd}`).format.numberFormat =
+    'yyyy-mm-dd';
+  cmaReferenceSheet.getRange(`H${dataStart}:H${dataEnd}`).format.numberFormat =
+    '0.0';
+  cmaReferenceSheet.getRange(`I${dataStart}:I${dataEnd}`).format.numberFormat = '0';
+  cmaReferenceSheet.getRange(`L${dataStart}:S${dataEnd}`).format.numberFormat =
+    '0.0';
+  cmaReferenceSheet
+    .getRange(`J${dataStart}:J${dataEnd}`)
+    .conditionalFormats.add('containsText', {
+      text: 'gate_passed',
+      format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
+    });
+  cmaReferenceSheet
+    .getRange(`J${dataStart}:J${dataEnd}`)
+    .conditionalFormats.add('containsText', {
+      text: 'gate_failed',
+      format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
+    });
+  cmaReferenceSheet
+    .getRange(`J${dataStart}:J${dataEnd}`)
+    .conditionalFormats.add('containsText', {
+      text: 'not_assessed',
+      format: { fill: C.amberLight, font: { color: '#8A4826', bold: true } },
+    });
+  const table = cmaReferenceSheet.tables.add(
+    `A12:W${dataEnd}`,
+    true,
+    'CmaReferenceValidationTable',
+  );
+  table.style = 'TableStyleMedium2';
+
+  const noteStart = dataEnd + 2;
+  const noteEnd = noteStart + 2;
+  cmaReferenceSheet.getRange(`A${noteStart}:W${noteEnd}`).merge();
+  cmaReferenceSheet.getRange(`A${noteStart}`).values = [[
+    'The normalized 1,752-row CMA observation file remains the auditable input. Blank projection and interval cells are intentional when a horizon fails or is not assessed. A baseline-only model state does not authorize all rows; inspect every geography, asset class and horizon individually.',
+  ]];
+  noteBlock(cmaReferenceSheet.getRange(`A${noteStart}:W${noteEnd}`));
+  cmaReferenceSheet.freezePanes.freezeRows(12);
+  cmaReferenceSheet.freezePanes.freezeColumns(4);
+  setWidths(
+    cmaReferenceSheet,
+    {
+      A: 14,
+      B: 22,
+      C: 30,
+      D: 39,
+      E: 14,
+      F: 14,
+      G: 14,
+      H: 14,
+      I: 14,
+      J: 18,
+      K: 27,
+      L: 18,
+      M: 15,
+      N: 15,
+      O: 18,
+      P: 18,
+      Q: 19,
+      R: 18,
+      S: 19,
+      T: 52,
+      U: 22,
+      V: 34,
+      W: 52,
+    },
+    noteEnd,
+  );
+}
+
 function buildProjectCostCheck() {
   titleBand(
     projectCost,
@@ -3965,13 +4201,21 @@ function buildCanadaExpansion() {
     ['Digest source ID', 'Publisher geography', 'Canonical URL'],
   ];
   header(canadaExpansion.getRange('H23:J23'));
-  canadaExpansion.getRange('H24:J32').values = sourceRows;
-  canadaExpansion.getRange('H24:H32').format.font = {
+  const digestSourceStartRow = 24;
+  const digestSourceEndRow = digestSourceStartRow + sourceRows.length - 1;
+  canadaExpansion.getRange(
+    `H${digestSourceStartRow}:J${digestSourceEndRow}`,
+  ).values = sourceRows;
+  canadaExpansion.getRange(
+    `H${digestSourceStartRow}:H${digestSourceEndRow}`,
+  ).format.font = {
     name: 'Aptos Mono',
     size: 8,
     color: C.tealDark,
   };
-  canadaExpansion.getRange('J24:J32').format.font = {
+  canadaExpansion.getRange(
+    `J${digestSourceStartRow}:J${digestSourceEndRow}`,
+  ).format.font = {
     size: 8,
     color: C.blueInput,
   };
@@ -5793,8 +6037,9 @@ function buildReleaseChecks() {
     ['Historical cost envelope reconciles and remains non-forecasting', 'PASS'],
     ['Reference-cost review packet reconciles and remains non-authorizing', 'PASS'],
     ['Information-sector capex screen reconciles and remains non-authorizing', 'PASS'],
+    ['CMA reference-cost expansion reconciles and remains withheld', 'PASS'],
   ];
-  checks.getRange('A16:C47').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C48').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -5973,22 +6218,27 @@ function buildReleaseChecks() {
       '=IF(AND(\'Sector Capex\'!B6=294,\'Sector Capex\'!B7=14,\'Sector Capex\'!B8=21,\'Sector Capex\'!E5="YES",\'Sector Capex\'!E6="NO",\'Sector Capex\'!E7="NO",\'Sector Capex\'!E8=99,\'Sector Capex\'!E9="51",ROWS(\'Sector Capex\'!$A$13:$A$306)=294,COUNTIF(\'Sector Capex\'!$R$13:$R$306,"NO")=294,COUNTIF(\'Sector Capex\'!$T$13:$T$306,"")=0,SUMIFS(\'Sector Capex\'!$H$13:$H$306,\'Sector Capex\'!$B$13:$B$306,"PR_48",\'Sector Capex\'!$E$13:$E$306,2024)=458600000),"PASS","FAIL")',
     ],
   ];
-  checks.getRange('B16:B47').conditionalFormats.add('containsText', {
+  checks.getRange('B48').formulas = [
+    [
+      '=IF(AND(\'CMA Reference\'!B6=1752,\'CMA Reference\'!B7=12,\'CMA Reference\'!B8=60,\'CMA Reference\'!B9=9,\'CMA Reference\'!B10=36,\'CMA Reference\'!E5=15,\'CMA Reference\'!E6="NO",\'CMA Reference\'!E7="Vancouver CMA only",\'CMA Reference\'!E9="baseline_only",\'CMA Reference\'!E10="pending",ROWS(\'CMA Reference\'!$A$13:$A$72)=60,COUNTIF(\'CMA Reference\'!$J$13:$J$72,"gate_passed")=9,COUNTIF(\'CMA Reference\'!$J$13:$J$72,"gate_failed")=36,COUNTIF(\'CMA Reference\'!$J$13:$J$72,"not_assessed")=15,COUNTIFS(\'CMA Reference\'!$A$13:$A$72,"CMA_933",\'CMA Reference\'!$J$13:$J$72,"gate_passed")=9,COUNTIFS(\'CMA Reference\'!$A$13:$A$72,"CMA_535",\'CMA Reference\'!$J$13:$J$72,"gate_passed")=0,COUNTIFS(\'CMA Reference\'!$A$13:$A$72,"CMA_462",\'CMA Reference\'!$J$13:$J$72,"gate_passed")=0,COUNT(\'CMA Reference\'!$L$13:$L$72)=9,COUNTIF(\'CMA Reference\'!$U$13:$U$72,"NO")=60,COUNTIF(\'CMA Reference\'!$W$13:$W$72,"")=0),"PASS","FAIL")',
+    ],
+  ];
+  checks.getRange('B16:B48').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B47').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B48').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A49:D51').merge();
-  checks.getRange('A49').values = [
+  checks.getRange('A50:D52').merge();
+  checks.getRange('A50').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A49:D51'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 55);
+  noteBlock(checks.getRange('A50:D52'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 56);
 }
 
 function buildDashboard() {

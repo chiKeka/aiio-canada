@@ -209,9 +209,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.19.0-dev.xlsx",
-        "workbook_sha256=sha256:81c639ec90e61c52fb369c2a7511e20907fdb08f8c61968a747936d40cae95b6",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.19.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.20.0-dev.xlsx",
+        "workbook_sha256=sha256:0c1de25980ea3f138ae49f0a15187819fd5cec728ed9f4d62873605626b64e79",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.20.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",
@@ -300,6 +300,20 @@
       "summary": "No historical treatment/counterfactual panel yet identifies an AI-attributable cost or schedule effect; the product correctly returns null."
     },
     {
+      "category": "canada_expansion",
+      "check_id": "cma_reference_cost_expansion",
+      "evidence": [
+        "data/processed/bcpi_reference_van_tor_mtl.csv",
+        "data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json",
+        "research/src/aiio/adapters/statcan.py",
+        "research/src/aiio/cma_calibration.py",
+        "docs/methodology/cma-reference-cost-expansion.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The Vancouver, Toronto and Montr\u00e9al CMA baseline is hash-locked; nine Vancouver horizons pass internally while every result remains withheld pending review."
+    },
+    {
       "category": "decision_grade_outputs",
       "check_id": "provincial_decision_models",
       "evidence": [
@@ -307,7 +321,7 @@
       ],
       "release_gate": true,
       "status": "pending",
-      "summary": "BC, Ontario and Quebec evidence exists, but the locked history gate leaves all provincial projections unassessed and null."
+      "summary": "BC, Ontario and Quebec province-level evidence remains too short and null. A separate CMA artifact does not substitute for provincial decision models."
     },
     {
       "category": "governance",
@@ -340,7 +354,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 20,
+    "pass": 21,
     "pending": 3
   },
   "structural_integrity": true

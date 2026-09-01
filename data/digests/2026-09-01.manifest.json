@@ -2,15 +2,16 @@
   "automatic_model_change": false,
   "digest_id": "AIIO_DIGEST_2026_09_01",
   "edition_date": "2026-09-01",
-  "item_count": 4,
+  "item_count": 5,
   "item_ids": [
     "PROVINCIAL_PUBLIC_PROJECT_INTAKE_2026_09",
     "PROVINCIAL_POWER_PLANNING_CONTRACT_2026_09",
     "PROVINCIAL_BCPI_REFERENCE_GATE_2026_09",
-    "INFORMATION_SECTOR_CONSTRUCTION_CAPEX_SCREEN_2026_09"
+    "INFORMATION_SECTOR_CONSTRUCTION_CAPEX_SCREEN_2026_09",
+    "CMA_REFERENCE_COST_EXPANSION_2026_09"
   ],
-  "items_sha256": "sha256:d8698a6c0c5e6128bdb5cfb24fc6d1a261a24d420f24a7da1335ebf7732c470f",
-  "markdown_sha256": "sha256:9405fde106bd6f96ecd4846120bcf5a83109f68f86dfd1293f9b909645fcd1e2",
+  "items_sha256": "sha256:7a7db943e474648e23a2467a8994cc27769693a5c807001462c03e6cb87308ad",
+  "markdown_sha256": "sha256:7b4f497dab987efa65615f6add5f3283484c8330cec639a34787690bc598acda",
   "publication_boundary": {
     "baseline_changed": false,
     "model_parameters_changed": false,

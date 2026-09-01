@@ -3,7 +3,7 @@
 Act as an independent modelling reviewer. Perform a read-only review; do not edit files, alter gates, authorize publication directly or supply replacement parameters. Verify the exact packet and input hashes before reviewing.
 
 Packet: `data/model-runs/alberta_reference_cost_review_package_v0.1.json`
-Packet SHA-256: `sha256:4fba8c40fa17df6d3e53d09b722f1b2222888a585e6461763144b6657a8b9fdf`
+Packet SHA-256: `sha256:7a7512d5b1f465468e019fff92ab9bacecb98b48f5c6ed9bacd94ed65faf6fa6`
 
 ## Locked inputs
 
@@ -13,7 +13,7 @@ Packet SHA-256: `sha256:4fba8c40fa17df6d3e53d09b722f1b2222888a585e6461763144b665
 - `research/src/aiio/model_review.py` — `sha256:3e340792421d3799ffc289c3b787626e48be43e3714b690c0b962bd10e50f7d6`
 - `research/tests/test_calibration.py` — `sha256:4a692c14a2c17e7abb2ffaac883714ee07ef06fd2ab1dcebac24e87b5fa9af64`
 - `research/tests/test_calibration_artifact.py` — `sha256:6d9763e886b80e9c64ab560ea1f404e0ef85f9269bcab128eadaf8e5063310c2`
-- `docs/methodology/calibration-protocol.md` — `sha256:422b9c71de81c5427fe1465157574b8ab5190307d9f098dca56f6a75fdd8dd97`
+- `docs/methodology/calibration-protocol.md` — `sha256:5fe2e7fc1f00b8c1010d288213db1cceeaadf50848ed15f5e2578956ae6c44be`
 - `docs/methodology/reference-cost-independent-review.md` — `sha256:1b4931e58c332473062c27b444d4019121db8797af5063032d94142277f203fc`
 - `docs/methodology/pspe-integration-audit.md` — `sha256:dacb1fe3a377a34899a28181bf7dc7fbcd4ad1d55f884ce47dc9eb774aa8eafa`
 - `docs/product/decision-mode.md` — `sha256:40122bde8022e7b21c1c8c361c3a528cef84ce0476f07a2523f06068d71ab912`

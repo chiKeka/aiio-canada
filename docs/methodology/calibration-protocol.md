@@ -43,6 +43,15 @@ origins range from 15 at one year to zero at five years, before the required
 `not_assessed`. No Alberta model selection, error band or coefficient is
 transferred to another province.
 
+A separate city-market expansion preserves Vancouver, Toronto and Montréal CMA
+identifiers. The institutional, school and office series contain 182 quarters
+from 1981 Q1 through 2026 Q2, while the bus-depot series begin in 2017. The
+unchanged locked protocol produces 9 gate-passing, 36 gate-failed and 15
+not-assessed horizons. All nine passes are Vancouver results. Every result
+remains withheld pending independent modelling review, and no CMA result is
+relabeled as province-wide evidence. See
+`docs/methodology/cma-reference-cost-expansion.md`.
+
 ### E2 — AI-attributable incremental effect
 
 The second estimand is the difference between the public-project outcome under
