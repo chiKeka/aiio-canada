@@ -235,9 +235,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.25.0-dev.xlsx",
-        "workbook_sha256=sha256:199f3f4a144f0aafa5a1f3dfb88dd8c6d657bc71318f665a8663710e7a4209c4",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.25.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.26.0-dev.xlsx",
+        "workbook_sha256=sha256:8964cee5781b84f6ead0f0a3a929f58ec901364f7eb18753d499e40ede706b27",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.26.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",

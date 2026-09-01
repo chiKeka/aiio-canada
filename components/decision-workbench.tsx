@@ -150,7 +150,7 @@ function DecisionSignalRail() {
     { label: 'Market context', value: 'Available', note: 'Observed + inferred', tone: 'border-t-[#2f8f83]' },
     { label: 'Historical analog', value: 'Available', note: 'Stress test · not forecast', tone: 'border-t-[#57a8b2]' },
     { label: 'Future baseline', value: 'Withheld', note: 'Horizon gate failed', tone: 'border-t-[#d66b35]' },
-    { label: 'AI cost increment', value: 'Unquantified', note: 'Calibration required', tone: 'border-t-[#d66b35]' },
+    { label: 'AI cost increment', value: 'Unquantified', note: '0 of 8 sources qualify', tone: 'border-t-[#d66b35]' },
     { label: 'Graph pathways', value: 'Inspectable', note: 'Assumed · low confidence', tone: 'border-t-[#57a8b2]' },
   ];
   return (

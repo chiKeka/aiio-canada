@@ -9,6 +9,7 @@ import {
   BookOpen,
   Building2,
   CircleCheck,
+  CircleX,
   ChevronRight,
   Clock3,
   Database,
@@ -34,6 +35,7 @@ import {
 import releaseData from '@/public/data/latest.json';
 import attributionReadiness from '@/data/model-runs/ai_attribution_identification_readiness_v0.1.json';
 import panelPreflight from '@/data/model-runs/ai_attribution_panel_preflight_v0.1.json';
+import treatmentSourceFeasibility from '@/data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json';
 import buildingInvestmentControls from '@/data/model-runs/building_investment_controls_canada_v0.1.json';
 import regionalMacroControls from '@/data/model-runs/regional_macro_controls_canada_v0.1.json';
 import procurementOutcomeFeasibility from '@/data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json';
@@ -89,6 +91,16 @@ const provincialCoverage = [
 ];
 
 const coverageColumns = ['Public projects', 'Cost reference', 'Trade labour', 'Power planning'];
+
+const treatmentGateLabels: Record<string, string> = {
+  ai_or_data_centre_specific: 'AI / data centre',
+  construction_activity_specific: 'Construction',
+  realized_not_intended: 'Realized',
+  region_or_project_linkable: 'Linked',
+  quarterly_or_finer: 'Quarterly+',
+  publicly_retrievable: 'Public',
+  revision_provenance_available: 'Revisions',
+};
 
 const attributionDomainMeta = [
   {
@@ -408,12 +420,14 @@ export function ObservatoryDashboard() {
             </article>
           </div>
 
+          <TreatmentSourceGateboard />
+
           <article className="mt-5 overflow-hidden rounded-xl border border-[#132f39] bg-[#0d252e] text-white">
             <div className="grid gap-8 border-b border-white/10 p-6 lg:grid-cols-[minmax(0,.78fr)_minmax(520px,1.22fr)] lg:items-end sm:p-8">
               <div>
                 <div className="flex items-center gap-2 text-[#83cbbf]"><GitBranch className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em]">Panel acquisition preflight · operational</p></div>
                 <h3 className="mt-3 text-2xl font-medium tracking-[-0.035em] sm:text-3xl">The candidate map is large enough. The evidence is not yet eligible.</h3>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#abc0c5]">Ten hash-locked evidence receipts are assigned to every treatment and outcome gap. Candidate regions are planning scope only; no partial row enters an estimator.</p>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#abc0c5]">Eleven hash-locked evidence receipts are assigned to every treatment and outcome gap. Candidate regions are planning scope only; no partial row enters an estimator.</p>
               </div>
               <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-5">
                 <ContractMetric inverted label="Candidate CMAs" value={panelPreflight.candidate_scope.region_count.toString()} />
@@ -651,4 +665,71 @@ function AttributionDomainCard({ label, role, sourceCount, status, summary }: { 
 
 function ContractMetric({ inverted = false, label, value }: { inverted?: boolean; label: string; value: string }) {
   return <div><dt className={`font-mono text-[9px] uppercase tracking-[0.08em] ${inverted ? 'text-[#9fb7bc]' : 'text-[#4e625e]'}`}>{label}</dt><dd className={`mt-1 text-sm font-semibold ${inverted ? 'text-white' : 'text-[#173941]'}`}>{value}</dd></div>;
+}
+
+function TreatmentSourceGateboard() {
+  const gates = treatmentSourceFeasibility.required_authorizing_gates;
+  return (
+    <article className="mt-5 overflow-hidden rounded-xl border border-[#132f39] bg-[#081e28] text-white shadow-[0_18px_50px_rgba(8,30,40,0.12)]">
+      <div className="grid gap-6 border-b border-white/10 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+        <div>
+          <div className="flex items-center gap-2 text-[#83cbbf]">
+            <ShieldCheck className="size-4" />
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em]">Treatment source qualification</p>
+          </div>
+          <h3 className="mt-3 max-w-3xl text-2xl font-medium tracking-[-0.035em] sm:text-3xl">A plausible source must pass every gate before it can identify treatment.</h3>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#a8bdc2]">The matrix makes the withholding decision inspectable. A failed gate changes what the measure means; passing several gates cannot be averaged into eligibility.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10">
+          <div className="bg-[#103542] px-5 py-4"><p className="font-mono text-2xl font-semibold text-white">{treatmentSourceFeasibility.authorizing_candidate_count}</p><p className="mt-1 text-[10px] uppercase tracking-[0.08em] text-[#9db3b9]">qualifying sources</p></div>
+          <div className="bg-[#103542] px-5 py-4"><p className="font-mono text-2xl font-semibold text-white">{treatmentSourceFeasibility.candidate_count}</p><p className="mt-1 text-[10px] uppercase tracking-[0.08em] text-[#9db3b9]">sources screened</p></div>
+        </div>
+      </div>
+
+      <div className="border-b border-white/10 bg-[#0d2934] px-5 py-3 sm:hidden">
+        <p className="font-mono text-[9px] uppercase tracking-[0.08em] text-[#91a9af]">Swipe horizontally to inspect all seven gates</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[1040px] border-collapse text-left">
+          <caption className="sr-only">Public source eligibility against the seven AI construction treatment gates</caption>
+          <thead>
+            <tr className="border-b border-white/10 bg-white/[0.035] font-mono text-[9px] uppercase tracking-[0.08em] text-[#91a9af]">
+              <th className="w-[310px] px-6 py-4 font-medium" scope="col">Candidate source</th>
+              {gates.map((gate) => <th className="px-3 py-4 text-center font-medium" key={gate} scope="col">{treatmentGateLabels[gate] ?? gate}</th>)}
+              <th className="px-6 py-4 text-right font-medium" scope="col">Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            {treatmentSourceFeasibility.candidates.map((candidate) => (
+              <tr className="border-b border-white/8 last:border-0 hover:bg-white/[0.025]" key={candidate.candidate_id}>
+                <th className="px-6 py-4" scope="row">
+                  <span className="block text-sm font-medium text-[#edf4f5]">{candidate.source_title}</span>
+                  <span className="mt-1 block max-w-[280px] text-[10px] leading-4 text-[#819aa0]">{candidate.analytical_role.replaceAll('_', ' ')}</span>
+                </th>
+                {gates.map((gate) => {
+                  const passed = candidate.gate_assessment[gate as keyof typeof candidate.gate_assessment];
+                  return (
+                    <td className="px-3 py-4 text-center" key={gate}>
+                      <span className={`mx-auto grid size-6 place-items-center rounded-full border ${passed ? 'border-[#4ea99b]/50 bg-[#174a49] text-[#8bd3c6]' : 'border-[#d17b50]/40 bg-[#462d28] text-[#f0a77f]'}`} title={`${treatmentGateLabels[gate]}: ${passed ? 'passes' : 'fails'}`}>
+                        {passed ? <CircleCheck className="size-3.5" /> : <CircleX className="size-3.5" />}
+                        <span className="sr-only">{passed ? 'Pass' : 'Fail'}</span>
+                      </span>
+                    </td>
+                  );
+                })}
+                <td className="px-6 py-4 text-right">
+                  <span className="inline-flex rounded-full border border-[#d17b50]/40 bg-[#462d28] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.07em] text-[#f0a77f]">excluded</span>
+                  <span className="mt-1 block font-mono text-[9px] text-[#82999f]">{candidate.passed_gate_count} / {candidate.required_gate_count} gates</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="grid gap-4 border-t border-white/10 bg-white/[0.035] px-6 py-5 text-xs leading-5 text-[#9db3b9] sm:grid-cols-[1fr_auto] sm:items-center">
+        <p><strong className="text-[#dce8ea]">Next evidence required:</strong> {treatmentSourceFeasibility.acquisition_decision.next_evidence_needed}</p>
+        <Link className="font-medium text-[#91d4c8] underline decoration-[#4f8e85] underline-offset-4 hover:text-white" href="/methods">Read the treatment protocol</Link>
+      </div>
+    </article>
+  );
 }
