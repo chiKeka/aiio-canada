@@ -74,3 +74,9 @@ The common public-delivery taxonomy covers hospitals, schools, government facili
 ## Calibration roadmap
 
 Calibration is a separate research stream. Candidate inputs include provincial construction employment and vacancy measures, apprenticeship completions, wage and hours data, building-construction price components, project schedules, utility queue information and procurement outcomes. Calibration may change parameter sets only through a reviewed versioned release; the weekly digest never changes model parameters automatically.
+
+The Alberta public-building baseline is governed by the locked estimands,
+rolling-origin validation and fail-closed publication rules in
+[`docs/methodology/calibration-protocol.md`](../methodology/calibration-protocol.md).
+Provincial expansion must rerun those gates rather than transfer an Alberta
+coefficient. AI attribution remains a separate panel or event-study workstream.

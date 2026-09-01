@@ -17,6 +17,7 @@ from .adapters.statcan_census import (
     normalize_census_trade_employment,
 )
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
+from .calibration import run_reference_class_baseline
 from .digest import build_digest
 from .labour import run_labour_recruitment_pressure
 from .materials import run_material_cost_screen, run_provincial_material_cost_screen
@@ -105,6 +106,13 @@ def main() -> None:
     public_projects_parser.add_argument("output_csv_path", type=Path)
     public_projects_parser.add_argument("--window-start", type=int, default=2027)
     public_projects_parser.add_argument("--window-end", type=int, default=2036)
+
+    cost_baseline_parser = subparsers.add_parser(
+        "run-cost-baseline",
+        help="build the held-out Alberta BCPI public-building reference baseline",
+    )
+    cost_baseline_parser.add_argument("bcpi_path", type=Path)
+    cost_baseline_parser.add_argument("output_path", type=Path)
 
     power_evidence_parser = subparsers.add_parser(
         "run-power-evidence",
@@ -309,6 +317,23 @@ def main() -> None:
                         "status": "passed",
                         "model_id": output["model_id"],
                         "screened_project_count": output["screened_project_count"],
+                    }
+                )
+            )
+        elif args.command == "run-cost-baseline":
+            output = run_reference_class_baseline(
+                args.bcpi_path.resolve(),
+                args.output_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "release_state": output["release_state"],
+                        "reference_class_count": len(
+                            output["reference_class_results"]
+                        ),
                     }
                 )
             )

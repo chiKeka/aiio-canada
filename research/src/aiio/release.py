@@ -50,6 +50,10 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     public_project_exposure = json.loads(
         inputs["public_project_exposure_run"].read_text(encoding="utf-8")
     )
+    cost_baseline = json.loads(
+        inputs["cost_baseline_run"].read_text(encoding="utf-8")
+    )
+    validate_cost_baseline_publication(cost_baseline)
     power_evidence = json.loads(
         inputs["power_evidence_run"].read_text(encoding="utf-8")
     )
@@ -66,6 +70,7 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     labour_pressure_path = release_dir / "labour_pressure.json"
     material_cost_screen_path = release_dir / "material_cost_screen.json"
     public_project_exposure_path = release_dir / "public_project_exposure.json"
+    cost_baseline_path = release_dir / "cost_baseline.json"
     power_evidence_path = release_dir / "power_evidence.json"
     write_json(baseline_path, baseline)
     write_json(scenario_path, scenario)
@@ -75,6 +80,7 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     write_json(labour_pressure_path, labour_pressure)
     write_json(material_cost_screen_path, material_cost_screen)
     write_json(public_project_exposure_path, public_project_exposure)
+    write_json(cost_baseline_path, cost_baseline)
     write_json(power_evidence_path, power_evidence)
     shutil.copyfile(inputs["alberta_ai_projects"], release_dir / "alberta_ai_projects.csv")
     shutil.copyfile(inputs["bcpi_alberta"], release_dir / "bcpi_alberta.csv")
@@ -114,6 +120,7 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         "labour_pressure.json": sha256_file(labour_pressure_path),
         "material_cost_screen.json": sha256_file(material_cost_screen_path),
         "public_project_exposure.json": sha256_file(public_project_exposure_path),
+        "cost_baseline.json": sha256_file(cost_baseline_path),
         "power_evidence.json": sha256_file(power_evidence_path),
         "alberta_ai_projects.csv": sha256_file(release_dir / "alberta_ai_projects.csv"),
         "bcpi_alberta.csv": sha256_file(release_dir / "bcpi_alberta.csv"),
@@ -137,7 +144,7 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         ),
     }
     manifest = {
-        "schema_version": "1.3.0",
+        "schema_version": "1.4.0",
         "release_id": f"AIIO_RELEASE_{version.upper().replace('.', '_').replace('-', '_')}",
         "version": version,
         "status": "research-prototype",
@@ -148,6 +155,7 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         "engine_version": model_run["engine_version"],
         "parameter_set_id": model_run["parameter_set_id"],
         "power_overlay_version": power_run["overlay_id"],
+        "cost_baseline_version": cost_baseline["model_id"],
         "input_manifest_hash": input_manifest_hash,
         "configuration_hash": sha256_json(
             {
@@ -158,7 +166,7 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         ),
         "inputs": input_hashes,
         "outputs": output_hashes,
-        "publication_note": "Uncalibrated research prototype. Observations, inferences and scenarios remain explicitly separated; diagnostic scores are not findings or forecasts.",
+        "publication_note": "Research prototype. Reference-index projections publish only where held-out gates pass; the AI-attributable increment remains null and graph diagnostics are not findings or forecasts.",
     }
     manifest_path = release_dir / "manifest.json"
     write_json(manifest_path, manifest)
@@ -173,6 +181,7 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
         "labour_pressure": labour_pressure,
         "material_cost_screen": material_cost_screen,
         "public_project_exposure": public_project_exposure,
+        "cost_baseline": cost_baseline,
         "power_evidence": power_evidence,
     }
     latest_path = public_dir / "latest.json"
@@ -205,6 +214,10 @@ def build_release(root: Path, version: str, created_at: str) -> dict[str, Any]:
     shutil.copyfile(
         release_dir / "power_evidence_alberta.csv",
         downloads_dir / "power_evidence_alberta.csv",
+    )
+    shutil.copyfile(
+        cost_baseline_path,
+        downloads_dir / "alberta_bcpi_reference_baseline.json",
     )
     return manifest
 
@@ -279,6 +292,15 @@ def build_baseline(
             for item in sorted(projects, key=lambda row: row["name"])
         ],
     }
+
+
+def validate_cost_baseline_publication(cost_baseline: dict[str, Any]) -> None:
+    authorization = cost_baseline.get("publication_authorization", {})
+    if authorization.get("public_projection_authorized") is not True:
+        raise ValidationError(
+            "cost baseline cannot enter a public release until the independent "
+            "modelling gate authorizes its projections"
+        )
 
 
 def latest_labour_availability(path: Path) -> dict[str, Any]:
@@ -683,9 +705,16 @@ def verify_manifest(root: Path, version: str) -> None:
         actual = sha256_file(release_dir / name)
         if actual != expected:
             raise ValidationError(f"release output hash mismatch: {name}")
-    current_inputs = release_input_paths(root)
-    if set(current_inputs) != set(manifest["inputs"]):
-        raise ValidationError("release input key set does not match the manifest")
+    available_inputs = release_input_paths(root)
+    unknown_inputs = set(manifest["inputs"]) - set(available_inputs)
+    if unknown_inputs:
+        raise ValidationError(
+            "release input key set contains names unknown to this verifier: "
+            + ", ".join(sorted(unknown_inputs))
+        )
+    current_inputs = {
+        name: available_inputs[name] for name in manifest["inputs"]
+    }
     for name, path in current_inputs.items():
         actual = sha256_file(path)
         expected = manifest["inputs"].get(name)
@@ -745,6 +774,12 @@ def release_input_paths(root: Path) -> dict[str, Path]:
             / "data"
             / "model-runs"
             / "public_project_exposure_alberta_v0.1.json"
+        ),
+        "cost_baseline_run": (
+            root
+            / "data"
+            / "model-runs"
+            / "alberta_bcpi_reference_baseline_v0.1.json"
         ),
         "public_project_exposure_csv": (
             root / "data" / "processed" / "public_project_exposure_alberta.csv"

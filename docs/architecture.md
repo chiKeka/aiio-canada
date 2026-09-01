@@ -17,6 +17,9 @@ Provincial baseline and project inventory
     ├── public-delivery asset overlap screen
     └── observed power request/contract boundary
     ↓
+Held-out reference-class baseline
+    ↘ AI-attributable increment (withheld pending identification)
+    ↓
 Typed CAD-pressure graph + scenario shocks
     ↓
 Propagation, sensitivity and validation runs
@@ -43,17 +46,28 @@ Source-specific adapters retrieve machine-readable files where available. Raw re
 
 The baseline describes the observed system before a scenario shock: public projects, employment and vacancies by occupation, wages, construction price indices, material supply proxies, generation and transmission outlooks, and known AI/data-centre projects. Detailed current vacancies and the 2021 Census workforce stock remain separately dated. Their guarded cross-vintage ratio is an inferred recruitment screen, not a vacancy rate or graph calibration input.
 
-### 4. Graph model
+### 4. Cost baseline and attribution
+
+The cost-translation pipeline is modular. A reference-class baseline forecasts
+an observed BCPI model-building index through locked rolling-origin calibration
+and validation partitions. Failed asset/geography/horizon combinations remain
+null. The AI-attributable increment is a separate causal estimand and remains
+null until a historical treatment, counterfactual and project-outcome panel
+passes the protocol in
+[`docs/methodology/calibration-protocol.md`](methodology/calibration-protocol.md).
+The graph never supplies a multiplier for the reference baseline.
+
+### 5. Graph model
 
 Nodes represent shocks, resources, materials, cost signals and public-delivery delay pressure. Directed typed edges encode mechanisms. Each edge records sign, magnitude range, lag, absorption, supporting evidence, confidence, author, version and assumption ID. Resource, material, signal and outcome nodes may retain part of a pressure state into later years using an explicit low/central/high retention factor. The engine reports signed totals and the paths that produced them.
 
-### 5. Scenario layer
+### 6. Scenario layer
 
 A scenario is an explicit set of non-observed inputs: investment quantum, timing, construction share, local capture and normalization denominators. It produces a versioned structural diagnostic against a named graph. The first Alberta run also tests denominators, absorption, local capture and retention one at a time and in joint lower-/higher-pressure cases. These cases are not probability intervals.
 
 Power-system quantities are deliberately separate. An observed evidence screen records AESO request, allocation and contract quantities without turning them into a forecast. An independent scenario overlay starts with IT load in MW, uses energy PUE only for annual energy, applies a distinct peak-to-IT factor to peak demand, and stages load using an annual commissioning profile. It cannot be inferred from the CAD scenario and is not an AESO needs assessment.
 
-### 6. Publication layer
+### 7. Publication layer
 
 All outputs read an immutable release manifest containing input hashes, code version, model configuration and run time. The public interface must expose evidence status and uncertainty. Excel reproduces key tables through exported data, not duplicated hidden logic.
 
@@ -68,7 +82,7 @@ All outputs read an immutable release manifest containing input hashes, code ver
 ## Release gates
 
 1. Schema and source validation.
-2. Baseline reconciliation.
+2. Baseline series integrity, rolling-origin partition and fail-closed output checks.
 3. Labour geography/NOC coverage, missingness, zero-filler and cross-vintage formula checks.
 4. Material-series coverage and aligned-period checks.
 5. Public-project classification, schedule-missingness and cost-allocation checks.
@@ -78,3 +92,4 @@ All outputs read an immutable release manifest containing input hashes, code ver
 9. Workbook-to-release reconciliation.
 10. Accessibility and public-language review.
 11. Independent methodological review and documented disposition.
+12. AI-attributable cost and schedule fields remain null unless the separate identification gate passes.

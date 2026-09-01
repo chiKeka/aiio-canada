@@ -15,6 +15,7 @@ from aiio.release import (
     latest_labour_availability,
     latest_labour_availability_canada,
     sha256_file,
+    validate_cost_baseline_publication,
     verify_manifest,
     write_json,
 )
@@ -149,6 +150,25 @@ class ReleaseVerificationTests(unittest.TestCase):
     def test_verifier_accepts_matching_inputs_outputs_and_commit(self) -> None:
         self.verify()
 
+    def test_public_release_rejects_unauthorized_cost_baseline(self) -> None:
+        with self.assertRaisesRegex(ValidationError, "independent modelling gate"):
+            validate_cost_baseline_publication(
+                {
+                    "publication_authorization": {
+                        "public_projection_authorized": False
+                    }
+                }
+            )
+
+    def test_public_release_accepts_authorized_cost_baseline(self) -> None:
+        validate_cost_baseline_publication(
+            {
+                "publication_authorization": {
+                    "public_projection_authorized": True
+                }
+            }
+        )
+
     def test_verifier_rejects_tampered_input(self) -> None:
         self.input_path.write_text('{"value": 9}\n', encoding="utf-8")
         with self.assertRaisesRegex(ValidationError, "input hash mismatch"):
@@ -168,6 +188,18 @@ class ReleaseVerificationTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(ValidationError, "HEAD"):
                 verify_manifest(self.root, self.version)
+
+    def test_verifier_allows_newer_pipeline_inputs_absent_from_old_manifest(self) -> None:
+        newer_input = self.root / "newer.json"
+        newer_input.write_text('{"new": true}\n', encoding="utf-8")
+        with (
+            patch(
+                "aiio.release.release_input_paths",
+                return_value={"input": self.input_path, "newer": newer_input},
+            ),
+            patch("aiio.release.git_state", return_value=("abc123", False)),
+        ):
+            verify_manifest(self.root, self.version)
 
     def test_latest_labour_baseline_keeps_suppressed_value_missing(self) -> None:
         labour_path = self.root / "labour.csv"

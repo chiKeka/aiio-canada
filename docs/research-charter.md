@@ -72,4 +72,5 @@ If $50 billion of AI infrastructure investment occurs in Alberta between 2027 an
 - Announced capex is not treated as committed, spent or locally captured without evidence.
 - Electrical energy, peak demand, connection requests and transmission capacity are distinct quantities.
 - Model pressure scores are diagnostic indices unless and until econometric calibration supports physical-unit claims.
+- Market-wide reference-index projections and AI-attributable increments are separate estimands; neither may be inferred from the other.
 - The Observatory is a research instrument, not dissertation authorship. Academic use must follow the supplied MMPM guide's source, ethics and generative-AI disclosure requirements.
