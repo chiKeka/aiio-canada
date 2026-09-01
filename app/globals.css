@@ -137,13 +137,26 @@
   }
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family:
+      var(--font-geist-sans),
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
   }
   html {
     @apply scroll-smooth;
   }
-  ::selection { background: #a8d7ce; color: #0a2934; }
-  :focus-visible { outline: 2px solid #28766d; outline-offset: 3px; }
+  ::selection {
+    background: #a8d7ce;
+    color: #0a2934;
+  }
+  :focus-visible {
+    outline: 2px solid #28766d;
+    outline-offset: 3px;
+  }
 }
 
 .editorial-highlight {
@@ -165,6 +178,16 @@
 }
 
 .observatory-grid {
+  isolation: isolate;
+  position: relative;
+}
+
+.observatory-grid::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: '';
   background-image:
     linear-gradient(rgba(33, 88, 84, 0.065) 1px, transparent 1px),
     linear-gradient(90deg, rgba(33, 88, 84, 0.065) 1px, transparent 1px);
@@ -173,6 +196,16 @@
 }
 
 .research-observatory-grid {
+  isolation: isolate;
+  position: relative;
+}
+
+.research-observatory-grid::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: '';
   background-image:
     linear-gradient(rgba(115, 255, 185, 0.055) 1px, transparent 1px),
     linear-gradient(90deg, rgba(115, 255, 185, 0.055) 1px, transparent 1px);
@@ -191,7 +224,7 @@
   z-index: -1;
   inset: 0;
   pointer-events: none;
-  content: "";
+  content: '';
   background-image:
     linear-gradient(rgba(87, 198, 192, 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(87, 198, 192, 0.045) 1px, transparent 1px);
@@ -213,7 +246,9 @@
   border: 4px solid #f8f7f1;
   border-radius: 999px;
   background: #155f5a;
-  box-shadow: 0 0 0 1px #155f5a, 0 3px 10px rgba(17, 70, 68, 0.22);
+  box-shadow:
+    0 0 0 1px #155f5a,
+    0 3px 10px rgba(17, 70, 68, 0.22);
   cursor: grab;
 }
 
@@ -228,6 +263,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

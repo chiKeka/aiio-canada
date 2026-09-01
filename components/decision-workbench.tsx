@@ -48,7 +48,7 @@ export function DecisionWorkbench() {
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <Badge className="border-[#b8d4cc] bg-[#e6f1ed] text-[#155d56]">Executive decision workspace</Badge>
-              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#6a7b77]">Alberta pilot · release {releaseData.manifest.version}</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#5b6d69]">Alberta pilot · release {releaseData.manifest.version}</span>
             </div>
             <h1 className="max-w-4xl text-balance text-4xl font-normal leading-[1.04] tracking-[-0.05em] text-[#112f37] sm:text-6xl">What do we <span className="editorial-highlight">know</span>—and what must we resolve—before this project goes to market?</h1>
             <p className="mt-5 max-w-3xl text-sm leading-6 text-[#596d69] sm:text-base">Define a capital project, separate observed market conditions from the Alberta $50B counterfactual, inspect relevant model paths, and turn evidence gaps into decision gates.</p>
