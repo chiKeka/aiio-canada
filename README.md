@@ -46,6 +46,7 @@ npm run power:evidence
 npm run power:planning:provinces
 npm run digest:build
 npm run digest:audit
+npm run program:audit
 npm run model:run
 npm run power:run
 npm run research:test
@@ -59,6 +60,12 @@ The digest protocol is documented in
 [`docs/methodology/weekly-evidence-digest.md`](docs/methodology/weekly-evidence-digest.md).
 Edition dates use UTC, every source reference must match the source registry,
 and the cadence audit fails when the latest intake is more than eight days old.
+
+Program completeness is reported separately from publication readiness in
+[`docs/release/program-readiness-audit.md`](docs/release/program-readiness-audit.md).
+`npm run program:audit` permits documented pending or blocked research gates but
+fails on structural defects. `npm run program:audit:release` fails unless every
+decision-grade, independent-review and publication gate passes.
 
 The committed labour extracts contain graph-relevant NOC vacancy and
 offered-wage observations from Statistics Canada table 14-10-0444-01. One file

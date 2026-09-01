@@ -38,6 +38,7 @@ from .power_planning import run_provincial_power_planning_contract
 from .project_cost import run_project_reference_cost
 from .public_projects import run_public_project_exposure
 from .registry import load_registry
+from .readiness import audit_program_readiness, require_release_ready
 from .retrieval import retrieve
 from .schemas import ValidationError
 from .scenario import run_scenario
@@ -199,6 +200,18 @@ def main() -> None:
     )
     digest_audit_parser.add_argument("--as-of", default=utc_today)
     digest_audit_parser.add_argument("--max-age-days", type=int, default=8)
+
+    readiness_parser = subparsers.add_parser(
+        "audit-program-readiness",
+        help="audit structural, decision-grade, review and publication gates",
+    )
+    readiness_parser.add_argument("--as-of", default=utc_today)
+    readiness_parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("data/model-runs/program_readiness_current.json"),
+    )
+    readiness_parser.add_argument("--require-release-ready", action="store_true")
 
     scenario_parser = subparsers.add_parser(
         "run-scenario", help="run a versioned graph scenario and write auditable JSON output"
@@ -547,6 +560,34 @@ def main() -> None:
                 max_age_days=args.max_age_days,
             )
             print(json.dumps(result))
+        elif args.command == "audit-program-readiness":
+            output_path = (
+                args.output if args.output.is_absolute() else root / args.output
+            ).resolve()
+            result = audit_program_readiness(
+                root,
+                as_of_date=date.fromisoformat(args.as_of),
+                output_path=output_path,
+            )
+            if result["status_counts"]["fail"]:
+                raise ValidationError(
+                    "program readiness audit found structural failures; see "
+                    + str(output_path)
+                )
+            if args.require_release_ready:
+                require_release_ready(result)
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "output": str(output_path),
+                        "structural_integrity": result["structural_integrity"],
+                        "decision_grade_ready": result["decision_grade_ready"],
+                        "release_ready": result["release_ready"],
+                        "status_counts": result["status_counts"],
+                    }
+                )
+            )
         elif args.command == "run-scenario":
             output = run_scenario(
                 args.graph_path.resolve(),

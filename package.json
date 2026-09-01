@@ -35,6 +35,8 @@
     "power:planning:provinces": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-provincial-power-planning data/manual/provincial_power_planning_extract_2026_09.json data/model-runs/provincial_power_planning_contract_v0.1.json data/processed/provincial_power_planning_metrics.csv",
     "digest:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-digest data/digests/items/2026-09-01.json --date 2026-09-01",
     "digest:audit": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-digest-cadence",
+    "program:audit": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-program-readiness",
+    "program:audit:release": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-program-readiness --require-release-ready",
     "model:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-scenario data/model/alberta_graph_v0.2.json data/scenarios/alberta_50b_counterfactual_v0.2.json data/model-runs/alberta_50b_counterfactual_v0.2.json",
     "power:run": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-power-overlay data/scenarios/alberta_power_overlay_v0.1.json data/model-runs/alberta_power_overlay_v0.1.json",
     "workbook:build": "node workbook-work/build_aiio_workbook.mjs",

@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "as_of_date": "2026-09-01",
+  "independent_review": {
+    "grok": {
+      "status": "blocked",
+      "reason": "The Grok CLI is installed but not authenticated; no review prompt or verdict has been produced.",
+      "evidence": "docs/reviews/2026-09-01-grok-digest-workbook-gate.md"
+    },
+    "claude": {
+      "status": "held",
+      "reason": "The user explicitly paused Claude review; no verdict is claimed.",
+      "evidence": "docs/reviews/2026-09-01-grok-digest-workbook-gate.md"
+    }
+  },
+  "deployment": {
+    "status": "held",
+    "published_release_basis": "0.6.0-dev",
+    "reason": "The user explicitly asked to hold publication while completeness and product framing are refined."
+  }
+}

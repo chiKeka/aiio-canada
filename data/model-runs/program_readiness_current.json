@@ -1,0 +1,211 @@
+{
+  "as_of_date": "2026-09-01",
+  "audit_id": "AIIO_PROGRAM_READINESS_2026_09_01",
+  "checks": [
+    {
+      "category": "research_design",
+      "check_id": "formal_research_program",
+      "evidence": [
+        "docs/research-charter.md",
+        "docs/architecture.md",
+        "docs/governance/publication-policy.md",
+        "docs/governance/dissertation-alignment.md",
+        "docs/methodology/pspe-integration-audit.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The named research program, framing question, governance boundary and PSPE integration are documented."
+    },
+    {
+      "category": "evidence_pipeline",
+      "check_id": "public_evidence_registry",
+      "evidence": [
+        "data/registry/sources.json",
+        "raw_manifest_count=16"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The public-source registry validates with 21 unique sources."
+    },
+    {
+      "category": "analysis_engine",
+      "check_id": "alberta_graph_scenario_engine",
+      "evidence": [
+        "data/model/alberta_graph_v0.2.json",
+        "data/scenarios/alberta_50b_counterfactual_v0.2.json",
+        "data/model-runs/alberta_50b_counterfactual_v0.2.json",
+        "data/scenarios/alberta_power_overlay_v0.1.json",
+        "data/model-runs/alberta_power_overlay_v0.1.json",
+        "docs/scenarios/alberta-50b-protocol.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The graph engine, sealed $50B Alberta scenario, independent power overlay and protocol are present."
+    },
+    {
+      "category": "evidence_pipeline",
+      "check_id": "alberta_evidence_spine",
+      "evidence": [
+        "data/processed/alberta_ai_projects.csv",
+        "data/processed/bcpi_alberta.csv",
+        "data/processed/labour_availability_alberta.csv",
+        "data/model-runs/labour_recruitment_pressure_canada_v0.1.json",
+        "data/model-runs/bcpi_material_cost_screen_alberta_v0.1.json",
+        "data/model-runs/public_project_exposure_alberta_v0.1.json",
+        "data/model-runs/power_evidence_alberta_v0.1.json"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "Alberta project, price, labour, material, public-project and power evidence artifacts are present."
+    },
+    {
+      "category": "canada_expansion",
+      "check_id": "canada_labour_spine",
+      "evidence": [
+        "data/processed/labour_availability_canada.csv",
+        "data/processed/labour_workforce_stock_canada.csv",
+        "vacancy_geographies=13",
+        "workforce_geographies=13"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The common vacancy/wage and workforce-stock spine covers all 13 provinces and territories."
+    },
+    {
+      "category": "canada_expansion",
+      "check_id": "provincial_pilot_intake",
+      "evidence": [
+        "data/model-runs/public_projects_bc_on_qc_intake_v0.1.json",
+        "data/model-runs/bcpi_material_cost_screen_provinces_v0.1.json",
+        "data/model-runs/bc_on_qc_bcpi_reference_baseline_v0.1.json",
+        "data/model-runs/provincial_power_planning_contract_v0.1.json"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The BC, Ontario and Quebec project, cost and power intakes are reproducible and remain research-only."
+    },
+    {
+      "category": "living_program",
+      "check_id": "weekly_evidence_operation",
+      "evidence": [
+        "data/digests/items/2026-09-01.json",
+        "data/digests/2026-09-01.md",
+        "data/digests/2026-09-01.manifest.json",
+        "age_days=0"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The weekly digest is current at 2026-09-01, hash-reconciled and cannot change the model automatically."
+    },
+    {
+      "category": "product",
+      "check_id": "dual_mode_public_product",
+      "evidence": [
+        "app/page.tsx",
+        "app/scenario/page.tsx",
+        "app/pressure/page.tsx",
+        "app/evidence/page.tsx",
+        "app/digest/page.tsx",
+        "app/methods/page.tsx",
+        "app/research/page.tsx",
+        "app/downloads/page.tsx",
+        "components/mode-toggle.tsx",
+        "components/decision-workbench.tsx",
+        "components/impact-path-graph.tsx",
+        "scripts/a11y-audit.mjs",
+        ".github/workflows/quality.yml"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The executive/research dual-mode website, dependency graph, evidence routes and automated quality gates are implemented."
+    },
+    {
+      "category": "product",
+      "check_id": "auditable_workbook_component",
+      "evidence": [
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.8.0-dev.xlsx",
+        "workbook_sha256=sha256:c0a75084234e74a9cdb4dc400fe9d09e8a9d0eb130c7224ffde3b1aeaa42949c",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.8.0-dev.xlsx.inspect.ndjson"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The Canada development workbook and its formula/structure inspection receipt are present."
+    },
+    {
+      "category": "release",
+      "check_id": "frozen_public_release_integrity",
+      "evidence": [
+        "public/data/manifest.json",
+        "public/data/latest.json",
+        "data/releases/0.6.0-dev/manifest.json"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The frozen public release 0.6.0-dev reconciles to its immutable manifest and output hashes."
+    },
+    {
+      "category": "decision_grade_outputs",
+      "check_id": "alberta_reference_cost_projection",
+      "evidence": [
+        "data/model-runs/alberta_bcpi_reference_baseline_v0.1.json"
+      ],
+      "release_gate": true,
+      "status": "pending",
+      "summary": "The reproducible Alberta reference-cost run is built, but publication remains withheld pending independent modelling review."
+    },
+    {
+      "category": "decision_grade_outputs",
+      "check_id": "ai_attributable_cost_schedule_effect",
+      "evidence": [
+        "data/model-runs/alberta_bcpi_reference_baseline_v0.1.json"
+      ],
+      "release_gate": true,
+      "status": "pending",
+      "summary": "No historical treatment/counterfactual panel yet identifies an AI-attributable cost or schedule effect; the product correctly returns null."
+    },
+    {
+      "category": "decision_grade_outputs",
+      "check_id": "provincial_decision_models",
+      "evidence": [
+        "data/model-runs/bc_on_qc_bcpi_reference_baseline_v0.1.json"
+      ],
+      "release_gate": true,
+      "status": "pending",
+      "summary": "BC, Ontario and Quebec evidence exists, but the locked history gate leaves all provincial projections unassessed and null."
+    },
+    {
+      "category": "governance",
+      "check_id": "independent_review",
+      "evidence": [
+        "data/governance/program-gates.json",
+        "docs/reviews/2026-09-01-grok-digest-workbook-gate.md"
+      ],
+      "release_gate": true,
+      "status": "blocked",
+      "summary": "Independent review is not complete; no passing verdict is inferred from a prepared review package."
+    },
+    {
+      "category": "release",
+      "check_id": "current_publication",
+      "evidence": [
+        "data/governance/program-gates.json",
+        "public/data/manifest.json"
+      ],
+      "release_gate": true,
+      "status": "blocked",
+      "summary": "Publication is held; the live/public bundle remains on the frozen 0.6.0-dev basis."
+    }
+  ],
+  "decision_grade_ready": false,
+  "program_name": "AI Infrastructure Impact Observatory Canada",
+  "publication_ready": false,
+  "release_ready": false,
+  "schema_version": "1.0.0",
+  "status_counts": {
+    "blocked": 2,
+    "fail": 0,
+    "pass": 10,
+    "pending": 3
+  },
+  "structural_integrity": true
+}
