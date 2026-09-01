@@ -40,6 +40,14 @@ class TreatmentSourceFeasibilityTests(unittest.TestCase):
         self.assertEqual(rebuilt["candidate_count"], 8)
         self.assertEqual(rebuilt["authorizing_candidate_count"], 0)
         self.assertEqual(rebuilt["required_authorizing_gates"], list(REQUIRED_GATES))
+        self.assertEqual(
+            rebuilt["input_manifest"]["contract_path"],
+            "data/model/ai_attribution_treatment_source_feasibility_contract_v0.1.json",
+        )
+        self.assertEqual(
+            rebuilt["input_manifest"]["registry_path"],
+            "data/registry/sources.json",
+        )
         self.assertFalse(rebuilt["publication_boundary"]["treatment_authorized"])
         self.assertIsNone(
             rebuilt["publication_boundary"]["ai_attributable_cost_effect"]

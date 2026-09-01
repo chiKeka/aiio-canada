@@ -1,6 +1,6 @@
 {
   "artifact_count": 26,
-  "artifact_manifest_sha256": "sha256:babfc60be426e26532aee5c5b62cd5741160222c34d85c6faf4138f0fe51e32e",
+  "artifact_manifest_sha256": "sha256:1423ef3399c3ffdf199e5b3985f69849e0306bfd8afb9618ea190c7b858add01",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -108,13 +108,13 @@
       "artifact_id": "panel_preflight",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
-      "sha256": "sha256:69ea562391c3d0308c9fc3fefc26c8510aa500ec4e42a934f5c351603559443d"
+      "sha256": "sha256:e989fb144d4823016f762ae0c21dc5850e9f66f46bce1ba2d1ea1b06e212c1fa"
     },
     {
       "artifact_id": "treatment_source_feasibility",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
-      "sha256": "sha256:c2fdf9152ec9c1acf7a302fb6838851fb1001c530e26815dc5e11a8f5a6f4b26"
+      "sha256": "sha256:c108ca2d1ff6a6fe2d9a90134b8d0b315b8f2defcc190acf4a6fd33e47934333"
     },
     {
       "artifact_id": "building_investment_controls",

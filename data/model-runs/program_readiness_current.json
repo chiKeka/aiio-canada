@@ -261,7 +261,7 @@
       "check_id": "research_surface_provenance",
       "evidence": [
         "public/data/research-surface.json",
-        "artifact_manifest_sha256=sha256:babfc60be426e26532aee5c5b62cd5741160222c34d85c6faf4138f0fe51e32e",
+        "artifact_manifest_sha256=sha256:1423ef3399c3ffdf199e5b3985f69849e0306bfd8afb9618ea190c7b858add01",
         "research/src/aiio/research_surface.py"
       ],
       "release_gate": true,

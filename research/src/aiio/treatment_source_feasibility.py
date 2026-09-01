@@ -38,6 +38,14 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _repository_relative_path(path: Path) -> str:
+    resolved = path.resolve()
+    for parent in resolved.parents:
+        if (parent / "data").is_dir() and (parent / "research").is_dir():
+            return resolved.relative_to(parent).as_posix()
+    return path.as_posix()
+
+
 def validate_treatment_source_contract(
     contract: dict[str, Any], *, registry_ids: set[str]
 ) -> None:
@@ -127,9 +135,9 @@ def build_treatment_source_feasibility(
         "schema_version": "1.0.0",
         "evidence_status": "observed_source_capability_with_inferred_eligibility",
         "input_manifest": {
-            "contract_path": str(contract_path),
+            "contract_path": _repository_relative_path(contract_path),
             "contract_sha256": _sha256(contract_path),
-            "registry_path": str(registry_path),
+            "registry_path": _repository_relative_path(registry_path),
             "registry_sha256": _sha256(registry_path),
         },
         "required_authorizing_gates": list(REQUIRED_GATES),
