@@ -8,6 +8,8 @@ import {
 } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
 import historicalEnvelope from '@/data/model-runs/alberta_bcpi_historical_envelope_v0.1.json';
+import referenceCostReview from '@/data/model-runs/alberta_reference_cost_review_package_v0.1.json';
+import programGates from '@/data/governance/program-gates.json';
 
 const methodSteps = [
   [
@@ -43,6 +45,7 @@ const methodSteps = [
 ];
 
 export default function MethodsPage() {
+  const reviewerStates = Object.entries(programGates.independent_review);
   const evidenceScreens = releaseData as typeof releaseData & {
     material_cost_screen?: { limitations: string[] };
     public_project_exposure?: { limitations: string[] };
@@ -76,6 +79,78 @@ export default function MethodsPage() {
               <p className="mt-2 text-sm leading-6 text-[#52645f]">{text}</p>
             </article>
           ))}
+        </div>
+      </section>
+      <section className="border-y border-[#dfb18d] bg-[#fff1e5]">
+        <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-12">
+          <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
+            <div>
+              <div className="flex items-center gap-2 text-[#94471f]">
+                <ShieldCheck className="size-5" />
+                <span className="font-mono text-xs uppercase tracking-[0.14em]">
+                  Independent modelling gate
+                </span>
+              </div>
+              <h2 className="mt-4 text-2xl font-medium tracking-[-0.025em]">
+                The packet is ready. The verdict is not.
+              </h2>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-[#805843]">
+                The Alberta E1 review instrument hash-locks the model artifact,
+                implementation, tests and claim boundaries. It cannot authorize
+                publication itself, and a future pass would apply only to an
+                individually validated reference-index horizon.
+              </p>
+              <dl className="mt-6 grid grid-cols-3 gap-3">
+                {[
+                  ['Locked inputs', referenceCostReview.input_manifest.length],
+                  [
+                    'Required criteria',
+                    referenceCostReview.required_criteria.length,
+                  ],
+                  [
+                    'Eligible horizons',
+                    referenceCostReview.facts_to_reconcile
+                      .gate_passing_horizons.length,
+                  ],
+                ].map(([label, value]) => (
+                  <div
+                    className="rounded-lg border border-[#e0b18b] bg-[#fff8f1] p-3"
+                    key={label}
+                  >
+                    <dt className="text-xs text-[#8d654f]">{label}</dt>
+                    <dd className="mt-1 font-mono text-xl text-[#743b20]">
+                      {value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+            <div className="space-y-3">
+              {reviewerStates.map(([reviewer, gate]) => (
+                <article
+                  className="rounded-lg border border-[#e0b18b] bg-[#fff8f1] p-4"
+                  key={reviewer}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="font-mono text-xs uppercase tracking-[0.12em] text-[#743b20]">
+                      {reviewer} review
+                    </h3>
+                    <span className="rounded-full border border-[#d59d74] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-[#94471f]">
+                      {gate.status}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-[#805843]">
+                    {gate.reason}
+                  </p>
+                </article>
+              ))}
+              <p className="text-xs leading-5 text-[#8d654f]">
+                No reviewer output, approval or replacement parameter is
+                inferred from tool availability. All public projection,
+                project-cost and AI-attribution fields remain withheld.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
       <section className="bg-[#0b2a36] text-white">

@@ -3,6 +3,7 @@
   "model_id": "AIIO_CA_BC_ON_QC_BCPI_REFERENCE_BASELINE_0_1",
   "source_id": "STATCAN_BCPI_18100289",
   "input_sha256": "8d6f2bce624176f736d68ac40f87fc5a3e78aec68d7ad0493ee26b3cfba60a5e",
+  "code_sha256": "e1f727c620c556ae40150824cab11afae49cd26cafe5e568d5438265185c413d",
   "as_of_date": "2026-06-30",
   "evidence_status": "observed_series_with_held_out_model_validation",
   "release_state": "not_assessed",

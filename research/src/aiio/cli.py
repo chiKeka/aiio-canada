@@ -59,6 +59,10 @@ from .digest import build_digest, validate_digest_cadence
 from .historical_envelope import run_historical_reference_envelope
 from .labour import run_labour_recruitment_pressure
 from .materials import run_material_cost_screen, run_provincial_material_cost_screen
+from .model_review import (
+    build_reference_cost_review_package,
+    validate_reference_cost_review_verdict,
+)
 from .power_evidence import run_power_evidence_screen
 from .power_planning import run_provincial_power_planning_contract
 from .project_cost import run_project_reference_cost
@@ -253,6 +257,20 @@ def main() -> None:
     project_cost_parser.add_argument("project_path", type=Path)
     project_cost_parser.add_argument("baseline_path", type=Path)
     project_cost_parser.add_argument("output_path", type=Path)
+
+    reference_review_parser = subparsers.add_parser(
+        "build-reference-cost-review",
+        help="build the deterministic independent-review packet for the Alberta E1 baseline",
+    )
+    reference_review_parser.add_argument("output_json_path", type=Path)
+    reference_review_parser.add_argument("output_prompt_path", type=Path)
+
+    reference_verdict_parser = subparsers.add_parser(
+        "validate-reference-cost-verdict",
+        help="validate an independent Alberta E1 review verdict without authorizing publication",
+    )
+    reference_verdict_parser.add_argument("package_path", type=Path)
+    reference_verdict_parser.add_argument("verdict_path", type=Path)
 
     power_evidence_parser = subparsers.add_parser(
         "run-power-evidence",
@@ -999,6 +1017,28 @@ def main() -> None:
                     }
                 )
             )
+        elif args.command == "build-reference-cost-review":
+            output = build_reference_cost_review_package(
+                root,
+                args.output_json_path.resolve(),
+                args.output_prompt_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "package_id": output["package_id"],
+                        "review_status": output["review_status"],
+                        "criterion_count": len(output["required_criteria"]),
+                    }
+                )
+            )
+        elif args.command == "validate-reference-cost-verdict":
+            output = validate_reference_cost_review_verdict(
+                args.package_path.resolve(),
+                args.verdict_path.resolve(),
+            )
+            print(json.dumps(output))
         elif args.command == "run-power-evidence":
             output = run_power_evidence_screen(
                 args.manual_extract_path.resolve(),

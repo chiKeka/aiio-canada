@@ -209,9 +209,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.17.0-dev.xlsx",
-        "workbook_sha256=sha256:80e850230eb23cfa92a1607ec9a64eec78a640a91521b619685d411711b20b91",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.17.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.18.0-dev.xlsx",
+        "workbook_sha256=sha256:69b242eee7ee58d6393d329fdb0a4ae37d5b5d36093cf4407bd56cf6f47b339b",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.18.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",
@@ -228,6 +228,18 @@
       "release_gate": true,
       "status": "pass",
       "summary": "The frozen public release 0.6.0-dev reconciles to its immutable manifest and output hashes."
+    },
+    {
+      "category": "governance",
+      "check_id": "reference_cost_review_instrument",
+      "evidence": [
+        "data/model-runs/alberta_reference_cost_review_package_v0.1.json",
+        "docs/reviews/2026-09-01-reference-cost-review-prompt.md",
+        "research/src/aiio/model_review.py"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "The Alberta E1 review packet hash-locks the model, method, tests and ten-criterion verdict contract while remaining non-authorizing."
     },
     {
       "category": "decision_support",
@@ -315,7 +327,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 18,
+    "pass": 19,
     "pending": 3
   },
   "structural_integrity": true

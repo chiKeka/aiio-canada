@@ -11,6 +11,8 @@ from typing import Any
 
 from .adapters.statcan import PROVINCE_DGUID_TO_GEOGRAPHY_ID
 from .digest import validate_digest_cadence
+from .model_review import PACKAGE_ID as REFERENCE_COST_REVIEW_PACKAGE_ID
+from .model_review import REVIEW_CRITERIA as REFERENCE_COST_REVIEW_CRITERIA
 from .registry import load_registry
 from .schemas import ValidationError
 
@@ -681,6 +683,59 @@ def audit_program_readiness(
 
     alberta_baseline = load_json_or_empty(
         root / "data/model-runs/alberta_bcpi_reference_baseline_v0.1.json"
+    )
+    reference_review_path = (
+        root / "data/model-runs/alberta_reference_cost_review_package_v0.1.json"
+    )
+    reference_review = load_json_or_empty(reference_review_path)
+    review_manifest = reference_review.get("input_manifest", [])
+    review_manifest_ok = isinstance(review_manifest, list) and len(review_manifest) == 10
+    if review_manifest_ok:
+        for item in review_manifest:
+            try:
+                relative_path = Path(item["path"])
+                resolved_path = (root / relative_path).resolve()
+                resolved_path.relative_to(root)
+                entry_ok = (
+                    not relative_path.is_absolute()
+                    and resolved_path.is_file()
+                    and item.get("sha256") == sha256_file(resolved_path)
+                )
+            except (KeyError, TypeError, ValueError, OSError):
+                entry_ok = False
+            if not entry_ok:
+                review_manifest_ok = False
+                break
+    review_boundary = reference_review.get("publication_boundary", {})
+    reference_review_ready = (
+        reference_review_path.exists()
+        and reference_review.get("package_id") == REFERENCE_COST_REVIEW_PACKAGE_ID
+        and reference_review.get("review_status") == "pending_independent_review"
+        and review_manifest_ok
+        and len(reference_review.get("required_criteria", []))
+        == len(REFERENCE_COST_REVIEW_CRITERIA)
+        and reference_review.get("model_artifact_sha256")
+        == sha256_file(
+            root / "data/model-runs/alberta_bcpi_reference_baseline_v0.1.json"
+        )
+        and review_boundary.get("independent_review_complete") is False
+        and review_boundary.get("public_projection_authorized") is False
+        and review_boundary.get("ai_attributable_effect_authorized") is False
+        and review_boundary.get("project_cost_translation_authorized") is False
+    )
+    record(
+        "reference_cost_review_instrument",
+        "governance",
+        PASS if reference_review_ready else FAIL,
+        "The Alberta E1 review packet hash-locks the model, method, tests and ten-criterion verdict contract while remaining non-authorizing."
+        if reference_review_ready
+        else "The Alberta E1 review packet is missing, stale or has an unsafe authorization boundary.",
+        [
+            "data/model-runs/alberta_reference_cost_review_package_v0.1.json",
+            "docs/reviews/2026-09-01-reference-cost-review-prompt.md",
+            "research/src/aiio/model_review.py",
+        ],
+        release_gate=True,
     )
     historical_envelope_path = (
         root / "data/model-runs/alberta_bcpi_historical_envelope_v0.1.json"

@@ -93,6 +93,16 @@ validation errors, interval coverage, gate results and projected fields. A
 series remain distinct from CMA series; coefficients and model selections are
 not transferred across geographies.
 
+The Alberta reference-cost independent-review package requires `package_id`,
+`model_artifact_sha256`, a role-labelled and hash-locked `input_manifest`,
+`facts_to_reconcile`, ten `required_criteria`, `reviewer_instructions`,
+`test_commands`, `verdict_contract` and a false-valued `publication_boundary`.
+A separate verdict must lock the exact package hash, identify the reviewer and
+independence declaration, disposition every criterion and test, enumerate
+findings, acknowledge the narrow claim boundary and return either `pass` with
+`authorize_baseline_only` or `hold` with `withhold`. Validation of a verdict
+does not itself edit a model artifact, governance gate or public release.
+
 ## Public-project exposure
 
 Required fields: `project_id`, `asset_class`, `asset_class_evidence_status`, `sponsor_signal`, `sponsor_signal_evidence_status`, `estimated_cost_cad`, `start_year`, `end_year`, `schedule_overlap_status`, `overlap_years`, `annualized_cost_cad_if_complete`, `indicative_cost_allocated_to_window_cad`, `source_id`, `source_evidence_status`.

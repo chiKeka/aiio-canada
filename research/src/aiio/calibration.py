@@ -25,6 +25,10 @@ MAX_ABSOLUTE_VALIDATION_BIAS_PERCENT = 10.0
 MAX_DEGRADATION_FROM_FLAT_PERCENTAGE_POINTS = 2.0
 MIN_VALIDATION_INTERVAL_COVERAGE_PERCENT = 60.0
 
+
+def _implementation_sha256() -> str:
+    return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+
 GEOGRAPHY_LABELS = {
     "CMA_825": "Calgary CMA",
     "CMA_835": "Edmonton CMA",
@@ -449,6 +453,7 @@ def build_reference_class_baseline(
         "model_id": model_id,
         "source_id": SOURCE_ID,
         "input_sha256": input_hash,
+        "code_sha256": _implementation_sha256(),
         "as_of_date": as_of_date,
         "evidence_status": "observed_series_with_held_out_model_validation",
         "release_state": (

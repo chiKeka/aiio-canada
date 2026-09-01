@@ -42,6 +42,8 @@ Stores source identity, publisher, URL, access method, publication and retrieval
 
 Source-specific adapters retrieve machine-readable files where available. Raw responses are retained by content hash. Transformation code emits normalized records and validation results. Manual extraction is permitted only with a reviewer and page/table locator.
 
+Independent model review is also artifact-based. The Alberta E1 review instrument hash-locks the normalized input, model artifact, implementation, tests and claim-boundary documents, then requires a separate criterion-level JSON verdict. Verdict validation is non-mutating: review evidence cannot silently authorize a projection or publish a release.
+
 ### 3. Baseline
 
 The baseline describes the observed system before a scenario shock: public projects, employment and vacancies by occupation, wages, construction price indices, material supply proxies, generation and transmission outlooks, and known AI/data-centre projects. Detailed current vacancies and the 2021 Census workforce stock remain separately dated. Their guarded cross-vintage ratio is an inferred recruitment screen, not a vacancy rate or graph calibration input.

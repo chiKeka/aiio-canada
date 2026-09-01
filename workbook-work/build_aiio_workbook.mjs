@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.17.0-dev';
+const workbookBuildVersion = '0.18.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -365,6 +365,23 @@ const historicalCostEnvelope = JSON.parse(
     'utf8',
   ),
 );
+const referenceCostReview = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'alberta_reference_cost_review_package_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const programGates = JSON.parse(
+  await fs.readFile(
+    path.join(projectRoot, 'data', 'governance', 'program-gates.json'),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -387,6 +404,7 @@ const projectExposure = workbook.worksheets.add('Project Exposure');
 const powerEvidence = workbook.worksheets.add('Power Evidence');
 const costBaselineSheet = workbook.worksheets.add('Cost Baseline');
 const historicalCostSheet = workbook.worksheets.add('Historical Envelope');
+const referenceReviewSheet = workbook.worksheets.add('Reference Review');
 const projectCost = workbook.worksheets.add('Project Cost Check');
 const canadaExpansion = workbook.worksheets.add('Canada Expansion');
 const attributionGate = workbook.worksheets.add('Attribution Gate');
@@ -436,6 +454,7 @@ for (const sheet of [
   powerEvidence,
   costBaselineSheet,
   historicalCostSheet,
+  referenceReviewSheet,
   projectCost,
   canadaExpansion,
   attributionGate,
@@ -471,6 +490,7 @@ buildProjectExposure();
 buildPowerEvidence();
 buildCostBaseline();
 buildHistoricalCostEnvelope();
+buildReferenceReview();
 buildProjectCostCheck();
 buildCanadaExpansion();
 buildAttributionGate();
@@ -519,9 +539,9 @@ console.log(inspectDashboard.ndjson);
 
 const inspectReadMe = await workbook.inspect({
   kind: 'table',
-  range: 'Read Me!A1:H51',
+  range: 'Read Me!A1:H52',
   include: 'values,formulas',
-  tableMaxRows: 51,
+  tableMaxRows: 52,
   tableMaxCols: 8,
 });
 console.log(inspectReadMe.ndjson);
@@ -561,6 +581,15 @@ const inspectHistoricalEnvelope = await workbook.inspect({
   tableMaxCols: 19,
 });
 console.log(inspectHistoricalEnvelope.ndjson);
+
+const inspectReferenceReview = await workbook.inspect({
+  kind: 'table',
+  range: 'Reference Review!A1:J40',
+  include: 'values,formulas',
+  tableMaxRows: 40,
+  tableMaxCols: 10,
+});
+console.log(inspectReferenceReview.ndjson);
 
 const inspectCanadaExpansion = await workbook.inspect({
   kind: 'table',
@@ -643,7 +672,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H51',
+  'Read Me': 'A1:H52',
   Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -662,6 +691,7 @@ const previewRanges = {
   'Power Evidence': 'A1:H28',
   'Cost Baseline': 'A1:P54',
   'Historical Envelope': 'A1:S55',
+  'Reference Review': 'A1:J40',
   'Project Cost Check': 'A1:L38',
   'Canada Expansion': 'A1:J48',
   'Attribution Gate': 'A1:J48',
@@ -737,7 +767,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H46').values = [
+  readme.getRange('A18:H47').values = [
     [
       '1',
       'Dashboard',
@@ -1010,6 +1040,16 @@ function buildReadMe() {
     ],
     [
       '28',
+      'Reference Review',
+      'Inspect the hash-locked Alberta E1 reviewer packet, ten required criteria, channel status and the single narrowly eligible horizon.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '29',
       'Sources',
       'Open the current research source register, distinguish release sources and check source vintages.',
       '',
@@ -1019,7 +1059,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '29',
+      '30',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -1029,29 +1069,29 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A46').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B46').format.font = { bold: true };
-  readme.getRange('C18:H46').merge(true);
-  readme.getRange('A48:H48').merge();
-  readme.getRange('A48').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A48:H48'), C.amber);
+  readme.getRange('A18:A47').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B47').format.font = { bold: true };
+  readme.getRange('C18:H47').merge(true);
   readme.getRange('A49:H49').merge();
-  readme.getRange('A49').values = [
+  readme.getRange('A49').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A49:H49'), C.amber);
+  readme.getRange('A50:H50').merge();
+  readme.getRange('A50').values = [
     [
-      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only; its quantiles are not forecasts, probabilities or project allowances. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
+      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. The ${referenceCostReview.required_criteria.length}-criterion independent-review packet is prepared but has no verdict, and both reviewer channels remain blocked. No public project-cost result is authorized. The Historical Envelope publishes realized BCPI-window distributions only; its quantiles are not forecasts, probabilities or project allowances. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its complete ${quebecFullArchive.snapshot_date_count}-date archive contains ${quebecFullArchive.unique_project_count} stable IDs and ${quebecFullArchive.disappearance_event_count} adjacent-snapshot disappearances; publisher-declared complete-service and retirement markers precede ${quebecFullArchive.publisher_declared_retirement_disappearance_event_count}, while ${quebecFullArchive.unclassified_disappearance_event_count} remain unclassified. These are selection diagnostics, not audited exit outcomes, and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
     ],
   ];
-  readme.getRange('A49:H49').format = {
+  readme.getRange('A50:H50').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A49').format.rowHeight = 174;
+  readme.getRange('A50').format.rowHeight = 190;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
-    51,
+    52,
   );
 }
 
@@ -3080,6 +3120,175 @@ function buildHistoricalCostEnvelope() {
       Q: 20, R: 18, S: 52,
     },
     historicalEndRow + 4,
+  );
+}
+
+function buildReferenceReview() {
+  titleBand(
+    referenceReviewSheet,
+    'Independent reference-cost review gate',
+    'Hash-locked Alberta E1 review instrument · a prepared packet is not a verdict',
+    'J',
+  );
+  const boundary = referenceCostReview.publication_boundary;
+  const reviewerRows = Object.entries(programGates.independent_review).map(
+    ([reviewer, state]) => [
+      reviewer.toUpperCase(),
+      state.status,
+      state.reason,
+      state.evidence,
+    ],
+  );
+  const criteriaRows = referenceCostReview.required_criteria.map((criterion) => [
+    criterion.criterion_id,
+    criterion.required ? 'YES' : 'NO',
+    'pending_independent_review',
+    criterion.question,
+  ]);
+  const passingRows =
+    referenceCostReview.facts_to_reconcile.gate_passing_horizons.map((item) => [
+      item.asset_class,
+      item.geography_id,
+      item.horizon_years,
+      item.selected_method,
+      item.projected_cumulative_change_percent,
+      'E1 baseline only; not a project-cost or AI-effect forecast',
+    ]);
+
+  referenceReviewSheet.getRange('A5:B10').values = [
+    ['Package ID', referenceCostReview.package_id],
+    ['Review status', referenceCostReview.review_status],
+    ['Model ID', referenceCostReview.model_id],
+    ['Locked input files', referenceCostReview.input_manifest.length],
+    ['Required criteria', referenceCostReview.required_criteria.length],
+    [
+      'Gate-passing horizons',
+      referenceCostReview.facts_to_reconcile.gate_passing_horizons.length,
+    ],
+  ];
+  referenceReviewSheet.getRange('A5:A10').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  referenceReviewSheet.getRange('B5:B10').format = {
+    fill: C.soft,
+    borders: { preset: 'outside', style: 'thin', color: C.line },
+  };
+  referenceReviewSheet.getRange('D5:E9').values = [
+    [
+      'Independent review complete',
+      boundary.independent_review_complete ? 'YES' : 'NO',
+    ],
+    [
+      'Public projection authorized',
+      boundary.public_projection_authorized ? 'YES' : 'NO',
+    ],
+    [
+      'AI-attributable effect authorized',
+      boundary.ai_attributable_effect_authorized ? 'YES' : 'NO',
+    ],
+    [
+      'Project-cost translation authorized',
+      boundary.project_cost_translation_authorized ? 'YES' : 'NO',
+    ],
+    ['Validated reviewer verdicts', 0],
+  ];
+  referenceReviewSheet.getRange('D5:D9').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  referenceReviewSheet.getRange('E5:E8').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+  };
+  referenceReviewSheet.getRange('G5:J10').merge();
+  referenceReviewSheet.getRange('G5').values = [[
+    'WITHHELD. The packet makes review reproducible but does not constitute independent review. A valid pass may recommend only the individually gate-passing E1 horizon. Failed horizons, AI-attributable effects, project-budget translations, province-wide claims and graph-score monetization remain prohibited.',
+  ]];
+  referenceReviewSheet.getRange('G5:J10').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529' },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  referenceReviewSheet.getRange('A13:D13').values = [[
+    'Reviewer channel',
+    'Status',
+    'Reason',
+    'Evidence record',
+  ]];
+  header(referenceReviewSheet.getRange('A13:D13'));
+  referenceReviewSheet.getRange(`A14:D${13 + reviewerRows.length}`).values =
+    reviewerRows;
+  referenceReviewSheet
+    .getRange(`B14:B${13 + reviewerRows.length}`)
+    .conditionalFormats.add('containsText', {
+      text: 'blocked',
+      format: { fill: C.amberLight, font: { color: '#8A4826', bold: true } },
+    });
+
+  referenceReviewSheet.getRange('A18:D18').values = [[
+    'Criterion ID',
+    'Required',
+    'Current status',
+    'Independent review question',
+  ]];
+  header(referenceReviewSheet.getRange('A18:D18'));
+  const criteriaEndRow = 18 + criteriaRows.length;
+  referenceReviewSheet.getRange(`A19:D${criteriaEndRow}`).values = criteriaRows;
+  referenceReviewSheet
+    .getRange(`C19:C${criteriaEndRow}`)
+    .conditionalFormats.add('containsText', {
+      text: 'pending_independent_review',
+      format: { fill: C.amberLight, font: { color: '#8A4826', bold: true } },
+    });
+  const criteriaTable = referenceReviewSheet.tables.add(
+    `A18:D${criteriaEndRow}`,
+    true,
+    'ReferenceCostReviewCriteriaTable',
+  );
+  criteriaTable.style = 'TableStyleMedium2';
+
+  referenceReviewSheet.getRange('A31:F31').values = [[
+    'Asset class',
+    'Geography ID',
+    'Horizon (years)',
+    'Selected method',
+    'Projected cumulative change (%)',
+    'Permitted claim if independently authorized',
+  ]];
+  header(referenceReviewSheet.getRange('A31:F31'));
+  referenceReviewSheet.getRange(`A32:F${31 + passingRows.length}`).values =
+    passingRows;
+  referenceReviewSheet
+    .getRange(`C32:C${31 + passingRows.length}`)
+    .format.numberFormat = '0';
+  referenceReviewSheet
+    .getRange(`E32:E${31 + passingRows.length}`)
+    .format.numberFormat = '0.0';
+
+  referenceReviewSheet.getRange('A35:J38').merge();
+  referenceReviewSheet.getRange('A35').values = [[boundary.reason]];
+  noteBlock(referenceReviewSheet.getRange('A35:J38'));
+  referenceReviewSheet.freezePanes.freezeRows(18);
+  referenceReviewSheet.freezePanes.freezeColumns(1);
+  setWidths(
+    referenceReviewSheet,
+    {
+      A: 35,
+      B: 27,
+      C: 31,
+      D: 75,
+      E: 27,
+      F: 56,
+      G: 18,
+      H: 18,
+      I: 18,
+      J: 18,
+    },
+    40,
   );
 }
 
@@ -5339,8 +5548,9 @@ function buildReleaseChecks() {
     ['Quebec complete archive reconciles and remains non-authorizing', 'PASS'],
     ['Alberta scenario variants reconcile and remain non-authorizing', 'PASS'],
     ['Historical cost envelope reconciles and remains non-forecasting', 'PASS'],
+    ['Reference-cost review packet reconciles and remains non-authorizing', 'PASS'],
   ];
-  checks.getRange('A16:C45').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C46').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -5509,22 +5719,27 @@ function buildReleaseChecks() {
       '=IF(AND(ROWS(\'Historical Envelope\'!$A$12:$A$51)=40,COUNTIF(\'Historical Envelope\'!$F$12:$F$51,"")=0,\'Historical Envelope\'!E5="YES",COUNTIF(\'Historical Envelope\'!$E$6:$E$8,"NO")=3,COUNTIF(\'Historical Envelope\'!$S$12:$S$51,"")=0,ABS(\'Historical Envelope\'!R12-((1+\'Historical Envelope\'!L12/100)^(1/\'Historical Envelope\'!E12)-1))<0.000001),"PASS","FAIL")',
     ],
   ];
-  checks.getRange('B16:B45').conditionalFormats.add('containsText', {
+  checks.getRange('B46').formulas = [
+    [
+      '=IF(AND(\'Reference Review\'!B6="pending_independent_review",\'Reference Review\'!E5="NO",\'Reference Review\'!E6="NO",\'Reference Review\'!E7="NO",\'Reference Review\'!E8="NO",\'Reference Review\'!E9=0,\'Reference Review\'!B8=10,\'Reference Review\'!B9=10,\'Reference Review\'!B10=1,COUNTA(\'Reference Review\'!$A$19:$A$28)=10,COUNTIF(\'Reference Review\'!$C$19:$C$28,"pending_independent_review")=10,COUNTA(\'Reference Review\'!$A$14:$A$15)=2,COUNTIF(\'Reference Review\'!$B$14:$B$15,"blocked")=2),"PASS","FAIL")',
+    ],
+  ];
+  checks.getRange('B16:B46').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B45').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B46').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A47:D49').merge();
-  checks.getRange('A47').values = [
+  checks.getRange('A48:D50').merge();
+  checks.getRange('A48').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A47:D49'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 53);
+  noteBlock(checks.getRange('A48:D50'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 54);
 }
 
 function buildDashboard() {

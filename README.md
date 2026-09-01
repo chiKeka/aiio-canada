@@ -58,6 +58,7 @@ npm run digest:audit
 npm run program:audit
 npm run attribution:readiness
 npm run cost:historical-envelope
+npm run cost:review-package
 npm run model:run
 npm run model:variants
 npm run power:run

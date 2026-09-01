@@ -27,7 +27,7 @@ class CalibrationArtifactTests(unittest.TestCase):
         )
         self.assertEqual(
             hashlib.sha256(committed.read_bytes()).hexdigest(),
-            "bab3878917d7ea643de095af846213c2a2079fc07c8334e87272de49508225e5",
+            "9909c2d10a6c67f9699d98cd16dead6e619635b3a16b535c389ae9efa518bd40",
         )
         with tempfile.TemporaryDirectory() as directory:
             regenerated_path = Path(directory) / "baseline.json"
@@ -114,7 +114,7 @@ class CalibrationArtifactTests(unittest.TestCase):
         )
         self.assertEqual(
             hashlib.sha256(committed.read_bytes()).hexdigest(),
-            "866b7f7aca6cf12e6184a5417048036ded318a369c53f039e815e5c99c4aac0b",
+            "b79e81862d8e70865a21ff72781d5d45589948de347abf191b81b78d91ca3969",
         )
         with tempfile.TemporaryDirectory() as directory:
             regenerated_path = Path(directory) / "provincial-baseline.json"

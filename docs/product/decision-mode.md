@@ -77,6 +77,14 @@ class is unsupported, or independent review is incomplete, the entire project
 baseline remains null. This market reference calculation never contains the AI
 increment and never uses a graph pressure score.
 
+The independent-review packet is visible as governance evidence, not as a
+projection. It must lock the exact model artifact, implementation, tests and
+claim-boundary documents. A separate verdict must disposition all ten required
+criteria and may recommend only `authorize_baseline_only`; verdict validation
+does not edit the model artifact, governance state or public release. A
+prepared packet, an authenticated reviewer tool or a prose approval cannot
+unlock Decision Mode.
+
 ## Analysis channels
 
 The product distinguishes five channels:
