@@ -152,6 +152,28 @@ artifact. A reported construction value is a permit estimate, not realized
 spend. An occupancy-granted date is a limited-coverage trend proxy, not legal
 occupancy confirmation or verified construction completion.
 
+## Audited public-project outcome reference
+
+Required fields: `outcome_case_id`, `project_reference_id`,
+`project_reference_id_status`, `project_name`, `geography_id`, `asset_class`,
+`delivery_model`, `baseline_cost_cad`, `baseline_cost_approval_date`,
+`baseline_cost_scope_id`, `baseline_price_basis_date`,
+`latest_or_final_cost_cad`, `latest_or_final_cost_as_of_date`,
+`latest_or_final_cost_status`, `cost_variance_cad`,
+`cost_variance_percent`, `baseline_substantial_completion_date`,
+`baseline_completion_precision`, `actual_substantial_completion_date`,
+`actual_completion_precision`, `schedule_delay_days`,
+`source_reported_schedule_delay`, `approved_change_history_complete`,
+`cost_components`, `authorizing_field_status`, `source_id`, `source_locators`,
+`quality_flags`.
+
+Cost differences are calculated only when baseline and latest cost values share
+the same declared scope. Day delays are calculated only when both planned and
+actual completion dates have day precision. A source category in
+`cost_components` is observed; its `graph_channel` is inferred. Named audited
+reference cases do not become an outcome panel, and missing price-basis dates,
+change histories or start dates remain null.
+
 ## Conventions
 
 - Currency is CAD and carries a price year.

@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import re
 from collections import Counter
 from datetime import date
 from pathlib import Path
@@ -19,6 +20,9 @@ PENDING = "pending"
 BLOCKED = "blocked"
 FAIL = "fail"
 ALLOWED_STATUSES = {PASS, PENDING, BLOCKED, FAIL}
+WORKBOOK_VERSION_PATTERN = re.compile(
+    r"^AIIO_Canada_Research_(\d+)\.(\d+)\.(\d+)(?:-([A-Za-z0-9.-]+))?\.xlsx$"
+)
 
 
 def sha256_file(path: Path) -> str:
@@ -27,6 +31,27 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return f"sha256:{digest.hexdigest()}"
+
+
+def select_latest_workbook(paths: list[Path]) -> Path | None:
+    """Select the newest workbook using semantic version order, not filename order."""
+
+    def version_key(path: Path) -> tuple[int, int, int, int, str, str]:
+        match = WORKBOOK_VERSION_PATTERN.match(path.name)
+        if match is None:
+            return (-1, -1, -1, -1, "", path.name)
+        major, minor, patch = (int(match.group(index)) for index in range(1, 4))
+        prerelease = match.group(4)
+        return (
+            major,
+            minor,
+            patch,
+            1 if prerelease is None else 0,
+            prerelease or "",
+            path.name,
+        )
+
+    return max(paths, key=version_key) if paths else None
 
 
 def audit_program_readiness(
@@ -349,7 +374,7 @@ def audit_program_readiness(
         release_gate=True,
     )
 
-    workbook_candidates = sorted(
+    workbook_candidates = list(
         (root / "outputs/01a0579f-936b-77b3-93e5-be6035628b16").glob(
             "AIIO_Canada_Research_*.xlsx"
         )
@@ -357,7 +382,9 @@ def audit_program_readiness(
     workbook_ok = False
     workbook_evidence: list[str] = []
     if workbook_candidates:
-        workbook_path = workbook_candidates[-1]
+        workbook_path = select_latest_workbook(workbook_candidates)
+        if workbook_path is None:
+            raise AssertionError("workbook candidate selection unexpectedly returned none")
         inspect_path = workbook_path.with_suffix(workbook_path.suffix + ".inspect.ndjson")
         workbook_ok = inspect_path.exists()
         workbook_evidence = [

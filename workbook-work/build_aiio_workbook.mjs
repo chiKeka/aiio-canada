@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.11.0-dev';
+const workbookBuildVersion = '0.12.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -255,6 +255,17 @@ const permitProxyRows = parseCsv(
     'utf8',
   ),
 );
+const auditedOutcomes = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'oago_audited_project_outcomes_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -281,6 +292,7 @@ const attributionGate = workbook.worksheets.add('Attribution Gate');
 const investmentControls = workbook.worksheets.add('Investment Controls');
 const procurementIntake = workbook.worksheets.add('Procurement Intake');
 const permitProxy = workbook.worksheets.add('Permit Proxy');
+const auditedOutcomeSheet = workbook.worksheets.add('Audited Outcomes');
 const sources = workbook.worksheets.add('Sources');
 const checks = workbook.worksheets.add('Release Checks');
 
@@ -325,6 +337,7 @@ for (const sheet of [
   investmentControls,
   procurementIntake,
   permitProxy,
+  auditedOutcomeSheet,
   sources,
   checks,
 ]) {
@@ -355,6 +368,7 @@ buildAttributionGate();
 buildInvestmentControls();
 buildProcurementIntake();
 buildPermitProxy();
+buildAuditedOutcomes();
 buildSources();
 buildReleaseChecks();
 buildDashboard();
@@ -412,9 +426,9 @@ console.log(inspectProjectCost.ndjson);
 
 const inspectChecks = await workbook.inspect({
   kind: 'table',
-  range: 'Release Checks!A1:D47',
+  range: 'Release Checks!A1:D48',
   include: 'values,formulas',
-  tableMaxRows: 47,
+  tableMaxRows: 48,
   tableMaxCols: 4,
 });
 console.log(inspectChecks.ndjson);
@@ -464,6 +478,15 @@ const inspectPermitProxy = await workbook.inspect({
 });
 console.log(inspectPermitProxy.ndjson);
 
+const inspectAuditedOutcomes = await workbook.inspect({
+  kind: 'table',
+  range: 'Audited Outcomes!A1:O46',
+  include: 'values,formulas',
+  tableMaxRows: 46,
+  tableMaxCols: 15,
+});
+console.log(inspectAuditedOutcomes.ndjson);
+
 const errors = await workbook.inspect({
   kind: 'match',
   searchTerm: '#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A',
@@ -496,8 +519,9 @@ const previewRanges = {
   'Investment Controls': 'A1:R28',
   'Procurement Intake': 'A1:X28',
   'Permit Proxy': 'A1:M42',
+  'Audited Outcomes': 'A1:O46',
   Sources: 'A1:J34',
-  'Release Checks': 'A1:D47',
+  'Release Checks': 'A1:D48',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -562,7 +586,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H41').values = [
+  readme.getRange('A18:H42').values = [
     [
       '1',
       'Dashboard',
@@ -785,6 +809,16 @@ function buildReadMe() {
     ],
     [
       '23',
+      'Audited Outcomes',
+      'Inspect hash-locked named project outcomes, component bridges and the fields still missing for attribution.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '24',
       'Sources',
       'Open the current research source register, distinguish release sources and check source vintages.',
       '',
@@ -794,7 +828,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '24',
+      '25',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -804,25 +838,25 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A41').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B41').format.font = { bold: true };
-  readme.getRange('C18:H41').merge(true);
-  readme.getRange('A43:H43').merge();
-  readme.getRange('A43').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A43:H43'), C.amber);
+  readme.getRange('A18:A42').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B42').format.font = { bold: true };
+  readme.getRange('C18:H42').merge(true);
   readme.getRange('A44:H44').merge();
-  readme.getRange('A44').values = [
+  readme.getRange('A44').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A44:H44'), C.amber);
+  readme.getRange('A45:H45').merge();
+  readme.getRange('A45').values = [
     [
       `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. CanadaBuys supplies no stable physical-project ID, CMA geography, independent estimate, complete changes, physical completion or bidder count. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
     ],
   ];
-  readme.getRange('A44:H44').format = {
+  readme.getRange('A45:H45').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A44').format.rowHeight = 126;
+  readme.getRange('A45').format.rowHeight = 126;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
@@ -3900,6 +3934,283 @@ function buildPermitProxy() {
   );
 }
 
+function buildAuditedOutcomes() {
+  titleBand(
+    auditedOutcomeSheet,
+    'Audited public-project outcome references',
+    'Hash-locked Ontario Auditor General cases · field discovery only · pending independent transcription review',
+    'O',
+  );
+
+  const coverage = auditedOutcomes.coverage_summary;
+  auditedOutcomeSheet.getRange('A5:B5').values = [['Coverage', 'Count / status']];
+  header(auditedOutcomeSheet.getRange('A5:B5'));
+  auditedOutcomeSheet.getRange('A6:B11').values = [
+    ['Named completed projects', coverage.named_completed_project_count],
+    ['Completed total-cost cases', coverage.completed_total_cost_case_count],
+    [
+      'Exact-day completion pairs',
+      coverage.exact_day_substantial_completion_pair_count,
+    ],
+    ['Published price-basis dates', coverage.price_basis_date_case_count],
+    [
+      'Stable publisher project IDs',
+      coverage.publisher_stable_project_id_case_count,
+    ],
+    [
+      'Reference cases authorized',
+      auditedOutcomes.publication_boundary.reference_case_publication_authorized
+        ? 'YES'
+        : 'NO',
+    ],
+  ];
+  auditedOutcomeSheet.getRange('A6:A11').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  auditedOutcomeSheet.getRange('B6:B11').format = {
+    fill: C.white,
+    font: { color: C.ink },
+    borders: { preset: 'inside', style: 'thin', color: C.line },
+  };
+  auditedOutcomeSheet.getRange('B11').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  auditedOutcomeSheet.getRange('D5:O5').merge();
+  auditedOutcomeSheet.getRange('D5').values = [['Publication boundary']];
+  sectionHeader(auditedOutcomeSheet.getRange('D5:O5'), C.amber);
+  auditedOutcomeSheet.getRange('D6:O11').merge();
+  auditedOutcomeSheet.getRange('D6').values = [
+    [
+      `${auditedOutcomes.publication_boundary.reason} These cases may inform schema design and graph-channel mapping, but they do not authorize an AI-attributable cost or schedule effect. Review status: ${labelize(auditedOutcomes.review.status)}.`,
+    ],
+  ];
+  auditedOutcomeSheet.getRange('D6:O11').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  auditedOutcomeSheet.getRange('A13:O13').values = [
+    [
+      'Project',
+      'Asset class',
+      'Delivery model',
+      'Baseline cost (CAD)',
+      'Latest / final cost (CAD)',
+      'Variance (CAD)',
+      'Variance (%)',
+      'Baseline substantial completion',
+      'Actual substantial completion',
+      'Delay (days)',
+      'Latest cost status',
+      'Price basis date',
+      'Complete change history',
+      'Cost panel authorized',
+      'Schedule panel authorized',
+    ],
+  ];
+  header(auditedOutcomeSheet.getRange('A13:O13'));
+  const caseFirstRow = 14;
+  const caseLastRow = caseFirstRow + auditedOutcomes.cases.length - 1;
+  auditedOutcomeSheet.getRange(`A${caseFirstRow}:O${caseLastRow}`).values =
+    auditedOutcomes.cases.map((item) => [
+      item.project_name,
+      labelize(item.asset_class),
+      labelize(item.delivery_model),
+      item.baseline_cost_cad,
+      item.latest_or_final_cost_cad,
+      item.cost_variance_cad,
+      item.cost_variance_percent / 100,
+      item.baseline_substantial_completion_date,
+      item.actual_substantial_completion_date,
+      item.schedule_delay_days,
+      labelize(item.latest_or_final_cost_status),
+      item.baseline_price_basis_date,
+      item.approved_change_history_complete ? 'YES' : 'NO',
+      item.cost_outcome_panel_authorized ? 'YES' : 'NO',
+      item.schedule_outcome_panel_authorized ? 'YES' : 'NO',
+    ]);
+  auditedOutcomeSheet.getRange(`A${caseFirstRow}:O${caseLastRow}`).format = {
+    font: { color: C.ink, size: 9 },
+    wrapText: true,
+    verticalAlignment: 'top',
+    borders: {
+      insideHorizontal: { style: 'thin', color: C.line },
+      bottom: { style: 'thin', color: C.line },
+    },
+  };
+  auditedOutcomeSheet.getRange(`A${caseFirstRow}:C${caseLastRow}`).format.font = {
+    bold: true,
+    color: C.ink,
+    size: 9,
+  };
+  auditedOutcomeSheet.getRange(`D${caseFirstRow}:F${caseLastRow}`).format.numberFormat =
+    '$#,##0';
+  auditedOutcomeSheet.getRange(`G${caseFirstRow}:G${caseLastRow}`).format.numberFormat =
+    '0.0%';
+  auditedOutcomeSheet.getRange(`J${caseFirstRow}:J${caseLastRow}`).format.numberFormat =
+    '#,##0';
+  auditedOutcomeSheet.getRange(`M${caseFirstRow}:O${caseLastRow}`).format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826', size: 9 },
+    borders: { preset: 'inside', style: 'thin', color: '#E1B48E' },
+  };
+  auditedOutcomeSheet.getRange(`A${caseFirstRow}:O${caseLastRow}`).format.rowHeight =
+    58;
+
+  const componentRows = auditedOutcomes.cases.flatMap((item) =>
+    item.cost_components.map((component) => [
+      item.project_name,
+      component.source_category,
+      labelize(component.graph_channel),
+      component.value_cad,
+      component.source_evidence_status,
+      component.graph_channel_evidence_status,
+    ]),
+  );
+  const componentFirstRow = 20;
+  const componentLastRow = componentFirstRow + componentRows.length - 1;
+  auditedOutcomeSheet.getRange('A19:F19').values = [
+    [
+      'Project',
+      'Source cost category',
+      'AIIO graph channel',
+      'Value (CAD)',
+      'Source evidence',
+      'Channel evidence',
+    ],
+  ];
+  header(auditedOutcomeSheet.getRange('A19:F19'));
+  auditedOutcomeSheet.getRange(`A${componentFirstRow}:F${componentLastRow}`).values =
+    componentRows;
+  auditedOutcomeSheet.getRange(`A${componentFirstRow}:F${componentLastRow}`).format = {
+    font: { color: C.ink, size: 9 },
+    wrapText: true,
+    verticalAlignment: 'top',
+    borders: {
+      insideHorizontal: { style: 'thin', color: C.line },
+      bottom: { style: 'thin', color: C.line },
+    },
+  };
+  auditedOutcomeSheet.getRange(`D${componentFirstRow}:D${componentLastRow}`).format.numberFormat =
+    '$#,##0';
+
+  auditedOutcomeSheet.getRange('H19:K19').values = [
+    ['Project', 'Reported component total', 'Summed components', 'Check'],
+  ];
+  header(auditedOutcomeSheet.getRange('H19:K19'));
+  const reconciliationFirstRow = 20;
+  const reconciliationLastRow =
+    reconciliationFirstRow + auditedOutcomes.cases.length - 1;
+  auditedOutcomeSheet.getRange(
+    `H${reconciliationFirstRow}:I${reconciliationLastRow}`,
+  ).values = auditedOutcomes.cases.map((item) => [
+    item.project_name,
+    item.cost_component_total_cad,
+  ]);
+  for (let index = 0; index < auditedOutcomes.cases.length; index += 1) {
+    const row = reconciliationFirstRow + index;
+    auditedOutcomeSheet.getRange(`J${row}`).formulas = [
+      [`=SUMIF($A$${componentFirstRow}:$A$${componentLastRow},H${row},$D$${componentFirstRow}:$D$${componentLastRow})`],
+    ];
+    auditedOutcomeSheet.getRange(`K${row}`).formulas = [
+      [`=IF(ABS(I${row}-J${row})<1,"PASS","FAIL")`],
+    ];
+  }
+  auditedOutcomeSheet.getRange(
+    `H${reconciliationFirstRow}:K${reconciliationLastRow}`,
+  ).format = {
+    font: { color: C.ink, size: 9 },
+    wrapText: true,
+    borders: { preset: 'inside', style: 'thin', color: C.line },
+  };
+  auditedOutcomeSheet.getRange(
+    `I${reconciliationFirstRow}:J${reconciliationLastRow}`,
+  ).format.numberFormat = '$#,##0';
+  auditedOutcomeSheet
+    .getRange(`K${reconciliationFirstRow}:K${reconciliationLastRow}`)
+    .conditionalFormats.add('containsText', {
+      text: 'PASS',
+      format: {
+        fill: C.tealLight,
+        font: { color: C.tealDark, bold: true },
+      },
+    });
+
+  auditedOutcomeSheet.getRange('H24:O24').merge();
+  auditedOutcomeSheet.getRange('H24').values = [['Evidence boundary']];
+  sectionHeader(auditedOutcomeSheet.getRange('H24:O24'), C.amber);
+  auditedOutcomeSheet.getRange('H25:O32').merge();
+  auditedOutcomeSheet.getRange('H25').values = [
+    [
+      `Observed source categories are retained verbatim. AIIO graph channels are inferred classifications for mechanism mapping. Lakeridge Gardens has mixed month/day schedule precision, so no day-delay value is computed. Highway 427 has an exact ${auditedOutcomes.cases[1].schedule_delay_days}-day substantial-completion difference, but its latest cost was under dispute and not final at the audit date. Neither case has a published estimate price-basis date or complete approved-change history.`,
+    ],
+  ];
+  auditedOutcomeSheet.getRange('H25:O32').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  const outcomeSource = currentSourceRegistry.sources.find(
+    (item) => item.source_id === auditedOutcomes.source_id,
+  );
+  auditedOutcomeSheet.getRange('H34:O34').merge();
+  auditedOutcomeSheet.getRange('H34').values = [['Source and reproducibility']];
+  sectionHeader(auditedOutcomeSheet.getRange('H34:O34'));
+  auditedOutcomeSheet.getRange('H35:O41').merge();
+  auditedOutcomeSheet.getRange('H35').values = [
+    [
+      `Source: ${outcomeSource?.canonical_url ?? auditedOutcomes.source_id}\nArchive: ${auditedOutcomes.source_file.archive_file}\nContent hash: ${auditedOutcomes.source_file.content_hash}\nVerified text anchors: ${auditedOutcomes.source_file.verified_anchor_count}\nReview record: ${auditedOutcomes.review.review_record}`,
+    ],
+  ];
+  auditedOutcomeSheet.getRange('H35:O41').format = {
+    fill: C.soft,
+    font: { name: 'Aptos Mono', color: C.muted, size: 8 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: C.line },
+  };
+
+  const table = auditedOutcomeSheet.tables.add(
+    `A19:F${componentLastRow}`,
+    true,
+    'AuditedOutcomeComponentsTable',
+  );
+  table.style = 'TableStyleMedium2';
+  auditedOutcomeSheet.freezePanes.freezeRows(13);
+  auditedOutcomeSheet.freezePanes.freezeColumns(1);
+  setWidths(
+    auditedOutcomeSheet,
+    {
+      A: 38,
+      B: 28,
+      C: 34,
+      D: 20,
+      E: 19,
+      F: 19,
+      G: 15,
+      H: 36,
+      I: 22,
+      J: 22,
+      K: 26,
+      L: 18,
+      M: 20,
+      N: 20,
+      O: 21,
+    },
+    46,
+  );
+}
+
 function buildSources() {
   titleBand(
     sources,
@@ -4038,8 +4349,9 @@ function buildReleaseChecks() {
     ['Regional investment-control panel reconciles to artifact', 'PASS'],
     ['CanadaBuys procurement intake reconciles and remains non-authorizing', 'PASS'],
     ['Edmonton permit proxy reconciles and remains non-authorizing', 'PASS'],
+    ['Audited outcome references reconcile and remain non-authorizing', 'PASS'],
   ];
-  checks.getRange('A16:C40').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C41').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -4179,22 +4491,27 @@ function buildReleaseChecks() {
       `=IF(AND('Permit Proxy'!A6=${permitProxyReport.broad_screen_row_count},'Permit Proxy'!C6=${permitProxyReport.data_centre_candidate_count},'Permit Proxy'!G6=${permitProxyReport.explicit_ai_reference_count},'Permit Proxy'!I6=${permitProxyReport.data_centre_candidate_occupancy_date_available_count},ROWS('Permit Proxy'!$A$14:$A$${permitCandidateLastRow})=${permitProxyReport.data_centre_candidate_count},COUNTIF('Permit Proxy'!$J$14:$J$${permitCandidateLastRow},"observed")=0),"PASS","FAIL")`,
     ],
   ];
-  checks.getRange('B16:B40').conditionalFormats.add('containsText', {
+  checks.getRange('B41').formulas = [
+    [
+      `=IF(AND('Audited Outcomes'!B6=${auditedOutcomes.coverage_summary.named_completed_project_count},'Audited Outcomes'!B9=0,'Audited Outcomes'!B11="NO",COUNTIF('Audited Outcomes'!$K$20:$K$${19 + auditedOutcomes.cases.length},"PASS")=${auditedOutcomes.cases.length},COUNTIF('Audited Outcomes'!$N$14:$O$${13 + auditedOutcomes.cases.length},"YES")=0),"PASS","FAIL")`,
+    ],
+  ];
+  checks.getRange('B16:B41').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B40').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B41').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A42:D44').merge();
-  checks.getRange('A42').values = [
+  checks.getRange('A43:D45').merge();
+  checks.getRange('A43').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A42:D44'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 47);
+  noteBlock(checks.getRange('A43:D45'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 48);
 }
 
 function buildDashboard() {

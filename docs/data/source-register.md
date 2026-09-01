@@ -47,6 +47,17 @@ completion required to authorize an AI-attributable effect. See
 The Edmonton permit implementation is documented in
 `docs/methodology/edmonton-data-centre-permit-proxy.md`.
 
+The 2024 Ontario Auditor General performance audit is now a registered,
+content-hash-locked outcome source. Its fail-closed intake preserves two named
+completed projects: Lakeridge Gardens Long-Term Care Home and Highway 427
+Expansion. It supplies one completed total-cost comparison, one estimated cost
+still under dispute, two planned/actual substantial-completion comparisons and
+source cost-component breakdowns. Only Highway 427 has day precision for both
+substantial-completion dates. Neither case provides an estimate price-basis
+date, complete approved-change history, publisher-stable project ID or reusable
+regional panel, so the outcome domains remain missing for causal authorization.
+See `docs/methodology/audited-project-outcome-references.md`.
+
 ## Implemented provincial public-project intake
 
 Three official provincial inventories now share a source-preserving schema:

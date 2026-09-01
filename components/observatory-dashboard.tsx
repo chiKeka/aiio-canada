@@ -36,6 +36,7 @@ import attributionReadiness from '@/data/model-runs/ai_attribution_identificatio
 import buildingInvestmentControls from '@/data/model-runs/building_investment_controls_canada_v0.1.json';
 import procurementOutcomeFeasibility from '@/data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json';
 import edmontonPermitProxy from '@/data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json';
+import auditedProjectOutcomes from '@/data/model-runs/oago_audited_project_outcomes_v0.1.json';
 import { ModeToggle } from '@/components/mode-toggle';
 import { boundedDisplayScore } from '@/lib/decision-analysis';
 
@@ -95,13 +96,13 @@ const attributionDomainMeta = [
     id: 'PUBLIC_PROJECT_COST_OUTCOMES',
     label: 'Public cost outcome',
     role: 'Authorizing outcome',
-    summary: 'CanadaBuys tender, award and contract linkages are screened. A reconciled estimate price basis, approved change history and stable physical-project class are still missing.',
+    summary: `CanadaBuys linkages are screened and ${auditedProjectOutcomes.coverage_summary.named_completed_project_count} audited named cases are preserved. Only ${auditedProjectOutcomes.coverage_summary.completed_total_cost_case_count} has a completed total-cost comparison; price basis, complete changes and a reusable class panel remain missing.`,
   },
   {
     id: 'PUBLIC_PROJECT_SCHEDULE_OUTCOMES',
     label: 'Public schedule outcome',
     role: 'Authorizing outcome',
-    summary: 'Requires baseline and actual start and completion dates, with the schedule-baseline vintage preserved.',
+    summary: `The audited intake supplies ${auditedProjectOutcomes.coverage_summary.exact_day_substantial_completion_pair_count} exact-day planned/actual completion pair. Complete baseline and actual start/completion histories with reusable regional coverage are still required.`,
   },
   {
     id: 'REGIONAL_CONSTRUCTION_ACTIVITY_CONTROLS',
@@ -437,6 +438,19 @@ export function ObservatoryDashboard() {
               <ContractMetric label="Tender + award" value={procurementOutcomeFeasibility.linked_tender_award_count.toLocaleString('en-CA')} />
               <ContractMetric label="Tender + contract" value={procurementOutcomeFeasibility.linked_tender_contract_count.toLocaleString('en-CA')} />
               <ContractMetric label="CMA locations" value={procurementOutcomeFeasibility.cma_geography_count.toString()} />
+            </dl>
+          </div>
+
+          <div className="mt-5 grid gap-5 rounded-xl border border-[#b8cbd4] bg-[#edf3f5] p-5 lg:grid-cols-[minmax(0,.9fr)_minmax(520px,1.1fr)] lg:items-center sm:p-6">
+            <div>
+              <div className="flex items-center gap-2 text-[#456574]"><BookOpen className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Audited outcome references · transcription review pending</p></div>
+              <p className="mt-2 text-sm leading-6 text-[#526b76]">Two Ontario audit cases now preserve scope-checked cost and substantial-completion histories plus source cost components. They improve reference design but do not form an outcome panel or authorize an AI effect.</p>
+            </div>
+            <dl className="grid grid-cols-2 gap-5 border-t border-[#c5d4da] pt-5 sm:grid-cols-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+              <ContractMetric label="Named cases" value={auditedProjectOutcomes.coverage_summary.named_completed_project_count.toString()} />
+              <ContractMetric label="Completed total cost" value={auditedProjectOutcomes.coverage_summary.completed_total_cost_case_count.toString()} />
+              <ContractMetric label="Exact-day schedule pairs" value={auditedProjectOutcomes.coverage_summary.exact_day_substantial_completion_pair_count.toString()} />
+              <ContractMetric label="Price-basis dates" value={auditedProjectOutcomes.coverage_summary.price_basis_date_case_count.toString()} />
             </dl>
           </div>
 

@@ -123,7 +123,8 @@
         "CANADABUYS_TENDER_NOTICES_FY2026_2027",
         "CANADABUYS_AWARD_NOTICES_FY2026_2027",
         "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
-        "GC_PROACTIVE_CONTRACTS"
+        "GC_PROACTIVE_CONTRACTS",
+        "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024"
       ],
       "available_variables": [
         "tender_publication_and_close_dates",
@@ -131,14 +132,18 @@
         "reported_award_and_contract_values_cad",
         "contract_instrument_start_and_end_dates",
         "contract_amendment_rows_for_selected_pspc_linkages",
-        "contract_amendment_value_cad_for_selected_federal_records"
+        "contract_amendment_value_cad_for_selected_federal_records",
+        "audited_named_project_baseline_cost_cad",
+        "audited_named_project_latest_or_completed_total_cost_cad",
+        "source_reported_cost_variance_percent",
+        "known_approved_budget_revision"
       ],
       "missing_variables": [
         "independent_estimate_with_price_basis",
         "complete_approved_change_history",
         "consistent_asset_reference_class"
       ],
-      "limitation": "The current-fiscal-year federal feasibility intake links selected tender, award and contract records, but it has no stable physical-project ID, CMA geography, independent estimate price basis, complete approved-change history or physical completion and therefore cannot reconcile a common estimate-to-outturn outcome."
+      "limitation": "The federal feasibility intake still cannot reconcile a common estimate-to-outturn outcome. The Ontario Auditor General source adds two named audited references, including one completed total-cost comparison and one estimated cost still under dispute, but neither publishes an estimate price-basis date, complete approved-change history, publisher-stable project ID or reusable asset reference-class panel."
     },
     {
       "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
@@ -148,13 +153,18 @@
         "CANADABUYS_PROCUREMENT_DATA",
         "CANADABUYS_TENDER_NOTICES_FY2026_2027",
         "CANADABUYS_AWARD_NOTICES_FY2026_2027",
-        "CANADABUYS_CONTRACT_HISTORY_FY2026_2027"
+        "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
+        "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024"
       ],
       "available_variables": [
         "tender_publication_date",
         "tender_close_date",
         "award_date_for_selected_records",
-        "contract_instrument_start_and_end_dates"
+        "contract_instrument_start_and_end_dates",
+        "audited_named_project_baseline_substantial_completion_date",
+        "audited_named_project_actual_substantial_completion_date",
+        "source_reported_schedule_delay_classification",
+        "inferred_calendar_day_difference_when_both_dates_are_exact"
       ],
       "missing_variables": [
         "baseline_start_date_and_vintage",
@@ -162,7 +172,7 @@
         "actual_start_date",
         "actual_completion_date"
       ],
-      "limitation": "Tender timing and procurement-instrument start/end dates are not baseline-to-actual physical project schedule performance."
+      "limitation": "Tender timing and procurement-instrument start/end dates are not physical schedule outcomes. The Ontario audit adds two named planned-to-actual substantial-completion references, but only Highway 427 has exact day precision for both completion dates; neither case supplies a complete exact baseline-start/actual-start pair or a reusable regional panel."
     },
     {
       "domain_id": "REGIONAL_CONSTRUCTION_ACTIVITY_CONTROLS",

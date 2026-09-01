@@ -14,6 +14,7 @@ from aiio.readiness import (
     audit_digest_artifacts,
     audit_frozen_release,
     require_release_ready,
+    select_latest_workbook,
     sha256_file,
     summarize_readiness,
 )
@@ -55,6 +56,14 @@ class ReadinessTests(unittest.TestCase):
         self.assertFalse(report["release_ready"])
         with self.assertRaisesRegex(ValidationError, "review, calibration"):
             require_release_ready(report)
+
+    def test_latest_workbook_uses_semantic_version_order(self) -> None:
+        candidates = [
+            self.root / "AIIO_Canada_Research_0.9.0-dev.xlsx",
+            self.root / "AIIO_Canada_Research_0.11.0-dev.xlsx",
+            self.root / "AIIO_Canada_Research_0.12.0-dev.xlsx",
+        ]
+        self.assertEqual(select_latest_workbook(candidates), candidates[2])
 
     def write_digest_fixture(self) -> None:
         items_dir = self.root / "data/digests/items"

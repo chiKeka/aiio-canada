@@ -29,6 +29,7 @@ from .adapters.edmonton_permits import (
     fetch_edmonton_permit_candidates,
     normalize_edmonton_permit_proxy,
 )
+from .audited_outcomes import run_audited_project_outcomes
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .adapters.provincial_projects import (
     BC_SOURCE_ID,
@@ -121,6 +122,13 @@ def main() -> None:
         help="build the fail-closed Edmonton data-centre permit activity proxy",
     )
     edmonton_permits_parser.add_argument("raw_path", type=Path)
+
+    audited_outcomes_parser = subparsers.add_parser(
+        "normalize-audited-project-outcomes",
+        help="build fail-closed named project outcome references from the Ontario audit",
+    )
+    audited_outcomes_parser.add_argument("manual_extract_path", type=Path)
+    audited_outcomes_parser.add_argument("source_pdf_path", type=Path)
 
     subparsers.add_parser(
         "fetch-census-workforce",
@@ -456,6 +464,44 @@ def main() -> None:
                         "realized_ai_construction_treatment_authorized": report[
                             "publication_boundary"
                         ]["realized_ai_construction_treatment_authorized"],
+                    }
+                )
+            )
+        elif args.command == "normalize-audited-project-outcomes":
+            source_records = {
+                source.source_id: source for source in load_registry(registry_path)
+            }
+            source_id = "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024"
+            if source_id not in source_records:
+                raise ValidationError(
+                    "Ontario audited-outcome source is missing from the registry"
+                )
+            report = run_audited_project_outcomes(
+                args.manual_extract_path.resolve(),
+                args.source_pdf_path.resolve(),
+                root
+                / "data"
+                / "model-runs"
+                / "oago_audited_project_outcomes_v0.1.json",
+                root
+                / "data"
+                / "processed"
+                / "oago_audited_project_outcomes.csv",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": report["model_id"],
+                        "named_completed_project_count": report[
+                            "coverage_summary"
+                        ]["named_completed_project_count"],
+                        "public_project_cost_outcome_authorized": report[
+                            "publication_boundary"
+                        ]["public_project_cost_outcome_authorized"],
+                        "public_project_schedule_outcome_authorized": report[
+                            "publication_boundary"
+                        ]["public_project_schedule_outcome_authorized"],
                     }
                 )
             )

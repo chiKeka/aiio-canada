@@ -505,6 +505,24 @@
       "evidence_status": "observed",
       "status": "candidate",
       "notes": "Includes permit date, building/work type, job description and reported construction value. A permit is an intention/proxy, not realized construction spend, labour hours or completion. Text classification of data-centre permits would be inferred and require review."
+    },
+    {
+      "source_id": "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
+      "title": "Procurement and Delivery of Selected Infrastructure Projects",
+      "publisher": "Office of the Auditor General of Ontario",
+      "canonical_url": "https://www.auditor.on.ca/en/content/annualreports/audits/en2024/AR-PA_infrastructureON_en24.html",
+      "retrieval_url": "https://www.auditor.on.ca/en/content/annualreports/arreports/en24/pa_infrastructureON_en24.pdf",
+      "source_type": "independent_public_infrastructure_performance_audit",
+      "domain": "public_project_outcomes",
+      "geography": "Ontario",
+      "as_of_date": "2024-10-31",
+      "last_verified": "2026-09-01",
+      "licence_note": "Official public audit report; retain the report year, retrieval time, response hash and exact page locators. Copyright remains with the Office of the Auditor General of Ontario.",
+      "access_method": "pdf",
+      "update_frequency": "one-time audit report with possible hosted revisions",
+      "evidence_status": "observed",
+      "status": "candidate",
+      "notes": "Independent performance audit of three named Ontario infrastructure projects. Lakeridge Gardens and Highway 427 contain valuable estimate-to-latest-cost and planned-to-actual substantial-completion evidence, but price-basis dates, complete approved-change histories and a reusable outcome panel remain incomplete. Highway 427 final costs were under dispute at the audit date."
     }
   ]
 }
