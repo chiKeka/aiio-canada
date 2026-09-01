@@ -123,7 +123,7 @@ function DecisionSignalRail() {
     <div className="grid gap-px overflow-hidden rounded-[10px] border border-[#d8dcd7] bg-[#d8dcd7] sm:grid-cols-2 lg:col-span-2 lg:grid-cols-4" aria-label="Decision readiness signals">
       {signals.map((signal) => (
         <div className={`border-t-2 bg-white px-4 py-3 ${signal.tone}`} key={signal.label}>
-          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.11em] text-[#6a7b77]">{signal.label}</p>
+          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.11em] text-[#61736f]">{signal.label}</p>
           <div className="mt-1 flex items-baseline justify-between gap-3">
             <p className="text-sm font-semibold text-[#17343d]">{signal.value}</p>
             <p className="text-right text-[10px] text-[#697a76]">{signal.note}</p>

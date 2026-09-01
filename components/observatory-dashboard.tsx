@@ -8,10 +8,12 @@ import {
   ArrowRight,
   BookOpen,
   Building2,
+  CircleCheck,
   ChevronRight,
   Clock3,
   Database,
   GitBranch,
+  LockKeyhole,
   MapPin,
   ShieldCheck,
   Sparkles,
@@ -52,6 +54,31 @@ const researchLayers = [
     text: 'Test investment size, timing and composition without presenting scenarios as forecasts.',
   },
 ];
+
+const provincialCoverage = [
+  {
+    province: 'Alberta',
+    role: 'Published pilot',
+    layers: ['Pilot release', 'Pilot release', 'Pilot release', 'Observed screen'],
+  },
+  {
+    province: 'British Columbia',
+    role: 'Expansion intake',
+    layers: ['Source locked', 'Reference ready', 'Common signal', 'Source contract'],
+  },
+  {
+    province: 'Ontario',
+    role: 'Expansion intake',
+    layers: ['Source locked', 'Reference ready', 'Common signal', 'Source contract'],
+  },
+  {
+    province: 'Quebec',
+    role: 'Expansion intake',
+    layers: ['Source locked', 'Reference ready', 'Common signal', 'Source contract'],
+  },
+];
+
+const coverageColumns = ['Public projects', 'Cost reference', 'Trade labour', 'Power planning'];
 
 export function ObservatoryDashboard() {
   const [capex, setCapex] = useState(50);
@@ -279,6 +306,60 @@ export function ObservatoryDashboard() {
         </div>
       </section>
 
+      <section id="canada-coverage" className="border-y border-[#d7ddd8] bg-[#f0efe8]">
+        <div className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
+          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+            <div>
+              <p className="font-mono text-xs font-semibold uppercase tracking-[0.15em] text-[#28766d]">Canada expansion map</p>
+              <h2 className="mt-3 max-w-3xl text-3xl font-medium tracking-[-0.04em] text-[#0d2b36] sm:text-4xl">Coverage first. Comparison only when the quantities agree.</h2>
+            </div>
+            <p className="max-w-lg text-sm leading-6 text-[#5b6d69]">This matrix shows research readiness, not provincial performance. Expansion-source records remain outside Decision Mode until their validation and review gates pass.</p>
+          </div>
+
+          <div className="mt-9 overflow-hidden rounded-xl border border-[#cdd5d0] bg-[#fbfaf5] shadow-[0_16px_45px_rgba(21,55,55,.06)]">
+            <p className="border-b border-[#d8ddd8] bg-white px-4 py-3 font-mono text-[9px] uppercase tracking-[0.08em] text-[#687a75] sm:hidden">Swipe horizontally to inspect all evidence layers</p>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[820px] border-collapse text-left">
+                <caption className="sr-only">Research evidence coverage by province and evidence layer</caption>
+                <thead>
+                  <tr className="border-b border-[#d8ddd8] bg-[#e7ebe6] font-mono text-[10px] uppercase tracking-[0.1em] text-[#405652]">
+                    <th className="px-5 py-4 font-semibold" scope="col">Province</th>
+                    {coverageColumns.map((column) => <th className="px-4 py-4 font-semibold" key={column} scope="col">{column}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {provincialCoverage.map((row) => (
+                    <tr className="border-b border-[#e0e4df] last:border-0" key={row.province}>
+                      <th className="px-5 py-5" scope="row">
+                        <span className="block text-sm font-semibold text-[#153941]">{row.province}</span>
+                        <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.08em] text-[#536662]">{row.role}</span>
+                      </th>
+                      {row.layers.map((status, index) => <td className="px-4 py-5" key={`${row.province}-${coverageColumns[index]}`}><CoverageStatus status={status} /></td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-[#d8ddd8] bg-white px-5 py-4 font-mono text-[9px] uppercase tracking-[0.07em] text-[#60716d]">
+              <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-[#2f8f83]" /> Published pilot layer</span>
+              <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-[#6b8798]" /> Common national/provincial signal</span>
+              <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-[#d66b35]" /> Locked intake · review pending</span>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <article className="rounded-xl border border-[#bed3cb] bg-[#e5f1ed] p-5 sm:p-6">
+              <div className="flex items-center gap-2 text-[#17645d]"><CircleCheck className="size-4" /><h3 className="text-sm font-semibold">Comparable now</h3></div>
+              <p className="mt-3 text-sm leading-6 text-[#4f6964]">Coverage status, source vintage, within-publisher scenario spread, and like-for-like quantities with aligned units, periods and system boundaries.</p>
+            </article>
+            <article className="rounded-xl border border-[#dfb18f] bg-[#fff0e4] p-5 sm:p-6">
+              <div className="flex items-center gap-2 text-[#96502d]"><LockKeyhole className="size-4" /><h3 className="text-sm font-semibold">Held behind the gate</h3></div>
+              <p className="mt-3 text-sm leading-6 text-[#755d4f]">Ontario data-centre energy versus Quebec winter peak, B.C. supply actions as spare capacity, or any conversion of province-wide capex into a transmission build requirement.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <section id="evidence" className="border-y border-[#dae0db] bg-[#ebece6]">
         <div className="mx-auto grid max-w-[1440px] gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1fr_auto] lg:px-12">
           <div className="flex gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-[#1a6d66]"><BookOpen className="size-4" /></span><div><p className="text-lg font-medium text-[#14323d]">{releaseData.baseline.ai_project_pipeline.core_project_count} core data-centre records are in the current Alberta evidence view.</p><p className="mt-1 max-w-2xl text-sm leading-6 text-[#52645f]">Projects with reported values total ${(releaseData.baseline.ai_project_pipeline.known_core_capex_cad / 1_000_000_000).toFixed(2)}B, but these are announcements—not commitments or realized spend. The weekly digest feeds review, never the model automatically.</p></div></div>
@@ -312,4 +393,15 @@ function FlowNode({ active, eyebrow, icon: Icon, label }: { active?: boolean; ey
 
 function FlowArrow() {
   return <div className="flex items-center text-[#6fa99f]" aria-hidden="true"><span className="h-px w-2 bg-current sm:w-5" /><ChevronRight className="-ml-1 size-4" /></div>;
+}
+
+function CoverageStatus({ status }: { status: string }) {
+  const pilot = status === 'Pilot release' || status === 'Observed screen';
+  const common = status === 'Reference ready' || status === 'Common signal';
+  const tone = pilot
+    ? 'border-[#9bc7bd] bg-[#e5f2ee] text-[#17645d]'
+    : common
+      ? 'border-[#b6c8d0] bg-[#edf2f4] text-[#456574]'
+      : 'border-[#e0b18f] bg-[#fff0e4] text-[#96502d]';
+  return <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.06em] ${tone}`}><span className="size-1.5 rounded-full bg-current opacity-70" />{status}</span>;
 }

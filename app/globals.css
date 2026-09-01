@@ -164,7 +164,17 @@
 }
 
 .aiio-command-grid {
+  isolation: isolate;
+  position: relative;
   background-color: var(--aiio-midnight);
+}
+
+.aiio-command-grid::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: "";
   background-image:
     linear-gradient(rgba(87, 198, 192, 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(87, 198, 192, 0.045) 1px, transparent 1px);
