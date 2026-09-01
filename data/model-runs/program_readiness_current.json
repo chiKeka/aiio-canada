@@ -261,7 +261,7 @@
       "check_id": "research_surface_provenance",
       "evidence": [
         "public/data/research-surface.json",
-        "artifact_manifest_sha256=sha256:69a42763bd2a43444c5b74f78c99fe295f8f55d05f84384c6e710cb5f0b8d309",
+        "artifact_manifest_sha256=sha256:babfc60be426e26532aee5c5b62cd5741160222c34d85c6faf4138f0fe51e32e",
         "research/src/aiio/research_surface.py"
       ],
       "release_gate": true,
@@ -472,7 +472,7 @@
         "public/data/manifest.json"
       ],
       "release_gate": true,
-      "status": "blocked",
+      "status": "pending",
       "summary": "Publication is held; the live/public bundle remains on the frozen 0.6.0-dev basis."
     }
   ],
@@ -482,10 +482,10 @@
   "release_ready": false,
   "schema_version": "1.0.0",
   "status_counts": {
-    "blocked": 2,
+    "blocked": 1,
     "fail": 0,
     "pass": 31,
-    "pending": 3
+    "pending": 4
   },
   "structural_integrity": true
 }
