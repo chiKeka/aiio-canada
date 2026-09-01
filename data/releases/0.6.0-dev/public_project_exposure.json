@@ -527,13 +527,16 @@
     }
   ],
   "evidence_status": "observed_with_inferred_classification_and_annualization",
+  "excluded_ai_relevant_project_count": 22,
+  "exclusion_rule": "Exclude records classified by the upstream controlled AI-relevance taxonomy as core_data_centre or enabling_power so the scenario shock is not counted as an exposed public-delivery asset.",
   "geography_id": "PR_48",
   "limitations": [
     "Asset class and sponsor signals are controlled-vocabulary inferences; they are not legal ownership determinations.",
     "The Alberta Major Projects inventory has a publication threshold and is not a complete capital plan or procurement register.",
     "Reported costs are estimates, are not probability-weighted and may be missing. Missing costs remain null.",
     "Uniform annualization is a scheduling screen, not an expenditure forecast or a claim about construction curves.",
-    "Overlap identifies simultaneous delivery windows; it does not prove competition, delay or cost causation."
+    "Overlap identifies simultaneous delivery windows; it does not prove competition, delay or cost causation.",
+    "Core data-centre and classified enabling-power records are excluded by the declared AI-relevance rule; this screen is not an AI-project census."
   ],
   "model_id": "AIIO_AB_PUBLIC_PROJECT_EXPOSURE_0_1",
   "projects": [
