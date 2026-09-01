@@ -134,7 +134,7 @@ export function ExecutiveCockpit() {
 
             <div className="min-h-0">
               {view === 'outlook' ? (
-                <MonthlyEscalationOutlook calibration={monthlyCalibration as MonthlyEscalationCalibration} durationYears={duration} projectStart={startYear} />
+                <MonthlyEscalationOutlook assetOutcome={analysis.asset.outcome} calibration={monthlyCalibration as MonthlyEscalationCalibration} durationYears={duration} projectStart={startYear} />
               ) : view === 'cockpit' ? (
                 <CockpitView analysis={analysis} budgetMillions={budgetMillions} completeLabour={completeLabour} leadingMaterial={leadingMaterial} requestedGw={requestedGw} />
               ) : view === 'walkthrough' ? (
