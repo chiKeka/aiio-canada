@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.8.0-dev';
+const workbookBuildVersion = '0.9.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -167,6 +167,50 @@ const currentSourceRegistry = JSON.parse(
     'utf8',
   ),
 );
+const attributionReadiness = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'ai_attribution_identification_readiness_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const attributionContract = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model',
+      'ai_attribution_panel_contract_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const investmentControlReport = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'building_investment_controls_canada_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const investmentControlRows = parseCsv(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'processed',
+      'building_investment_controls_canada.csv',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -189,6 +233,8 @@ const powerEvidence = workbook.worksheets.add('Power Evidence');
 const costBaselineSheet = workbook.worksheets.add('Cost Baseline');
 const projectCost = workbook.worksheets.add('Project Cost Check');
 const canadaExpansion = workbook.worksheets.add('Canada Expansion');
+const attributionGate = workbook.worksheets.add('Attribution Gate');
+const investmentControls = workbook.worksheets.add('Investment Controls');
 const sources = workbook.worksheets.add('Sources');
 const checks = workbook.worksheets.add('Release Checks');
 
@@ -229,6 +275,8 @@ for (const sheet of [
   costBaselineSheet,
   projectCost,
   canadaExpansion,
+  attributionGate,
+  investmentControls,
   sources,
   checks,
 ]) {
@@ -255,6 +303,8 @@ buildPowerEvidence();
 buildCostBaseline();
 buildProjectCostCheck();
 buildCanadaExpansion();
+buildAttributionGate();
+buildInvestmentControls();
 buildSources();
 buildReleaseChecks();
 buildDashboard();
@@ -328,6 +378,24 @@ const inspectCanadaExpansion = await workbook.inspect({
 });
 console.log(inspectCanadaExpansion.ndjson);
 
+const inspectAttributionGate = await workbook.inspect({
+  kind: 'table',
+  range: 'Attribution Gate!A1:J48',
+  include: 'values,formulas',
+  tableMaxRows: 48,
+  tableMaxCols: 10,
+});
+console.log(inspectAttributionGate.ndjson);
+
+const inspectInvestmentControls = await workbook.inspect({
+  kind: 'table',
+  range: 'Investment Controls!A1:R18',
+  include: 'values,formulas',
+  tableMaxRows: 18,
+  tableMaxCols: 18,
+});
+console.log(inspectInvestmentControls.ndjson);
+
 const errors = await workbook.inspect({
   kind: 'match',
   searchTerm: '#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A',
@@ -337,7 +405,7 @@ const errors = await workbook.inspect({
 console.log(errors.ndjson);
 
 const previewRanges = {
-  'Read Me': 'A1:H45',
+  'Read Me': 'A1:H48',
   Dashboard: 'A1:L48',
   Assumptions: 'A1:K38',
   'Scenario Timeline': 'A1:H17',
@@ -356,8 +424,10 @@ const previewRanges = {
   'Cost Baseline': 'A1:P54',
   'Project Cost Check': 'A1:L38',
   'Canada Expansion': 'A1:J48',
-  Sources: 'A1:H17',
-  'Release Checks': 'A1:D42',
+  'Attribution Gate': 'A1:J48',
+  'Investment Controls': 'A1:R28',
+  Sources: 'A1:J30',
+  'Release Checks': 'A1:D45',
 };
 for (const [sheetName, range] of Object.entries(previewRanges)) {
   const preview = await workbook.render({
@@ -422,7 +492,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H37').values = [
+  readme.getRange('A18:H39').values = [
     [
       '1',
       'Dashboard',
@@ -605,8 +675,8 @@ function buildReadMe() {
     ],
     [
       '19',
-      'Sources',
-      'Open authoritative public URLs and check source vintages.',
+      'Attribution Gate',
+      'Inspect the preregistered treatment, outcome, control and diagnostic gates for an AI-attributable effect.',
       '',
       '',
       '',
@@ -615,6 +685,26 @@ function buildReadMe() {
     ],
     [
       '20',
+      'Investment Controls',
+      'Inspect the Canada-wide quarterly building-investment control panel and its source lineage.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '21',
+      'Sources',
+      'Open the current research source register, distinguish release sources and check source vintages.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '22',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -624,29 +714,29 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A37').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B37').format.font = { bold: true };
-  readme.getRange('C18:H37').merge(true);
-  readme.getRange('A39:H39').merge();
-  readme.getRange('A39').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A39:H39'), C.amber);
-  readme.getRange('A40:H40').merge();
-  readme.getRange('A40').values = [
+  readme.getRange('A18:A39').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B39').format.font = { bold: true };
+  readme.getRange('C18:H39').merge(true);
+  readme.getRange('A41:H41').merge();
+  readme.getRange('A41').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A41:H41'), C.amber);
+  readme.getRange('A42:H42').merge();
+  readme.getRange('A42').values = [
     [
-      'WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case and every AI-attributable cost or schedule increment remain unknown.',
+      'WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The attribution contract also lacks an authorizing realized AI-construction treatment plus reconciled public-project cost and schedule outcomes, so all AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.',
     ],
   ];
-  readme.getRange('A40:H40').format = {
+  readme.getRange('A42:H42').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A40').format.rowHeight = 96;
+  readme.getRange('A42').format.rowHeight = 112;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
-    45,
+    48,
   );
 }
 
@@ -2898,14 +2988,440 @@ function buildCanadaExpansion() {
   );
 }
 
+function buildAttributionGate() {
+  titleBand(
+    attributionGate,
+    'AI-attributable effect identification gate',
+    'Preregistered treatment, outcome, control and diagnostic requirements · research only',
+    'J',
+  );
+
+  attributionGate.getRange('A5:B5').values = [['Control', 'Current value']];
+  header(attributionGate.getRange('A5:B5'));
+  attributionGate.getRange('A6:B13').values = [
+    ['Contract ID', attributionReadiness.contract_id],
+    ['Estimand ID', attributionReadiness.estimand_id],
+    ['Analysis status', attributionReadiness.analysis_status],
+    [
+      'AI-attributable increment authorized',
+      attributionReadiness.publication_authorization
+        .ai_attributable_increment_authorized
+        ? 'YES'
+        : 'NO',
+    ],
+    [
+      'Cost escalation (CAD)',
+      attributionReadiness.publication_authorization.cost_escalation_cad,
+    ],
+    [
+      'Cost escalation (%)',
+      attributionReadiness.publication_authorization.cost_escalation_percent,
+    ],
+    [
+      'Schedule delay (days)',
+      attributionReadiness.publication_authorization.schedule_delay_days,
+    ],
+    [
+      'Publication status',
+      attributionReadiness.publication_authorization.status,
+    ],
+  ];
+  attributionGate.getRange('A6:A13').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  attributionGate.getRange('B6:B13').format = {
+    fill: C.white,
+    font: { color: C.ink },
+    borders: { preset: 'inside', style: 'thin', color: C.line },
+  };
+  attributionGate.getRange('B9:B13').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  attributionGate.getRange('B10').format.numberFormat = '$#,##0';
+  attributionGate.getRange('B11').format.numberFormat = '0.0%';
+  attributionGate.getRange('B12').format.numberFormat = '#,##0';
+
+  attributionGate.getRange('D5:J5').merge();
+  attributionGate.getRange('D5').values = [['Publication boundary']];
+  sectionHeader(attributionGate.getRange('D5:J5'), C.amber);
+  attributionGate.getRange('D6:J13').merge();
+  attributionGate.getRange('D6').values = [
+    [
+      `${attributionReadiness.publication_authorization.reason} Announced capex, requested connection load, demand forecasts, scenario capex and graph pressure scores are prohibited as authorizing treatment measures. The graph remains a mechanism and bottleneck map; it does not supply the counterfactual or identify the treatment effect.`,
+    ],
+  ];
+  attributionGate.getRange('D6:J13').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  attributionGate.getRange('A16:F16').values = [
+    [
+      'Domain',
+      'Role',
+      'Status',
+      'Available variables',
+      'Missing variables',
+      'Registry-bound source IDs',
+    ],
+  ];
+  header(attributionGate.getRange('A16:F16'));
+  const domainRows = attributionReadiness.domain_status.map((domain) => [
+    labelize(domain.domain_id),
+    labelize(domain.role),
+    domain.status,
+    domain.available_variables.map(labelize).join('; '),
+    domain.missing_variables.map(labelize).join('; '),
+    domain.source_ids.join('; '),
+  ]);
+  attributionGate.getRange(`A17:F${16 + domainRows.length}`).values = domainRows;
+  attributionGate.getRange(`A17:F${16 + domainRows.length}`).format = {
+    font: { color: C.ink, size: 9 },
+    wrapText: true,
+    verticalAlignment: 'top',
+    borders: {
+      insideHorizontal: { style: 'thin', color: C.line },
+      bottom: { style: 'thin', color: C.line },
+    },
+  };
+  attributionGate.getRange(`A17:C${16 + domainRows.length}`).format.font = {
+    bold: true,
+    color: C.ink,
+    size: 9,
+  };
+  attributionGate
+    .getRange(`C17:C${16 + domainRows.length}`)
+    .conditionalFormats.add('containsText', {
+      text: 'available',
+      format: {
+        fill: C.tealLight,
+        font: { color: C.tealDark, bold: true },
+      },
+    });
+  attributionGate
+    .getRange(`C17:C${16 + domainRows.length}`)
+    .conditionalFormats.add('containsText', {
+      text: 'missing',
+      format: {
+        fill: C.amberLight,
+        font: { color: '#8A4826', bold: true },
+      },
+    });
+  attributionGate.getRange(`A17:F${16 + domainRows.length}`).format.rowHeight = 58;
+
+  attributionGate.getRange('A26:D26').values = [
+    ['Design requirement', 'Value', 'Required before estimation', 'Status'],
+  ];
+  header(attributionGate.getRange('A26:D26'));
+  attributionGate.getRange('A27:D34').values = [
+    [
+      'Primary estimator',
+      labelize(attributionReadiness.design.primary_estimator),
+      'Yes',
+      'locked',
+    ],
+    [
+      'Unit of analysis',
+      attributionContract.unit_of_analysis,
+      'Yes',
+      'locked',
+    ],
+    ['Frequency', attributionContract.frequency, 'Yes', 'locked'],
+    [
+      'Anticipation periods',
+      attributionReadiness.design.anticipation_periods,
+      'Yes',
+      'locked',
+    ],
+    [
+      'Minimum pre-treatment quarters',
+      attributionReadiness.design.minimum_pre_treatment_quarters,
+      'Yes',
+      'locked',
+    ],
+    [
+      'Minimum post-treatment quarters',
+      attributionReadiness.design.minimum_post_treatment_quarters,
+      'Yes',
+      'locked',
+    ],
+    [
+      'Minimum treated regions',
+      attributionReadiness.design.minimum_treated_regions,
+      'Yes',
+      'locked',
+    ],
+    [
+      'Minimum controls per cohort',
+      attributionReadiness.design.minimum_control_regions_per_cohort,
+      'Yes',
+      'locked',
+    ],
+  ];
+  attributionGate.getRange('A27:A34').format.font = { bold: true, color: C.ink };
+  attributionGate.getRange('B27:D34').format = {
+    fill: C.white,
+    font: { color: C.ink, size: 9 },
+    wrapText: true,
+    borders: { preset: 'inside', style: 'thin', color: C.line },
+  };
+
+  attributionGate.getRange('F26:H26').values = [
+    ['Readiness check', 'Status', 'Summary'],
+  ];
+  header(attributionGate.getRange('F26:H26'));
+  const readinessRows = attributionReadiness.readiness_checks.map((check) => [
+    labelize(check.check_id),
+    check.status,
+    check.summary,
+  ]);
+  attributionGate.getRange(`F27:H${26 + readinessRows.length}`).values =
+    readinessRows;
+  attributionGate.getRange(`F27:H${26 + readinessRows.length}`).format = {
+    font: { color: C.ink, size: 9 },
+    wrapText: true,
+    verticalAlignment: 'top',
+    borders: {
+      insideHorizontal: { style: 'thin', color: C.line },
+      bottom: { style: 'thin', color: C.line },
+    },
+  };
+  attributionGate.getRange(`F27:F${26 + readinessRows.length}`).format.font = {
+    bold: true,
+    color: C.ink,
+    size: 9,
+  };
+  attributionGate
+    .getRange(`G27:G${26 + readinessRows.length}`)
+    .conditionalFormats.add('containsText', {
+      text: 'pass',
+      format: {
+        fill: C.tealLight,
+        font: { color: C.tealDark, bold: true },
+      },
+    });
+  attributionGate
+    .getRange(`G27:G${26 + readinessRows.length}`)
+    .conditionalFormats.add('containsText', {
+      text: 'pending',
+      format: {
+        fill: C.amberLight,
+        font: { color: '#8A4826', bold: true },
+      },
+    });
+  attributionGate.getRange(`F27:H${26 + readinessRows.length}`).format.rowHeight =
+    44;
+
+  attributionGate.getRange('A40:J40').merge();
+  attributionGate.getRange('A40').values = [['Identification rule']];
+  sectionHeader(attributionGate.getRange('A40:J40'), C.amber);
+  attributionGate.getRange('A41:J46').merge();
+  attributionGate.getRange('A41').values = [
+    [
+      `Authorizing measures: ${attributionContract.treatment.authorizing_measures.map(labelize).join('; ')}. Research-only proxies: ${attributionContract.treatment.proxy_measures_research_only.map(labelize).join('; ')}. Prohibited as treatment: ${attributionContract.treatment.prohibited_as_treatment.map(labelize).join('; ')}. Effect publication remains withheld until the identifying panel, common support, pre-trend equivalence, placebo and negative-control tests, leave-one-out sensitivity and independent review all pass.`,
+    ],
+  ];
+  attributionGate.getRange('A41:J46').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  attributionGate.getRange('A48:J48').merge();
+  attributionGate.getRange('A48').values = [
+    [
+      `Contract hash: ${attributionReadiness.contract_sha256} · regional control output hash: ${investmentControlReport.output_sha256}`,
+    ],
+  ];
+  attributionGate.getRange('A48').format = {
+    font: { name: 'Aptos Mono', size: 8, color: C.muted },
+  };
+  attributionGate.freezePanes.freezeRows(4);
+  setWidths(
+    attributionGate,
+    {
+      A: 31,
+      B: 26,
+      C: 17,
+      D: 40,
+      E: 40,
+      F: 34,
+      G: 18,
+      H: 58,
+      I: 16,
+      J: 16,
+    },
+    48,
+  );
+}
+
+function buildInvestmentControls() {
+  titleBand(
+    investmentControls,
+    'Canada regional building-investment controls',
+    `Statistics Canada ${investmentControlReport.source_id} · quarterly control panel through ${investmentControlReport.as_of_date}`,
+    'R',
+  );
+
+  const summaryCards = [
+    ['A5:C5', 'A6:C6', 'Observations', investmentControlReport.observation_count],
+    ['D5:F5', 'D6:F6', 'Geographies', investmentControlReport.geography_count],
+    ['G5:I5', 'G6:I6', 'Quarters', investmentControlReport.quarter_count],
+    ['J5:L5', 'J6:L6', 'Latest period', investmentControlReport.as_of_date],
+    ['M5:O5', 'M6:O6', 'Source evidence', 'observed monthly'],
+    ['P5:R5', 'P6:R6', 'Panel evidence', 'inferred quarterly'],
+  ];
+  for (const [labelRange, valueRange, label, value] of summaryCards) {
+    investmentControls.getRange(labelRange).merge();
+    investmentControls.getRange(labelRange.split(':')[0]).values = [[label]];
+    investmentControls.getRange(labelRange).format = {
+      fill: C.tealLight,
+      font: { bold: true, color: C.tealDark, size: 9 },
+      horizontalAlignment: 'center',
+      verticalAlignment: 'center',
+      borders: { preset: 'outside', style: 'thin', color: '#B9CEC7' },
+    };
+    investmentControls.getRange(valueRange).merge();
+    investmentControls.getRange(valueRange.split(':')[0]).values = [[value]];
+    investmentControls.getRange(valueRange).format = {
+      fill: C.white,
+      font: { bold: true, color: C.ink, size: 14 },
+      horizontalAlignment: 'center',
+      verticalAlignment: 'center',
+      borders: { preset: 'outside', style: 'thin', color: '#B9CEC7' },
+    };
+  }
+  investmentControls.getRange('A6:I6').format.numberFormat = '#,##0';
+
+  investmentControls.getRange('A8:R8').merge();
+  investmentControls.getRange('A8').values = [
+    [
+      `REGIONAL CONTROL ONLY. ${investmentControlReport.publication_boundary.reason} Values are sums of three contiguous observed monthly values; incomplete quarters remain missing.`,
+    ],
+  ];
+  investmentControls.getRange('A8:R8').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+  investmentControls.getRange('A8').format.rowHeight = 42;
+
+  const headers = [
+    'observation_id',
+    'indicator_id',
+    'geography_label',
+    'statcan_dguid',
+    'type_of_structure',
+    'investment_basis',
+    'value',
+    'unit',
+    'geography_id',
+    'period_start',
+    'period_end',
+    'source_id',
+    'source_evidence_status',
+    'evidence_status',
+    'transformation_id',
+    'source_month_count',
+    'quality_flags',
+    'source_url',
+  ];
+  investmentControls.getRange('A10:R10').values = [headers];
+  header(investmentControls.getRange('A10:R10'));
+  const sourceUrl = currentSourceRegistry.sources.find(
+    (source) => source.source_id === investmentControlReport.source_id,
+  )?.canonical_url;
+  const rows = investmentControlRows.map((row) => [
+    row.observation_id,
+    row.indicator_id,
+    row.geography_label,
+    row.statcan_dguid,
+    row.type_of_structure,
+    row.investment_basis,
+    numberOrNull(row.value),
+    row.unit,
+    row.geography_id,
+    new Date(`${row.period_start}T00:00:00Z`),
+    new Date(`${row.period_end}T00:00:00Z`),
+    row.source_id,
+    row.source_evidence_status,
+    row.evidence_status,
+    row.transformation_id,
+    numberOrNull(row.source_month_count),
+    row.quality_flags,
+    sourceUrl ?? '',
+  ]);
+  const lastRow = 10 + rows.length;
+  investmentControls.getRange(`A11:R${lastRow}`).values = rows;
+  investmentControls.getRange(`G11:G${lastRow}`).format.numberFormat = '$#,##0';
+  investmentControls.getRange(`J11:K${lastRow}`).format.numberFormat =
+    'yyyy-mm-dd';
+  investmentControls.getRange(`P11:P${lastRow}`).format.numberFormat = '#,##0';
+  investmentControls.getRange(`A11:B${lastRow}`).format.font = {
+    name: 'Aptos Mono',
+    size: 8,
+    color: C.ink,
+  };
+  investmentControls.getRange(`L11:O${lastRow}`).format.font = {
+    name: 'Aptos Mono',
+    size: 8,
+    color: C.tealDark,
+  };
+  investmentControls.getRange(`R11:R${lastRow}`).format.font = {
+    size: 8,
+    color: C.blueInput,
+  };
+  const table = investmentControls.tables.add(
+    `A10:R${lastRow}`,
+    true,
+    'InvestmentControlsTable',
+  );
+  table.style = 'TableStyleMedium2';
+  investmentControls.freezePanes.freezeRows(10);
+  investmentControls.freezePanes.freezeColumns(3);
+  const widths = {
+    A: 27,
+    B: 48,
+    C: 40,
+    D: 17,
+    E: 38,
+    F: 36,
+    G: 17,
+    H: 20,
+    I: 16,
+    J: 15,
+    K: 15,
+    L: 24,
+    M: 22,
+    N: 18,
+    O: 39,
+    P: 18,
+    Q: 30,
+    R: 48,
+  };
+  for (const [column, width] of Object.entries(widths)) {
+    investmentControls.getRange(`${column}1:${column}${lastRow}`).format.columnWidth =
+      width;
+  }
+}
+
 function buildSources() {
   titleBand(
     sources,
-    'Public source register',
-    `Authoritative and candidate sources included in release ${release.manifest.version}`,
-    'H',
+    'Current research source register',
+    `All ${currentSourceRegistry.sources.length} registry sources · public release membership shown separately`,
+    'J',
   );
-  sources.getRange('A4:H4').values = [
+  sources.getRange('A4:J4').values = [
     [
       'Source ID',
       'Title',
@@ -2913,13 +3429,19 @@ function buildSources() {
       'Domain',
       'Geography',
       'As-of date',
-      'Status',
+      'Registry status',
+      'Evidence status',
+      `In release ${release.manifest.version}`,
       'Canonical URL',
     ],
   ];
-  header(sources.getRange('A4:H4'));
-  sources.getRange(`A5:H${4 + release.sources.length}`).values =
-    release.sources.map((item) => [
+  header(sources.getRange('A4:J4'));
+  const releaseSourceIds = new Set(
+    release.sources.map((source) => source.source_id),
+  );
+  const sourceLastRow = 4 + currentSourceRegistry.sources.length;
+  sources.getRange(`A5:J${sourceLastRow}`).values =
+    currentSourceRegistry.sources.map((item) => [
       item.source_id,
       item.title,
       item.publisher,
@@ -2927,12 +3449,33 @@ function buildSources() {
       item.geography,
       new Date(`${item.as_of_date}T00:00:00Z`),
       item.status,
+      item.evidence_status,
+      releaseSourceIds.has(item.source_id) ? 'YES' : 'NO',
       item.canonical_url,
     ]);
-  sources.getRange(`F5:F${4 + release.sources.length}`).format.numberFormat =
-    'yyyy-mm-dd';
+  sources.getRange(`F5:F${sourceLastRow}`).format.numberFormat = 'yyyy-mm-dd';
+  sources.getRange(`I5:I${sourceLastRow}`).conditionalFormats.add(
+    'containsText',
+    {
+      text: 'YES',
+      format: {
+        fill: C.tealLight,
+        font: { color: C.tealDark, bold: true },
+      },
+    },
+  );
+  sources.getRange(`I5:I${sourceLastRow}`).conditionalFormats.add(
+    'containsText',
+    {
+      text: 'NO',
+      format: {
+        fill: C.soft,
+        font: { color: C.muted, bold: true },
+      },
+    },
+  );
   const table = sources.tables.add(
-    `A4:H${4 + release.sources.length}`,
+    `A4:J${sourceLastRow}`,
     true,
     'SourceRegisterTable',
   );
@@ -2941,8 +3484,19 @@ function buildSources() {
   sources.freezePanes.freezeColumns(1);
   setWidths(
     sources,
-    { A: 29, B: 47, C: 25, D: 28, E: 34, F: 14, G: 13, H: 48 },
-    16,
+    {
+      A: 31,
+      B: 48,
+      C: 26,
+      D: 28,
+      E: 42,
+      F: 14,
+      G: 16,
+      H: 17,
+      I: 18,
+      J: 48,
+    },
+    sourceLastRow,
   );
 }
 
@@ -2994,8 +3548,10 @@ function buildReleaseChecks() {
     ['Provincial BCPI projections remain unauthorized', 'PASS'],
     ['Provincial power profile remains unauthorized', 'PASS'],
     ['Weekly digest cannot change the model automatically', 'PASS'],
+    ['AI-attributable effect remains unauthorized and null', 'PASS'],
+    ['Regional investment-control panel reconciles to artifact', 'PASS'],
   ];
-  checks.getRange('A16:C36').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C38').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -3108,22 +3664,33 @@ function buildReleaseChecks() {
   checks.getRange('B36').formulas = [
     ['=IF(\'Canada Expansion\'!B20="NO","PASS","FAIL")'],
   ];
-  checks.getRange('B16:B36').conditionalFormats.add('containsText', {
+  checks.getRange('B37').formulas = [
+    [
+      '=IF(AND(\'Attribution Gate\'!B9="NO",\'Attribution Gate\'!B10="",\'Attribution Gate\'!B11="",\'Attribution Gate\'!B12=""),"PASS","FAIL")',
+    ],
+  ];
+  const investmentControlLastRow = 10 + investmentControlRows.length;
+  checks.getRange('B38').formulas = [
+    [
+      `=IF(AND(ROWS('Investment Controls'!$A$11:$A$${investmentControlLastRow})=${investmentControlReport.observation_count},COUNTIF('Investment Controls'!$M$11:$M$${investmentControlLastRow},"observed")=${investmentControlReport.observation_count},COUNTIF('Investment Controls'!$N$11:$N$${investmentControlLastRow},"inferred")=${investmentControlReport.observation_count}),"PASS","FAIL")`,
+    ],
+  ];
+  checks.getRange('B16:B38').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B36').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B38').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
   checks.getRange('A39:D41').merge();
   checks.getRange('A39').values = [
     [
-      'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, or if a cost output appears while a required validation or independent-review gate is withheld.',
+      'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
   noteBlock(checks.getRange('A39:D41'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 42);
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 45);
 }
 
 function buildDashboard() {
