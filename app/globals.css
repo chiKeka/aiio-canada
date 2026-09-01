@@ -267,6 +267,29 @@
   background-size: 48px 48px;
 }
 
+.cockpit-aurora {
+  background:
+    radial-gradient(circle at 72% 18%, rgba(57, 164, 157, 0.18), transparent 32%),
+    radial-gradient(circle at 15% 88%, rgba(214, 107, 53, 0.12), transparent 34%),
+    linear-gradient(145deg, #071c25 0%, #092630 48%, #071b24 100%);
+}
+
+.cockpit-aurora::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(121, 207, 196, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(121, 207, 196, 0.12) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.cockpit-orbit {
+  box-shadow: 0 0 80px rgba(79, 197, 182, 0.06) inset;
+}
+
 .scenario-range {
   appearance: none;
   height: 5px;

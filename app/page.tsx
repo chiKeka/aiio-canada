@@ -1,5 +1,5 @@
-import { DecisionWorkbench } from '@/components/decision-workbench';
+import { ExecutiveCockpit } from '@/components/executive-cockpit';
 
 export default function Home() {
-  return <DecisionWorkbench />;
+  return <ExecutiveCockpit />;
 }
