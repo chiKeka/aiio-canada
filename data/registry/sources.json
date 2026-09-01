@@ -201,6 +201,24 @@
       "notes": "The document defines suivi_modifications as the presentation of changes authorized during the project lifecycle and their effective dates. Its own publication date is not encoded; the as-of date aligns it to the current dashboard resource used by AIIO."
     },
     {
+      "source_id": "QUEBEC_PQI_ARCHIVE_CATALOG",
+      "title": "Quebec infrastructure dashboard CKAN resource catalog",
+      "publisher": "Données Québec and Secrétariat du Conseil du trésor du Québec",
+      "canonical_url": "https://www.donneesquebec.ca/recherche/api/3/action/package_show?id=67d85a7a-10af-4af0-b4da-abc64cfd735a",
+      "retrieval_url": "https://www.donneesquebec.ca/recherche/api/3/action/package_show?id=67d85a7a-10af-4af0-b4da-abc64cfd735a",
+      "source_type": "catalog_metadata_json",
+      "domain": "public_project_outcomes",
+      "geography": "Quebec",
+      "as_of_date": "2026-08-24",
+      "last_verified": "2026-09-01",
+      "licence_note": "Public CKAN catalog metadata for a CC BY 4.0 dataset; downstream files retain the source dataset attribution.",
+      "access_method": "api_json",
+      "update_frequency": "with each dashboard resource update",
+      "evidence_status": "observed",
+      "status": "active",
+      "notes": "The package catalog enumerates 69 official CSV dashboard vintages from 2020-05-19 through 2026-08-20 plus spreadsheet counterparts and the field dictionary. The source dataset states that the reporting threshold changed from $50 million to $20 million in November 2020."
+    },
+    {
       "source_id": "ALBERTA_MAJOR_PROJECTS_METHOD",
       "title": "Alberta Major Projects methodology",
       "publisher": "Government of Alberta",

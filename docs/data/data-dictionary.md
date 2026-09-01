@@ -197,6 +197,25 @@ calendar months. Source history text is not silently rewritten: every parsed
 event carries a SHA-256 trace. A failed chain remains visible but cannot populate
 the gated baseline/current comparison fields.
 
+## Quebec milestone vintages and parser review
+
+The milestone snapshot table requires `snapshot_date`, `vintage_index`,
+`threshold_regime`, stable `project_id`, source identifiers and labels,
+`asset_class`, observed stage and geography, current authorized cost, current
+completion month, source-history hash, evidence status and source ID.
+
+The lifecycle table requires first/last observed snapshots, milestone count,
+latest-presence flag, pre/post-threshold flags, interval-disappearance and
+reentry counts, adjacent-pair change diagnostics, a binary `presence_pattern`,
+source ID and quality flags. Disappearance and reentry are observations across
+the selected milestones, not inferred completion, cancellation or restart.
+
+The parser-review CSV requires a deterministic `sample_id`, selection reasons,
+source row locator, source file and history hashes, verbatim public history text,
+parsed summary fields and event JSON, plus blank reviewer identity, date, status,
+notes and reviewed-value fields. Blank reviewer fields are a release invariant
+until a documented independent review is completed.
+
 ## Conventions
 
 - Currency is CAD and carries a price year.

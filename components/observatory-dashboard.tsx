@@ -38,6 +38,8 @@ import procurementOutcomeFeasibility from '@/data/model-runs/canadabuys_construc
 import edmontonPermitProxy from '@/data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json';
 import auditedProjectOutcomes from '@/data/model-runs/oago_audited_project_outcomes_v0.1.json';
 import quebecProjectRevisions from '@/data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json';
+import quebecLongitudinal from '@/data/model-runs/quebec_pqi_milestone_longitudinal_v0.1.json';
+import quebecParserReview from '@/data/model-runs/quebec_pqi_parser_review_package_v0.1.json';
 import { ModeToggle } from '@/components/mode-toggle';
 import { boundedDisplayScore } from '@/lib/decision-analysis';
 
@@ -431,14 +433,15 @@ export function ObservatoryDashboard() {
 
           <div className="mt-5 grid gap-5 rounded-xl border border-[#9fb9c5] bg-[#eaf1f4] p-5 lg:grid-cols-[minmax(0,.9fr)_minmax(520px,1.1fr)] lg:items-center sm:p-6">
             <div>
-              <div className="flex items-center gap-2 text-[#365d6d]"><GitBranch className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Quebec authorized revision panel · candidate</p></div>
-              <p className="mt-2 text-sm leading-6 text-[#526b76]">The official lifecycle history now yields chain-reconciled authorized cost and completion-month revisions under stable publisher project IDs. It is a research candidate, not a final-outturn reference class or an AI effect.</p>
+              <div className="flex items-center gap-2 text-[#365d6d]"><GitBranch className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Quebec longitudinal + revision panel · candidate</p></div>
+              <p className="mt-2 text-sm leading-6 text-[#526b76]">Ten threshold-aware milestones reveal how much a current dashboard omits, while the latest lifecycle history yields chain-reconciled authorized revisions. A {quebecParserReview.sample_project_count}-project stratified review packet is prepared; independent review is still pending.</p>
             </div>
-            <dl className="grid grid-cols-2 gap-5 border-t border-[#bdced5] pt-5 sm:grid-cols-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-              <ContractMetric label="Stable project IDs" value={quebecProjectRevisions.coverage_summary.stable_lifecycle_project_id_count.toLocaleString('en-CA')} />
+            <dl className="grid grid-cols-2 gap-5 border-t border-[#bdced5] pt-5 sm:grid-cols-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+              <ContractMetric label="Milestone vintages" value={quebecLongitudinal.vintage_count.toString()} />
+              <ContractMetric label="Unique projects" value={quebecLongitudinal.unique_project_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Absent from latest" value={quebecLongitudinal.absent_from_latest_project_count.toLocaleString('en-CA')} />
               <ContractMetric label="Cost chains" value={quebecProjectRevisions.coverage_summary.cost_revision_chain_reconciled_project_count.toLocaleString('en-CA')} />
               <ContractMetric label="Schedule chains" value={quebecProjectRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count.toLocaleString('en-CA')} />
-              <ContractMetric label="Joint chains" value={quebecProjectRevisions.coverage_summary.joint_reconciled_revision_project_count.toLocaleString('en-CA')} />
             </dl>
           </div>
 

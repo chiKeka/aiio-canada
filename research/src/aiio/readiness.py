@@ -391,6 +391,92 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    quebec_vintage_contract_path = (
+        root / "data/model/quebec_pqi_milestone_vintage_contract_v0.1.json"
+    )
+    quebec_longitudinal_report_path = (
+        root / "data/model-runs/quebec_pqi_milestone_longitudinal_v0.1.json"
+    )
+    quebec_snapshot_path = (
+        root / "data/processed/quebec_pqi_milestone_project_vintages.csv"
+    )
+    quebec_lifecycle_path = (
+        root / "data/processed/quebec_pqi_milestone_project_lifecycles.csv"
+    )
+    quebec_review_package_path = (
+        root / "data/model-runs/quebec_pqi_parser_review_package_v0.1.json"
+    )
+    quebec_review_path = (
+        root / "data/reviews/quebec_pqi_parser_review_sample_v0.1.csv"
+    )
+    quebec_vintage_contract = load_json_or_empty(quebec_vintage_contract_path)
+    quebec_longitudinal = load_json_or_empty(quebec_longitudinal_report_path)
+    quebec_review = load_json_or_empty(quebec_review_package_path)
+    quebec_snapshot_rows = csv_row_count(quebec_snapshot_path)
+    quebec_lifecycle_rows = csv_row_count(quebec_lifecycle_path)
+    quebec_review_rows = csv_row_count(quebec_review_path)
+    quebec_longitudinal_ready = (
+        quebec_vintage_contract_path.exists()
+        and quebec_longitudinal_report_path.exists()
+        and quebec_snapshot_path.exists()
+        and quebec_lifecycle_path.exists()
+        and quebec_review_package_path.exists()
+        and quebec_review_path.exists()
+        and quebec_vintage_contract.get("selected_vintage_count") == 10
+        and quebec_vintage_contract.get("catalog_csv_resource_count") == 69
+        and quebec_vintage_contract.get("selection_rule", {}).get(
+            "complete_monthly_panel"
+        )
+        is False
+        and quebec_longitudinal.get("snapshot_observation_count")
+        == quebec_snapshot_rows
+        and quebec_longitudinal.get("unique_project_count")
+        == quebec_lifecycle_rows
+        and quebec_longitudinal.get("outputs", {}).get("snapshot_csv_sha256")
+        == sha256_file(quebec_snapshot_path)
+        and quebec_longitudinal.get("outputs", {}).get("lifecycle_csv_sha256")
+        == sha256_file(quebec_lifecycle_path)
+        and quebec_longitudinal.get("publication_boundary", {}).get(
+            "complete_longitudinal_panel_authorized"
+        )
+        is False
+        and quebec_longitudinal.get("publication_boundary", {}).get(
+            "project_exit_outcome_authorized"
+        )
+        is False
+        and quebec_review.get("sample_project_count") == quebec_review_rows
+        and quebec_review.get("review_output", {}).get("content_hash")
+        == sha256_file(quebec_review_path)
+        and quebec_review.get("publication_boundary", {}).get(
+            "independent_parser_review_complete"
+        )
+        is False
+        and quebec_review.get("publication_boundary", {}).get(
+            "parser_authorized_for_decision_use"
+        )
+        is False
+    )
+    record(
+        "quebec_milestone_longitudinal_panel",
+        "evidence_pipeline",
+        PASS if quebec_longitudinal_ready else FAIL,
+        (
+            "The Quebec archive selection, milestone lifecycle diagnostics and stratified parser-review package reproduce and remain explicitly non-authorizing."
+            if quebec_longitudinal_ready
+            else "The Quebec longitudinal or parser-review artifact is missing, unreconciled or has an unsafe publication boundary."
+        ),
+        [
+            "data/model/quebec_pqi_milestone_vintage_contract_v0.1.json",
+            "data/model-runs/quebec_pqi_milestone_longitudinal_v0.1.json",
+            "data/processed/quebec_pqi_milestone_project_vintages.csv",
+            "data/processed/quebec_pqi_milestone_project_lifecycles.csv",
+            "data/model-runs/quebec_pqi_parser_review_package_v0.1.json",
+            "data/reviews/quebec_pqi_parser_review_sample_v0.1.csv",
+            "docs/methodology/quebec-milestone-longitudinal-panel.md",
+        ],
+        release_gate=True,
+    )
+
     digest_status, digest_summary, digest_evidence = audit_digest_artifacts(
         root, as_of_date=as_of_date
     )

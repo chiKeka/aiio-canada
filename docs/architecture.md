@@ -67,8 +67,11 @@ protocol is documented in
 The Quebec project-dashboard intake adds a source-faithful candidate panel of
 authorized cost and completion-month revisions. Stable publisher lifecycle IDs,
 field-dictionary anchors, event arithmetic and revision-chain endpoints are
-hash-checked before a record can enter the panel. Authorized revisions are not
-final outturns, and the current single-province snapshot cannot supply a causal
+hash-checked before a record can enter the panel. A separate archive module
+inventories all 69 official CSV resources, retrieves ten threshold-aware
+milestones and exposes survivor-selection diagnostics without assigning exit
+causes. A deterministic 57-project review packet carries exact source text and
+blank reviewer fields. None of these artifacts supplies final outturns, a causal
 AI effect or a transferable Alberta cost factor.
 
 ### 5. Graph model
@@ -100,8 +103,9 @@ All outputs read an immutable release manifest containing input hashes, code ver
 3. Labour geography/NOC coverage, missingness, zero-filler and cross-vintage formula checks.
 4. Material-series coverage and aligned-period checks.
 5. Public-project classification, schedule-missingness and cost-allocation checks.
-6. Quebec field-dictionary anchors, lifecycle-ID uniqueness, revision arithmetic,
-   endpoint reconciliation and fail-closed publication checks.
+6. Quebec field-dictionary anchors, lifecycle-ID uniqueness, archive selection,
+   vintage hashes, revision arithmetic, endpoint reconciliation, parser-review
+   state and fail-closed publication checks.
 7. Power source-hash, requested-load ordering and Phase 1 reconciliation checks.
 8. Graph DAG, self-loop, validity, retention and edge-metadata checks.
 9. Scenario identity, sign, lag, mass-bound, additivity, sensitivity, deterministic and golden-run tests.

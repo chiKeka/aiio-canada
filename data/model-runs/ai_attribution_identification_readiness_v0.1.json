@@ -18,7 +18,7 @@
     "STATCAN_JVWS_14100444"
   ],
   "contract_id": "AIIO_E2_ATTRIBUTION_PANEL_CONTRACT_0_1",
-  "contract_sha256": "sha256:21954c3bf967f41a0f3e21effe8b82af1a7083eb9b5f6de1da4d4db9520e0749",
+  "contract_sha256": "sha256:fc8dbf87733f4fd2c6f49038a9e2e636d4363f38167c9996921f6d76ca8198b1",
   "design": {
     "aggregation": "event_time_and_exposure_cohort",
     "anticipation_periods": 2,
@@ -75,10 +75,12 @@
         "authorized_cost_revision_effective_month",
         "baseline_and_current_authorized_cost_cad_for_reconciled_chains",
         "authorized_cost_variance_cad_and_fraction",
-        "common_inferred_public_asset_class"
+        "common_inferred_public_asset_class",
+        "threshold_aware_milestone_presence_pattern",
+        "interval_disappearance_and_reentry_diagnostics"
       ],
       "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",
-      "limitation": "The federal feasibility intake still cannot reconcile a common estimate-to-outturn outcome. The Ontario Auditor General source adds two named audited references. The Quebec dashboard now supplies stable lifecycle IDs and 141 parser-reconciled authorized-cost revision chains across common inferred asset classes, but these are authorized parameters rather than final outturns, omit estimate price-basis dates, come from one current-vintage survivor snapshot and remain pending independent parser review.",
+      "limitation": "The federal feasibility intake still cannot reconcile a common estimate-to-outturn outcome. The Ontario Auditor General source adds two named audited references. The Quebec dashboard supplies stable lifecycle IDs, 141 parser-reconciled authorized-cost revision chains and a threshold-aware 10-vintage milestone panel that exposes survivor selection, but the milestones are not the complete 69-vintage archive, exit causes are unknown, authorized parameters are not final outturns, estimate price-basis dates are absent and independent parser review remains pending.",
       "missing_variables": [
         "independent_estimate_with_price_basis",
         "complete_approved_change_history",
@@ -113,10 +115,12 @@
         "authorized_completion_revision_effective_month",
         "baseline_and_current_completion_month_for_reconciled_chains",
         "authorized_schedule_change_months",
-        "fiscal_year_completion_marker"
+        "fiscal_year_completion_marker",
+        "threshold_aware_milestone_presence_pattern",
+        "interval_disappearance_and_reentry_diagnostics"
       ],
       "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
-      "limitation": "Tender timing and procurement-instrument start/end dates are not physical schedule outcomes. The Ontario audit adds two named planned-to-actual substantial-completion references. The Quebec dashboard adds 168 parser-reconciled month-precision authorized completion-revision chains and 87 fiscal-year completion markers, but does not supply exact baseline/actual start and completion dates, a multi-region panel or independent parser review.",
+      "limitation": "Tender timing and procurement-instrument start/end dates are not physical schedule outcomes. The Ontario audit adds two named planned-to-actual substantial-completion references. The Quebec dashboard adds 168 parser-reconciled month-precision authorized completion-revision chains, 87 fiscal-year completion markers and a 10-vintage presence panel, but disappearance does not identify completion, exact baseline/actual start and completion dates remain unavailable, and there is no complete monthly, multi-region or independently reviewed outcome panel.",
       "missing_variables": [
         "baseline_start_date_and_vintage",
         "baseline_completion_date_and_vintage",
@@ -308,10 +312,10 @@
       "summary": "Review cannot authorize an effect until the evidence and identification gates produce an eligible model package."
     }
   ],
-  "registered_source_count": 30,
+  "registered_source_count": 31,
   "run_id": "AIIO_E2_IDENTIFICATION_READINESS_0_1",
   "schema_version": "1.0.0",
-  "source_registry_sha256": "sha256:21b63d1796701c6b845b6d8c61188563f07068a25099a53b422626ba65079bd2",
+  "source_registry_sha256": "sha256:99dd8d84bf3bde702c76d83affa0fb5a16dcaa5b91538cafe553968d11499046",
   "treatment_contract": {
     "authorizing_measures": [
       "realized_construction_spend_cad",

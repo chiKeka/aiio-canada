@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
 const threadId = '01a0579f-936b-77b3-93e5-be6035628b16';
 const outputDir = path.join(projectRoot, 'outputs', threadId);
 const previewDir = path.join(projectRoot, 'workbook-work', 'previews');
-const workbookBuildVersion = '0.13.0-dev';
+const workbookBuildVersion = '0.14.0-dev';
 
 const release = JSON.parse(
   await fs.readFile(
@@ -288,6 +288,50 @@ const quebecRevisionRows = parseCsv(
     'utf8',
   ),
 );
+const quebecVintageContract = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model',
+      'quebec_pqi_milestone_vintage_contract_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const quebecLongitudinal = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'quebec_pqi_milestone_longitudinal_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
+const quebecLifecycleRows = parseCsv(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'processed',
+      'quebec_pqi_milestone_project_lifecycles.csv',
+    ),
+    'utf8',
+  ),
+);
+const quebecParserReview = JSON.parse(
+  await fs.readFile(
+    path.join(
+      projectRoot,
+      'data',
+      'model-runs',
+      'quebec_pqi_parser_review_package_v0.1.json',
+    ),
+    'utf8',
+  ),
+);
 const labourPressure = release.labour_pressure;
 
 const workbook = Workbook.create();
@@ -316,6 +360,7 @@ const procurementIntake = workbook.worksheets.add('Procurement Intake');
 const permitProxy = workbook.worksheets.add('Permit Proxy');
 const auditedOutcomeSheet = workbook.worksheets.add('Audited Outcomes');
 const quebecRevisionSheet = workbook.worksheets.add('Quebec Revisions');
+const quebecVintageSheet = workbook.worksheets.add('Quebec Vintages');
 const sources = workbook.worksheets.add('Sources');
 const checks = workbook.worksheets.add('Release Checks');
 
@@ -362,6 +407,7 @@ for (const sheet of [
   permitProxy,
   auditedOutcomeSheet,
   quebecRevisionSheet,
+  quebecVintageSheet,
   sources,
   checks,
 ]) {
@@ -394,6 +440,7 @@ buildProcurementIntake();
 buildPermitProxy();
 buildAuditedOutcomes();
 buildQuebecRevisions();
+buildQuebecVintages();
 buildSources();
 buildReleaseChecks();
 buildDashboard();
@@ -521,6 +568,15 @@ const inspectQuebecRevisions = await workbook.inspect({
 });
 console.log(inspectQuebecRevisions.ndjson);
 
+const inspectQuebecVintages = await workbook.inspect({
+  kind: 'table',
+  range: 'Quebec Vintages!A1:O42',
+  include: 'values,formulas',
+  tableMaxRows: 42,
+  tableMaxCols: 15,
+});
+console.log(inspectQuebecVintages.ndjson);
+
 const errors = await workbook.inspect({
   kind: 'match',
   searchTerm: '#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A',
@@ -555,6 +611,7 @@ const previewRanges = {
   'Permit Proxy': 'A1:M42',
   'Audited Outcomes': 'A1:O46',
   'Quebec Revisions': 'A1:R38',
+  'Quebec Vintages': 'A1:O42',
   Sources: 'A1:J34',
   'Release Checks': 'A1:D50',
 };
@@ -621,7 +678,7 @@ function buildReadMe() {
   readme.getRange('A17:H17').merge();
   readme.getRange('A17').values = [['How to use this workbook']];
   sectionHeader(readme.getRange('A17:H17'));
-  readme.getRange('A18:H43').values = [
+  readme.getRange('A18:H44').values = [
     [
       '1',
       'Dashboard',
@@ -864,6 +921,16 @@ function buildReadMe() {
     ],
     [
       '25',
+      'Quebec Vintages',
+      'Inspect threshold-aware archive milestones, survivor-selection diagnostics and pending parser-review status.',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ],
+    [
+      '26',
       'Sources',
       'Open the current research source register, distinguish release sources and check source vintages.',
       '',
@@ -873,7 +940,7 @@ function buildReadMe() {
       '',
     ],
     [
-      '26',
+      '27',
       'Release Checks',
       'Confirm formula reconciliations and manifest identity.',
       '',
@@ -883,29 +950,29 @@ function buildReadMe() {
       '',
     ],
   ];
-  readme.getRange('A18:A43').format.font = { bold: true, color: C.tealDark };
-  readme.getRange('B18:B43').format.font = { bold: true };
-  readme.getRange('C18:H43').merge(true);
-  readme.getRange('A45:H45').merge();
-  readme.getRange('A45').values = [['Interpretation boundary']];
-  sectionHeader(readme.getRange('A45:H45'), C.amber);
+  readme.getRange('A18:A44').format.font = { bold: true, color: C.tealDark };
+  readme.getRange('B18:B44').format.font = { bold: true };
+  readme.getRange('C18:H44').merge(true);
   readme.getRange('A46:H46').merge();
-  readme.getRange('A46').values = [
+  readme.getRange('A46').values = [['Interpretation boundary']];
+  sectionHeader(readme.getRange('A46:H46'), C.amber);
+  readme.getRange('A47:H47').merge();
+  readme.getRange('A47').values = [
     [
-      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains, but these are not final outturns, AI effects or Alberta transfer factors. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
+      `WITHHELD COST OUTPUTS + UNCALIBRATED STRUCTURAL DIAGNOSTIC. Only 1 of 40 asset/geography/horizon cost-baseline checks passes; every four- and five-year Alberta health and school reference projection is unavailable. No public project-cost result is authorized. The Edmonton screen finds ${permitProxyReport.data_centre_candidate_count} explicit data-centre permit candidates with ${permitProxyReport.explicit_ai_reference_count} explicit AI references and ${permitProxyReport.data_centre_candidate_occupancy_date_available_count} candidate occupancy dates; publisher-estimated permit values remain activity proxies, not AI capex or realized spend. Quebec supplies ${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} reconciled authorized-cost chains and ${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains. Its ${quebecLongitudinal.vintage_count} selected milestones contain ${quebecLongitudinal.unique_project_count} unique IDs, of which ${quebecLongitudinal.absent_from_latest_project_count} are absent from the latest snapshot; absence is not an exit outcome. The archive sample is incomplete and the ${quebecParserReview.sample_project_count}-project parser review is pending. All AI-attributable cost and delay fields remain null. Pressure scores are not findings, forecasts, probabilities or percentages. The graph is a mechanism layer and is not monetized. Additional transmission for the $50B case remains unknown.`,
     ],
   ];
-  readme.getRange('A46:H46').format = {
+  readme.getRange('A47:H47').format = {
     fill: C.amberLight,
     font: { color: '#7B4529' },
     wrapText: true,
     verticalAlignment: 'center',
   };
-  readme.getRange('A46').format.rowHeight = 138;
+  readme.getRange('A47').format.rowHeight = 156;
   setWidths(
     readme,
     { A: 12, B: 30, C: 26, D: 16, E: 16, F: 16, G: 16, H: 16 },
-    50,
+    51,
   );
 }
 
@@ -4513,6 +4580,257 @@ function buildQuebecRevisions() {
   );
 }
 
+function buildQuebecVintages() {
+  titleBand(
+    quebecVintageSheet,
+    'Quebec archive milestones and selection diagnostics',
+    '69 official CSV resources · 10 threshold-aware milestones · incomplete panel · exit causes unknown',
+    'O',
+  );
+
+  const boundary = quebecLongitudinal.publication_boundary;
+  quebecVintageSheet.getRange('A5:D5').values = [
+    ['Archive coverage', 'Count / status', 'Panel diagnostic', 'Count / status'],
+  ];
+  header(quebecVintageSheet.getRange('A5:D5'));
+  quebecVintageSheet.getRange('A6:D10').values = [
+    [
+      'Selected milestones',
+      quebecLongitudinal.vintage_count,
+      'Official CSV resources',
+      quebecVintageContract.catalog_csv_resource_count,
+    ],
+    [
+      'Unique stable project IDs',
+      quebecLongitudinal.unique_project_count,
+      'Snapshot-project observations',
+      quebecLongitudinal.snapshot_observation_count,
+    ],
+    [
+      'Present in latest snapshot',
+      quebecLongitudinal.present_in_latest_project_count,
+      'Absent from latest snapshot',
+      quebecLongitudinal.absent_from_latest_project_count,
+    ],
+    [
+      'Interval disappearance',
+      quebecLongitudinal.project_with_interval_disappearance_count,
+      'Milestone reentry',
+      quebecLongitudinal.project_with_milestone_reentry_count,
+    ],
+    [
+      'Complete panel authorized',
+      boundary.complete_longitudinal_panel_authorized ? 'YES' : 'NO',
+      'Independent parser review complete',
+      quebecParserReview.publication_boundary.independent_parser_review_complete
+        ? 'YES'
+        : 'NO',
+    ],
+  ];
+  quebecVintageSheet.getRange('A6:A10').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  quebecVintageSheet.getRange('C6:C10').format.font = {
+    bold: true,
+    color: C.ink,
+  };
+  quebecVintageSheet.getRange('B10:D10').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+    borders: { preset: 'inside', style: 'thin', color: '#E1B48E' },
+  };
+
+  quebecVintageSheet.getRange('F5:O5').merge();
+  quebecVintageSheet.getRange('F5').values = [['Interpretation boundary']];
+  sectionHeader(quebecVintageSheet.getRange('F5:O5'), C.amber);
+  quebecVintageSheet.getRange('F6:O10').merge();
+  quebecVintageSheet.getRange('F6').values = [
+    [
+      `${boundary.reason} A disappearance may reflect completion, cancellation, renaming, merger, threshold scope or another dashboard change. It is not an observed exit outcome. The ${quebecParserReview.sample_project_count}-project review packet is prepared, but reviewer fields remain blank and the parser is not authorized for decision use.`,
+    ],
+  ];
+  quebecVintageSheet.getRange('F6:O10').format = {
+    fill: C.amberLight,
+    font: { color: '#7B4529', size: 10 },
+    wrapText: true,
+    verticalAlignment: 'center',
+    borders: { preset: 'outside', style: 'thin', color: '#E1B48E' },
+  };
+
+  quebecVintageSheet.getRange('A13:H13').values = [
+    [
+      'Snapshot date',
+      'Threshold regime',
+      'Projects',
+      'Raw rows',
+      'Duplicates collapsed',
+      'Selection reasons',
+      'Resource ID',
+      'Content hash',
+    ],
+  ];
+  header(quebecVintageSheet.getRange('A13:H13'));
+  const vintageLastRow = 13 + quebecLongitudinal.vintages.length;
+  quebecVintageSheet.getRange(`A14:H${vintageLastRow}`).values =
+    quebecLongitudinal.vintages.map((vintage) => {
+      const contractVintage = quebecVintageContract.selected_vintages.find(
+        (item) => item.snapshot_date === vintage.snapshot_date,
+      );
+      return [
+        vintage.snapshot_date,
+        vintage.threshold_regime === 'cad_50m_and_over'
+          ? 'CAD 50M+'
+          : 'CAD 20M+',
+        vintage.project_count,
+        vintage.raw_row_count,
+        vintage.publisher_duplicate_rows_collapsed,
+        contractVintage?.selection_reasons.join(' | ') ?? '',
+        vintage.resource_id,
+        vintage.content_hash,
+      ];
+    });
+  quebecVintageSheet.getRange(`G14:H${vintageLastRow}`).format.font = {
+    name: 'Aptos Mono',
+    color: C.muted,
+    size: 8,
+  };
+  const vintageTable = quebecVintageSheet.tables.add(
+    `A13:H${vintageLastRow}`,
+    true,
+    'QuebecMilestoneVintagesTable',
+  );
+  vintageTable.style = 'TableStyleMedium2';
+
+  const transition = quebecLongitudinal.threshold_transition;
+  quebecVintageSheet.getRange('J13:O13').merge();
+  quebecVintageSheet.getRange('J13').values = [['November 2020 threshold transition']];
+  sectionHeader(quebecVintageSheet.getRange('J13:O13'));
+  quebecVintageSheet.getRange('J14:O18').values = [
+    ['Last pre-threshold snapshot', transition.last_pre_threshold_snapshot, '', 'First post-threshold snapshot', transition.first_post_threshold_snapshot, ''],
+    ['Pre-threshold projects', transition.last_pre_threshold_project_count, '', 'Post-threshold projects', transition.first_post_threshold_project_count, ''],
+    ['Continuing IDs', transition.continuing_project_count, '', 'Newly observed IDs', transition.newly_observed_project_count, ''],
+    ['No longer observed IDs', transition.no_longer_observed_project_count, '', 'Pure threshold cohort?', 'NO', ''],
+    ['Interpretation', transition.interpretation, '', '', '', ''],
+  ];
+  quebecVintageSheet.getRange('J14:J18').format.font = { bold: true, color: C.ink };
+  quebecVintageSheet.getRange('M14:M17').format.font = { bold: true, color: C.ink };
+  quebecVintageSheet.getRange('J18:O18').merge();
+  quebecVintageSheet.getRange('J18').values = [
+    [`Interpretation — ${transition.interpretation}`],
+  ];
+  quebecVintageSheet.getRange('J18:O18').format = {
+    fill: C.soft,
+    font: { color: C.muted, size: 9 },
+    wrapText: true,
+  };
+
+  quebecVintageSheet.getRange('J20:O20').merge();
+  quebecVintageSheet.getRange('J20').values = [['Parser review state']];
+  sectionHeader(quebecVintageSheet.getRange('J20:O20'), C.amber);
+  quebecVintageSheet.getRange('J21:O24').values = [
+    ['Package status', quebecParserReview.review_status, '', 'Selected projects', quebecParserReview.sample_project_count, ''],
+    ['Sampling fraction', quebecParserReview.sampling_fraction, '', 'Source projects', quebecParserReview.source_project_count, ''],
+    ['Independent review complete', 'NO', '', 'Parser decision-use authorized', 'NO', ''],
+    ['Review output hash', quebecParserReview.review_output.content_hash, '', '', '', ''],
+  ];
+  quebecVintageSheet.getRange('J21:J24').format.font = { bold: true, color: C.ink };
+  quebecVintageSheet.getRange('M21:M23').format.font = { bold: true, color: C.ink };
+  quebecVintageSheet.getRange('K22').format.numberFormat = '0.0%';
+  quebecVintageSheet.getRange('K23:N23').format = {
+    fill: C.amberLight,
+    font: { bold: true, color: '#8A4826' },
+  };
+  quebecVintageSheet.getRange('K24:O24').merge();
+  quebecVintageSheet.getRange('K24').format.font = {
+    name: 'Aptos Mono',
+    color: C.muted,
+    size: 8,
+  };
+
+  quebecVintageSheet.getRange('A27:O27').values = [
+    [
+      'Project ID',
+      'Latest project name',
+      'Asset class',
+      'First observed',
+      'Last observed',
+      'Milestones',
+      'In latest',
+      'Pre-threshold',
+      'Post-threshold',
+      'Disappearances',
+      'Reentries',
+      'Cost pairs changed',
+      'Completion pairs changed',
+      'Presence pattern',
+      'Quality flags',
+    ],
+  ];
+  header(quebecVintageSheet.getRange('A27:O27'));
+  const firstLifecycleRow = 28;
+  const lastLifecycleRow = firstLifecycleRow + quebecLifecycleRows.length - 1;
+  quebecVintageSheet.getRange(`A${firstLifecycleRow}:O${lastLifecycleRow}`).values =
+    quebecLifecycleRows.map((row) => [
+      row.project_id,
+      row.latest_project_name,
+      labelize(row.latest_asset_class),
+      row.first_observed_snapshot,
+      row.last_observed_snapshot,
+      numberOrNull(row.observed_milestone_count),
+      yesNo(row.present_in_latest_snapshot),
+      yesNo(row.observed_pre_threshold),
+      yesNo(row.observed_post_threshold),
+      numberOrNull(row.interval_disappearance_count),
+      numberOrNull(row.milestone_reentry_count),
+      numberOrNull(row.authorized_cost_change_pair_count),
+      numberOrNull(row.completion_month_change_pair_count),
+      row.presence_pattern,
+      row.quality_flags,
+    ]);
+  quebecVintageSheet.getRange(`G${firstLifecycleRow}:G${lastLifecycleRow}`).conditionalFormats.add(
+    'containsText',
+    {
+      text: 'NO',
+      format: { fill: C.amberLight, font: { color: '#8A4826' } },
+    },
+  );
+  quebecVintageSheet.getRange(`N${firstLifecycleRow}:O${lastLifecycleRow}`).format.font = {
+    name: 'Aptos Mono',
+    color: C.muted,
+    size: 8,
+  };
+  const lifecycleTable = quebecVintageSheet.tables.add(
+    `A27:O${lastLifecycleRow}`,
+    true,
+    'QuebecMilestoneProjectLifecyclesTable',
+  );
+  lifecycleTable.style = 'TableStyleMedium2';
+  quebecVintageSheet.freezePanes.freezeRows(27);
+  quebecVintageSheet.freezePanes.freezeColumns(2);
+  setWidths(
+    quebecVintageSheet,
+    {
+      A: 16,
+      B: 48,
+      C: 31,
+      D: 16,
+      E: 16,
+      F: 12,
+      G: 12,
+      H: 14,
+      I: 15,
+      J: 16,
+      K: 12,
+      L: 17,
+      M: 22,
+      N: 18,
+      O: 48,
+    },
+    lastLifecycleRow,
+  );
+}
+
 function buildSources() {
   titleBand(
     sources,
@@ -4653,8 +4971,9 @@ function buildReleaseChecks() {
     ['Edmonton permit proxy reconciles and remains non-authorizing', 'PASS'],
     ['Audited outcome references reconcile and remain non-authorizing', 'PASS'],
     ['Quebec authorized-revision chains reconcile and remain non-authorizing', 'PASS'],
+    ['Quebec milestone panel and parser-review package reconcile and remain non-authorizing', 'PASS'],
   ];
-  checks.getRange('A16:C42').values = checkLabels.map(([label, expected]) => [
+  checks.getRange('A16:C43').values = checkLabels.map(([label, expected]) => [
     label,
     null,
     expected,
@@ -4805,22 +5124,28 @@ function buildReleaseChecks() {
       `=IF(AND('Quebec Revisions'!B6=${quebecRevisions.coverage_summary.source_project_count},'Quebec Revisions'!D6=${quebecRevisions.coverage_summary.stable_lifecycle_project_id_count},'Quebec Revisions'!D7=${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count},'Quebec Revisions'!D8=${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count},'Quebec Revisions'!B10="NO",'Quebec Revisions'!D10="NO",ROWS('Quebec Revisions'!$A$25:$A$${quebecProjectLastRow})=${quebecRevisionRows.length},COUNTIF('Quebec Revisions'!$H$25:$H$${quebecProjectLastRow},"YES")=${quebecRevisions.coverage_summary.cost_revision_chain_reconciled_project_count},COUNTIF('Quebec Revisions'!$N$25:$N$${quebecProjectLastRow},"YES")=${quebecRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count}),"PASS","FAIL")`,
     ],
   ];
-  checks.getRange('B16:B42').conditionalFormats.add('containsText', {
+  const quebecLifecycleLastRow = 27 + quebecLifecycleRows.length;
+  checks.getRange('B43').formulas = [
+    [
+      `=IF(AND('Quebec Vintages'!B6=${quebecLongitudinal.vintage_count},'Quebec Vintages'!D6=${quebecVintageContract.catalog_csv_resource_count},'Quebec Vintages'!B7=${quebecLongitudinal.unique_project_count},'Quebec Vintages'!D7=${quebecLongitudinal.snapshot_observation_count},'Quebec Vintages'!B8=${quebecLongitudinal.present_in_latest_project_count},'Quebec Vintages'!D8=${quebecLongitudinal.absent_from_latest_project_count},'Quebec Vintages'!B10="NO",'Quebec Vintages'!D10="NO",ROWS('Quebec Vintages'!$A$28:$A$${quebecLifecycleLastRow})=${quebecLifecycleRows.length},'Quebec Vintages'!N22=${quebecParserReview.source_project_count},'Quebec Vintages'!N21=${quebecParserReview.sample_project_count}),"PASS","FAIL")`,
+    ],
+  ];
+  checks.getRange('B16:B43').conditionalFormats.add('containsText', {
     text: 'PASS',
     format: { fill: C.tealLight, font: { color: C.tealDark, bold: true } },
   });
-  checks.getRange('B16:B42').conditionalFormats.add('containsText', {
+  checks.getRange('B16:B43').conditionalFormats.add('containsText', {
     text: 'FAIL',
     format: { fill: '#FDE8E5', font: { color: '#A33D32', bold: true } },
   });
-  checks.getRange('A44:D46').merge();
-  checks.getRange('A44').values = [
+  checks.getRange('A45:D47').merge();
+  checks.getRange('A45').values = [
     [
       'A public release is blocked if any check returns FAIL, if the workbook and website manifests differ, if assumptions/scenarios are presented as observations, if an AI-attributable value appears before the identification gate passes, or if a cost output appears while a required validation or independent-review gate is withheld.',
     ],
   ];
-  noteBlock(checks.getRange('A44:D46'));
-  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 50);
+  noteBlock(checks.getRange('A45:D47'));
+  setWidths(checks, { A: 59, B: 61, C: 15, D: 18 }, 51);
 }
 
 function buildDashboard() {

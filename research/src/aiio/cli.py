@@ -34,6 +34,9 @@ from .quebec_revisions import (
     DICTIONARY_SOURCE_ID as QUEBEC_DICTIONARY_SOURCE_ID,
     run_quebec_authorized_revisions,
 )
+from .quebec_vintages import retrieve_milestone_resources
+from .quebec_longitudinal import run_quebec_milestone_longitudinal
+from .quebec_review import build_quebec_parser_review_package
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .adapters.provincial_projects import (
     BC_SOURCE_ID,
@@ -140,6 +143,24 @@ def main() -> None:
     )
     quebec_revisions_parser.add_argument("dashboard_csv_path", type=Path)
     quebec_revisions_parser.add_argument("dictionary_pdf_path", type=Path)
+
+    quebec_vintages_parser = subparsers.add_parser(
+        "fetch-quebec-milestone-vintages",
+        help="retrieve a threshold-aware milestone sample from the official Quebec dashboard archive",
+    )
+    quebec_vintages_parser.add_argument("catalog_json_path", type=Path)
+
+    quebec_longitudinal_parser = subparsers.add_parser(
+        "normalize-quebec-milestone-vintages",
+        help="build a fail-closed stable-ID longitudinal panel from Quebec milestone snapshots",
+    )
+    quebec_longitudinal_parser.add_argument("contract_path", type=Path)
+
+    quebec_review_parser = subparsers.add_parser(
+        "build-quebec-parser-review",
+        help="build a deterministic, still-unauthorized independent parser-review package",
+    )
+    quebec_review_parser.add_argument("dashboard_csv_path", type=Path)
 
     subparsers.add_parser(
         "fetch-census-workforce",
@@ -556,6 +577,111 @@ def main() -> None:
                         "authorized_revision_reference_panel_authorized": report[
                             "publication_boundary"
                         ]["authorized_revision_reference_panel_authorized"],
+                    }
+                )
+            )
+        elif args.command == "fetch-quebec-milestone-vintages":
+            report = retrieve_milestone_resources(
+                args.catalog_json_path.resolve(),
+                root / "data" / "raw" / "quebec_pqi_project_dashboard_vintages",
+                root
+                / "data"
+                / "model"
+                / "quebec_pqi_milestone_vintage_contract_v0.1.json",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "contract_id": report["contract_id"],
+                        "catalog_csv_resource_count": report[
+                            "catalog_csv_resource_count"
+                        ],
+                        "selected_vintage_count": report["selected_vintage_count"],
+                        "catalog_start_date": report["catalog_start_date"],
+                        "catalog_end_date": report["catalog_end_date"],
+                        "longitudinal_outcome_panel_authorized": report[
+                            "publication_boundary"
+                        ]["longitudinal_outcome_panel_authorized"],
+                    }
+                )
+            )
+        elif args.command == "normalize-quebec-milestone-vintages":
+            report = run_quebec_milestone_longitudinal(
+                args.contract_path.resolve(),
+                root / "data" / "raw" / "quebec_pqi_project_dashboard_vintages",
+                root
+                / "data"
+                / "model-runs"
+                / "quebec_pqi_milestone_longitudinal_v0.1.json",
+                root
+                / "data"
+                / "processed"
+                / "quebec_pqi_milestone_project_vintages.csv",
+                root
+                / "data"
+                / "processed"
+                / "quebec_pqi_milestone_project_lifecycles.csv",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": report["model_id"],
+                        "vintage_count": report["vintage_count"],
+                        "snapshot_observation_count": report[
+                            "snapshot_observation_count"
+                        ],
+                        "unique_project_count": report["unique_project_count"],
+                        "present_in_latest_project_count": report[
+                            "present_in_latest_project_count"
+                        ],
+                        "complete_longitudinal_panel_authorized": report[
+                            "publication_boundary"
+                        ]["complete_longitudinal_panel_authorized"],
+                    }
+                )
+            )
+        elif args.command == "build-quebec-parser-review":
+            report = build_quebec_parser_review_package(
+                args.dashboard_csv_path.resolve(),
+                root
+                / "data"
+                / "model-runs"
+                / "quebec_pqi_authorized_project_revisions_v0.1.json",
+                root
+                / "data"
+                / "processed"
+                / "quebec_pqi_authorized_project_revisions.csv",
+                root
+                / "data"
+                / "processed"
+                / "quebec_pqi_authorized_revision_events.csv",
+                root
+                / "data"
+                / "model-runs"
+                / "quebec_pqi_milestone_longitudinal_v0.1.json",
+                root
+                / "data"
+                / "processed"
+                / "quebec_pqi_milestone_project_lifecycles.csv",
+                root / "data" / "reviews" / "quebec_pqi_parser_review_sample_v0.1.csv",
+                root
+                / "data"
+                / "model-runs"
+                / "quebec_pqi_parser_review_package_v0.1.json",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "package_id": report["package_id"],
+                        "review_status": report["review_status"],
+                        "sample_project_count": report["sample_project_count"],
+                        "source_project_count": report["source_project_count"],
+                        "independent_parser_review_complete": report[
+                            "publication_boundary"
+                        ]["independent_parser_review_complete"],
                     }
                 )
             )

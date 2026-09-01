@@ -25,6 +25,7 @@ class RetrievalRecord:
 
 def retrieve(source: SourceRecord, raw_root: Path) -> RetrievalRecord:
     if source.access_method not in {
+        "api_json",
         "bulk_zip",
         "csv",
         "geojson",
@@ -77,11 +78,12 @@ def _suffix_for(access_method: str, content_type: str) -> str:
         return ".pdf"
     if access_method == "xlsx":
         return ".xlsx"
+    if access_method == "api_json":
+        return ".json"
     if access_method == "csv" or content_type == "text/csv":
         return ".csv"
     if access_method == "geojson" or content_type in {
         "application/geo+json",
-        "application/json",
     }:
         return ".geojson"
     return ".html"

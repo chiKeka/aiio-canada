@@ -10,6 +10,9 @@ class RetrievalTests(unittest.TestCase):
         self.assertEqual(_suffix_for("geojson", "application/geo+json"), ".geojson")
         self.assertEqual(_suffix_for("geojson", "application/json"), ".geojson")
 
+    def test_api_json_access_uses_plain_json_suffix(self) -> None:
+        self.assertEqual(_suffix_for("api_json", "application/json"), ".json")
+
 
 if __name__ == "__main__":
     unittest.main()

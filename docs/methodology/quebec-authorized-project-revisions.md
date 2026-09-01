@@ -114,7 +114,10 @@ public-project schedule outcome panel: not authorized
 AI-attributable effect: not authorized
 ```
 
-The next evidence step is to retrieve archived dashboard vintages, define
-vintage-entry and retirement rules, and independently review the French-text
-parser against a stratified project sample before any reference distribution is
-promoted.
+The archived-catalog inventory, threshold-aware ten-vintage milestone panel and
+57-project stratified parser-review packet are now implemented. The milestone
+panel shows that 472 of 1,121 observed stable IDs are absent from the latest
+snapshot, but does not infer exit causes. See
+`docs/methodology/quebec-milestone-longitudinal-panel.md`. The next evidence step
+is to complete the independent parser review and test the milestone design
+against the full 69-vintage panel before any reference distribution is promoted.
