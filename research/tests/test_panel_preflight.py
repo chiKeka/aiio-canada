@@ -58,6 +58,7 @@ class PanelAcquisitionPreflightTests(unittest.TestCase):
         self.assertEqual(
             rebuilt["current_eligibility"]["assembled_panel_row_count"], 0
         )
+        self.assertEqual(len(rebuilt["evidence_receipts"]), 11)
         self.assertFalse(
             rebuilt["publication_boundary"]["effect_estimation_authorized"]
         )

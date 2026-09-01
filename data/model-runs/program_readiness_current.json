@@ -25,7 +25,7 @@
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The public-source registry validates with 36 unique sources."
+      "summary": "The public-source registry validates with 40 unique sources."
     },
     {
       "category": "analysis_engine",
@@ -330,17 +330,31 @@
     },
     {
       "category": "research_design",
+      "check_id": "ai_treatment_source_feasibility",
+      "evidence": [
+        "data/model/ai_attribution_treatment_source_feasibility_contract_v0.1.json",
+        "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
+        "research/src/aiio/treatment_source_feasibility.py",
+        "docs/methodology/ai-attribution-treatment-source-feasibility.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "Eight plausible public sources are reproducibly screened against seven locked gates; none authorizes realized AI-construction treatment and effect fields remain null."
+    },
+    {
+      "category": "research_design",
       "check_id": "attribution_panel_acquisition_preflight",
       "evidence": [
         "data/model/ai_attribution_panel_contract_v0.1.json",
         "data/model/ai_attribution_panel_acquisition_contract_v0.1.json",
         "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
+        "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
         "research/src/aiio/panel_preflight.py",
         "docs/methodology/ai-attribution-panel-acquisition.md"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The hash-locked E2 preflight covers five candidate regions, three public asset classes, ten evidence receipts and all 27 authorizing field instances while assembling zero ineligible panel rows."
+      "summary": "The hash-locked E2 preflight covers five candidate regions, three public asset classes, eleven evidence receipts and all 27 authorizing field instances while assembling zero ineligible panel rows."
     },
     {
       "category": "decision_grade_outputs",
@@ -432,7 +446,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 27,
+    "pass": 28,
     "pending": 3
   },
   "structural_integrity": true

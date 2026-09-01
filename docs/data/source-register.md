@@ -48,6 +48,16 @@ completion required to authorize an AI-attributable effect. See
 The Edmonton permit implementation is documented in
 `docs/methodology/edmonton-data-centre-permit-proxy.md`.
 
+An explicit treatment-source feasibility contract now assesses eight plausible
+public sources against seven non-substitutable authorizing gates. It adds the
+Statistics Canada building-permit table, 2024 commercial-building energy survey
+instrument and release, and annual CMA-industry employment table to the source
+register. None passes every gate. The energy survey materially improves
+operating-stock and power context because its questionnaire collects
+data-centre type, floor area, critical IT load and design load, but its public
+release does not expose construction dose. See
+`docs/methodology/ai-attribution-treatment-source-feasibility.md`.
+
 The Alberta Major Projects AI-relevant extract now also feeds a deterministic
 announcement ledger. The 2026-08-31 snapshot contains 22 records and preserves
 project stage, partial reported-estimated-cost coverage, schedule coverage and

@@ -96,6 +96,34 @@
       ]
     },
     {
+      "receipt_id": "PUBLIC_TREATMENT_SOURCE_FEASIBILITY",
+      "domain_id": "REALIZED_AI_CONSTRUCTION_TREATMENT",
+      "geography_ids": ["CA", "PR_48", "CMA_825", "CMA_835"],
+      "source_ids": [
+        "ALBERTA_MAJOR_PROJECTS",
+        "EDMONTON_GENERAL_BUILDING_PERMITS",
+        "STATCAN_CAPEX_INDUSTRY_GEOGRAPHY_34100035",
+        "STATCAN_IBC_34100293",
+        "STATCAN_BUILDING_PERMITS_34100285",
+        "STATCAN_SCIEU_5034_2024",
+        "STATCAN_SCIEU_5034_2024_RELEASE",
+        "STATCAN_CMA_INDUSTRY_EMPLOYMENT_14100468"
+      ],
+      "artifact_path": "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
+      "evidence_status": "candidate_proxy",
+      "authorizing_status": "non_authorizing",
+      "available_variables": [
+        "source_level_gate_assessment",
+        "source_exclusion_reason",
+        "required_authorizing_treatment_characteristics"
+      ],
+      "assertions": [
+        {"json_path": "candidate_count", "equals": 8},
+        {"json_path": "authorizing_candidate_count", "equals": 0},
+        {"json_path": "publication_boundary.treatment_authorized", "equals": false}
+      ]
+    },
+    {
       "receipt_id": "CANADABUYS_OUTCOME_FEASIBILITY",
       "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",
       "geography_ids": ["CA"],
@@ -254,7 +282,12 @@
         "ALBERTA_MAJOR_PROJECTS",
         "EDMONTON_GENERAL_BUILDING_PERMITS",
         "AESO_LARGE_LOAD_PROJECTS",
-        "STATCAN_CAPEX_INDUSTRY_GEOGRAPHY_34100035"
+        "STATCAN_CAPEX_INDUSTRY_GEOGRAPHY_34100035",
+        "STATCAN_IBC_34100293",
+        "STATCAN_BUILDING_PERMITS_34100285",
+        "STATCAN_SCIEU_5034_2024",
+        "STATCAN_SCIEU_5034_2024_RELEASE",
+        "STATCAN_CMA_INDUSTRY_EMPLOYMENT_14100468"
       ],
       "current_status": "source_gap",
       "completion_rule": "At least two reconciled regions publish a positive realized-spend or construction-labour measure with project, quarter and revision provenance."

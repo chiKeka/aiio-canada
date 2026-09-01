@@ -1020,6 +1020,57 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    treatment_source_contract_path = (
+        root
+        / "data/model/ai_attribution_treatment_source_feasibility_contract_v0.1.json"
+    )
+    treatment_source_run_path = (
+        root
+        / "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json"
+    )
+    treatment_source_run = load_json_or_empty(treatment_source_run_path)
+    treatment_source_manifest = treatment_source_run.get("input_manifest", {})
+    treatment_source_boundary = treatment_source_run.get("publication_boundary", {})
+    treatment_source_ready = (
+        treatment_source_contract_path.exists()
+        and treatment_source_run_path.exists()
+        and treatment_source_manifest.get("contract_sha256")
+        == sha256_file(treatment_source_contract_path).removeprefix("sha256:")
+        and treatment_source_manifest.get("registry_sha256")
+        == sha256_file(root / "data/registry/sources.json").removeprefix("sha256:")
+        and treatment_source_run.get("candidate_count") == 8
+        and treatment_source_run.get("authorizing_candidate_count") == 0
+        and len(treatment_source_run.get("required_authorizing_gates", [])) == 7
+        and all(
+            item.get("authorizing_status") == "excluded_non_authorizing"
+            and bool(item.get("failed_gates"))
+            and bool(item.get("exclusion_reason"))
+            for item in treatment_source_run.get("candidates", [])
+        )
+        and treatment_source_run.get("acquisition_decision", {}).get("status")
+        == "no_authorizing_public_source_identified"
+        and treatment_source_boundary.get("current_authorizing_source_count") == 0
+        and treatment_source_boundary.get("treatment_authorized") is False
+        and treatment_source_boundary.get("authorizing_treatment_measure") is None
+        and treatment_source_boundary.get("ai_attributable_cost_effect") is None
+        and treatment_source_boundary.get("ai_attributable_schedule_effect") is None
+    )
+    record(
+        "ai_treatment_source_feasibility",
+        "research_design",
+        PASS if treatment_source_ready else FAIL,
+        "Eight plausible public sources are reproducibly screened against seven locked gates; none authorizes realized AI-construction treatment and effect fields remain null."
+        if treatment_source_ready
+        else "The public treatment-source feasibility artifact is missing, stale, incomplete or unsafe.",
+        [
+            "data/model/ai_attribution_treatment_source_feasibility_contract_v0.1.json",
+            "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
+            "research/src/aiio/treatment_source_feasibility.py",
+            "docs/methodology/ai-attribution-treatment-source-feasibility.md",
+        ],
+        release_gate=True,
+    )
+
     panel_acquisition_contract_path = (
         root / "data/model/ai_attribution_panel_acquisition_contract_v0.1.json"
     )
@@ -1070,7 +1121,7 @@ def audit_program_readiness(
         and panel_field_gaps.get("acquisition_task_field_instance_count") == 27
         and panel_field_gaps.get("uncovered_required_field_instance_count") == 0
         and panel_field_gaps.get("complete_authorizing_scope_count") == 0
-        and len(panel_receipts) == 10
+        and len(panel_receipts) == 11
         and all(item.get("assertions_passed") is True for item in panel_receipts)
         and all(
             item.get("authorizing_status") in {"non_authorizing", "control_only"}
@@ -1088,13 +1139,14 @@ def audit_program_readiness(
         "attribution_panel_acquisition_preflight",
         "research_design",
         PASS if panel_preflight_ready else FAIL,
-        "The hash-locked E2 preflight covers five candidate regions, three public asset classes, ten evidence receipts and all 27 authorizing field instances while assembling zero ineligible panel rows."
+        "The hash-locked E2 preflight covers five candidate regions, three public asset classes, eleven evidence receipts and all 27 authorizing field instances while assembling zero ineligible panel rows."
         if panel_preflight_ready
         else "The E2 acquisition contract or evidence-receipt preflight is missing, stale, incomplete or unsafe.",
         [
             "data/model/ai_attribution_panel_contract_v0.1.json",
             "data/model/ai_attribution_panel_acquisition_contract_v0.1.json",
             "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
+            "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
             "research/src/aiio/panel_preflight.py",
             "docs/methodology/ai-attribution-panel-acquisition.md",
         ],

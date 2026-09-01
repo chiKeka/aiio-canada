@@ -65,6 +65,7 @@ from .provincial_backcast_review import (
 from .attribution import build_attribution_readiness
 from .ai_capex_ledger import run_ai_capex_announcement_ledger
 from .panel_preflight import run_panel_acquisition_preflight
+from .treatment_source_feasibility import run_treatment_source_feasibility
 from .digest import build_digest, validate_digest_cadence
 from .historical_envelope import run_historical_reference_envelope
 from .historical_analog import run_historical_analog_matrix
@@ -427,6 +428,13 @@ def main() -> None:
     panel_preflight_parser.add_argument("attribution_contract_path", type=Path)
     panel_preflight_parser.add_argument("acquisition_contract_path", type=Path)
     panel_preflight_parser.add_argument("output_path", type=Path)
+
+    treatment_sources_parser = subparsers.add_parser(
+        "run-treatment-source-feasibility",
+        help="screen public treatment-source candidates against the locked E2 authorizing gates",
+    )
+    treatment_sources_parser.add_argument("contract_path", type=Path)
+    treatment_sources_parser.add_argument("output_path", type=Path)
 
     scenario_parser = subparsers.add_parser(
         "run-scenario", help="run a versioned graph scenario and write auditable JSON output"
@@ -1426,6 +1434,27 @@ def main() -> None:
                         "effect_estimation_authorized": output[
                             "publication_boundary"
                         ]["effect_estimation_authorized"],
+                    }
+                )
+            )
+        elif args.command == "run-treatment-source-feasibility":
+            output = run_treatment_source_feasibility(
+                args.contract_path.resolve(),
+                registry_path,
+                args.output_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "feasibility_id": output["feasibility_id"],
+                        "candidate_count": output["candidate_count"],
+                        "authorizing_candidate_count": output[
+                            "authorizing_candidate_count"
+                        ],
+                        "treatment_authorized": output["publication_boundary"][
+                            "treatment_authorized"
+                        ],
                     }
                 )
             )

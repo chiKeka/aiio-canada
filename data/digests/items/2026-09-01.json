@@ -220,7 +220,7 @@
           "source_url": "https://www.tresor.gouv.qc.ca/infrastructures-publiques/tableau-de-bord"
         }
       ],
-      "observed_change": "The E2 preflight now reconciles ten hash-locked evidence receipts against five candidate CMAs, three public asset classes and all 27 authorizing field instances. Candidate scope meets the planned minimum counts, but zero regions, asset classes or panel rows are currently eligible for estimation.",
+      "observed_change": "The E2 preflight now reconciles eleven hash-locked evidence receipts against five candidate CMAs, three public asset classes and all 27 authorizing field instances. Candidate scope meets the planned minimum counts, but zero regions, asset classes or panel rows are currently eligible for estimation.",
       "model_implication": "Prioritize four explicit acquisition tasks: quarterly realized construction dose, estimate-to-outturn cost records, baseline-to-actual physical schedules and procurement competition with compliant bidder counts. Do not assemble partial panel rows, run an effect estimator or convert announcements, MW, permit values, graph scores, authorized revisions or catalog disappearances into authorizing treatment or outcomes.",
       "evidence_status": "inferred",
       "geography_ids": [
@@ -229,6 +229,39 @@
         "CMA_933",
         "CMA_535",
         "CMA_462"
+      ],
+      "model_action": "no_change",
+      "automatic_model_change": false
+    },
+    {
+      "item_id": "AI_TREATMENT_SOURCE_FEASIBILITY_2026_09",
+      "headline": "Eight plausible public sources still leave realized AI-construction treatment unidentified",
+      "sources": [
+        {
+          "source_id": "STATCAN_SCIEU_5034_2024",
+          "source_url": "https://www.statcan.gc.ca/en/statistical-programs/instrument/5034_Q14_V5"
+        },
+        {
+          "source_id": "STATCAN_SCIEU_5034_2024_RELEASE",
+          "source_url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260813/dq260813a-eng.htm"
+        },
+        {
+          "source_id": "STATCAN_BUILDING_PERMITS_34100285",
+          "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410028501"
+        },
+        {
+          "source_id": "STATCAN_CMA_INDUSTRY_EMPLOYMENT_14100468",
+          "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410046802"
+        }
+      ],
+      "observed_change": "A deterministic screen now tests eight plausible public sources against seven required characteristics: data-centre specificity, construction specificity, realized measurement, project or regional linkage, quarterly frequency, public retrieval and revision provenance. No source passes all seven. The 2024 commercial-building energy survey collects valuable data-centre operating characteristics, but the public release does not expose building-level construction dose.",
+      "model_implication": "Use the new energy survey as operating-stock and power context only. Keep permits, announcements, broad building investment, information-sector capex and broad employment outside the authorizing treatment field. Continue seeking a public or disclosure-authorized quarterly source for realized project or regional spend or construction labour hours.",
+      "evidence_status": "inferred",
+      "geography_ids": [
+        "CA",
+        "PR_48",
+        "CMA_825",
+        "CMA_835"
       ],
       "model_action": "no_change",
       "automatic_model_change": false

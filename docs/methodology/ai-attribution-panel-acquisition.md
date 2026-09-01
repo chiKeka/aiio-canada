@@ -28,9 +28,10 @@ regions, zero eligible asset classes and zero assembled panel rows.
 
 ## Evidence receipts
 
-Ten receipts bind the preflight to current model artifacts and registered public
+Eleven receipts bind the preflight to current model artifacts and registered public
 sources. They cover the Alberta announcement ledger, Edmonton permits, the
-Statistics Canada information-sector capex proxy, CanadaBuys cost and
+Statistics Canada information-sector capex proxy, the eight-source public
+treatment-feasibility screen, CanadaBuys cost and
 procurement feasibility, Ontario audited cost/schedule references, Quebec cost
 and schedule candidates, and the Canada building-investment control panel.
 
@@ -85,7 +86,8 @@ All effect fields therefore remain null—not zero.
 
 ```bash
 npm run attribution:readiness
+npm run attribution:treatment-sources
 npm run attribution:preflight
-PYTHONPATH=research/src python3 -m unittest research/tests/test_panel_preflight.py -v
+PYTHONPATH=research/src python3 -m unittest research/tests/test_panel_preflight.py research/tests/test_treatment_source_feasibility.py -v
 npm run program:audit
 ```
