@@ -24,7 +24,14 @@ class RetrievalRecord:
 
 
 def retrieve(source: SourceRecord, raw_root: Path) -> RetrievalRecord:
-    if source.access_method not in {"bulk_zip", "csv", "html", "pdf", "xlsx"}:
+    if source.access_method not in {
+        "bulk_zip",
+        "csv",
+        "geojson",
+        "html",
+        "pdf",
+        "xlsx",
+    }:
         raise ValidationError(
             f"{source.source_id} uses {source.access_method}; a source-specific adapter is required"
         )
@@ -72,4 +79,9 @@ def _suffix_for(access_method: str, content_type: str) -> str:
         return ".xlsx"
     if access_method == "csv" or content_type == "text/csv":
         return ".csv"
+    if access_method == "geojson" or content_type in {
+        "application/geo+json",
+        "application/json",
+    }:
+        return ".geojson"
     return ".html"

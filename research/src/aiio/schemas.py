@@ -132,6 +132,74 @@ class ObservationRecord:
 
 
 @dataclass(frozen=True)
+class PublicProjectRecord:
+    project_id: str
+    source_record_id: str
+    name: str
+    description: str
+    geography_id: str
+    province: str
+    municipality: str
+    region: str
+    asset_class: str
+    asset_class_evidence_status: str
+    source_category: str
+    source_type: str
+    source_subtype: str
+    stage: str
+    stage_source_text: str
+    start_period: str
+    completion_period: str
+    start_year: int | None
+    end_year: int | None
+    estimated_cost_cad: float | None
+    cost_status: str
+    public_funding_signal: str
+    public_funding_evidence_status: str
+    lead_organization: str
+    supporting_ministry: str
+    latitude: float | None
+    longitude: float | None
+    project_url: str
+    source_id: str
+    source_scope: str
+    source_evidence_status: EvidenceStatus
+    as_of_date: str
+    quality_flags: tuple[str, ...] = field(default_factory=tuple)
+
+    def validate(self) -> None:
+        if not ID_PATTERN.fullmatch(self.project_id):
+            raise ValidationError(f"invalid public project_id: {self.project_id!r}")
+        if not self.source_record_id or not self.name.strip():
+            raise ValidationError("public projects require source_record_id and name")
+        if not self.geography_id.startswith("PR_") or not self.province:
+            raise ValidationError("public projects require a provincial geography")
+        if not self.asset_class or not self.asset_class_evidence_status:
+            raise ValidationError("public projects require an explicit asset classification")
+        if self.estimated_cost_cad is not None and self.estimated_cost_cad < 0:
+            raise ValidationError("public project cost cannot be negative")
+        if self.start_year is not None and not 1900 <= self.start_year <= 2200:
+            raise ValidationError("public project start_year is outside the supported range")
+        if self.end_year is not None and not 1900 <= self.end_year <= 2200:
+            raise ValidationError("public project end_year is outside the supported range")
+        if (
+            self.start_year is not None
+            and self.end_year is not None
+            and self.start_year > self.end_year
+        ):
+            raise ValidationError("public project start_year cannot exceed end_year")
+        if self.latitude is not None and not -90 <= self.latitude <= 90:
+            raise ValidationError("public project latitude is invalid")
+        if self.longitude is not None and not -180 <= self.longitude <= 180:
+            raise ValidationError("public project longitude is invalid")
+        if self.project_url:
+            _https_url(self.project_url, "project_url")
+        _iso_date(self.as_of_date, "as_of_date")
+        if self.source_evidence_status is EvidenceStatus.SCENARIO:
+            raise ValidationError("scenario records cannot enter the public-project layer")
+
+
+@dataclass(frozen=True)
 class ScenarioRecord:
     scenario_id: str
     geography_id: str

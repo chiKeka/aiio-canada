@@ -18,6 +18,12 @@ from .adapters.statcan_census import (
     normalize_census_trade_employment,
 )
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
+from .adapters.provincial_projects import (
+    BC_SOURCE_ID,
+    ONTARIO_SOURCE_ID,
+    QUEBEC_SOURCE_ID,
+    normalize_provincial_projects,
+)
 from .calibration import (
     PROVINCIAL_REFERENCE_GEOGRAPHY_LABELS,
     PROVINCIAL_REFERENCE_LIMITATIONS,
@@ -165,6 +171,14 @@ def main() -> None:
     projects_parser.add_argument("csv_path", type=Path)
     projects_parser.add_argument("--as-of", required=True)
 
+    provincial_projects_parser = subparsers.add_parser(
+        "normalize-provincial-projects",
+        help="normalize BC, Ontario and Quebec official project inventories",
+    )
+    provincial_projects_parser.add_argument("bc_geojson_path", type=Path)
+    provincial_projects_parser.add_argument("ontario_csv_path", type=Path)
+    provincial_projects_parser.add_argument("quebec_csv_path", type=Path)
+
     digest_parser = subparsers.add_parser("build-digest", help="render a reviewed weekly evidence digest")
     digest_parser.add_argument("items_path", type=Path)
     digest_parser.add_argument("--date", default=date.today().isoformat())
@@ -281,6 +295,40 @@ def main() -> None:
                         "status": "passed",
                         "project_count": project_count,
                         "ai_relevant_count": ai_count,
+                    }
+                )
+            )
+        elif args.command == "normalize-provincial-projects":
+            source_records = {
+                source.source_id: source for source in load_registry(registry_path)
+            }
+            source_ids = (BC_SOURCE_ID, ONTARIO_SOURCE_ID, QUEBEC_SOURCE_ID)
+            missing = [source_id for source_id in source_ids if source_id not in source_records]
+            if missing:
+                raise ValidationError(
+                    f"provincial project sources missing from registry: {missing}"
+                )
+            report = normalize_provincial_projects(
+                args.bc_geojson_path.resolve(),
+                args.ontario_csv_path.resolve(),
+                args.quebec_csv_path.resolve(),
+                root / "data" / "processed" / "public_projects_bc_on_qc.csv",
+                root
+                / "data"
+                / "model-runs"
+                / "public_projects_bc_on_qc_intake_v0.1.json",
+                source_as_of_dates={
+                    source_id: source_records[source_id].as_of_date
+                    for source_id in source_ids
+                },
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "transformation_id": report["transformation_id"],
+                        "record_count": report["record_count"],
+                        "geography_count": report["geography_count"],
                     }
                 )
             )

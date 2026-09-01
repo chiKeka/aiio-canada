@@ -1,0 +1,4 @@
+# Raw provider downloads are immutable evidence blobs. Preserve exact bytes and
+# suppress line-oriented diffs for CSV/GeoJSON payloads with provider line endings.
+data/raw/**/*.csv -text -diff
+data/raw/**/*.geojson -text -diff

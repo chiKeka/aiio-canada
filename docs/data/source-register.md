@@ -22,6 +22,18 @@ access methods must be revalidated at ingestion time.
 | Population/building demand | Statistics Canada demographics and provincial forecasts | Population and cohort demand drivers | Provincial/CMA; quarterly/annual | P2 |
 | Procurement/schedules | Alberta Purchasing Connection and public tender portals | Tender volume, award timing, bid signals | Alberta/municipal; event-based | P2 |
 
+## Implemented provincial public-project intake
+
+Three official provincial inventories now share a source-preserving schema:
+
+- British Columbia: the historical [Major Projects Inventory feature layer](https://catalogue.data.gov.bc.ca/dataset/ea4c0bdb-a63f-49a4-b14a-09c1560aad0b). The public inventory was discontinued after Q3 2025, while all retrieved feature `LAST_UPDATE` values report 2024-12-01. AIIO therefore treats the layer as historical and retains both vintage warnings.
+- Ontario: [Ontario Builds: key infrastructure projects](https://data.ontario.ca/en/dataset/ontario-builds-key-infrastructure-projects), English all-project CSV dated 2026-06-12. The publisher calls this a sample of key projects; it is not treated as a complete capital plan. The source has no publisher project identifier, so AIIO derives a deterministic vintage-record hash and flags it.
+- Quebec: the [public infrastructure project dashboard](https://www.tresor.gouv.qc.ca/infrastructures-publiques/tableau-de-bord), CSV dated 2026-08-20. Current coverage is limited to Plan québécois des infrastructures projects of at least $20 million; pre-November 2020 vintages used a $50 million threshold.
+
+The normalized file retains publisher category, type, stage, location, funding signal, cost status and original schedule text. Asset classes are explicit inferences. British Columbia and Quebec costs are converted from millions of Canadian dollars; Ontario zero budget values are treated as unavailable because the dataset uses them as placeholders. Missing values remain null.
+
+The intake is not yet a pooled exposure model. Source thresholds, completeness, vintages and schedule fields differ materially: Ontario and Quebec do not publish a comparable construction start period for most records. The machine report therefore sets `public_project_exposure_authorized` to `false` until a source-specific comparability design and schedule strategy pass review.
+
 ## Intake rule
 
 Each adapter must capture the source metadata defined in the data dictionary, retain a raw-file hash, emit a schema validation report and document any suppression, revision or licensing limitation. Discovery sources can enter the digest but cannot directly calibrate a material model parameter without promotion through evidence review.

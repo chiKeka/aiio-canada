@@ -22,6 +22,7 @@ ALLOWED_ACCESS_METHODS = {
     "api_json",
     "bulk_zip",
     "csv",
+    "geojson",
     "html",
     "html_form_export",
     "pdf",

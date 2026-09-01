@@ -41,6 +41,7 @@ npm run bcpi:normalize:provinces
 npm run materials:screen
 npm run materials:screen:provinces
 npm run projects:exposure
+npm run projects:normalize:provinces
 npm run power:evidence
 npm run model:run
 npm run power:run
