@@ -37,7 +37,9 @@ The reproducible analytical gates are:
 npm run research:validate
 npm run labour:normalize
 npm run labour:normalize:canada
+npm run bcpi:normalize:provinces
 npm run materials:screen
+npm run materials:screen:provinces
 npm run projects:exposure
 npm run power:evidence
 npm run model:run

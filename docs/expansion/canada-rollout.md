@@ -29,6 +29,18 @@ evidence structure, not comparable province-level model calibration. Smaller
 jurisdictions have substantial unavailable, confidential or suppressed cells
 that must remain visible.
 
+The BCPI adapter selects the nine province-level geographies published in
+Statistics Canada table 18-10-0289-01 for 16 specified building/component
+combinations. It does not preserve the table's other building, division or CMA
+series. Prince Edward Island and the territories are absent from this product
+and remain explicit gaps. School is nested within the broader institutional
+building category, so those two archetypes are related rather than disjoint
+market totals. The index-point field is measured above the 2023 annual base
+(index minus 100), not from the first quarter of 2023. These common cost indexes
+are evidence baselines, not cross-province model calibration or AI-attributed
+effects. Stable `PR_*` geography identifiers, rather than display labels, are
+the cross-dataset join keys.
+
 ### Phase 2 — national coverage
 
 Extend the remaining evidence domains to every province and territory. Statistics Canada series provide the common national spine; provincial and municipal sources add project, procurement, utility and workforce detail. Missingness is published rather than silently imputed.

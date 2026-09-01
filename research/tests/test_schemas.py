@@ -8,8 +8,10 @@ from datetime import date
 from pathlib import Path
 
 from aiio.adapters.statcan import (
+    BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID,
     PROVINCE_DGUID_TO_GEOGRAPHY_ID,
     TRADE_NOC_TO_NODE,
+    normalize_bcpi_provinces,
     normalize_jvws_alberta,
     normalize_jvws_canada,
     quarter_bounds,
@@ -97,6 +99,65 @@ class SchemaTests(unittest.TestCase):
         self.assertEqual(quarter_bounds("2026-Q2"), ("2026-04-01", "2026-06-30"))
         self.assertEqual(quarter_bounds("2026-04"), ("2026-04-01", "2026-06-30"))
         self.assertEqual(slug("Non-residential building"), "NON_RESIDENTIAL_BUILDING")
+
+    def test_bcpi_provincial_normalizer_keeps_published_provinces_separate(self) -> None:
+        header = (
+            '"REF_DATE","GEO","DGUID","Type of building","Division",'
+            '"UOM","VALUE","STATUS","SYMBOL"\n'
+        )
+        rows = []
+        for dguid in BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID:
+            rows.append(
+                f'"2026-Q2","Province {dguid}","{dguid}","Factory",'
+                '"Concrete","Index, 2023=100","110.0","",""'
+            )
+        rows.extend(
+            [
+                '"2026-Q2","Canada","2021A000011124","Factory","Concrete","Index, 2023=100","111.0","",""',
+                '"2026-Q2","Calgary, Alberta","2021S0503825","Factory","Concrete","Index, 2023=100","112.0","",""',
+                '"2026-Q2","Alberta","2021A000248","Office building","Concrete","Index, 2023=100","113.0","",""',
+            ]
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive_path = root / "bcpi.zip"
+            output_path = root / "bcpi_provinces.csv"
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("18100289.csv", header + "\n".join(rows) + "\n")
+            observations = normalize_bcpi_provinces(archive_path, output_path)
+            output = output_path.read_text(encoding="utf-8")
+        self.assertEqual(len(observations), 9)
+        self.assertEqual(
+            {item.geography_id for item in observations},
+            set(BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID.values()),
+        )
+        self.assertNotIn("Canada,2021A000011124", output)
+        self.assertNotIn("Calgary, Alberta", output)
+        self.assertNotIn("Office building", output)
+        self.assertIn("TR_STATCAN_BCPI_CA_PROVINCES_MATERIALS_1_0_0", output)
+
+    def test_bcpi_provincial_normalizer_fails_when_source_coverage_changes(self) -> None:
+        header = (
+            '"REF_DATE","GEO","DGUID","Type of building","Division",'
+            '"UOM","VALUE","STATUS","SYMBOL"\n'
+        )
+        rows = []
+        for dguid in BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID:
+            rows.append(
+                f'"2026-Q2","Province {dguid}","{dguid}","Factory",'
+                '"Concrete","Index, 2023=100","110.0","",""'
+            )
+        rows.append(
+            '"2026-Q2","Prince Edward Island","2021A000211","Factory",'
+            '"Concrete","Index, 2023=100","109.0","",""'
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive_path = root / "bcpi.zip"
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("18100289.csv", header + "\n".join(rows) + "\n")
+            with self.assertRaisesRegex(ValidationError, "source province coverage changed"):
+                normalize_bcpi_provinces(archive_path, root / "output.csv")
 
     def test_jvws_normalizer_preserves_suppression_and_trade_mapping(self) -> None:
         header = (

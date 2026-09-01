@@ -10,6 +10,7 @@ import zipfile
 from pathlib import Path
 
 from ..constants import EvidenceStatus
+from ..material_taxonomy import material_indicator_targets
 from ..schemas import ObservationRecord, ValidationError
 
 
@@ -41,6 +42,21 @@ PROVINCE_DGUID_TO_GEOGRAPHY_ID = {
 JVWS_STATISTICS = {"Job vacancies", "Average offered hourly wage"}
 JVWS_ALBERTA_TRANSFORMATION_ID = "TR_STATCAN_JVWS_AB_NOC_1_0_0"
 JVWS_CANADA_TRANSFORMATION_ID = "TR_STATCAN_JVWS_CA_PROVINCES_NOC_1_0_0"
+BCPI_PROVINCIAL_TRANSFORMATION_ID = "TR_STATCAN_BCPI_CA_PROVINCES_MATERIALS_1_0_0"
+BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID = {
+    key: PROVINCE_DGUID_TO_GEOGRAPHY_ID[key]
+    for key in (
+        "2021A000210",
+        "2021A000212",
+        "2021A000213",
+        "2021A000224",
+        "2021A000235",
+        "2021A000246",
+        "2021A000247",
+        "2021A000248",
+        "2021A000259",
+    )
+}
 
 
 def normalize_bcpi_alberta(zip_path: Path, output_path: Path) -> list[ObservationRecord]:
@@ -120,6 +136,164 @@ def normalize_bcpi_alberta(zip_path: Path, output_path: Path) -> list[Observatio
                 }
             )
     return observations
+
+
+def normalize_bcpi_provinces(
+    zip_path: Path, output_path: Path
+) -> list[ObservationRecord]:
+    """Normalize selected BCPI material rows for published provinces.
+
+    The Statistics Canada table currently includes province-level rows for nine
+    provinces. Prince Edward Island and the territories are absent from this
+    product and remain explicit coverage gaps rather than being imputed.
+    """
+    with zipfile.ZipFile(zip_path) as archive:
+        csv_names = [
+            name
+            for name in archive.namelist()
+            if name.endswith(".csv") and "MetaData" not in name
+        ]
+        if len(csv_names) != 1:
+            raise ValidationError(f"expected one BCPI data CSV, found {csv_names}")
+        with closing(archive.open(csv_names[0])) as binary_handle:
+            with TextIOWrapper(
+                binary_handle, encoding="utf-8-sig", newline=""
+            ) as text_handle:
+                reader = csv.DictReader(text_handle)
+                required = {
+                    "REF_DATE",
+                    "GEO",
+                    "DGUID",
+                    "Type of building",
+                    "Division",
+                    "UOM",
+                    "VALUE",
+                    "STATUS",
+                    "SYMBOL",
+                }
+                if not reader.fieldnames or not required.issubset(reader.fieldnames):
+                    raise ValidationError(
+                        f"BCPI schema changed; missing "
+                        f"{sorted(required - set(reader.fieldnames or []))}"
+                    )
+                targets = material_indicator_targets()
+                observations: list[tuple[ObservationRecord, dict[str, str]]] = []
+                published_province_dguids: set[str] = set()
+                for raw in reader:
+                    statcan_dguid = raw["DGUID"].strip()
+                    if statcan_dguid in PROVINCE_DGUID_TO_GEOGRAPHY_ID:
+                        published_province_dguids.add(statcan_dguid)
+                    if statcan_dguid not in BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID:
+                        continue
+                    building = raw["Type of building"].strip()
+                    division = raw["Division"].strip()
+                    indicator_id = f"BCPI_{slug(building)}_{slug(division)}"
+                    if indicator_id not in targets:
+                        continue
+                    period_start, period_end = quarter_bounds(raw["REF_DATE"].strip())
+                    value_text = raw["VALUE"].strip()
+                    quality_flags = tuple(
+                        flag
+                        for flag in (
+                            f"status:{raw['STATUS'].strip()}"
+                            if raw["STATUS"].strip()
+                            else "",
+                            f"symbol:{raw['SYMBOL'].strip()}"
+                            if raw["SYMBOL"].strip()
+                            else "",
+                            "value_missing_or_suppressed" if not value_text else "",
+                        )
+                        if flag
+                    )
+                    identity = "|".join(
+                        (
+                            raw["REF_DATE"].strip(),
+                            statcan_dguid,
+                            building,
+                            division,
+                            raw["UOM"].strip(),
+                        )
+                    )
+                    observation = ObservationRecord(
+                        observation_id=(
+                            f"OBS_BCPI_{hashlib.sha256(identity.encode()).hexdigest()[:20].upper()}"
+                        ),
+                        indicator_id=indicator_id,
+                        value=float(value_text) if value_text else None,
+                        unit=raw["UOM"].strip(),
+                        geography_id=BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID[
+                            statcan_dguid
+                        ],
+                        period_start=period_start,
+                        period_end=period_end,
+                        source_id="STATCAN_BCPI_18100289",
+                        evidence_status=EvidenceStatus.OBSERVED,
+                        as_of_date=period_end,
+                        transformation_id=BCPI_PROVINCIAL_TRANSFORMATION_ID,
+                        quality_flags=quality_flags,
+                    )
+                    observation.validate()
+                    observations.append(
+                        (
+                            observation,
+                            {
+                                "geography_label": raw["GEO"].replace("\xa0", " ").strip(),
+                                "statcan_dguid": statcan_dguid,
+                            },
+                        )
+                    )
+
+    expected_published_dguids = set(BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID)
+    if published_province_dguids != expected_published_dguids:
+        raise ValidationError(
+            "BCPI source province coverage changed; expected DGUIDs "
+            f"{sorted(expected_published_dguids)}, found "
+            f"{sorted(published_province_dguids)}. Review coverage before publication."
+        )
+    actual_geographies = {item.geography_id for item, _ in observations}
+    expected_geographies = set(BCPI_PROVINCE_DGUID_TO_GEOGRAPHY_ID.values())
+    if actual_geographies != expected_geographies:
+        raise ValidationError(
+            "BCPI provincial material scope changed; expected "
+            f"{sorted(expected_geographies)}, found {sorted(actual_geographies)}"
+        )
+    observations.sort(
+        key=lambda item: (
+            item[0].geography_id,
+            item[0].indicator_id,
+            item[0].period_end,
+        )
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fields = (
+        "observation_id",
+        "indicator_id",
+        "geography_id",
+        "geography_label",
+        "statcan_dguid",
+        "value",
+        "unit",
+        "period_start",
+        "period_end",
+        "source_id",
+        "evidence_status",
+        "as_of_date",
+        "transformation_id",
+        "quality_flags",
+    )
+    with output_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        for item, dimensions in observations:
+            writer.writerow(
+                {
+                    **item.__dict__,
+                    **dimensions,
+                    "evidence_status": item.evidence_status.value,
+                    "quality_flags": "|".join(item.quality_flags),
+                }
+            )
+    return [item for item, _ in observations]
 
 
 def normalize_jvws_alberta(zip_path: Path, output_path: Path) -> list[ObservationRecord]:

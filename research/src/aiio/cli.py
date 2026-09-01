@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .adapters.statcan import (
     normalize_bcpi_alberta,
+    normalize_bcpi_provinces,
     normalize_jvws_alberta,
     normalize_jvws_canada,
 )
@@ -18,7 +19,7 @@ from .adapters.statcan_census import (
 from .adapters.alberta_projects import fetch_major_projects, normalize_major_projects
 from .digest import build_digest
 from .labour import run_labour_recruitment_pressure
-from .materials import run_material_cost_screen
+from .materials import run_material_cost_screen, run_provincial_material_cost_screen
 from .power_evidence import run_power_evidence_screen
 from .public_projects import run_public_project_exposure
 from .registry import load_registry
@@ -41,6 +42,12 @@ def main() -> None:
 
     bcpi_parser = subparsers.add_parser("normalize-bcpi", help="normalize Alberta rows from a BCPI zip")
     bcpi_parser.add_argument("zip_path", type=Path)
+
+    bcpi_canada_parser = subparsers.add_parser(
+        "normalize-bcpi-provinces",
+        help="normalize selected province-level BCPI material observations",
+    )
+    bcpi_canada_parser.add_argument("zip_path", type=Path)
 
     labour_parser = subparsers.add_parser(
         "normalize-jvws",
@@ -80,6 +87,14 @@ def main() -> None:
     materials_parser.add_argument("bcpi_path", type=Path)
     materials_parser.add_argument("output_json_path", type=Path)
     materials_parser.add_argument("output_csv_path", type=Path)
+
+    provincial_materials_parser = subparsers.add_parser(
+        "run-provincial-material-screen",
+        help="build the common province-level BCPI material-cost screen",
+    )
+    provincial_materials_parser.add_argument("bcpi_path", type=Path)
+    provincial_materials_parser.add_argument("output_json_path", type=Path)
+    provincial_materials_parser.add_argument("output_csv_path", type=Path)
 
     public_projects_parser = subparsers.add_parser(
         "run-public-project-exposure",
@@ -167,6 +182,22 @@ def main() -> None:
                 root / "data" / "processed" / "bcpi_alberta.csv",
             )
             print(json.dumps({"status": "passed", "observation_count": len(observations)}))
+        elif args.command == "normalize-bcpi-provinces":
+            observations = normalize_bcpi_provinces(
+                args.zip_path.resolve(),
+                root / "data" / "processed" / "bcpi_material_provinces.csv",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "observation_count": len(observations),
+                        "geography_count": len(
+                            {item.geography_id for item in observations}
+                        ),
+                    }
+                )
+            )
         elif args.command == "normalize-jvws":
             observations = normalize_jvws_alberta(
                 args.zip_path.resolve(),
@@ -245,6 +276,22 @@ def main() -> None:
                         "status": "passed",
                         "model_id": output["model_id"],
                         "observation_count": output["observation_count"],
+                    }
+                )
+            )
+        elif args.command == "run-provincial-material-screen":
+            output = run_provincial_material_cost_screen(
+                args.bcpi_path.resolve(),
+                args.output_json_path.resolve(),
+                args.output_csv_path.resolve(),
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": output["model_id"],
+                        "observation_count": output["observation_count"],
+                        "geography_count": len(output["geography_scope"]),
                     }
                 )
             )

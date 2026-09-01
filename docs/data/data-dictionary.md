@@ -71,6 +71,10 @@ Power overlays are independent scenario artifacts. `energy_pue` applies to annua
 
 Required fields: `geography_id`, `archetype`, `component`, `indicator_id`, `period_end`, `index_value`, `unit`, `quarter_over_quarter_percent_change`, `year_over_year_percent_change`, `source_id`, `source_evidence_status`, `change_evidence_status`, `quality_flags`.
 
+The province-level BCPI normalization additionally retains `geography_label`
+and `statcan_dguid`. Its coverage is the nine province series published in the
+source table; missing jurisdictions are not filled with national or CMA values.
+
 BCPI levels are observed; changes are inferred arithmetic transformations. Building archetypes are proxies and cannot be described as data-centre prices, physical availability, or AI-caused effects.
 
 ## Public-project exposure
