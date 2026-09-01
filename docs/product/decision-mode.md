@@ -30,7 +30,8 @@ explanation when challenged.
    - observed labour-market availability and wages;
    - scenario trade and material pressure;
    - grid and utility enabling constraints;
-   - regional macroeconomic spillovers when that channel is calibrated.
+   - dated regional macroeconomic context, kept separate from any future
+     AI-attributable spillover estimate.
 4. Open the dependency graph to see the exact paths, lags, evidence grades and
    sticky points behind the brief.
 5. Review practical decision triggers: procurement timing, market sounding,
@@ -95,8 +96,10 @@ The product distinguishes five channels:
    transmission or distribution dependencies.
 3. Delivery capacity: procurement packaging, contractor capacity, sequencing
    and schedule spillovers.
-4. Regional macro demand: wages, services, housing and general inflation. This
-   is a planned calibration stream and is not quantified in the current graph.
+4. Regional macro demand: the product now displays separate dated controls for
+   wages, housing activity, population, consumer prices and non-residential
+   investment. These are descriptive context only; the AI-attributable
+   spillover channel remains uncalibrated and is not quantified in the graph.
 5. Public fiscal response: capital-plan reprioritization and budget pressure.
    This is a later policy layer, not a current model output.
 

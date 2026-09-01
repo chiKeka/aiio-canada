@@ -20,6 +20,7 @@ access methods must be revalidated at ingestion time.
 | Industry structure | Statistics Canada supply-use tables | Industry commodity inputs and domestic/import shares | Canada/provinces; annual lag | P1 |
 | Materials | Statistics Canada producer price and manufacturing tables | Steel, cement, electrical equipment and selected material proxies | Canada; monthly | P1 |
 | Population/building demand | Statistics Canada demographics and provincial forecasts | Population and cohort demand drivers | Provincial/CMA; quarterly/annual | P2 |
+| Regional macro controls | Statistics Canada tables 18-10-0004-01, 17-10-0009-01, 14-10-0223-01 and 34-10-0156-01 | CPI, population, weekly earnings and housing starts | Provinces/territories where published; monthly/quarterly | P1 |
 | Procurement/schedules | Alberta Purchasing Connection and public tender portals | Tender volume, award timing, bid signals | Alberta/municipal; event-based | P2 |
 
 ## Causal-attribution feasibility sources
@@ -46,6 +47,14 @@ completion required to authorize an AI-attributable effect. See
 `docs/methodology/canadabuys-procurement-outcome-intake.md`.
 The Edmonton permit implementation is documented in
 `docs/methodology/edmonton-data-centre-permit-proxy.md`.
+
+Four additional Statistics Canada sources now join the provincial building-
+investment control in a common quarterly regional macro panel. It preserves
+all-items and shelter CPI, population, all-industry and construction weekly
+earnings, housing starts and non-residential building investment as seven
+separate series. The panel covers 82 jurisdiction-indicator series from 2017 Q1
+through the latest common quarter and deliberately does not publish a composite
+score. See `docs/methodology/regional-macro-controls.md`.
 
 The 2024 Ontario Auditor General performance audit is now a registered,
 content-hash-locked outcome source. Its fail-closed intake preserves two named

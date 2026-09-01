@@ -38,6 +38,7 @@ npm run research:validate
 npm run labour:normalize
 npm run labour:normalize:canada
 npm run investment:normalize:canada
+npm run macro:controls
 npm run procurement:normalize
 npm run outcomes:audit:normalize
 npm run outcomes:quebec:normalize

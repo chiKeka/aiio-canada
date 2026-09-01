@@ -288,6 +288,49 @@ def audit_program_readiness(
         release_gate=True,
     )
 
+    macro_output_path = root / "data/processed/regional_macro_controls_canada.csv"
+    macro_report_path = (
+        root / "data/model-runs/regional_macro_controls_canada_v0.1.json"
+    )
+    macro_report = load_json_or_empty(macro_report_path)
+    macro_boundary = macro_report.get("publication_boundary", {})
+    macro_control_ready = (
+        macro_output_path.exists()
+        and macro_report.get("output_sha256") == sha256_file(macro_output_path)
+        and macro_report.get("code_sha256")
+        == sha256_file(root / "research/src/aiio/macro_controls.py")
+        and macro_report.get("observation_count") == 3116
+        and macro_report.get("series_count") == 82
+        and macro_report.get("metric_count") == 7
+        and macro_report.get("province_and_territory_count") == 13
+        and macro_report.get("quarter_count") == 38
+        and macro_report.get("common_latest_period_end") == "2026-06-30"
+        and len(macro_report.get("input_manifest", [])) == 5
+        and len(macro_report.get("metric_coverage", {})) == 7
+        and macro_boundary.get("regional_macro_context_authorized") is True
+        and macro_boundary.get("composite_macro_pressure_score_authorized")
+        is False
+        and macro_boundary.get("scenario_calibration_authorized") is False
+        and macro_boundary.get("public_project_cost_translation_authorized")
+        is False
+        and macro_boundary.get("ai_attributable_effect_authorized") is False
+    )
+    record(
+        "regional_macro_control_panel",
+        "evidence_pipeline",
+        PASS if macro_control_ready else FAIL,
+        "Seven separate quarterly macro controls are hash-locked across 82 Canada-wide jurisdiction series and remain descriptive only."
+        if macro_control_ready
+        else "The regional macro control panel is missing, unreconciled or has an unsafe publication boundary.",
+        [
+            "data/processed/regional_macro_controls_canada.csv",
+            "data/model-runs/regional_macro_controls_canada_v0.1.json",
+            "research/src/aiio/macro_controls.py",
+            "docs/methodology/regional-macro-controls.md",
+        ],
+        release_gate=True,
+    )
+
     procurement_output_path = (
         root / "data/processed/canadabuys_construction_outcome_feasibility.csv"
     )

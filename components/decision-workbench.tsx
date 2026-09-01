@@ -21,6 +21,7 @@ import historicalEnvelope from '@/data/model-runs/alberta_bcpi_historical_envelo
 import auditedProjectOutcomes from '@/data/model-runs/oago_audited_project_outcomes_v0.1.json';
 import quebecFullArchive from '@/data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json';
 import quebecProjectRevisions from '@/data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json';
+import regionalMacroControls from '@/data/model-runs/regional_macro_controls_canada_v0.1.json';
 
 const COMPONENT_LABELS: Record<string, string> = {
   concrete: 'Concrete', electrical_systems: 'Electrical systems', hvac: 'HVAC',
@@ -220,13 +221,29 @@ function MarketAndPath({ analysis }: { analysis: Analysis }) {
 
 function EvidenceChannels({ analysis }: { analysis: Analysis }) {
   const power = analysis.powerEvidence;
+  const macro = Object.fromEntries(
+    regionalMacroControls.latest_alberta_controls.map((item) => [item.indicator_id, item]),
+  );
+  const macroRows = [
+    ['All-items CPI', macro.MACRO_CPI_ALL_ITEMS_QAVG],
+    ['Shelter CPI', macro.MACRO_CPI_SHELTER_QAVG],
+    ['Construction earnings', macro.MACRO_WEEKLY_EARNINGS_CONSTRUCTION_QAVG],
+    ['Population', macro.MACRO_POPULATION_QUARTERLY],
+    ['Housing starts', macro.MACRO_HOUSING_STARTS_SAAR_QAVG],
+    ['Non-residential investment', macro.MACRO_NON_RESIDENTIAL_BUILDING_INVESTMENT_QSUM],
+  ] as const;
   return <section className="rounded-xl border border-[#cbd5cf] bg-[#edf0ea] p-5 sm:p-6">
     <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end"><div><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#28766d]">Four-channel evidence check</p><h2 className="mt-2 text-xl font-medium">Do not let one signal stand in for the system.</h2></div><span className="font-mono text-[9px] text-[#5a6c68]">as of {analysis.analysisDate}</span></div>
-    <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+    <div className="mt-5 grid gap-3 md:grid-cols-2">
       <ChannelCard icon={Users} title="Labour screen" status="inferred diagnostic">{analysis.labourRows.length ? <ul className="space-y-1.5">{analysis.labourRows.map((row) => <li className="flex justify-between gap-3" key={row.trade_node_id}><span>{LABOUR_LABELS[row.trade_node_id]}</span><span className="font-mono font-semibold">{row.vacancies_per_1_000_2021_employed === null ? 'not published' : `${row.vacancies_per_1_000_2021_employed.toFixed(1)}/1k`}</span></li>)}</ul> : 'No matching complete labour diagnostic.'}</ChannelCard>
       <ChannelCard icon={Construction} title="Public delivery" status="observed + research candidate">{analysis.concurrentProjectCount} same-class Alberta records with complete schedules overlap this project window. The full Alberta class inventory has {analysis.publicAssetSummary?.project_count ?? 0} records. Separately, {auditedProjectOutcomes.coverage_summary.named_completed_project_count} audited Ontario cases and a Québec panel with {quebecProjectRevisions.coverage_summary.cost_revision_chain_reconciled_project_count} authorized-cost chains, {quebecProjectRevisions.coverage_summary.schedule_revision_chain_reconciled_project_count} completion-month chains and {quebecFullArchive.publisher_declared_retirement_disappearance_event_count} source-declared retirement transitions inform reference design. Those transitions are not audited completions, and neither source authorizes an AI effect or a transfer factor for this project.</ChannelCard>
       <ChannelCard icon={Zap} title="Power system" status="observed · separate MW channel">AESO reported {(power.requested_load.latest_requested_load_mw / 1000).toFixed(1)} GW requested in {power.requested_load.latest_application_period}; Phase 1 allocation is {(power.phase1.allocated_mw / 1000).toFixed(1)} GW. Project-specific transmission need is unknown.</ChannelCard>
-      <ChannelCard icon={Factory} title="Regional macro" status="not yet quantified" warning>Economy-wide wage, housing, services and general-inflation spillovers remain a planned calibration stream, not a current model result.</ChannelCard>
+      <ChannelCard icon={Factory} title="Regional macro context" status="descriptive controls · 2026 Q2">
+        <ul className="grid gap-x-5 gap-y-1.5 sm:grid-cols-2">
+          {macroRows.map(([label, item]) => <li className="flex justify-between gap-3 border-b border-[#e3e6e1] pb-1.5" key={label}><span>{label}</span><span className="font-mono font-semibold text-[#275f5a]">{formatMacroChange(item?.year_over_year_change_percent)}</span></li>)}
+        </ul>
+        <p className="mt-3 text-[10px] leading-4">Separate Statistics Canada controls—not a composite pressure score, AI effect, project escalation forecast or scenario calibration.</p>
+      </ChannelCard>
     </div>
     <p className="mt-4 text-[10px] leading-4 text-[#5a6c68]">Labour is vacancies per 1,000 people employed in the 2021 Census and is not StatCan&apos;s vacancy rate or spare capacity. Requested power load is not contracted, connected or forecast load. Concurrent projects show timing overlap, not competition or causation.</p>
   </section>;
@@ -241,7 +258,7 @@ function DecisionActions({ analysis }: { analysis: Analysis }) {
     { timing: 'At each estimate gate', title: 'Re-run the dated evidence screen', text: `Refresh the ${METROS[analysis.metroId]} material, labour and public-project signals through ${analysis.scenarioWindowYears.length ? formatYears(analysis.scenarioWindowYears) : 'the applicable delivery window'}.` },
   ];
   return <section className="bg-[#f7f6f1]"><div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
-    <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr]"><div><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#28766d]">Decision actions</p><h2 className="mt-3 text-3xl font-medium tracking-[-0.035em]">Turn evidence into a gate, not a guess.</h2><p className="mt-4 max-w-md text-sm leading-6 text-[#5c706b]">The evidence can change diligence and sequencing today. It cannot yet produce an AI-specific dollar contingency.</p><div className="mt-6 grid gap-2 text-xs"><CoverageRow label="Observed market screen" status="Available" /><CoverageRow label="Historical index envelope" status="Available · descriptive" /><CoverageRow label="Structural pathway" status="Assumed · low confidence" /><CoverageRow label="Project cost translation" status="Calibration pending" warning /><CoverageRow label="Regional macro spillover" status="Research stream pending" warning /></div></div>
+    <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr]"><div><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#28766d]">Decision actions</p><h2 className="mt-3 text-3xl font-medium tracking-[-0.035em]">Turn evidence into a gate, not a guess.</h2><p className="mt-4 max-w-md text-sm leading-6 text-[#5c706b]">The evidence can change diligence and sequencing today. It cannot yet produce an AI-specific dollar contingency.</p><div className="mt-6 grid gap-2 text-xs"><CoverageRow label="Observed market screen" status="Available" /><CoverageRow label="Historical index envelope" status="Available · descriptive" /><CoverageRow label="Regional macro context" status="Available · descriptive" /><CoverageRow label="Structural pathway" status="Assumed · low confidence" /><CoverageRow label="Project cost translation" status="Calibration pending" warning /><CoverageRow label="AI macro spillover" status="Calibration pending" warning /></div></div>
       <ol className="grid gap-3 sm:grid-cols-2">{actions.map((action, index) => <li className="rounded-xl border border-[#ced8d1] bg-[#fbfaf5] p-5" key={action.title}><div className="flex items-center justify-between gap-3"><span className="font-mono text-[10px] font-semibold text-[#28766d]">0{index + 1}</span><span className="rounded-full bg-[#e5efeb] px-2 py-1 text-[9px] font-medium text-[#285d58]">{action.timing}</span></div><h3 className="mt-5 font-medium">{action.title}</h3><p className="mt-2 text-xs leading-5 text-[#62736f]">{action.text}</p></li>)}</ol>
     </div>
     <div className="mt-8 flex flex-col justify-between gap-4 rounded-xl border border-[#cbd5cf] bg-[#e8ece7] p-5 sm:flex-row sm:items-center"><div className="flex gap-3"><MapPin className="mt-0.5 size-4 shrink-0 text-[#28766d]" /><div><p className="max-w-3xl text-xs leading-5 text-[#576c67]">Research Mode provides the evidence register, assumptions, uncertainty, source links and downloads. Source IDs used here:</p><p className="mt-1 break-all font-mono text-[9px] leading-4 text-[#5a6c68]">{analysis.sourceIds.join(' · ')}</p></div></div><Link className="shrink-0 text-xs font-semibold text-[#1c665f] hover:underline" href="/research">Open Research Mode →</Link></div>
@@ -253,4 +270,5 @@ function DecisionMetric({ evidence, icon: Icon, label, note, tone = 'default', v
 function ChannelCard({ children, icon: Icon, status, title, warning = false }: { children: React.ReactNode; icon: typeof Users; status: string; title: string; warning?: boolean }) { return <article className={`rounded-xl border p-4 ${warning ? 'border-[#dfb38f] bg-[#fff1e5]' : 'border-[#d5ddd8] bg-[#fbfaf5]'}`}><div className="flex items-center justify-between gap-2"><Icon className="size-4 text-[#28766d]" /><span className="font-mono text-[8px] uppercase text-[#5a6c68]">{status}</span></div><h3 className="mt-4 text-sm font-medium">{title}</h3><div className="mt-2 text-[11px] leading-5 text-[#5a6c68]">{children}</div></article>; }
 function CoverageRow({ label, status, warning = false }: { label: string; status: string; warning?: boolean }) { return <div className="flex items-center justify-between gap-4 border-b border-[#d6ded9] py-2 last:border-0"><span className="text-[#52645f]">{label}</span><span className={`font-mono text-[10px] font-semibold ${warning ? 'text-[#a04f27]' : 'text-[#28766d]'}`}>{status}</span></div>; }
 function formatPercent(value: number) { return Number.isFinite(value) ? `${value >= 0 ? '+' : ''}${value.toFixed(1)}%` : 'n/a'; }
+function formatMacroChange(value: number | null | undefined) { return value === null || value === undefined || !Number.isFinite(value) ? 'not published' : `${value >= 0 ? '+' : ''}${value.toFixed(1)}% YoY`; }
 function formatYears(years: number[]) { if (!years.length) return 'none'; if (years.length === 1) return String(years[0]); const consecutive = years.every((year, index) => index === 0 || year === years[index - 1] + 1); return consecutive ? `${years[0]}–${years.at(-1)}` : years.join(', '); }

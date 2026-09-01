@@ -2,6 +2,7 @@ import { Building2, BriefcaseBusiness, Database, ExternalLink, ShieldCheck, Tren
 
 import { EvidenceExplorer } from '@/components/evidence-explorer';
 import { LabourMarketExplorer, type NationalLabourAvailability, type NationalLabourPressure, type NationalWorkforceStock } from '@/components/labour-market-explorer';
+import { RegionalMacroExplorer } from '@/components/regional-macro-explorer';
 import { EvidencePill, PageIntro, SiteFooter, SiteHeader } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
 import informationSectorCapex from '@/data/model-runs/information_sector_construction_capex_screen_v0.1.json';
@@ -48,6 +49,7 @@ export default function EvidencePage() {
         <EvidenceExplorer projects={releaseData.baseline.projects} />
       </section>
       {labourCanada ? <LabourMarketExplorer labour={labourCanada} pressure={labourPressure} workforce={workforceCanada} /> : labour ? <LabourAvailabilityPanel labour={labour} /> : null}
+      <RegionalMacroExplorer />
       <InformationSectorCapexPanel />
       <CmaReferenceCostPanel />
       <section className="border-t border-[#d5ddd8] bg-[#e9ebe5]">

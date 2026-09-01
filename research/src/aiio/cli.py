@@ -62,6 +62,7 @@ from .digest import build_digest, validate_digest_cadence
 from .historical_envelope import run_historical_reference_envelope
 from .labour import run_labour_recruitment_pressure
 from .materials import run_material_cost_screen, run_provincial_material_cost_screen
+from .macro_controls import build_regional_macro_controls
 from .model_review import (
     build_reference_cost_review_package,
     validate_reference_cost_review_verdict,
@@ -129,6 +130,15 @@ def main() -> None:
         help="normalize quarterly regional non-residential building-investment controls",
     )
     investment_parser.add_argument("zip_path", type=Path)
+
+    macro_controls_parser = subparsers.add_parser(
+        "run-regional-macro-controls",
+        help="build the Canada-wide quarterly regional macro control panel",
+    )
+    macro_controls_parser.add_argument("cpi_zip_path", type=Path)
+    macro_controls_parser.add_argument("population_zip_path", type=Path)
+    macro_controls_parser.add_argument("earnings_zip_path", type=Path)
+    macro_controls_parser.add_argument("housing_zip_path", type=Path)
 
     capex_treatment_parser = subparsers.add_parser(
         "normalize-capex-treatment-screen",
@@ -502,6 +512,32 @@ def main() -> None:
                         "geography_count": len(
                             {item["geography_id"] for item in observations}
                         ),
+                    }
+                )
+            )
+        elif args.command == "run-regional-macro-controls":
+            report = build_regional_macro_controls(
+                args.cpi_zip_path.resolve(),
+                args.population_zip_path.resolve(),
+                args.earnings_zip_path.resolve(),
+                args.housing_zip_path.resolve(),
+                root / "data/processed/building_investment_controls_canada.csv",
+                root
+                / "data/model-runs/building_investment_controls_canada_v0.1.json",
+                root / "data/processed/regional_macro_controls_canada.csv",
+                root
+                / "data/model-runs/regional_macro_controls_canada_v0.1.json",
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": "passed",
+                        "model_id": report["model_id"],
+                        "observation_count": report["observation_count"],
+                        "series_count": report["series_count"],
+                        "common_latest_period_end": report[
+                            "common_latest_period_end"
+                        ],
                     }
                 )
             )

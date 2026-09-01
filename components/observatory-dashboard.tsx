@@ -34,6 +34,7 @@ import {
 import releaseData from '@/public/data/latest.json';
 import attributionReadiness from '@/data/model-runs/ai_attribution_identification_readiness_v0.1.json';
 import buildingInvestmentControls from '@/data/model-runs/building_investment_controls_canada_v0.1.json';
+import regionalMacroControls from '@/data/model-runs/regional_macro_controls_canada_v0.1.json';
 import procurementOutcomeFeasibility from '@/data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json';
 import edmontonPermitProxy from '@/data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json';
 import auditedProjectOutcomes from '@/data/model-runs/oago_audited_project_outcomes_v0.1.json';
@@ -415,6 +416,18 @@ export function ObservatoryDashboard() {
               <ContractMetric label="Observations" value={buildingInvestmentControls.observation_count.toLocaleString('en-CA')} />
               <ContractMetric label="Geographies" value={buildingInvestmentControls.geography_count.toString()} />
               <ContractMetric label="Quarters" value={buildingInvestmentControls.quarter_count.toString()} />
+            </dl>
+          </div>
+
+          <div className="mt-5 grid gap-5 rounded-xl border border-[#b8cbd4] bg-[#edf3f5] p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-6">
+            <div>
+              <div className="flex items-center gap-2 text-[#365d6d]"><Activity className="size-4" /><p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">Regional macro controls · descriptive only</p></div>
+              <p className="mt-2 text-sm leading-6 text-[#526b76]">Seven separate Statistics Canada controls now track consumer prices, population, payroll earnings, housing starts and non-residential investment through {regionalMacroControls.common_latest_period_end}. They provide regional context, not an AI effect or composite pressure score.</p>
+            </div>
+            <dl className="grid grid-cols-3 gap-5 border-t border-[#c5d4da] pt-5 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
+              <ContractMetric label="Observations" value={regionalMacroControls.observation_count.toLocaleString('en-CA')} />
+              <ContractMetric label="Series" value={regionalMacroControls.series_count.toString()} />
+              <ContractMetric label="Quarters" value={regionalMacroControls.quarter_count.toString()} />
             </dl>
           </div>
 

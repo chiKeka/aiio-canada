@@ -21,11 +21,11 @@
       "check_id": "public_evidence_registry",
       "evidence": [
         "data/registry/sources.json",
-        "raw_manifest_count=95"
+        "raw_manifest_count=99"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The public-source registry validates with 32 unique sources."
+      "summary": "The public-source registry validates with 36 unique sources."
     },
     {
       "category": "analysis_engine",
@@ -100,6 +100,19 @@
       "release_gate": true,
       "status": "pass",
       "summary": "The quarterly regional building-investment control is hash-locked across 13 provinces/territories and 36 CMAs or CMA parts."
+    },
+    {
+      "category": "evidence_pipeline",
+      "check_id": "regional_macro_control_panel",
+      "evidence": [
+        "data/processed/regional_macro_controls_canada.csv",
+        "data/model-runs/regional_macro_controls_canada_v0.1.json",
+        "research/src/aiio/macro_controls.py",
+        "docs/methodology/regional-macro-controls.md"
+      ],
+      "release_gate": true,
+      "status": "pass",
+      "summary": "Seven separate quarterly macro controls are hash-locked across 82 Canada-wide jurisdiction series and remain descriptive only."
     },
     {
       "category": "evidence_pipeline",
@@ -209,9 +222,9 @@
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.20.0-dev.xlsx",
-        "workbook_sha256=sha256:0c1de25980ea3f138ae49f0a15187819fd5cec728ed9f4d62873605626b64e79",
-        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.20.0-dev.xlsx.inspect.ndjson"
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.21.0-dev.xlsx",
+        "workbook_sha256=sha256:884d2c5980b12acdea44beaa500880454ae0def2cfaa7eb67b8970e91d7872f7",
+        "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.21.0-dev.xlsx.inspect.ndjson"
       ],
       "release_gate": true,
       "status": "pass",
@@ -354,7 +367,7 @@
   "status_counts": {
     "blocked": 2,
     "fail": 0,
-    "pass": 21,
+    "pass": 22,
     "pending": 3
   },
   "structural_integrity": true

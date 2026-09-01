@@ -320,10 +320,10 @@
       "summary": "Review cannot authorize an effect until the evidence and identification gates produce an eligible model package."
     }
   ],
-  "registered_source_count": 32,
+  "registered_source_count": 36,
   "run_id": "AIIO_E2_IDENTIFICATION_READINESS_0_1",
   "schema_version": "1.0.0",
-  "source_registry_sha256": "sha256:75a862662dd484d7df1514b94d1febc7435c5c95778c5c1cbe32ce51de9f1d40",
+  "source_registry_sha256": "sha256:5c84f6abc5ebb69e05a3161bae91785498edfe072b10c856e3114922bdc5b5d0",
   "treatment_contract": {
     "authorizing_measures": [
       "realized_construction_spend_cad",

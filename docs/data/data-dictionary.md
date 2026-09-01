@@ -172,6 +172,22 @@ constant dollars remain separate series. Province/territory and CMA identifiers
 remain separate; named CMA parts are not silently merged. The quarterly sum is
 inferred from observed monthly investment values and is a regional control only.
 
+## Regional macro control panel
+
+Required fields: `observation_id`, `indicator_id`, `indicator_label`,
+`geography_id`, `geography_label`, `statcan_dguid`, `period_start`,
+`period_end`, `value`, `unit`, `year_over_year_change_percent`, `source_id`,
+`source_url`, `source_evidence_status`, `evidence_status`,
+`transformation_id`, `aggregation_method`, `source_observation_count` and
+`quality_flags`.
+
+The panel keeps seven quarterly controls separate: all-items CPI, shelter CPI,
+population, all-industry weekly earnings, construction weekly earnings, housing
+starts and non-residential building investment. Monthly means, quarterly sums
+and year-over-year changes are inferred transformations. No composite macro
+pressure score, AI effect, scenario calibration or public-project cost
+translation is authorized.
+
 ## Municipal data-centre permit proxy
 
 Required fields: `permit_proxy_id`, `source_row_id`, `issue_date`, `issue_year`,

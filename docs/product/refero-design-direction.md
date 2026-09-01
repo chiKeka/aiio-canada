@@ -4,6 +4,8 @@ Status: adopted for the local AIIO Canada interface on 2026-08-31.
 
 Sources of inspiration: [Refero Styles](https://styles.refero.design/), its [Seline Analytics](https://styles.refero.design/style/7967c6d9-e50c-42b5-b4d1-74003ba41781), [Ventriloc](https://styles.refero.design/style/f99aca3e-5289-4595-a7cc-77a72052f4b8), and [Decide AI](https://styles.refero.design/style/5d9e1cc2-4b81-40fe-aa92-640f2e1d7420) references. This is a translation of general design patterns, not a copy of Refero or any referenced brand or asset.
 
+The 2026-09-01 product pass also reviewed [Together AI](https://styles.refero.design/style/461da0f0-fde6-46bc-8137-7eca006260a8) and [Visitors](https://styles.refero.design/style/e7876363-181a-44a9-9e5c-2255cf98aea5). Their research-console labelling and functional category tints informed the regional-control panels; AIIO retains its own teal, paper and warning semantics.
+
 ## Product expression
 
 AIIO should feel like a quiet analyst's desk built for consequential public decisions: calm, precise, dated, and inspectable. The product surface is the proof. Decorative marketing treatments should never compete with evidence status, uncertainty, or the project decision.
@@ -24,6 +26,8 @@ The two interface modes now use distinct but related visual voices:
 - Use dark, inverted analytical surfaces for the Research Mode header, framing question and graph; return to warm paper for long-form methodology and tables.
 - Reserve mint in Research Mode for active-state and signal punctuation. It must not replace amber/rust warning semantics.
 - Prefer generous section rhythm around dense, compact evidence cards.
+- Use subtle category-tinted panels only when the tint encodes an evidence
+  domain; never use pastel colour as decoration or to imply a positive result.
 
 ## AIIO-specific constraints
 
