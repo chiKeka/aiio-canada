@@ -242,7 +242,7 @@
     },
     {
       "artifact_path": "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
-      "artifact_sha256": "17c15dcd5a4082c2b7afea1c717236c1d29248c2920a28cad76431d94dbd314f",
+      "artifact_sha256": "76d0b0261f98fe3e4e9c95fb0530f562b2642587a57bf16b41917074be8b1f56",
       "assertion_count": 3,
       "assertions_passed": true,
       "authorizing_status": "non_authorizing",
@@ -481,7 +481,7 @@
     "attribution_contract_sha256": "1c53deb5653265bddc5f38fd62c7b3ca99c396f2f13b6d246fd220dcd079d77b",
     "code_sha256": "629e5b79c1213b0084a81841a9c6c9c02a3dd49e99ba82d893d51cb20033f211",
     "evidence_artifact_sha256": {
-      "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json": "17c15dcd5a4082c2b7afea1c717236c1d29248c2920a28cad76431d94dbd314f",
+      "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json": "76d0b0261f98fe3e4e9c95fb0530f562b2642587a57bf16b41917074be8b1f56",
       "data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json": "88862880dda6b03809699b39eeb956184d1170632c473ce99da593f846474170",
       "data/model-runs/building_investment_controls_canada_v0.1.json": "efc353850648d0f3d919ae9494535c5238a7f96f7f06ac25e42f71f1d1a2fc31",
       "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json": "597ad07e642e6d619a56243de4af3c0a241f919e9599544acdff54218c82a19c",
@@ -493,7 +493,7 @@
       "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json": "df2df36431380339a7ab57d94203b87c9607ee7b6c891088eaf1fbefbd48f8e9"
     },
     "source_registry_path": "data/registry/sources.json",
-    "source_registry_sha256": "3fc47f50b744c98891a5da37239a2bdfc7d884d17c873a82d59ceb093872ce34"
+    "source_registry_sha256": "4bea23fa75e7311e5a2b59f2c1b81432c3902f2e0cd72d55759c98ad6f03edcf"
   },
   "panel_assembly": {
     "reason": "The preflight inventories candidate evidence and covers every locked field with an acquisition task, but zero regions, asset classes or panel rows are eligible for estimation.",

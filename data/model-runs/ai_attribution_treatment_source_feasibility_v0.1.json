@@ -6,7 +6,7 @@
     "contract_path": "data/model/ai_attribution_treatment_source_feasibility_contract_v0.1.json",
     "contract_sha256": "8a1fb433b2a76d1c0582bb6bae811ce1af323532b4a363e3a5dcdf67263e736b",
     "registry_path": "data/registry/sources.json",
-    "registry_sha256": "3fc47f50b744c98891a5da37239a2bdfc7d884d17c873a82d59ceb093872ce34"
+    "registry_sha256": "4bea23fa75e7311e5a2b59f2c1b81432c3902f2e0cd72d55759c98ad6f03edcf"
   },
   "required_authorizing_gates": [
     "ai_or_data_centre_specific",

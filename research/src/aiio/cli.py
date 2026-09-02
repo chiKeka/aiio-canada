@@ -36,6 +36,12 @@ from .adapters.vancouver_permits import (
     fetch_vancouver_permit_candidates,
     normalize_vancouver_permit_proxy,
 )
+from .adapters.ckan_permit_proxies import (
+    MONTREAL_SOURCE_ID as MONTREAL_PERMIT_SOURCE_ID,
+    TORONTO_SOURCE_ID as TORONTO_PERMIT_SOURCE_ID,
+    fetch_ckan_permit_candidates,
+    normalize_ckan_permit_proxy,
+)
 from .audited_outcomes import run_audited_project_outcomes
 from .quebec_revisions import (
     DICTIONARY_SOURCE_ID as QUEBEC_DICTIONARY_SOURCE_ID,
@@ -205,6 +211,10 @@ def main() -> None:
         help="build the fail-closed Vancouver data-centre permit activity proxy",
     )
     vancouver_permits_parser.add_argument("raw_path", type=Path)
+    for city in ("toronto", "montreal"):
+        subparsers.add_parser(f"fetch-{city}-permits", help=f"retrieve a field-minimized {city.title()} data-centre permit screen")
+        city_parser = subparsers.add_parser(f"normalize-{city}-permits", help=f"build the fail-closed {city.title()} data-centre permit proxy")
+        city_parser.add_argument("raw_path", type=Path)
 
     audited_outcomes_parser = subparsers.add_parser(
         "normalize-audited-project-outcomes",
@@ -847,6 +857,20 @@ def main() -> None:
                 retrieval_manifest_path=raw_path.with_suffix(raw_path.suffix + ".manifest.json"),
             )
             print(json.dumps({"status": "passed", "model_id": report["model_id"], "data_centre_candidate_count": report["data_centre_candidate_count"], "realized_ai_construction_treatment_authorized": report["publication_boundary"]["realized_ai_construction_treatment_authorized"]}))
+        elif args.command in {"fetch-toronto-permits", "fetch-montreal-permits"}:
+            city = args.command.split("-")[1]
+            source_id = TORONTO_PERMIT_SOURCE_ID if city == "toronto" else MONTREAL_PERMIT_SOURCE_ID
+            source_records = {source.source_id: source for source in load_registry(registry_path)}
+            if source_id not in source_records: raise ValidationError(f"{city.title()} permit source is missing from the registry")
+            print(json.dumps(fetch_ckan_permit_candidates(city, root / "data" / "raw"), indent=2, sort_keys=True))
+        elif args.command in {"normalize-toronto-permits", "normalize-montreal-permits"}:
+            city = args.command.split("-")[1]
+            source_id = TORONTO_PERMIT_SOURCE_ID if city == "toronto" else MONTREAL_PERMIT_SOURCE_ID
+            source_records = {source.source_id: source for source in load_registry(registry_path)}
+            if source_id not in source_records: raise ValidationError(f"{city.title()} permit source is missing from the registry")
+            raw_path = args.raw_path.resolve()
+            report = normalize_ckan_permit_proxy(city, raw_path, root / "data" / "processed" / f"{city}_data_centre_permit_proxy.csv", root / "data" / "model-runs" / f"{city}_data_centre_permit_proxy_v0.1.json", source_as_of_date=source_records[source_id].as_of_date, retrieval_manifest_path=raw_path.with_suffix(raw_path.suffix + ".manifest.json"))
+            print(json.dumps({"status": "passed", "model_id": report["model_id"], "data_centre_candidate_count": report["data_centre_candidate_count"], "realized_ai_construction_treatment_authorized": False}))
         elif args.command == "normalize-audited-project-outcomes":
             source_records = {
                 source.source_id: source for source in load_registry(registry_path)

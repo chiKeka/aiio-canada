@@ -1,6 +1,6 @@
 {
-  "artifact_count": 33,
-  "artifact_manifest_sha256": "sha256:c3634376e3bbea577858ac9f0da8f56a58081425e4d554b71e8081e08665c53c",
+  "artifact_count": 35,
+  "artifact_manifest_sha256": "sha256:190053a8604c2ccbae1fb3277c10e7ff64e1feb615e60d571e8db227fc52c50b",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -30,7 +30,7 @@
       "artifact_id": "source_registry",
       "evidence_role": "source_provenance",
       "path": "data/registry/sources.json",
-      "sha256": "sha256:3fc47f50b744c98891a5da37239a2bdfc7d884d17c873a82d59ceb093872ce34"
+      "sha256": "sha256:4bea23fa75e7311e5a2b59f2c1b81432c3902f2e0cd72d55759c98ad6f03edcf"
     },
     {
       "artifact_id": "pspe_method_lineage",
@@ -108,13 +108,13 @@
       "artifact_id": "attribution_readiness",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_identification_readiness_v0.1.json",
-      "sha256": "sha256:c015c13fcd574fc68c6b1dfb31800290142e49807b33e942a00fd5747d290d70"
+      "sha256": "sha256:fda82cf129952cbb92969953d2805053520933573b712e33d132f1c8061dc04e"
     },
     {
       "artifact_id": "panel_preflight",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
-      "sha256": "sha256:36e1fe9ea9249fd7060deeecf46e517a0d864821f29166243ba4b39ec15ef395"
+      "sha256": "sha256:6bea6b5dfbc5d2e492fc3796d04e3e22e02f64a69a0d3ee9dcef1878d9455018"
     },
     {
       "artifact_id": "empirical_covariate_panel",
@@ -150,7 +150,7 @@
       "artifact_id": "treatment_source_feasibility",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
-      "sha256": "sha256:17c15dcd5a4082c2b7afea1c717236c1d29248c2920a28cad76431d94dbd314f"
+      "sha256": "sha256:76d0b0261f98fe3e4e9c95fb0530f562b2642587a57bf16b41917074be8b1f56"
     },
     {
       "artifact_id": "building_investment_controls",
@@ -175,6 +175,18 @@
       "evidence_role": "inferred_proxy",
       "path": "data/model-runs/vancouver_data_centre_permit_proxy_v0.1.json",
       "sha256": "sha256:0bc32209e4eadf8110a9a3c4c84d27bf0373023ea5e1e1899d727e43458c5027"
+    },
+    {
+      "artifact_id": "toronto_permit_proxy",
+      "evidence_role": "inferred_proxy",
+      "path": "data/model-runs/toronto_data_centre_permit_proxy_v0.1.json",
+      "sha256": "sha256:b43a81cb716cd91565994deff0315c4f551e9b7cd68e2d1634169797e26f3cf9"
+    },
+    {
+      "artifact_id": "montreal_permit_proxy",
+      "evidence_role": "inferred_proxy",
+      "path": "data/model-runs/montreal_data_centre_permit_proxy_v0.1.json",
+      "sha256": "sha256:d494b8ee320cf656e67202b429d01929143c3f5f4db3b2fc378e44a88e648556"
     },
     {
       "artifact_id": "audited_outcomes",
