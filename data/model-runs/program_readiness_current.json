@@ -1,6 +1,6 @@
 {
-  "as_of_date": "2026-09-01",
-  "audit_id": "AIIO_PROGRAM_READINESS_2026_09_01",
+  "as_of_date": "2026-09-02",
+  "audit_id": "AIIO_PROGRAM_READINESS_2026_09_02",
   "checks": [
     {
       "category": "research_design",
@@ -228,7 +228,7 @@
         "data/digests/items/2026-09-01.json",
         "data/digests/2026-09-01.md",
         "data/digests/2026-09-01.manifest.json",
-        "age_days=0"
+        "age_days=1"
       ],
       "release_gate": true,
       "status": "pass",
@@ -261,12 +261,12 @@
       "check_id": "research_surface_provenance",
       "evidence": [
         "public/data/research-surface.json",
-        "artifact_manifest_sha256=sha256:8d4fb27bf006296118eea6b647eced7c0d0941f31c4ce85c97f784bb87ed255b",
+        "artifact_manifest_sha256=sha256:2136cfabe36e3446110da858e74b02df01fb9fca04d6b84a768a8acce3f4a546",
         "research/src/aiio/research_surface.py"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The evolving research website reconciles 27 hash-locked artifacts above the frozen release without promoting them."
+      "summary": "The evolving research website reconciles 29 hash-locked artifacts above the frozen release without promoting them."
     },
     {
       "category": "product",

@@ -1,6 +1,6 @@
 {
-  "artifact_count": 27,
-  "artifact_manifest_sha256": "sha256:8d4fb27bf006296118eea6b647eced7c0d0941f31c4ce85c97f784bb87ed255b",
+  "artifact_count": 29,
+  "artifact_manifest_sha256": "sha256:2136cfabe36e3446110da858e74b02df01fb9fca04d6b84a768a8acce3f4a546",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -115,6 +115,18 @@
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
       "sha256": "sha256:e989fb144d4823016f762ae0c21dc5850e9f66f46bce1ba2d1ea1b06e212c1fa"
+    },
+    {
+      "artifact_id": "empirical_covariate_panel",
+      "evidence_role": "observed_descriptive",
+      "path": "data/model-runs/ai_attribution_empirical_covariate_panel_v0.1.json",
+      "sha256": "sha256:abd7fa173366758ba6d4a88b2ddf5b1a167f77b3705c9b9846b591fcf76f25c5"
+    },
+    {
+      "artifact_id": "empirical_estimation",
+      "evidence_role": "withheld_model_output",
+      "path": "data/model-runs/ai_attribution_empirical_estimation_v0.1.json",
+      "sha256": "sha256:4d9b84e25864e80fb4058efef0fa6df19b6e75b427eeced74756e5dd76e6965a"
     },
     {
       "artifact_id": "treatment_source_feasibility",

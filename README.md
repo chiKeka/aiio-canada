@@ -61,6 +61,8 @@ npm run pspe:lineage
 npm run program:audit
 npm run attribution:readiness
 npm run attribution:preflight
+npm run attribution:panel
+npm run attribution:estimate
 npm run treatment:capex-screen
 npm run treatment:announcement-ledger
 npm run bcpi:normalize:reference-cmas

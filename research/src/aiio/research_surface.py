@@ -29,6 +29,8 @@ ARTIFACTS = [
     ("ai_capex_ledger", "data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json", "observed_and_inferred"),
     ("attribution_readiness", "data/model-runs/ai_attribution_identification_readiness_v0.1.json", "governance"),
     ("panel_preflight", "data/model-runs/ai_attribution_panel_preflight_v0.1.json", "governance"),
+    ("empirical_covariate_panel", "data/model-runs/ai_attribution_empirical_covariate_panel_v0.1.json", "observed_descriptive"),
+    ("empirical_estimation", "data/model-runs/ai_attribution_empirical_estimation_v0.1.json", "withheld_model_output"),
     ("treatment_source_feasibility", "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json", "governance"),
     ("building_investment_controls", "data/model-runs/building_investment_controls_canada_v0.1.json", "observed_descriptive"),
     ("procurement_feasibility", "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json", "governance"),

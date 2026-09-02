@@ -66,6 +66,8 @@ from .provincial_backcast_review import (
 from .attribution import build_attribution_readiness
 from .ai_capex_ledger import run_ai_capex_announcement_ledger
 from .panel_preflight import run_panel_acquisition_preflight
+from .empirical_panel import build_empirical_covariate_panel
+from .empirical_estimation import run_empirical_estimation_gate
 from .treatment_source_feasibility import run_treatment_source_feasibility
 from .digest import build_digest, find_latest_digest_items, validate_digest_cadence
 from .historical_envelope import run_historical_reference_envelope
@@ -474,6 +476,29 @@ def main() -> None:
     )
     treatment_sources_parser.add_argument("contract_path", type=Path)
     treatment_sources_parser.add_argument("output_path", type=Path)
+
+    empirical_panel_parser = subparsers.add_parser(
+        "build-empirical-covariate-panel",
+        help="assemble the five-market E2 quarterly covariate panel while withholding ineligible estimation",
+    )
+    empirical_panel_parser.add_argument("attribution_contract_path", type=Path)
+    empirical_panel_parser.add_argument("acquisition_contract_path", type=Path)
+    empirical_panel_parser.add_argument("alberta_bcpi_path", type=Path)
+    empirical_panel_parser.add_argument("comparison_bcpi_path", type=Path)
+    empirical_panel_parser.add_argument("investment_path", type=Path)
+    empirical_panel_parser.add_argument("macro_path", type=Path)
+    empirical_panel_parser.add_argument("labour_path", type=Path)
+    empirical_panel_parser.add_argument("output_csv_path", type=Path)
+    empirical_panel_parser.add_argument("output_json_path", type=Path)
+
+    empirical_estimation_parser = subparsers.add_parser(
+        "run-empirical-estimation-gate",
+        help="run the E2 estimator eligibility gate and withhold effects when the panel is ineligible",
+    )
+    empirical_estimation_parser.add_argument("contract_path", type=Path)
+    empirical_estimation_parser.add_argument("panel_path", type=Path)
+    empirical_estimation_parser.add_argument("panel_report_path", type=Path)
+    empirical_estimation_parser.add_argument("output_path", type=Path)
 
     scenario_parser = subparsers.add_parser(
         "run-scenario", help="run a versioned graph scenario and write auditable JSON output"
@@ -1545,6 +1570,18 @@ def main() -> None:
                     }
                 )
             )
+        elif args.command == "build-empirical-covariate-panel":
+            output = build_empirical_covariate_panel(
+                root,
+                args.attribution_contract_path.resolve(), args.acquisition_contract_path.resolve(),
+                args.alberta_bcpi_path.resolve(), args.comparison_bcpi_path.resolve(),
+                args.investment_path.resolve(), args.macro_path.resolve(), args.labour_path.resolve(),
+                args.output_csv_path.resolve(), args.output_json_path.resolve(),
+            )
+            print(json.dumps({"status": "passed", "panel_id": output["panel_id"], "row_count": output["row_count"], "effect_estimation_authorized": output["publication_boundary"]["effect_estimation_authorized"]}))
+        elif args.command == "run-empirical-estimation-gate":
+            output = run_empirical_estimation_gate(root, args.contract_path.resolve(), args.panel_path.resolve(), args.panel_report_path.resolve(), args.output_path.resolve())
+            print(json.dumps({"status": "passed", "run_id": output["run_id"], "analysis_status": output["status"], "effect_publication_authorized": output["publication_boundary"]["effect_publication_authorized"]}))
         elif args.command == "run-treatment-source-feasibility":
             output = run_treatment_source_feasibility(
                 args.contract_path.resolve(),
