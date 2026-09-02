@@ -1,8 +1,11 @@
 # Third-party data and attribution
 
-AIIO Canada combines original software and research transformations with public
+AIIO Canada's original software and documentation are licensed under the
+Apache License 2.0 in `LICENSE`. AIIO Canada combines original software and
+research transformations with public
 data published by Canadian governments, municipalities, system operators and
-public agencies. Third-party data is not relicensed by this repository.
+public agencies. Third-party data and source documents are not relicensed by
+the Apache licence or by this repository.
 
 The authoritative source, publisher, canonical URL, retrieval method, evidence
 status and licence note for every registered source are recorded in

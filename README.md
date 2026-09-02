@@ -109,3 +109,10 @@ Deployment and release provenance are documented in
 
 GitHub runs the same lint, evidence-registry, model-test, and dual-build quality
 gate on every change to `main` and on pull requests.
+
+## Licence
+
+AIIO Canada's original software and documentation are available under the
+[Apache License 2.0](LICENSE). Third-party datasets and source documents retain
+their original terms; see [THIRD_PARTY_DATA.md](THIRD_PARTY_DATA.md) and the
+source registry before redistributing data.
