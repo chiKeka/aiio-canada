@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { AlertTriangle, GitBranch, Zap } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { AlertTriangle, Check, GitBranch, Link2, Zap } from 'lucide-react';
 
 import { EvidencePill } from '@/components/site-shell';
 import scenarioSuite from '@/data/model-runs/alberta_50b_scenario_suite_v0.1.json';
@@ -13,9 +13,30 @@ type VariantId = 'staggered' | 'front_loaded' | 'constrained_delivery' | 'high_l
 
 const VARIANT_IDS: VariantId[] = ['staggered', 'front_loaded', 'constrained_delivery', 'high_local_capture'];
 
-export function ScenarioLab() {
-  const [variantId, setVariantId] = useState<VariantId>('staggered');
-  const [powerCase, setPowerCase] = useState<PowerCase>('central');
+export function ScenarioLab({ initialPower = 'central', initialVariant = 'staggered' }: { initialPower?: PowerCase; initialVariant?: VariantId }) {
+  const [variantId, setVariantId] = useState<VariantId>(initialVariant);
+  const [powerCase, setPowerCase] = useState<PowerCase>(initialPower);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('variant', variantId);
+    url.searchParams.set('power', powerCase);
+    window.history.replaceState(null, '', url);
+  }, [variantId, powerCase]);
+
+  async function shareScenario() {
+    const url = window.location.href;
+    try {
+      if (navigator.share) await navigator.share({ title: 'AIIO Canada scenario', url });
+      else await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      console.error('Scenario link could not be shared', error);
+    }
+  }
   const selected = scenarioSuite.variant_summaries.find((item) => item.variant_id === variantId)!;
   const power = releaseData.power_overlay.cases[powerCase];
   const tradeRows = useMemo(() => scenarioSuite.comparison_matrix
@@ -45,7 +66,8 @@ export function ScenarioLab() {
           })}
         </div>
         <div className="mt-7"><p className="mb-3 text-xs font-medium">Independent power case</p><div className="grid grid-cols-3 gap-2">{(['low', 'central', 'high'] as PowerCase[]).map((option) => <button aria-pressed={powerCase === option} className={`rounded-lg border py-2 text-xs capitalize ${powerCase === option ? 'border-[#b7663b] bg-[#fff0e4] text-[#91431f]' : 'border-[#d2dad5] bg-white text-[#667773]'}`} key={option} onClick={() => setPowerCase(option)} type="button">{option}</button>)}</div></div>
-        <div className="mt-7 rounded-lg bg-[#eef0e9] p-4"><p className="font-mono text-[10px] uppercase tracking-[0.1em] text-[#52645f]">Run status</p><p className="mt-2 text-sm font-medium text-[#274a4b]">Versioned structural run</p><p className="mt-1 break-words text-xs leading-5 text-[#52645f]">{selected.scenario_id} · no forecast authorization</p></div>
+        <button className="mt-7 flex w-full items-center justify-center gap-2 rounded-lg bg-[#12333d] px-4 py-3 text-xs font-medium text-white transition hover:bg-[#1b4a52]" onClick={shareScenario} type="button">{copied ? <Check className="size-4" /> : <Link2 className="size-4" />}{copied ? 'Link copied' : 'Share this view'}</button>
+        <div className="mt-3 rounded-lg bg-[#eef0e9] p-4"><p className="font-mono text-[10px] uppercase tracking-[0.1em] text-[#52645f]">Run status</p><p className="mt-2 text-sm font-medium text-[#274a4b]">Versioned structural run</p><p className="mt-1 break-words text-xs leading-5 text-[#52645f]">{selected.scenario_id} · no forecast authorization</p><p className="mt-2 text-[10px] leading-4 text-[#52645f]">The URL records the selected variant and power case; it stores no project or personal data.</p></div>
       </aside>
 
       <div className="space-y-6">

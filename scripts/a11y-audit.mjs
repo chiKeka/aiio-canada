@@ -12,6 +12,7 @@ const routes = [
   '/methods',
   '/digest',
   '/downloads',
+  '/status',
 ];
 const blockingImpacts = new Set(['serious', 'critical']);
 

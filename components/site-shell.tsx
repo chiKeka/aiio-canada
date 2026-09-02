@@ -55,6 +55,7 @@ export function SiteFooter() {
           development
         </p>
         <p className="font-mono">Observed ≠ inferred ≠ assumed ≠ scenario</p>
+        <Link className="underline underline-offset-2" href="/status">System status</Link>
       </div>
     </footer>
   );

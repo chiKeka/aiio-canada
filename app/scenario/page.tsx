@@ -20,7 +20,10 @@ type PowerEvidence = {
   };
 };
 
-export default function ScenarioPage() {
+export default async function ScenarioPage({ searchParams }: { searchParams: Promise<{ power?: string; variant?: string }> }) {
+  const params = await searchParams;
+  const initialVariant = ['staggered', 'front_loaded', 'constrained_delivery', 'high_local_capture'].includes(params.variant ?? '') ? params.variant as 'staggered' | 'front_loaded' | 'constrained_delivery' | 'high_local_capture' : 'staggered';
+  const initialPower = ['low', 'central', 'high'].includes(params.power ?? '') ? params.power as 'low' | 'central' | 'high' : 'central';
   const evidence = (
     releaseData as typeof releaseData & { power_evidence?: PowerEvidence }
   ).power_evidence;
@@ -34,7 +37,7 @@ export default function ScenarioPage() {
       />
       {evidence ? <ObservedPowerBoundary evidence={evidence} /> : null}
       <section className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
-        <ScenarioLab />
+        <ScenarioLab initialPower={initialPower} initialVariant={initialVariant} />
       </section>
       <SiteFooter />
     </main>

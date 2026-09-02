@@ -133,12 +133,25 @@ def main() -> None:
     }
     item_path.parent.mkdir(parents=True, exist_ok=True)
     item_path.write_text(json.dumps(digest_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    build_digest(
+    digest_manifest = build_digest(
         item_path,
         root / "data/digests" / f"{as_of}.md",
         args.edition_date,
         source_registry_path=root / "data/registry/sources.json",
         manifest_path=root / "data/digests" / f"{as_of}.manifest.json",
+    )
+    latest_digest = {
+        "schema_version": "1.0.0",
+        "digest_id": digest_manifest["digest_id"],
+        "edition_date": digest_manifest["edition_date"],
+        "status": digest_manifest["status"],
+        "item_count": digest_manifest["item_count"],
+        "source_ids": digest_manifest["source_ids"],
+        "automatic_model_change": digest_manifest["automatic_model_change"],
+    }
+    latest_digest_path = root / "public/data/latest-digest.json"
+    latest_digest_path.write_text(
+        json.dumps(latest_digest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     surface = build_research_surface_manifest(root, root / "public/data/research-surface.json")
     print(json.dumps({"status": "review_pr_required", "edition_date": as_of, "candidate_counts": {"edmonton": edmonton_report["data_centre_candidate_count"], **{city: reports[city]["data_centre_candidate_count"] for city in reports}}, "comparison_panel_rows": panel_report["row_count"], "research_surface_artifacts": surface["artifact_count"], "automatic_model_change": False}, indent=2, sort_keys=True))

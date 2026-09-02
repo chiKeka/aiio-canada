@@ -12,6 +12,7 @@ SURFACE_ID = "AIIO_CANADA_RESEARCH_SURFACE_0_1"
 ARTIFACTS = [
     ("frozen_release_bundle", "public/data/latest.json", "frozen_release"),
     ("frozen_release_manifest", "public/data/manifest.json", "governance"),
+    ("latest_digest_pointer", "public/data/latest-digest.json", "governance"),
     ("program_gates", "data/governance/program-gates.json", "governance"),
     ("executive_monthly_escalation", "data/model-runs/executive_monthly_escalation_current.json", "withheld_model_output"),
     ("source_registry", "data/registry/sources.json", "source_provenance"),

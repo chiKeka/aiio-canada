@@ -1,6 +1,6 @@
 {
-  "artifact_count": 37,
-  "artifact_manifest_sha256": "sha256:e88afad7fcde56b9781262c22d049ba8d89010eb64e704c9245cd1beb69a7fad",
+  "artifact_count": 38,
+  "artifact_manifest_sha256": "sha256:594764327f0717dcd1e79431c07710068c197bae2575af67e7cbc37d36a46bc8",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -13,6 +13,12 @@
       "evidence_role": "governance",
       "path": "public/data/manifest.json",
       "sha256": "sha256:82c3a116d18ad0eb07041b99355cc32e687e2b47991b159252effa3ab29bfe01"
+    },
+    {
+      "artifact_id": "latest_digest_pointer",
+      "evidence_role": "governance",
+      "path": "public/data/latest-digest.json",
+      "sha256": "sha256:b2504732ecf0aa2a2259b44bfad7f993268c152799a5b6d56afb6bdcf19912b5"
     },
     {
       "artifact_id": "program_gates",

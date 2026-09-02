@@ -1,0 +1,14 @@
+{
+  "automatic_model_change": false,
+  "digest_id": "AIIO_DIGEST_2026_09_02",
+  "edition_date": "2026-09-02",
+  "item_count": 1,
+  "schema_version": "1.0.0",
+  "source_ids": [
+    "EDMONTON_GENERAL_BUILDING_PERMITS",
+    "MONTREAL_CONSTRUCTION_PERMITS",
+    "TORONTO_CLEARED_BUILDING_PERMITS",
+    "VANCOUVER_ISSUED_BUILDING_PERMITS"
+  ],
+  "status": "review"
+}
