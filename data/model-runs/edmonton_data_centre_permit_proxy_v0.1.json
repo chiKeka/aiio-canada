@@ -51,7 +51,7 @@
     "status": "municipal_permit_activity_proxy_only"
   },
   "reported_estimated_value_available_count": 85,
-  "retrieval_manifest_sha256": "sha256:95b67badb11a783d733e9faf3381b353ceb01689160a231de0c2ddce171959f7",
+  "retrieval_manifest_sha256": "sha256:fa721527ea95db3e9a13891c2b812f43ab6866c5756c53f1fb30bd3edb34a2e9",
   "schema_version": "0.1.0",
   "source_ids": [
     "EDMONTON_GENERAL_BUILDING_PERMITS"

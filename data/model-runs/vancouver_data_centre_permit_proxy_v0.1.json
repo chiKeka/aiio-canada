@@ -9,7 +9,7 @@
   "data_centre_candidate_reported_value_total_cad_proxy": 141771751.65,
   "evidence_status": "observed_permit_fields_with_inferred_keyword_classification",
   "explicit_ai_reference_count": 0,
-  "input_sha256": "sha256:e59dfebb0e70968785eb49c72cafce6dc9ad31ca9bae37617b0dbf5d8e69db15",
+  "input_sha256": "sha256:7a9fd95f05b2f757b139d60b1d7eb81cac25ca420c9059e2028f92a1973a7a5b",
   "limitations": [
     "The dataset starts in 2017 and records initial issuance rather than construction progress.",
     "Project value is an applicant estimate and may be zero, incomplete, revised or overlap related permits.",
@@ -17,7 +17,7 @@
     "Personal and precise location fields are excluded from the processed artifact."
   ],
   "model_id": "AIIO_VANCOUVER_DATA_CENTRE_PERMIT_PROXY_0_1",
-  "output_sha256": "sha256:8203480369fd3292240844af44a69fb040d7bfce17478c35353bb41fcb265cd3",
+  "output_sha256": "sha256:b9f932db163c7d4bf7dc161a3c15cf4ce1ec0a1a6834e8ae7542917c8e22e84c",
   "publication_boundary": {
     "causal_effect_authorized": false,
     "proxy_exposure_authorized": true,
@@ -26,7 +26,7 @@
     "reason": "Issued permits and declared project values indicate authorized activity, not realized quarterly expenditure or labour hours; text does not establish AI use.",
     "status": "municipal_permit_activity_proxy_only"
   },
-  "retrieval_manifest_sha256": "sha256:fb8c0919861d957da4cc7b58e82b58c9caec0395d4e95f96249b8fbeb871851d",
+  "retrieval_manifest_sha256": "sha256:1de2aa3e0cf99b415819d23e34006005aa31a08399f3d16981fc9acd5e641ad8",
   "schema_version": "0.1.0",
   "source_ids": [
     "VANCOUVER_ISSUED_BUILDING_PERMITS"

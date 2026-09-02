@@ -15,7 +15,7 @@
   ],
   "metadata_archive_path": "data/raw/edmonton_general_building_permits/2026-09-02_f4da956ae985.metadata.json",
   "metadata_byte_length": 55769,
-  "metadata_content_hash": "sha256:dad09932de9aa7ed5a26094c7541f2c9154409f74ba2d554d54dc882de52e825",
+  "metadata_content_hash": "sha256:1129d86ecf49a745a933bbca0f2d724826274266b898c9092c9c2c0d895fed21",
   "metadata_content_type": "application/json",
   "metadata_effective_url": "https://data.edmonton.ca/api/views/24uj-dj8v",
   "query_parameters": {
@@ -26,7 +26,7 @@
   },
   "result": "success",
   "retrieval_id": "RET_EDMONTON_GENERAL_BUILDING_PERMITS_f4da956ae985c7eb",
-  "retrieved_at": "2026-09-02T12:13:46+00:00",
+  "retrieved_at": "2026-09-02T16:49:53+00:00",
   "row_count": 85,
   "source_id": "EDMONTON_GENERAL_BUILDING_PERMITS"
 }

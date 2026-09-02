@@ -16,7 +16,7 @@
   "geography_count": 2,
   "input_manifest": {
     "data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json": "sha256:88862880dda6b03809699b39eeb956184d1170632c473ce99da593f846474170",
-    "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json": "sha256:3fcbfbbe11b1a9745042f54406cfde4b9097937b7b0b128a9a22f8a6bc4f0f05",
+    "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json": "sha256:10bf5872d1e18cce075f72f7cf7d491fdf68a636529978c506f27deb885f5491",
     "data/processed/alberta_ai_projects.csv": "sha256:46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199",
     "data/processed/edmonton_data_centre_permit_proxy.csv": "sha256:c76ff46006f6425be98824f09645d817f602b572b444cfe4e1c1e07bda3569b2"
   },

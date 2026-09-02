@@ -6,7 +6,7 @@
   "data_centre_candidate_count": 14,
   "evidence_status": "observed_permit_fields_with_inferred_keyword_classification",
   "explicit_ai_reference_count": 0,
-  "input_sha256": "sha256:32537a69318f52e199a7173dd0e120a4d807072a897ee7acf3ef3e5b7c79d5e1",
+  "input_sha256": "sha256:20f67da9f90304830d487143074e72aa6b620890c22bd4d4088b3f4eda5e850a",
   "limitations": [
     "Keyword classification requires review and does not establish AI use.",
     "Permit records may include multiple permit types or revisions for one underlying project.",
@@ -25,7 +25,7 @@
     "status": "municipal_permit_activity_proxy_only"
   },
   "reported_value_available_count": 0,
-  "retrieval_manifest_sha256": "sha256:d9bd5da353887f575376c35c86a1b9893d19414fa8d6a1061d1701f6ad905562",
+  "retrieval_manifest_sha256": "sha256:3ee03749760bc8b3d23f25553014c9274ed4c1ae7bdc677dca943cdbc02064cb",
   "schema_version": "0.1.0",
   "source_ids": [
     "MONTREAL_CONSTRUCTION_PERMITS"
