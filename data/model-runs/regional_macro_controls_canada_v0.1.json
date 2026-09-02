@@ -4,12 +4,12 @@
   "common_latest_period_end": "2026-06-30",
   "input_manifest": [
     {
-      "retrieval_manifest_sha256": "sha256:8f995cfb589bcd19cf79da1076407a0a535b4c176526a5429c1f490cf17b6025",
+      "retrieval_manifest_sha256": "sha256:f806adc3e6aa0159dee1e1a5837691eb5276cc7c5df178f299803bcf575b8215",
       "sha256": "sha256:b022bf41c44ddf18a56f1f496e6944c37cbcd14f4732092c7f0e871c15407310",
       "source_id": "STATCAN_CMHC_HOUSING_STARTS_34100156"
     },
     {
-      "retrieval_manifest_sha256": "sha256:a96efcc5810a7bd63cf8c67d06d6605ed8fe4d6f9a5cd75abf3fc9a1abc0f31a",
+      "retrieval_manifest_sha256": "sha256:411037ec666cf4085e0503345e292607e166a1b0ce1d3fd28893aa3cd9615a02",
       "sha256": "sha256:19f2712264fcfda9a2aacb019f6907582e73f40b7780ca88db7c986e5c95aa26",
       "source_id": "STATCAN_CPI_18100004"
     },
@@ -19,12 +19,12 @@
       "source_id": "STATCAN_IBC_34100293"
     },
     {
-      "retrieval_manifest_sha256": "sha256:67ed3072afea388c2f16486edcb4e948cadd6bda86f3be9f9f267c8cbc9985c8",
+      "retrieval_manifest_sha256": "sha256:0930dc07ffeb51dcc94be4d8027030ea2557da4b666382fa517fa538fc1c3626",
       "sha256": "sha256:4c99d5f137222ca7bcbb3c2c0e23b422c374e2712b68412965d06411bb0f31f5",
       "source_id": "STATCAN_POPULATION_17100009"
     },
     {
-      "retrieval_manifest_sha256": "sha256:264ae208b0909f83d2222a8070052bd7ce499380f496743c9f1048c4abbb5fc8",
+      "retrieval_manifest_sha256": "sha256:531b25854b21f44126fdc215440d8c10d9c8e62b2382d1022c565840b9d6ebb2",
       "sha256": "sha256:06c7a79f80a0f86cd304ece688f517e036af6e86465bba271d7f5df771058bde",
       "source_id": "STATCAN_SEPH_EARNINGS_14100223"
     }

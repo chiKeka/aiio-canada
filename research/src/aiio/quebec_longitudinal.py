@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .adapters.provincial_projects import classify_asset_class
+from .paths import repository_path
 from .quebec_revisions import _parse_money_millions, _parse_month_year
 from .schemas import ValidationError
 
@@ -270,9 +271,9 @@ def run_quebec_milestone_longitudinal(
         },
         "vintages": vintage_summaries,
         "outputs": {
-            "snapshot_csv": str(snapshot_output_path),
+            "snapshot_csv": repository_path(snapshot_output_path),
             "snapshot_csv_sha256": sha256_file(snapshot_output_path),
-            "lifecycle_csv": str(lifecycle_output_path),
+            "lifecycle_csv": repository_path(lifecycle_output_path),
             "lifecycle_csv_sha256": sha256_file(lifecycle_output_path),
         },
         "limitations": [

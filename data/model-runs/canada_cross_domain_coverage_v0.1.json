@@ -584,7 +584,7 @@
     },
     "capex": {
       "path": "data/model-runs/information_sector_construction_capex_screen_v0.1.json",
-      "sha256": "sha256:62d7a268cb7aaa37f07a155237bc488f9fa1720b7454a3eaa0a3fdc1be0189fe"
+      "sha256": "sha256:06ed4e591bf350ea7c82a31e60558c4495c716cbd9e5479f27328c04fd742a6e"
     },
     "investment": {
       "path": "data/model-runs/building_investment_controls_canada_v0.1.json",
@@ -596,7 +596,7 @@
     },
     "macro": {
       "path": "data/model-runs/regional_macro_controls_canada_v0.1.json",
-      "sha256": "sha256:81b583e1d51aabc1bba41fb75e80dabde9c45bab139ecd30d62d638a11432da1"
+      "sha256": "sha256:43bd0642c78fdb5ecb0b1633534246f041221bc412835677a37b0d2cd1f1e3c8"
     },
     "materials": {
       "path": "data/model-runs/bcpi_material_cost_screen_provinces_v0.1.json",

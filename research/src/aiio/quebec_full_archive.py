@@ -10,6 +10,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
+
+from .paths import repository_path
 from xml.etree import ElementTree
 
 from .adapters.provincial_projects import classify_asset_class
@@ -417,11 +419,11 @@ def run_quebec_full_archive_longitudinal(
         },
         "snapshot_summaries": snapshot_summaries,
         "outputs": {
-            "snapshot_csv": str(snapshot_output_path),
+            "snapshot_csv": repository_path(snapshot_output_path),
             "snapshot_csv_sha256": sha256_file(snapshot_output_path),
-            "lifecycle_csv": str(lifecycle_output_path),
+            "lifecycle_csv": repository_path(lifecycle_output_path),
             "lifecycle_csv_sha256": sha256_file(lifecycle_output_path),
-            "transition_csv": str(transition_output_path),
+            "transition_csv": repository_path(transition_output_path),
             "transition_csv_sha256": sha256_file(transition_output_path),
         },
         "limitations": [

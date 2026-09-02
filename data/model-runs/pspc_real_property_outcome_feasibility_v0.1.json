@@ -22,7 +22,7 @@
     "reason": "The public file provides anonymous ordinal statuses without geography, asset class, cost values, schedule dates or stable longitudinal project identity."
   },
   "record_count": 691,
-  "retrieval_manifest_sha256": "sha256:b07031f34dae29a9672d55e559f400daf39cbb679a24b8124afc2afbfece9e85",
+  "retrieval_manifest_sha256": "sha256:8b1a97b03e3b14d82f19047310f314fc6ea8fb90660b253bf31eee00a92becbd",
   "schema_version": "1.0.0",
   "status": "aggregate_outcome_context_only",
   "status_counts": {

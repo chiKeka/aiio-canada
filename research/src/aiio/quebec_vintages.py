@@ -11,6 +11,7 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
+from .paths import repository_path
 from .schemas import ValidationError
 
 
@@ -278,8 +279,8 @@ def retrieve_full_archive_resources(
                 )
             content = archive_path.read_bytes()
             csv_record = {
-                "archive_path": str(archive_path),
-                "manifest_path": str(manifest_path),
+                "archive_path": repository_path(archive_path),
+                "manifest_path": repository_path(manifest_path),
                 "content_hash": reused["content_hash"],
                 "byte_length": reused["byte_length"],
                 "retrieved_at": reused["retrieved_at"],
@@ -563,13 +564,13 @@ def _retrieve_resource(item: dict[str, Any], raw_root: Path) -> dict[str, Any]:
         "content_type": content_type,
         "byte_length": len(content),
         "row_count": len(rows),
-        "archive_path": str(destination),
+        "archive_path": repository_path(destination),
         "result": "success",
     }
     manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return {
-        "archive_path": str(destination),
-        "manifest_path": str(manifest_path),
+        "archive_path": repository_path(destination),
+        "manifest_path": repository_path(manifest_path),
         "content_hash": digest,
         "byte_length": len(content),
         "row_count": len(rows),
@@ -608,8 +609,8 @@ def _download_catalog_resource(
                 f"existing Quebec full-archive URL mismatch: {manifest_path}"
             )
         return {
-            "archive_path": str(destination),
-            "manifest_path": str(manifest_path),
+            "archive_path": repository_path(destination),
+            "manifest_path": repository_path(manifest_path),
             "content_hash": digest,
             "byte_length": destination.stat().st_size,
             "retrieved_at": existing_manifest["retrieved_at"],
@@ -657,15 +658,15 @@ def _download_catalog_resource(
         "content_hash": digest,
         "content_type": content_type,
         "byte_length": len(content),
-        "archive_path": str(destination),
+        "archive_path": repository_path(destination),
         "result": "success",
     }
     manifest_path.write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     return {
-        "archive_path": str(destination),
-        "manifest_path": str(manifest_path),
+        "archive_path": repository_path(destination),
+        "manifest_path": repository_path(manifest_path),
         "content_hash": digest,
         "byte_length": len(content),
         "retrieved_at": retrieved_at,

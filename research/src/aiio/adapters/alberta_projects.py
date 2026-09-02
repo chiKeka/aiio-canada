@@ -12,6 +12,7 @@ from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 
+from ..paths import repository_path
 from ..retrieval import RetrievalRecord
 from ..schemas import ValidationError
 
@@ -80,7 +81,7 @@ def fetch_major_projects(raw_root: Path) -> RetrievalRecord:
         content_hash=f"sha256:{digest}",
         content_type=content_type,
         byte_length=len(content),
-        archive_path=str(destination),
+        archive_path=repository_path(destination),
         result="success",
     )
     destination.with_suffix(".csv.manifest.json").write_text(

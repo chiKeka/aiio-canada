@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+from .paths import repository_path
 from .schemas import SourceRecord, ValidationError
 
 
@@ -63,7 +64,7 @@ def retrieve(source: SourceRecord, raw_root: Path) -> RetrievalRecord:
         content_hash=f"sha256:{digest}",
         content_type=content_type,
         byte_length=len(content),
-        archive_path=str(destination),
+        archive_path=repository_path(destination),
         result="success",
     )
     manifest_path = destination.with_suffix(destination.suffix + ".manifest.json")

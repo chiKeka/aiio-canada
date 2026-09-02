@@ -211,7 +211,7 @@
     },
     {
       "artifact_path": "data/model-runs/information_sector_construction_capex_screen_v0.1.json",
-      "artifact_sha256": "62d7a268cb7aaa37f07a155237bc488f9fa1720b7454a3eaa0a3fdc1be0189fe",
+      "artifact_sha256": "06ed4e591bf350ea7c82a31e60558c4495c716cbd9e5479f27328c04fd742a6e",
       "assertion_count": 2,
       "assertions_passed": true,
       "authorizing_status": "non_authorizing",
@@ -299,7 +299,7 @@
     },
     {
       "artifact_path": "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json",
-      "artifact_sha256": "54210f1298d845a42112c3c74406e807d3b79dad95546894a83ecdb6bee6169b",
+      "artifact_sha256": "860f6b43d4703b75f0473073166366ea72c5250356acaf42daf9433bf65ad660",
       "assertion_count": 2,
       "assertions_passed": true,
       "authorizing_status": "non_authorizing",
@@ -319,7 +319,7 @@
     },
     {
       "artifact_path": "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json",
-      "artifact_sha256": "54210f1298d845a42112c3c74406e807d3b79dad95546894a83ecdb6bee6169b",
+      "artifact_sha256": "860f6b43d4703b75f0473073166366ea72c5250356acaf42daf9433bf65ad660",
       "assertion_count": 2,
       "assertions_passed": true,
       "authorizing_status": "non_authorizing",
@@ -403,7 +403,7 @@
     },
     {
       "artifact_path": "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json",
-      "artifact_sha256": "dc2f3d7d6c2644edf34e82eebde08c86b365fd9fa451617507869ccbe90f559f",
+      "artifact_sha256": "54f52ac6203ea24aab5798c30af50f1c3ef248abc5740b3e8ddb1dd2cda49160",
       "assertion_count": 2,
       "assertions_passed": true,
       "authorizing_status": "non_authorizing",
@@ -425,7 +425,7 @@
     },
     {
       "artifact_path": "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json",
-      "artifact_sha256": "df2df36431380339a7ab57d94203b87c9607ee7b6c891088eaf1fbefbd48f8e9",
+      "artifact_sha256": "0e1b1fdd98732ce7882b3294e8dd16388132f059cc14bcbf88c1e9dd121f8095",
       "assertion_count": 2,
       "assertions_passed": true,
       "authorizing_status": "non_authorizing",
@@ -486,11 +486,11 @@
       "data/model-runs/building_investment_controls_canada_v0.1.json": "efc353850648d0f3d919ae9494535c5238a7f96f7f06ac25e42f71f1d1a2fc31",
       "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json": "597ad07e642e6d619a56243de4af3c0a241f919e9599544acdff54218c82a19c",
       "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json": "3fcbfbbe11b1a9745042f54406cfde4b9097937b7b0b128a9a22f8a6bc4f0f05",
-      "data/model-runs/information_sector_construction_capex_screen_v0.1.json": "62d7a268cb7aaa37f07a155237bc488f9fa1720b7454a3eaa0a3fdc1be0189fe",
+      "data/model-runs/information_sector_construction_capex_screen_v0.1.json": "06ed4e591bf350ea7c82a31e60558c4495c716cbd9e5479f27328c04fd742a6e",
       "data/model-runs/oago_audited_project_outcomes_v0.1.json": "9106612b664aac9617e67782e976b08ff0d6b2c4a9fe0bc89cdc27bc8af4e0bb",
-      "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json": "54210f1298d845a42112c3c74406e807d3b79dad95546894a83ecdb6bee6169b",
-      "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json": "dc2f3d7d6c2644edf34e82eebde08c86b365fd9fa451617507869ccbe90f559f",
-      "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json": "df2df36431380339a7ab57d94203b87c9607ee7b6c891088eaf1fbefbd48f8e9"
+      "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json": "860f6b43d4703b75f0473073166366ea72c5250356acaf42daf9433bf65ad660",
+      "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json": "54f52ac6203ea24aab5798c30af50f1c3ef248abc5740b3e8ddb1dd2cda49160",
+      "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json": "0e1b1fdd98732ce7882b3294e8dd16388132f059cc14bcbf88c1e9dd121f8095"
     },
     "source_registry_path": "data/registry/sources.json",
     "source_registry_sha256": "4bea23fa75e7311e5a2b59f2c1b81432c3902f2e0cd72d55759c98ad6f03edcf"

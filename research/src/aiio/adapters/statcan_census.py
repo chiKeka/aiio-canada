@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from ..constants import EvidenceStatus
+from ..paths import repository_path
 from ..retrieval import RetrievalRecord
 from ..schemas import ObservationRecord, ValidationError
 from .statcan import PROVINCE_DGUID_TO_GEOGRAPHY_ID, TRADE_NOC_TO_NODE
@@ -108,7 +109,7 @@ def fetch_census_trade_employment(raw_root: Path) -> RetrievalRecord:
         content_hash=f"sha256:{digest}",
         content_type="application/json",
         byte_length=len(content),
-        archive_path=str(destination),
+        archive_path=repository_path(destination),
         result="success",
     )
     destination.with_suffix(".json.manifest.json").write_text(

@@ -6,6 +6,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
+from ..paths import repository_path
 from ..schemas import ValidationError
 
 TORONTO_SOURCE_ID = "TORONTO_CLEARED_BUILDING_PERMITS"
@@ -49,7 +50,7 @@ def fetch_ckan_permit_candidates(city: str, raw_root: Path) -> dict[str, Any]:
     content = (json.dumps(envelope, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode()
     digest = hashlib.sha256(content).hexdigest(); destination_dir = raw_root / source_id.lower(); destination_dir.mkdir(parents=True, exist_ok=True)
     destination = destination_dir / f"{retrieved_at[:10]}_{digest[:12]}.json"; destination.write_bytes(content)
-    manifest = {"retrieval_id": f"RET_{source_id}_{digest[:16]}", "source_id": source_id, "resource_id": resource_id, "retrieved_at": retrieved_at, "query_terms": list(TERMS[city]), "content_hash": f"sha256:{digest}", "byte_length": len(content), "row_count": len(deduped), "archive_path": str(destination), "excluded_fields": _excluded(city), "result": "success"}
+    manifest = {"retrieval_id": f"RET_{source_id}_{digest[:16]}", "source_id": source_id, "resource_id": resource_id, "retrieved_at": retrieved_at, "query_terms": list(TERMS[city]), "content_hash": f"sha256:{digest}", "byte_length": len(content), "row_count": len(deduped), "archive_path": repository_path(destination), "excluded_fields": _excluded(city), "result": "success"}
     destination.with_suffix(".json.manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return manifest
 

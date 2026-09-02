@@ -153,7 +153,7 @@
     "intentions": 14,
     "preliminary_actual": 14
   },
-  "retrieval_manifest_sha256": "sha256:41d1cb12d079cef7cd2a5f8f6bb584a31770db5d727c2f6cc531d10af16a17d4",
+  "retrieval_manifest_sha256": "sha256:6e15c2aa49f5f4b2c3c65e02b99d3d8ef37555fe9b910b77fef860a2c7c86bf8",
   "schema_version": "1.0.0",
   "source_id": "STATCAN_CAPEX_INDUSTRY_GEOGRAPHY_34100035",
   "source_release_date": "2026-02-25",

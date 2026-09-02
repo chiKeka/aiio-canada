@@ -7,6 +7,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from .paths import repository_path
 from .quebec_revisions import REQUIRED_FIELDS, _sha256_text
 from .schemas import ValidationError
 
@@ -296,7 +297,7 @@ def build_quebec_parser_review_package(
         "sampling_fraction": len(review_rows) / len(summary_by_id),
         "selection_reason_counts": dict(sorted(reason_counts.items())),
         "review_output": {
-            "path": str(review_csv_path),
+            "path": repository_path(review_csv_path),
             "content_hash": sha256_file(review_csv_path),
         },
         "review_protocol": [

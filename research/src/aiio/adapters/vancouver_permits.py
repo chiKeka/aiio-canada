@@ -12,6 +12,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
+from ..paths import repository_path
 from ..schemas import ValidationError
 
 
@@ -62,7 +63,7 @@ def fetch_vancouver_permit_candidates(raw_root: Path) -> dict[str, Any]:
         "dataset_id": DATASET_ID, "retrieved_at": retrieved_at, "effective_url": effective_url,
         "query_parameters": params, "content_hash": f"sha256:{digest}",
         "content_type": content_type, "byte_length": len(content), "row_count": len(rows),
-        "archive_path": str(destination), "excluded_fields": ["address", "applicant", "applicantaddress", "buildingcontractor", "buildingcontractoraddress", "geom", "geo_point_2d"],
+        "archive_path": repository_path(destination), "excluded_fields": ["address", "applicant", "applicantaddress", "buildingcontractor", "buildingcontractoraddress", "geom", "geo_point_2d"],
         "result": "success",
     }
     destination.with_suffix(".json.manifest.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")

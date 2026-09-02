@@ -1,6 +1,6 @@
 {
   "artifact_count": 37,
-  "artifact_manifest_sha256": "sha256:92538a024743b5b714331a939430e1bb2ae26804152d00b6ada5d7cfa3fd68fe",
+  "artifact_manifest_sha256": "sha256:e88afad7fcde56b9781262c22d049ba8d89010eb64e704c9245cd1beb69a7fad",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -42,7 +42,7 @@
       "artifact_id": "canada_cross_domain_coverage",
       "evidence_role": "coverage_inventory",
       "path": "data/model-runs/canada_cross_domain_coverage_v0.1.json",
-      "sha256": "sha256:263a3e543203c9fd03b945972d509b4106505e414736e36ebf8ef4ac93f0d7af"
+      "sha256": "sha256:fea5c9e6322739a79ead4a00f0ff8a01f7ad069ccb08ee9970d6d34abf8d2b51"
     },
     {
       "artifact_id": "alberta_graph",
@@ -78,7 +78,7 @@
       "artifact_id": "information_sector_capex",
       "evidence_role": "inferred_proxy",
       "path": "data/model-runs/information_sector_construction_capex_screen_v0.1.json",
-      "sha256": "sha256:62d7a268cb7aaa37f07a155237bc488f9fa1720b7454a3eaa0a3fdc1be0189fe"
+      "sha256": "sha256:06ed4e591bf350ea7c82a31e60558c4495c716cbd9e5479f27328c04fd742a6e"
     },
     {
       "artifact_id": "cma_reference",
@@ -90,7 +90,7 @@
       "artifact_id": "regional_macro",
       "evidence_role": "observed_descriptive",
       "path": "data/model-runs/regional_macro_controls_canada_v0.1.json",
-      "sha256": "sha256:81b583e1d51aabc1bba41fb75e80dabde9c45bab139ecd30d62d638a11432da1"
+      "sha256": "sha256:43bd0642c78fdb5ecb0b1633534246f041221bc412835677a37b0d2cd1f1e3c8"
     },
     {
       "artifact_id": "province_linked_reference",
@@ -114,7 +114,7 @@
       "artifact_id": "panel_preflight",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
-      "sha256": "sha256:deed1b207c0eaf983c9891468427509e15aa8475b21358fe1ade7f945027f41c"
+      "sha256": "sha256:7893a61b3726f273c4d7f8513e91bacef784851d16e9dfbed582282365cd3e61"
     },
     {
       "artifact_id": "empirical_covariate_panel",
@@ -144,7 +144,7 @@
       "artifact_id": "pspc_outcome_feasibility",
       "evidence_role": "observed_reference",
       "path": "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json",
-      "sha256": "sha256:54210f1298d845a42112c3c74406e807d3b79dad95546894a83ecdb6bee6169b"
+      "sha256": "sha256:860f6b43d4703b75f0473073166366ea72c5250356acaf42daf9433bf65ad660"
     },
     {
       "artifact_id": "treatment_source_feasibility",
@@ -210,19 +210,19 @@
       "artifact_id": "quebec_revisions",
       "evidence_role": "observed_reference",
       "path": "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json",
-      "sha256": "sha256:dc2f3d7d6c2644edf34e82eebde08c86b365fd9fa451617507869ccbe90f559f"
+      "sha256": "sha256:54f52ac6203ea24aab5798c30af50f1c3ef248abc5740b3e8ddb1dd2cda49160"
     },
     {
       "artifact_id": "quebec_full_archive",
       "evidence_role": "observed_and_inferred",
       "path": "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json",
-      "sha256": "sha256:df2df36431380339a7ab57d94203b87c9607ee7b6c891088eaf1fbefbd48f8e9"
+      "sha256": "sha256:0e1b1fdd98732ce7882b3294e8dd16388132f059cc14bcbf88c1e9dd121f8095"
     },
     {
       "artifact_id": "quebec_parser_review",
       "evidence_role": "governance",
       "path": "data/model-runs/quebec_pqi_parser_review_package_v0.1.json",
-      "sha256": "sha256:ac2cd813ab91da01c9896d25ff2223396483190c8d714675ce1feb355676703a"
+      "sha256": "sha256:6f1d2816c2d1ae47a2152304639f083b82f09a1ca8e95135d44ff28b6f10097c"
     }
   ],
   "frozen_release_id": "AIIO_RELEASE_0_6_0_DEV",

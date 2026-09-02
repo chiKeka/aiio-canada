@@ -12,6 +12,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
+from ..paths import repository_path
 from ..schemas import ValidationError
 
 
@@ -146,8 +147,8 @@ def fetch_edmonton_permit_candidates(raw_root: Path) -> dict[str, Any]:
         "byte_length": len(content),
         "metadata_byte_length": len(metadata_bytes),
         "row_count": len(rows),
-        "archive_path": str(destination),
-        "metadata_archive_path": str(metadata_destination),
+        "archive_path": repository_path(destination),
+        "metadata_archive_path": repository_path(metadata_destination),
         "excluded_fields": [
             "address",
             "legal_description",

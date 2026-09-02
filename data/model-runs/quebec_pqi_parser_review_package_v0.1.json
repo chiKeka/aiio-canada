@@ -4,7 +4,7 @@
     "Sampling emphasizes parser edge cases and is not an estimator of population error without design weights.",
     "The current dashboard remains a survivor snapshot; milestone reentries are included only where the source ID is present in the current snapshot."
   ],
-  "longitudinal_report_sha256": "sha256:c7081d32b02870fd8545d058fbb70b80ce2d9d2aa1e076ce14b6a34aa4c928d3",
+  "longitudinal_report_sha256": "sha256:0f20f2e86e516f1f8c13194b6582e5ef1dccb6d829ffd825661b053e5b9a08fd",
   "package_id": "AIIO_QUEBEC_PQI_PARSER_REVIEW_PACKAGE_0_1",
   "publication_boundary": {
     "ai_attributable_effect_authorized": false,
@@ -27,7 +27,7 @@
     "Re-run this deterministic package after parser or source-vintage changes."
   ],
   "review_status": "pending_independent_review",
-  "revision_report_sha256": "sha256:dc2f3d7d6c2644edf34e82eebde08c86b365fd9fa451617507869ccbe90f559f",
+  "revision_report_sha256": "sha256:54f52ac6203ea24aab5798c30af50f1c3ef248abc5740b3e8ddb1dd2cda49160",
   "sample_project_count": 57,
   "sampling_fraction": 0.08782742681047766,
   "schema_version": "1.0.0",
@@ -64,7 +64,7 @@
   },
   "source_file_sha256": "sha256:a437f7ba9a749f33b130ec5a1a724821134b1b91bc7a2970bcf2597e8ff5877b",
   "source_id": "QUEBEC_PQI_PROJECT_DASHBOARD",
-  "source_manifest_sha256": "sha256:2f8a2c614faecfd959cb86e0ee31d92ae8b698edf9765ea392dcbf10df565727",
+  "source_manifest_sha256": "sha256:96531aaf67a741b0906b4315845b62d70853b768911dba906413537b7af41d5a",
   "source_project_count": 649,
   "source_snapshot_date": "2026-08-20"
 }

@@ -1,7 +1,7 @@
 {
   "absent_from_latest_project_count": 472,
   "contract_id": "AIIO_QUEBEC_PQI_MILESTONE_VINTAGES_0_1",
-  "contract_sha256": "sha256:51056456436005a5fa5516b2722d08420c85795da8e13f329136066cd92eb761",
+  "contract_sha256": "sha256:a9a63dbee5b85cf7dfdb68345d33370c142538498c3b4e468df6daf3a89b2a35",
   "latest_snapshot_project_count": 649,
   "limitations": [
     "Ten milestone snapshots do not reproduce every change observable in the complete 69-CSV catalog.",

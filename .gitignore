@@ -46,6 +46,9 @@ CLAUDE.md
 /workbook-work/*
 !/workbook-work/build_aiio_workbook.mjs
 
+# Finder/iCloud conflict copies are local recovery artifacts, never source.
+* 2.*
+
 # Large reproducible public-source caches (manifests remain versioned)
 /data/raw/statcan_jvws_14100444/*.zip
 /data/raw/statcan_lfs_occupation_14100416/*.zip
@@ -57,3 +60,6 @@ CLAUDE.md
 /data/raw/canadabuys_contract_history_fy2026_2027/*.csv
 /data/raw/edmonton_general_building_permits/*.json
 !/data/raw/edmonton_general_building_permits/*.json.manifest.json
+
+# Redistribution terms are not yet confirmed; retain only the hash receipt.
+/data/raw/alberta_major_projects/*.csv

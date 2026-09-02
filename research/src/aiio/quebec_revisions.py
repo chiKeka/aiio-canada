@@ -13,6 +13,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from .paths import repository_path
 from .adapters.provincial_projects import QUEBEC_SOURCE_ID, classify_asset_class
 from .schemas import ValidationError
 
@@ -757,9 +758,9 @@ def run_quebec_authorized_revisions(
             },
         },
         "outputs": {
-            "summary_csv": str(summary_csv_path),
+            "summary_csv": repository_path(summary_csv_path),
             "summary_csv_sha256": sha256_file(summary_csv_path),
-            "event_csv": str(event_csv_path),
+            "event_csv": repository_path(event_csv_path),
             "event_csv_sha256": sha256_file(event_csv_path),
         },
     }
