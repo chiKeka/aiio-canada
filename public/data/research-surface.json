@@ -1,6 +1,6 @@
 {
-  "artifact_count": 35,
-  "artifact_manifest_sha256": "sha256:190053a8604c2ccbae1fb3277c10e7ff64e1feb615e60d571e8db227fc52c50b",
+  "artifact_count": 37,
+  "artifact_manifest_sha256": "sha256:0a5e2d3a2ce30fd0eaca57478dd710914588f5f0b9365c1342e0ff88a96ec534",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -187,6 +187,18 @@
       "evidence_role": "inferred_proxy",
       "path": "data/model-runs/montreal_data_centre_permit_proxy_v0.1.json",
       "sha256": "sha256:d494b8ee320cf656e67202b429d01929143c3f5f4db3b2fc378e44a88e648556"
+    },
+    {
+      "artifact_id": "comparison_market_panel",
+      "evidence_role": "observed_and_inferred",
+      "path": "data/model-runs/comparison_market_permit_bcpi_panel_v0.1.json",
+      "sha256": "sha256:f1ae04ac456d33cad590c70423967f76e82f1f4770de8c4e6178e0fc389ed281"
+    },
+    {
+      "artifact_id": "comparison_market_association",
+      "evidence_role": "descriptive_proxy_analysis",
+      "path": "data/model-runs/comparison_market_proxy_association_v0.1.json",
+      "sha256": "sha256:b2d353f3d0dc8f335e49c59c590b20cacea6d8582acac921a3140c496a2e7b14"
     },
     {
       "artifact_id": "audited_outcomes",

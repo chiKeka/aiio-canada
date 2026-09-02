@@ -68,6 +68,8 @@
     "permits:vancouver-fetch": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch-vancouver-permits",
     "permits:toronto-fetch": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch-toronto-permits",
     "permits:montreal-fetch": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch-montreal-permits",
+    "attribution:comparison-panel": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-comparison-market-panel",
+    "attribution:comparison-association": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-comparison-market-association",
     "outcomes:audit:normalize": "PYTHONPATH=research/src python3 -m aiio.cli --root . normalize-audited-project-outcomes data/manual/oago_selected_infrastructure_outcomes_2024.json data/raw/oago_selected_infrastructure_projects_2024/2026-09-01_88cdf8a0966d.pdf",
     "outcomes:quebec:normalize": "PYTHONPATH=research/src python3 -m aiio.cli --root . normalize-quebec-authorized-revisions data/raw/quebec_pqi_project_dashboard/2026-09-01_a437f7ba9a74.csv data/raw/quebec_pqi_data_dictionary/2026-09-01_86c6c1ab940b.pdf",
     "outcomes:quebec:vintages:fetch": "PYTHONPATH=research/src python3 -m aiio.cli --root . fetch-quebec-milestone-vintages data/raw/quebec_pqi_archive_catalog/2026-09-01_c3a16c24dbe0.json",

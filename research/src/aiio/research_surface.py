@@ -41,6 +41,8 @@ ARTIFACTS = [
     ("vancouver_permit_proxy", "data/model-runs/vancouver_data_centre_permit_proxy_v0.1.json", "inferred_proxy"),
     ("toronto_permit_proxy", "data/model-runs/toronto_data_centre_permit_proxy_v0.1.json", "inferred_proxy"),
     ("montreal_permit_proxy", "data/model-runs/montreal_data_centre_permit_proxy_v0.1.json", "inferred_proxy"),
+    ("comparison_market_panel", "data/model-runs/comparison_market_permit_bcpi_panel_v0.1.json", "observed_and_inferred"),
+    ("comparison_market_association", "data/model-runs/comparison_market_proxy_association_v0.1.json", "descriptive_proxy_analysis"),
     ("audited_outcomes", "data/model-runs/oago_audited_project_outcomes_v0.1.json", "observed_reference"),
     ("quebec_revisions", "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json", "observed_reference"),
     ("quebec_full_archive", "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json", "observed_and_inferred"),

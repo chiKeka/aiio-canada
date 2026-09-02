@@ -81,6 +81,8 @@ from .empirical_panel import build_empirical_covariate_panel
 from .empirical_estimation import run_empirical_estimation_gate
 from .proxy_treatment import build_reconstructed_treatment_proxy
 from .proxy_association import run_proxy_association
+from .comparison_market_panel import build_comparison_market_panel
+from .comparison_market_association import run_comparison_market_association
 from .pspc_outcomes import normalize_pspc_outcomes
 from .treatment_source_feasibility import run_treatment_source_feasibility
 from .digest import build_digest, find_latest_digest_items, validate_digest_cadence
@@ -215,6 +217,8 @@ def main() -> None:
         subparsers.add_parser(f"fetch-{city}-permits", help=f"retrieve a field-minimized {city.title()} data-centre permit screen")
         city_parser = subparsers.add_parser(f"normalize-{city}-permits", help=f"build the fail-closed {city.title()} data-centre permit proxy")
         city_parser.add_argument("raw_path", type=Path)
+    subparsers.add_parser("build-comparison-market-panel", help="align three-city permit proxies to CMA BCPI")
+    subparsers.add_parser("run-comparison-market-association", help="run the non-causal three-city proxy association")
 
     audited_outcomes_parser = subparsers.add_parser(
         "normalize-audited-project-outcomes",
@@ -871,6 +875,14 @@ def main() -> None:
             raw_path = args.raw_path.resolve()
             report = normalize_ckan_permit_proxy(city, raw_path, root / "data" / "processed" / f"{city}_data_centre_permit_proxy.csv", root / "data" / "model-runs" / f"{city}_data_centre_permit_proxy_v0.1.json", source_as_of_date=source_records[source_id].as_of_date, retrieval_manifest_path=raw_path.with_suffix(raw_path.suffix + ".manifest.json"))
             print(json.dumps({"status": "passed", "model_id": report["model_id"], "data_centre_candidate_count": report["data_centre_candidate_count"], "realized_ai_construction_treatment_authorized": False}))
+        elif args.command == "build-comparison-market-panel":
+            permit_paths = {city: root / "data" / "processed" / f"{city}_data_centre_permit_proxy.csv" for city in ("vancouver", "toronto", "montreal")}
+            permit_reports = {city: root / "data" / "model-runs" / f"{city}_data_centre_permit_proxy_v0.1.json" for city in permit_paths}
+            report = build_comparison_market_panel(root, root / "data" / "processed" / "bcpi_reference_van_tor_mtl.csv", permit_paths, permit_reports, root / "data" / "processed" / "comparison_market_permit_bcpi_panel_v0.1.csv", root / "data" / "model-runs" / "comparison_market_permit_bcpi_panel_v0.1.json")
+            print(json.dumps({"status": "passed", "model_id": report["model_id"], "row_count": report["row_count"]}))
+        elif args.command == "run-comparison-market-association":
+            output = run_comparison_market_association(root / "data" / "processed" / "comparison_market_permit_bcpi_panel_v0.1.csv", root / "data" / "model-runs" / "comparison_market_permit_bcpi_panel_v0.1.json", root / "data" / "model-runs" / "comparison_market_proxy_association_v0.1.json")
+            print(json.dumps({"status": "passed", "run_id": output["run_id"], "observation_count": output["result"]["observation_count"], "causal_interpretation_authorized": False}))
         elif args.command == "normalize-audited-project-outcomes":
             source_records = {
                 source.source_id: source for source in load_registry(registry_path)

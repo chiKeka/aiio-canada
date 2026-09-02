@@ -1,0 +1,36 @@
+{
+  "asset_class_count": 4,
+  "input_manifest": {
+    "data/model-runs/montreal_data_centre_permit_proxy_v0.1.json": "sha256:d494b8ee320cf656e67202b429d01929143c3f5f4db3b2fc378e44a88e648556",
+    "data/model-runs/toronto_data_centre_permit_proxy_v0.1.json": "sha256:b43a81cb716cd91565994deff0315c4f551e9b7cd68e2d1634169797e26f3cf9",
+    "data/model-runs/vancouver_data_centre_permit_proxy_v0.1.json": "sha256:0bc32209e4eadf8110a9a3c4c84d27bf0373023ea5e1e1899d727e43458c5027",
+    "data/processed/bcpi_reference_van_tor_mtl.csv": "sha256:ac7f0603d84460c8049f335042d2ebc305671f1dab97174fdea159cfdbea1d4c",
+    "data/processed/montreal_data_centre_permit_proxy.csv": "sha256:5c28108fc7f77f657c95f092cbfd7dbe9eded79e0299635283f041a79e40f94f",
+    "data/processed/toronto_data_centre_permit_proxy.csv": "sha256:3f25a13eebb31c4aad47841f1f6383aba50f47df1ff45a7fd0506bfb9b15dd31",
+    "data/processed/vancouver_data_centre_permit_proxy.csv": "sha256:8203480369fd3292240844af44a69fb040d7bfce17478c35353bb41fcb265cd3"
+  },
+  "limitations": [
+    "Toronto contains cleared permits only, creating completion-lag right censoring relative to issued-permit feeds.",
+    "Permit counts can contain multiple trades or revisions for one underlying project.",
+    "Reported permit values are incomplete and are not comparable as realized expenditure.",
+    "BCPI is a market bid-price index, not project cost or schedule outturn."
+  ],
+  "market_count": 3,
+  "model_id": "AIIO_E2_COMPARISON_MARKET_PANEL_0_1",
+  "output_sha256": "sha256:8f3d2ee57fe5d5498d2b6fd17e02f29e415afdc9119372143aeb23e7476c0d82",
+  "permit_candidate_counts": {
+    "montreal": 14,
+    "toronto": 53,
+    "vancouver": 13
+  },
+  "publication_boundary": {
+    "ai_attributable_effect": null,
+    "causal_interpretation_authorized": false,
+    "descriptive_comparison_authorized": true,
+    "executive_calibration_authorized": false
+  },
+  "quarter_count": 38,
+  "row_count": 456,
+  "schema_version": "1.0.0",
+  "status": "comparison_market_proxy_panel"
+}
