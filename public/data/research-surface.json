@@ -1,6 +1,6 @@
 {
-  "artifact_count": 32,
-  "artifact_manifest_sha256": "sha256:90f6b58b96d9983ff142e9d46cb9a89593dbcbe558bac1e4dcc5a2ef71cb3690",
+  "artifact_count": 33,
+  "artifact_manifest_sha256": "sha256:c3634376e3bbea577858ac9f0da8f56a58081425e4d554b71e8081e08665c53c",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -30,7 +30,7 @@
       "artifact_id": "source_registry",
       "evidence_role": "source_provenance",
       "path": "data/registry/sources.json",
-      "sha256": "sha256:f760a2dc2f929dce3d9f9039bfa0842b4a3612118325b8f5b78766e47a10427e"
+      "sha256": "sha256:3fc47f50b744c98891a5da37239a2bdfc7d884d17c873a82d59ceb093872ce34"
     },
     {
       "artifact_id": "pspe_method_lineage",
@@ -108,13 +108,13 @@
       "artifact_id": "attribution_readiness",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_identification_readiness_v0.1.json",
-      "sha256": "sha256:a3cb428185ea1355e055480fa26233102cae29d02679a8ef69c75fc7a35f4d7a"
+      "sha256": "sha256:c015c13fcd574fc68c6b1dfb31800290142e49807b33e942a00fd5747d290d70"
     },
     {
       "artifact_id": "panel_preflight",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
-      "sha256": "sha256:daf2ef7dc46d3e531e58a8d76f1afab09d971c6129a076691681f15b039b8868"
+      "sha256": "sha256:36e1fe9ea9249fd7060deeecf46e517a0d864821f29166243ba4b39ec15ef395"
     },
     {
       "artifact_id": "empirical_covariate_panel",
@@ -150,7 +150,7 @@
       "artifact_id": "treatment_source_feasibility",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
-      "sha256": "sha256:ffc76192d9f2b6956ebaa5a80d5380e3abb4121a9614dea98d85e624ee7e352a"
+      "sha256": "sha256:17c15dcd5a4082c2b7afea1c717236c1d29248c2920a28cad76431d94dbd314f"
     },
     {
       "artifact_id": "building_investment_controls",
@@ -169,6 +169,12 @@
       "evidence_role": "inferred_proxy",
       "path": "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json",
       "sha256": "sha256:787436ff826347ad672cb5543434498505e97a56cdd278a6795925837605a782"
+    },
+    {
+      "artifact_id": "vancouver_permit_proxy",
+      "evidence_role": "inferred_proxy",
+      "path": "data/model-runs/vancouver_data_centre_permit_proxy_v0.1.json",
+      "sha256": "sha256:0bc32209e4eadf8110a9a3c4c84d27bf0373023ea5e1e1899d727e43458c5027"
     },
     {
       "artifact_id": "audited_outcomes",

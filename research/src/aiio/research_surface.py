@@ -38,6 +38,7 @@ ARTIFACTS = [
     ("building_investment_controls", "data/model-runs/building_investment_controls_canada_v0.1.json", "observed_descriptive"),
     ("procurement_feasibility", "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json", "governance"),
     ("edmonton_permit_proxy", "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json", "inferred_proxy"),
+    ("vancouver_permit_proxy", "data/model-runs/vancouver_data_centre_permit_proxy_v0.1.json", "inferred_proxy"),
     ("audited_outcomes", "data/model-runs/oago_audited_project_outcomes_v0.1.json", "observed_reference"),
     ("quebec_revisions", "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json", "observed_reference"),
     ("quebec_full_archive", "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json", "observed_and_inferred"),

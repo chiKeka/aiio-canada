@@ -31,6 +31,11 @@ from .adapters.edmonton_permits import (
     fetch_edmonton_permit_candidates,
     normalize_edmonton_permit_proxy,
 )
+from .adapters.vancouver_permits import (
+    SOURCE_ID as VANCOUVER_PERMIT_SOURCE_ID,
+    fetch_vancouver_permit_candidates,
+    normalize_vancouver_permit_proxy,
+)
 from .audited_outcomes import run_audited_project_outcomes
 from .quebec_revisions import (
     DICTIONARY_SOURCE_ID as QUEBEC_DICTIONARY_SOURCE_ID,
@@ -190,6 +195,16 @@ def main() -> None:
         help="build the fail-closed Edmonton data-centre permit activity proxy",
     )
     edmonton_permits_parser.add_argument("raw_path", type=Path)
+
+    subparsers.add_parser(
+        "fetch-vancouver-permits",
+        help="retrieve a field-minimized Vancouver data-centre permit screen",
+    )
+    vancouver_permits_parser = subparsers.add_parser(
+        "normalize-vancouver-permits",
+        help="build the fail-closed Vancouver data-centre permit activity proxy",
+    )
+    vancouver_permits_parser.add_argument("raw_path", type=Path)
 
     audited_outcomes_parser = subparsers.add_parser(
         "normalize-audited-project-outcomes",
@@ -814,6 +829,24 @@ def main() -> None:
                     }
                 )
             )
+        elif args.command == "fetch-vancouver-permits":
+            source_records = {source.source_id: source for source in load_registry(registry_path)}
+            if VANCOUVER_PERMIT_SOURCE_ID not in source_records:
+                raise ValidationError("Vancouver permit source is missing from the registry")
+            print(json.dumps(fetch_vancouver_permit_candidates(root / "data" / "raw"), indent=2, sort_keys=True))
+        elif args.command == "normalize-vancouver-permits":
+            source_records = {source.source_id: source for source in load_registry(registry_path)}
+            if VANCOUVER_PERMIT_SOURCE_ID not in source_records:
+                raise ValidationError("Vancouver permit source is missing from the registry")
+            raw_path = args.raw_path.resolve()
+            report = normalize_vancouver_permit_proxy(
+                raw_path,
+                root / "data" / "processed" / "vancouver_data_centre_permit_proxy.csv",
+                root / "data" / "model-runs" / "vancouver_data_centre_permit_proxy_v0.1.json",
+                source_as_of_date=source_records[VANCOUVER_PERMIT_SOURCE_ID].as_of_date,
+                retrieval_manifest_path=raw_path.with_suffix(raw_path.suffix + ".manifest.json"),
+            )
+            print(json.dumps({"status": "passed", "model_id": report["model_id"], "data_centre_candidate_count": report["data_centre_candidate_count"], "realized_ai_construction_treatment_authorized": report["publication_boundary"]["realized_ai_construction_treatment_authorized"]}))
         elif args.command == "normalize-audited-project-outcomes":
             source_records = {
                 source.source_id: source for source in load_registry(registry_path)

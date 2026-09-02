@@ -42,6 +42,7 @@ CLAUDE.md
 /outputs/
 /work/
 /tmp/
+/.firecrawl/
 /workbook-work/*
 !/workbook-work/build_aiio_workbook.mjs
 

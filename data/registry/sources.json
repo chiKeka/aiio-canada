@@ -3,6 +3,24 @@
   "generated_at": "2026-08-31",
   "sources": [
     {
+      "source_id": "VANCOUVER_ISSUED_BUILDING_PERMITS",
+      "title": "Issued building permits",
+      "publisher": "City of Vancouver",
+      "canonical_url": "https://opendata.vancouver.ca/explore/dataset/issued-building-permits/",
+      "retrieval_url": "https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/issued-building-permits/records",
+      "source_type": "municipal_open_data_api",
+      "domain": "ai_construction_treatment_feasibility",
+      "geography": "Vancouver, British Columbia",
+      "as_of_date": "2026-09-02",
+      "last_verified": "2026-09-02",
+      "licence_note": "Open Government Licence - Vancouver; retain dataset identifier, query, vintage and retrieval hash.",
+      "access_method": "api_json",
+      "update_frequency": "daily for current year; prior years static",
+      "evidence_status": "observed",
+      "status": "active",
+      "notes": "Permit issuance, elapsed days and applicant-estimated project value provide a transparent activity proxy from 2017 onward. They do not measure realized spend, labour hours, construction progress or AI use. Personal and precise-location fields are excluded from the processed artifact."
+    },
+    {
       "source_id": "STATCAN_BCPI_18100289",
       "title": "Building construction price indexes, by type of building and division",
       "publisher": "Statistics Canada",
