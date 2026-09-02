@@ -103,7 +103,13 @@ All outputs read an immutable release manifest containing input hashes, code ver
 ## Technology plan
 
 - Public application: React/TypeScript with server rendering and accessible interactive controls.
-- Application persistence: Cloudflare D1/SQLite for source metadata, digest items and release manifests.
+- Current persistence: versioned JSON/CSV evidence, digest items and release
+  manifests in Git. This keeps every public result reproducible and reviewable;
+  the deployed dashboard remains read-only and requires no runtime database.
+- Future transactional persistence: add managed Postgres only when the product
+  needs saved user scenarios, accounts, runtime calculations, annotations or a
+  multi-user review queue. Keep research evidence and immutable releases in Git
+  even after that addition.
 - Analytical pipeline: Python packages with typed schemas, tests and deterministic command-line entry points.
 - Raw and derived research files: versioned local directories with manifests and hashes; object storage can be added at publication scale.
 - Workbook: generated `.xlsx` with formulas, named assumptions, data dictionary, provenance and reconciliation checks.

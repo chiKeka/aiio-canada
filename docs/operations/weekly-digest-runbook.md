@@ -10,6 +10,13 @@ public release.
 
 ## Weekly sequence
 
+The scheduled GitHub workflow runs each Monday at 15:00 UTC and may also be
+started manually. It retrieves the registered municipal permit proxies from
+their official APIs, rebuilds the comparison artifacts and public research
+surface, creates a dated digest intake, and runs the full research and web
+quality gates. When evidence changes, it pushes an `automation/weekly-evidence-*`
+branch and opens a pull request. It never merges that pull request.
+
 1. Read the latest dated intake and manifest to establish the evidence cutoff.
 2. Check the official public sources already registered for the monitored
    channels and identify material releases or revisions since that cutoff.
@@ -28,6 +35,12 @@ public release.
 7. Review the generated Markdown and hash manifest. Commit a new edition only
    when the intake is substantive and every gate passes.
 
+The same process can be reproduced locally with
+`npm run evidence:refresh-weekly`. Direct official APIs are the reproducible
+acquisition path. Firecrawl can be used to discover or monitor candidate public
+sources, but a discovered source must be registered and reviewed before it can
+feed the automated model surface.
+
 ## Promotion boundary
 
 - `no_change` records evidence without proposing model work.
@@ -36,6 +49,8 @@ public release.
   independent-review and versioned-release gates.
 - The weekly operation never deploys, publishes, authorizes a withheld output,
   edits a frozen release, or turns a scenario into evidence.
+- Production updates only after a reviewer merges the generated pull request;
+  the existing Vercel Git integration then builds the reviewed `main` commit.
 
 ## Failure handling
 

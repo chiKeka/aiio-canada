@@ -1,7 +1,7 @@
 # GitHub and Vercel deployment
 
 AIIO Canada uses a private GitHub repository as the source of record and a
-Vercel preview deployment as the first public-web release gate. The application
+Vercel deployment as the public-web release gate. The application
 is a standard Next.js project; Vercel does not require secrets or environment
 variables for the current public-data prototype.
 
@@ -28,14 +28,23 @@ published data files.
    commit.
 4. Commit the generated publication artifacts separately. The manifest's
    `code_commit` remains the reviewed source commit that produced them.
-5. Push both commits to the private GitHub repository.
-6. Import the repository into Vercel and create a preview deployment.
-7. Verify the Vercel build result and inspect the preview in a browser before
-   promoting it to production.
+5. Push the reviewed branch and merge it through GitHub.
+6. The existing Vercel Git integration deploys the merged `main` commit.
+7. Verify the Vercel deployment result and inspect the production alias.
 
 This two-commit sequence preserves reproducibility: the publication commit can
 contain files generated from the exact source commit recorded in the manifest
 without creating a self-referential commit hash.
+
+## Continuous delivery boundary
+
+`.github/workflows/weekly-evidence-refresh.yml` acquires public evidence and
+opens a review pull request; it has no Vercel credentials and cannot deploy.
+Vercel currently deploys every commit that reaches `main`, independently of
+GitHub Actions. Therefore, changes must reach `main` only by reviewed merge.
+A hard required-check rule should be enabled if the repository becomes public
+or its GitHub plan supports private-repository rulesets. Until then, this is an
+operating control rather than a platform-enforced branch rule.
 
 ## Public-release boundary
 

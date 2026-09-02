@@ -26,7 +26,7 @@
     "reason": "Issued permits and declared project values indicate authorized activity, not realized quarterly expenditure or labour hours; text does not establish AI use.",
     "status": "municipal_permit_activity_proxy_only"
   },
-  "retrieval_manifest_sha256": "sha256:589383ffef91224d6b7804b4ca46eb0e83a297f5d0d6abc2cb203d969959330c",
+  "retrieval_manifest_sha256": "sha256:fb8c0919861d957da4cc7b58e82b58c9caec0395d4e95f96249b8fbeb871851d",
   "schema_version": "0.1.0",
   "source_ids": [
     "VANCOUVER_ISSUED_BUILDING_PERMITS"

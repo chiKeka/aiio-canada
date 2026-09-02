@@ -1,5 +1,5 @@
 {
-  "as_of_date": "2026-08-31",
+  "as_of_date": "2026-09-02",
   "broad_screen_row_count": 85,
   "classification_counts": {
     "broad_query_substring_false_positive": 6,
@@ -51,7 +51,7 @@
     "status": "municipal_permit_activity_proxy_only"
   },
   "reported_estimated_value_available_count": 85,
-  "retrieval_manifest_sha256": "sha256:5d5ebf88ca991426085fa6612d2bf7788aa30391e201d5a0b982f6a916ef9089",
+  "retrieval_manifest_sha256": "sha256:95b67badb11a783d733e9faf3381b353ceb01689160a231de0c2ddce171959f7",
   "schema_version": "0.1.0",
   "source_ids": [
     "EDMONTON_GENERAL_BUILDING_PERMITS"

@@ -1,0 +1,103 @@
+name: AIIO weekly evidence refresh
+
+on:
+  schedule:
+    - cron: '0 15 * * 1'
+  workflow_dispatch:
+    inputs:
+      edition_date:
+        description: Optional UTC edition date (YYYY-MM-DD)
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: aiio-weekly-evidence-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Check out reviewed main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Refresh official evidence feeds
+        env:
+          EDITION_DATE: ${{ inputs.edition_date }}
+        run: |
+          if [ -n "$EDITION_DATE" ]; then
+            python3 research/scripts/weekly_evidence_refresh.py --root . --edition-date "$EDITION_DATE"
+          else
+            npm run evidence:refresh-weekly
+          fi
+
+      - name: Verify refreshed evidence and application
+        run: |
+          npm run research:validate
+          npm run digest:audit
+          npm run research:test
+          npm run lint
+          npm run build
+          npm run build:sites
+
+      - name: Detect reviewable changes
+        id: changes
+        run: |
+          if git diff --quiet && [ -z "$(git status --porcelain --untracked-files=normal)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit refreshed evidence to a review branch
+        if: steps.changes.outputs.changed == 'true'
+        id: branch
+        run: |
+          EDITION="${{ inputs.edition_date }}"
+          if [ -z "$EDITION" ]; then EDITION="$(date -u +%F)"; fi
+          BRANCH="automation/weekly-evidence-${EDITION}-${GITHUB_RUN_ID}"
+          git config user.name "aiio-evidence-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add data/raw data/processed data/model-runs data/digests public/data/research-surface.json
+          git commit -m "Refresh weekly evidence ${EDITION}"
+          git push origin "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "edition=$EDITION" >> "$GITHUB_OUTPUT"
+
+      - name: Open research review pull request
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          gh pr create \
+            --base main \
+            --head "${{ steps.branch.outputs.branch }}" \
+            --title "Weekly evidence refresh — ${{ steps.branch.outputs.edition }}" \
+            --body "Automated refresh of registered official evidence sources. All generated outputs passed registry validation, research tests, lint, the Next.js build, and the Sites build. No model parameter or frozen release is promoted automatically. Review source changes, classifications, limitations, and the dated digest before merging."
+
+      - name: Record no-change run
+        if: steps.changes.outputs.changed == 'false'
+        run: echo "Official-source refresh completed with no repository changes."

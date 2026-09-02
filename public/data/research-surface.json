@@ -1,6 +1,6 @@
 {
   "artifact_count": 37,
-  "artifact_manifest_sha256": "sha256:0a5e2d3a2ce30fd0eaca57478dd710914588f5f0b9365c1342e0ff88a96ec534",
+  "artifact_manifest_sha256": "sha256:92538a024743b5b714331a939430e1bb2ae26804152d00b6ada5d7cfa3fd68fe",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -114,7 +114,7 @@
       "artifact_id": "panel_preflight",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
-      "sha256": "sha256:6bea6b5dfbc5d2e492fc3796d04e3e22e02f64a69a0d3ee9dcef1878d9455018"
+      "sha256": "sha256:deed1b207c0eaf983c9891468427509e15aa8475b21358fe1ade7f945027f41c"
     },
     {
       "artifact_id": "empirical_covariate_panel",
@@ -132,7 +132,7 @@
       "artifact_id": "reconstructed_ai_construction_proxy",
       "evidence_role": "inferred_proxy",
       "path": "data/model-runs/ai_construction_proxy_alberta_v0.1.json",
-      "sha256": "sha256:80ca06e36e2316c9646395ad23e8a6ec4b22e64f80ae3e6cc457a929c4375899"
+      "sha256": "sha256:662efbb8d58921dc2d301d9d507c2446d62958f6adc1992be75b3a66717f9eb1"
     },
     {
       "artifact_id": "proxy_association",
@@ -168,37 +168,37 @@
       "artifact_id": "edmonton_permit_proxy",
       "evidence_role": "inferred_proxy",
       "path": "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json",
-      "sha256": "sha256:787436ff826347ad672cb5543434498505e97a56cdd278a6795925837605a782"
+      "sha256": "sha256:3fcbfbbe11b1a9745042f54406cfde4b9097937b7b0b128a9a22f8a6bc4f0f05"
     },
     {
       "artifact_id": "vancouver_permit_proxy",
       "evidence_role": "inferred_proxy",
       "path": "data/model-runs/vancouver_data_centre_permit_proxy_v0.1.json",
-      "sha256": "sha256:0bc32209e4eadf8110a9a3c4c84d27bf0373023ea5e1e1899d727e43458c5027"
+      "sha256": "sha256:58a1113756b1fcdceece09d08e1d6c697d65dfafcf5b01b8017209b9cf7ee978"
     },
     {
       "artifact_id": "toronto_permit_proxy",
       "evidence_role": "inferred_proxy",
       "path": "data/model-runs/toronto_data_centre_permit_proxy_v0.1.json",
-      "sha256": "sha256:b43a81cb716cd91565994deff0315c4f551e9b7cd68e2d1634169797e26f3cf9"
+      "sha256": "sha256:1a312abf70cfd90c8cdeb29e94ca70ea2f2a6c74226805afc344af1ee26424f2"
     },
     {
       "artifact_id": "montreal_permit_proxy",
       "evidence_role": "inferred_proxy",
       "path": "data/model-runs/montreal_data_centre_permit_proxy_v0.1.json",
-      "sha256": "sha256:d494b8ee320cf656e67202b429d01929143c3f5f4db3b2fc378e44a88e648556"
+      "sha256": "sha256:028c8c24ec53f9210301f23addd9635ad90b4d2881bb6dd74f19b27b47b4fdad"
     },
     {
       "artifact_id": "comparison_market_panel",
       "evidence_role": "observed_and_inferred",
       "path": "data/model-runs/comparison_market_permit_bcpi_panel_v0.1.json",
-      "sha256": "sha256:f1ae04ac456d33cad590c70423967f76e82f1f4770de8c4e6178e0fc389ed281"
+      "sha256": "sha256:74072ac7bff94f0aaf52c6f4e18b3e5d556604d18e7a23b3ffbf05b2fbd0e08f"
     },
     {
       "artifact_id": "comparison_market_association",
       "evidence_role": "descriptive_proxy_analysis",
       "path": "data/model-runs/comparison_market_proxy_association_v0.1.json",
-      "sha256": "sha256:b2d353f3d0dc8f335e49c59c590b20cacea6d8582acac921a3140c496a2e7b14"
+      "sha256": "sha256:9fbdfbb05c10d8884de0e7ef119002da681687490d30cc21df379607ed01424a"
     },
     {
       "artifact_id": "audited_outcomes",

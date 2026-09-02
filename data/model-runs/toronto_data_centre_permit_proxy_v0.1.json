@@ -6,7 +6,7 @@
   "data_centre_candidate_count": 53,
   "evidence_status": "observed_permit_fields_with_inferred_keyword_classification",
   "explicit_ai_reference_count": 0,
-  "input_sha256": "sha256:7fe36fa06931a7d4ff374d76b9058a9d46055b041497897fa0b0a02edcfe5f16",
+  "input_sha256": "sha256:78961dadb98bc87e1831b27f8799f01b5ba01cfd04c6eefd1d6b1213ce0275f3",
   "limitations": [
     "Keyword classification requires review and does not establish AI use.",
     "Permit records may include multiple permit types or revisions for one underlying project.",
@@ -25,7 +25,7 @@
     "status": "municipal_permit_activity_proxy_only"
   },
   "reported_value_available_count": 17,
-  "retrieval_manifest_sha256": "sha256:2a2cb24229f5695c349d45556930997c003aaf429405dd0d507d25bfd47b7edc",
+  "retrieval_manifest_sha256": "sha256:984d59ff5970b9a059b1802cf39c5f2b5fa9360674e6303488fdeb46bae1aba7",
   "schema_version": "0.1.0",
   "source_ids": [
     "TORONTO_CLEARED_BUILDING_PERMITS"

@@ -1,9 +1,9 @@
 {
   "asset_class_count": 4,
   "input_manifest": {
-    "data/model-runs/montreal_data_centre_permit_proxy_v0.1.json": "sha256:d494b8ee320cf656e67202b429d01929143c3f5f4db3b2fc378e44a88e648556",
-    "data/model-runs/toronto_data_centre_permit_proxy_v0.1.json": "sha256:b43a81cb716cd91565994deff0315c4f551e9b7cd68e2d1634169797e26f3cf9",
-    "data/model-runs/vancouver_data_centre_permit_proxy_v0.1.json": "sha256:0bc32209e4eadf8110a9a3c4c84d27bf0373023ea5e1e1899d727e43458c5027",
+    "data/model-runs/montreal_data_centre_permit_proxy_v0.1.json": "sha256:028c8c24ec53f9210301f23addd9635ad90b4d2881bb6dd74f19b27b47b4fdad",
+    "data/model-runs/toronto_data_centre_permit_proxy_v0.1.json": "sha256:1a312abf70cfd90c8cdeb29e94ca70ea2f2a6c74226805afc344af1ee26424f2",
+    "data/model-runs/vancouver_data_centre_permit_proxy_v0.1.json": "sha256:58a1113756b1fcdceece09d08e1d6c697d65dfafcf5b01b8017209b9cf7ee978",
     "data/processed/bcpi_reference_van_tor_mtl.csv": "sha256:ac7f0603d84460c8049f335042d2ebc305671f1dab97174fdea159cfdbea1d4c",
     "data/processed/montreal_data_centre_permit_proxy.csv": "sha256:5c28108fc7f77f657c95f092cbfd7dbe9eded79e0299635283f041a79e40f94f",
     "data/processed/toronto_data_centre_permit_proxy.csv": "sha256:3f25a13eebb31c4aad47841f1f6383aba50f47df1ff45a7fd0506bfb9b15dd31",

@@ -190,7 +190,7 @@
     },
     {
       "artifact_path": "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json",
-      "artifact_sha256": "787436ff826347ad672cb5543434498505e97a56cdd278a6795925837605a782",
+      "artifact_sha256": "3fcbfbbe11b1a9745042f54406cfde4b9097937b7b0b128a9a22f8a6bc4f0f05",
       "assertion_count": 3,
       "assertions_passed": true,
       "authorizing_status": "non_authorizing",
@@ -485,7 +485,7 @@
       "data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json": "88862880dda6b03809699b39eeb956184d1170632c473ce99da593f846474170",
       "data/model-runs/building_investment_controls_canada_v0.1.json": "efc353850648d0f3d919ae9494535c5238a7f96f7f06ac25e42f71f1d1a2fc31",
       "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json": "597ad07e642e6d619a56243de4af3c0a241f919e9599544acdff54218c82a19c",
-      "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json": "787436ff826347ad672cb5543434498505e97a56cdd278a6795925837605a782",
+      "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json": "3fcbfbbe11b1a9745042f54406cfde4b9097937b7b0b128a9a22f8a6bc4f0f05",
       "data/model-runs/information_sector_construction_capex_screen_v0.1.json": "62d7a268cb7aaa37f07a155237bc488f9fa1720b7454a3eaa0a3fdc1be0189fe",
       "data/model-runs/oago_audited_project_outcomes_v0.1.json": "9106612b664aac9617e67782e976b08ff0d6b2c4a9fe0bc89cdc27bc8af4e0bb",
       "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json": "54210f1298d845a42112c3c74406e807d3b79dad95546894a83ecdb6bee6169b",
