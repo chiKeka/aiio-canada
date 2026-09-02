@@ -46,11 +46,11 @@
       "check_id": "public_evidence_registry",
       "evidence": [
         "data/registry/sources.json",
-        "raw_manifest_count=99"
+        "raw_manifest_count=100"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The public-source registry validates with 40 unique sources."
+      "summary": "The public-source registry validates with 41 unique sources."
     },
     {
       "category": "analysis_engine",
@@ -261,12 +261,12 @@
       "check_id": "research_surface_provenance",
       "evidence": [
         "public/data/research-surface.json",
-        "artifact_manifest_sha256=sha256:2136cfabe36e3446110da858e74b02df01fb9fca04d6b84a768a8acce3f4a546",
+        "artifact_manifest_sha256=sha256:90f6b58b96d9983ff142e9d46cb9a89593dbcbe558bac1e4dcc5a2ef71cb3690",
         "research/src/aiio/research_surface.py"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The evolving research website reconciles 29 hash-locked artifacts above the frozen release without promoting them."
+      "summary": "The evolving research website reconciles 32 hash-locked artifacts above the frozen release without promoting them."
     },
     {
       "category": "product",
@@ -392,7 +392,7 @@
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The hash-locked E2 preflight covers five candidate regions, three public asset classes, eleven evidence receipts and all 27 authorizing field instances while assembling zero ineligible panel rows."
+      "summary": "The hash-locked E2 preflight covers five candidate regions, three public asset classes, thirteen evidence receipts and all 27 authorizing field instances while assembling zero ineligible panel rows."
     },
     {
       "category": "decision_grade_outputs",

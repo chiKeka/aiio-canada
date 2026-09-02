@@ -1285,7 +1285,7 @@ def audit_program_readiness(
         and panel_field_gaps.get("acquisition_task_field_instance_count") == 27
         and panel_field_gaps.get("uncovered_required_field_instance_count") == 0
         and panel_field_gaps.get("complete_authorizing_scope_count") == 0
-        and len(panel_receipts) == 11
+        and len(panel_receipts) == 13
         and all(item.get("assertions_passed") is True for item in panel_receipts)
         and all(
             item.get("authorizing_status") in {"non_authorizing", "control_only"}
@@ -1303,7 +1303,7 @@ def audit_program_readiness(
         "attribution_panel_acquisition_preflight",
         "research_design",
         PASS if panel_preflight_ready else FAIL,
-        "The hash-locked E2 preflight covers five candidate regions, three public asset classes, eleven evidence receipts and all 27 authorizing field instances while assembling zero ineligible panel rows."
+        "The hash-locked E2 preflight covers five candidate regions, three public asset classes, thirteen evidence receipts and all 27 authorizing field instances while assembling zero ineligible panel rows."
         if panel_preflight_ready
         else "The E2 acquisition contract or evidence-receipt preflight is missing, stale, incomplete or unsafe.",
         [

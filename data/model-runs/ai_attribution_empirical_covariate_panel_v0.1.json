@@ -38,8 +38,9 @@
   "first_period_end": "2017-03-31",
   "frequency": "quarterly",
   "input_manifest": {
-    "data/model/ai_attribution_panel_acquisition_contract_v0.1.json": "sha256:2357b79475442c2681ecc4c2bc93e31c6315d52426d00884bbc91843bc6ed1b4",
-    "data/model/ai_attribution_panel_contract_v0.1.json": "sha256:6537510eac09b73bddf5a974ca70c9cc97f8de3e4771dae3a71787b74adefdc4",
+    "data/model/ai_attribution_panel_acquisition_contract_v0.1.json": "sha256:d71986f67fcedf43cccecf2a77e368429811093b2ceff42fde248cc81712cb7d",
+    "data/model/ai_attribution_panel_contract_v0.1.json": "sha256:1c53deb5653265bddc5f38fd62c7b3ca99c396f2f13b6d246fd220dcd079d77b",
+    "data/processed/ai_construction_proxy_alberta_v0.1.csv": "sha256:774eb46d94af9356a776c6a6ef9f979b777a72b84336c61d18a2307bac77f0ef",
     "data/processed/bcpi_alberta.csv": "sha256:4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1",
     "data/processed/bcpi_reference_van_tor_mtl.csv": "sha256:ac7f0603d84460c8049f335042d2ebc305671f1dab97174fdea159cfdbea1d4c",
     "data/processed/building_investment_controls_canada.csv": "sha256:95121c9ffe97ad972509d481d2517b8231c32af5d3f34d743f0910305996d33e",
@@ -48,8 +49,10 @@
   },
   "latest_period_end": "2026-03-31",
   "output_path": "data/processed/ai_attribution_empirical_covariate_panel_v0.1.csv",
-  "output_sha256": "sha256:313aee45444271ccb8b51b4988effbe3a690f92a73afa5dc7a0bb67c24ba1051",
+  "output_sha256": "sha256:399d320e4be4057eee482ac0e3d7838dc17f1e19efde258c5345c4ad3d788620",
   "panel_id": "AIIO_E2_EMPIRICAL_COVARIATE_PANEL_0_1",
+  "proxy_treatment_cell_count": 222,
+  "proxy_treatment_geography_count": 2,
   "publication_boundary": {
     "ai_attributable_increment": null,
     "descriptive_covariate_panel_authorized": true,

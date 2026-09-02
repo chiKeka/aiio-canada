@@ -68,6 +68,9 @@ from .ai_capex_ledger import run_ai_capex_announcement_ledger
 from .panel_preflight import run_panel_acquisition_preflight
 from .empirical_panel import build_empirical_covariate_panel
 from .empirical_estimation import run_empirical_estimation_gate
+from .proxy_treatment import build_reconstructed_treatment_proxy
+from .proxy_association import run_proxy_association
+from .pspc_outcomes import normalize_pspc_outcomes
 from .treatment_source_feasibility import run_treatment_source_feasibility
 from .digest import build_digest, find_latest_digest_items, validate_digest_cadence
 from .historical_envelope import run_historical_reference_envelope
@@ -488,6 +491,7 @@ def main() -> None:
     empirical_panel_parser.add_argument("investment_path", type=Path)
     empirical_panel_parser.add_argument("macro_path", type=Path)
     empirical_panel_parser.add_argument("labour_path", type=Path)
+    empirical_panel_parser.add_argument("proxy_treatment_path", type=Path)
     empirical_panel_parser.add_argument("output_csv_path", type=Path)
     empirical_panel_parser.add_argument("output_json_path", type=Path)
 
@@ -499,6 +503,22 @@ def main() -> None:
     empirical_estimation_parser.add_argument("panel_path", type=Path)
     empirical_estimation_parser.add_argument("panel_report_path", type=Path)
     empirical_estimation_parser.add_argument("output_path", type=Path)
+
+    proxy_treatment_parser = subparsers.add_parser("build-proxy-treatment", help="reconstruct an uncertainty-bounded, non-authorizing Alberta AI-construction exposure proxy")
+    proxy_treatment_parser.add_argument("projects_path", type=Path)
+    proxy_treatment_parser.add_argument("permits_path", type=Path)
+    proxy_treatment_parser.add_argument("project_report_path", type=Path)
+    proxy_treatment_parser.add_argument("permit_report_path", type=Path)
+    proxy_treatment_parser.add_argument("output_csv_path", type=Path)
+    proxy_treatment_parser.add_argument("output_json_path", type=Path)
+    proxy_association_parser = subparsers.add_parser("run-proxy-association", help="estimate a disclosed non-causal Alberta proxy association")
+    proxy_association_parser.add_argument("panel_path", type=Path)
+    proxy_association_parser.add_argument("panel_report_path", type=Path)
+    proxy_association_parser.add_argument("output_path", type=Path)
+    pspc_outcomes_parser = subparsers.add_parser("normalize-pspc-outcomes", help="profile PSPC public real-property delivery outcomes and preserve their linkage limits")
+    pspc_outcomes_parser.add_argument("input_path", type=Path)
+    pspc_outcomes_parser.add_argument("output_csv_path", type=Path)
+    pspc_outcomes_parser.add_argument("output_json_path", type=Path)
 
     scenario_parser = subparsers.add_parser(
         "run-scenario", help="run a versioned graph scenario and write auditable JSON output"
@@ -1575,13 +1595,22 @@ def main() -> None:
                 root,
                 args.attribution_contract_path.resolve(), args.acquisition_contract_path.resolve(),
                 args.alberta_bcpi_path.resolve(), args.comparison_bcpi_path.resolve(),
-                args.investment_path.resolve(), args.macro_path.resolve(), args.labour_path.resolve(),
+                args.investment_path.resolve(), args.macro_path.resolve(), args.labour_path.resolve(), args.proxy_treatment_path.resolve(),
                 args.output_csv_path.resolve(), args.output_json_path.resolve(),
             )
             print(json.dumps({"status": "passed", "panel_id": output["panel_id"], "row_count": output["row_count"], "effect_estimation_authorized": output["publication_boundary"]["effect_estimation_authorized"]}))
         elif args.command == "run-empirical-estimation-gate":
             output = run_empirical_estimation_gate(root, args.contract_path.resolve(), args.panel_path.resolve(), args.panel_report_path.resolve(), args.output_path.resolve())
             print(json.dumps({"status": "passed", "run_id": output["run_id"], "analysis_status": output["status"], "effect_publication_authorized": output["publication_boundary"]["effect_publication_authorized"]}))
+        elif args.command == "build-proxy-treatment":
+            output = build_reconstructed_treatment_proxy(root, args.projects_path.resolve(), args.permits_path.resolve(), args.project_report_path.resolve(), args.permit_report_path.resolve(), args.output_csv_path.resolve(), args.output_json_path.resolve())
+            print(json.dumps({"status": "passed", "model_id": output["model_id"], "row_count": output["row_count"], "causal_effect_authorized": output["publication_boundary"]["causal_effect_authorized"]}))
+        elif args.command == "run-proxy-association":
+            output = run_proxy_association(args.panel_path.resolve(), args.panel_report_path.resolve(), args.output_path.resolve())
+            print(json.dumps({"status": "passed", "run_id": output["run_id"], "result_count": len(output["results"]), "causal_interpretation_authorized": output["publication_boundary"]["causal_interpretation_authorized"]}))
+        elif args.command == "normalize-pspc-outcomes":
+            output = normalize_pspc_outcomes(args.input_path.resolve(), args.output_csv_path.resolve(), args.output_json_path.resolve())
+            print(json.dumps({"status": "passed", "model_id": output["model_id"], "record_count": output["record_count"], "project_outcome_authorized": output["publication_boundary"]["project_outcome_authorized"]}))
         elif args.command == "run-treatment-source-feasibility":
             output = run_treatment_source_feasibility(
                 args.contract_path.resolve(),

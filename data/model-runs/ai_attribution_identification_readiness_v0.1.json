@@ -11,6 +11,7 @@
     "EDMONTON_GENERAL_BUILDING_PERMITS",
     "GC_PROACTIVE_CONTRACTS",
     "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
+    "PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025",
     "QUEBEC_PQI_ARCHIVE_CATALOG",
     "QUEBEC_PQI_DATA_DICTIONARY",
     "QUEBEC_PQI_PROJECT_DASHBOARD",
@@ -25,7 +26,7 @@
     "STATCAN_SCIEU_5034_2024_RELEASE"
   ],
   "contract_id": "AIIO_E2_ATTRIBUTION_PANEL_CONTRACT_0_1",
-  "contract_sha256": "sha256:6537510eac09b73bddf5a974ca70c9cc97f8de3e4771dae3a71787b74adefdc4",
+  "contract_sha256": "sha256:1c53deb5653265bddc5f38fd62c7b3ca99c396f2f13b6d246fd220dcd079d77b",
   "design": {
     "aggregation": "event_time_and_exposure_cohort",
     "anticipation_periods": 2,
@@ -114,6 +115,7 @@
         "CANADABUYS_AWARD_NOTICES_FY2026_2027",
         "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
         "GC_PROACTIVE_CONTRACTS",
+        "PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025",
         "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
         "QUEBEC_PQI_PROJECT_DASHBOARD",
         "QUEBEC_PQI_DATA_DICTIONARY",
@@ -155,6 +157,7 @@
         "CANADABUYS_TENDER_NOTICES_FY2026_2027",
         "CANADABUYS_AWARD_NOTICES_FY2026_2027",
         "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
+        "PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025",
         "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
         "QUEBEC_PQI_PROJECT_DASHBOARD",
         "QUEBEC_PQI_DATA_DICTIONARY",
@@ -334,10 +337,10 @@
       "summary": "Review cannot authorize an effect until the evidence and identification gates produce an eligible model package."
     }
   ],
-  "registered_source_count": 40,
+  "registered_source_count": 41,
   "run_id": "AIIO_E2_IDENTIFICATION_READINESS_0_1",
   "schema_version": "1.0.0",
-  "source_registry_sha256": "sha256:f0e98225614a2c9fe4bb99a50b6b8719d5f3090d108c6fdfe7bf666b786a5f8b",
+  "source_registry_sha256": "sha256:f760a2dc2f929dce3d9f9039bfa0842b4a3612118325b8f5b78766e47a10427e",
   "treatment_contract": {
     "authorizing_measures": [
       "realized_construction_spend_cad",

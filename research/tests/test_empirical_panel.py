@@ -19,6 +19,7 @@ COMPARISON_BCPI = ROOT / "data/processed/bcpi_reference_van_tor_mtl.csv"
 INVESTMENT = ROOT / "data/processed/building_investment_controls_canada.csv"
 MACRO = ROOT / "data/processed/regional_macro_controls_canada.csv"
 LABOUR = ROOT / "data/processed/labour_availability_canada.csv"
+PROXY = ROOT / "data/processed/ai_construction_proxy_alberta_v0.1.csv"
 COMMITTED_CSV = ROOT / "data/processed/ai_attribution_empirical_covariate_panel_v0.1.csv"
 COMMITTED_REPORT = ROOT / "data/model-runs/ai_attribution_empirical_covariate_panel_v0.1.json"
 
@@ -27,7 +28,7 @@ class EmpiricalCovariatePanelTests(unittest.TestCase):
     def _build(self, output_csv: Path, output_json: Path, *, alberta_bcpi: Path = AB_BCPI):
         return build_empirical_covariate_panel(
             ROOT, ATTRIBUTION, ACQUISITION, alberta_bcpi, COMPARISON_BCPI,
-            INVESTMENT, MACRO, LABOUR, output_csv, output_json,
+            INVESTMENT, MACRO, LABOUR, PROXY, output_csv, output_json,
         )
 
     def test_committed_panel_reproduces_and_remains_non_authorizing(self) -> None:

@@ -63,6 +63,9 @@ npm run attribution:readiness
 npm run attribution:preflight
 npm run attribution:panel
 npm run attribution:estimate
+npm run attribution:proxy-treatment
+npm run attribution:proxy-association
+npm run outcomes:pspc
 npm run treatment:capex-screen
 npm run treatment:announcement-ledger
 npm run bcpi:normalize:reference-cmas

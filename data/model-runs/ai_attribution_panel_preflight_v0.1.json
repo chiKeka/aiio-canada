@@ -28,6 +28,7 @@
       "candidate_source_ids": [
         "CANADABUYS_PROCUREMENT_DATA",
         "GC_PROACTIVE_CONTRACTS",
+        "PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025",
         "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
         "QUEBEC_PQI_PROJECT_DASHBOARD"
       ],
@@ -53,6 +54,7 @@
     {
       "candidate_source_ids": [
         "CANADABUYS_PROCUREMENT_DATA",
+        "PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025",
         "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
         "QUEBEC_PQI_PROJECT_DASHBOARD",
         "QUEBEC_PQI_ARCHIVE_CATALOG"
@@ -240,7 +242,7 @@
     },
     {
       "artifact_path": "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
-      "artifact_sha256": "c108ca2d1ff6a6fe2d9a90134b8d0b315b8f2defcc190acf4a6fd33e47934333",
+      "artifact_sha256": "ffc76192d9f2b6956ebaa5a80d5380e3abb4121a9614dea98d85e624ee7e352a",
       "assertion_count": 3,
       "assertions_passed": true,
       "authorizing_status": "non_authorizing",
@@ -293,6 +295,46 @@
         "CANADABUYS_AWARD_NOTICES_FY2026_2027",
         "CANADABUYS_CONTRACT_HISTORY_FY2026_2027",
         "GC_PROACTIVE_CONTRACTS"
+      ]
+    },
+    {
+      "artifact_path": "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json",
+      "artifact_sha256": "54210f1298d845a42112c3c74406e807d3b79dad95546894a83ecdb6bee6169b",
+      "assertion_count": 2,
+      "assertions_passed": true,
+      "authorizing_status": "non_authorizing",
+      "available_variables": [
+        "anonymous_project_on_budget_status",
+        "anonymous_project_overall_health_status"
+      ],
+      "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",
+      "evidence_status": "candidate_outcome",
+      "geography_ids": [
+        "CA"
+      ],
+      "receipt_id": "PSPC_REAL_PROPERTY_OUTCOME_CONTEXT",
+      "source_ids": [
+        "PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025"
+      ]
+    },
+    {
+      "artifact_path": "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json",
+      "artifact_sha256": "54210f1298d845a42112c3c74406e807d3b79dad95546894a83ecdb6bee6169b",
+      "assertion_count": 2,
+      "assertions_passed": true,
+      "authorizing_status": "non_authorizing",
+      "available_variables": [
+        "anonymous_project_on_time_status",
+        "anonymous_project_on_scope_status"
+      ],
+      "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
+      "evidence_status": "candidate_outcome",
+      "geography_ids": [
+        "CA"
+      ],
+      "receipt_id": "PSPC_REAL_PROPERTY_SCHEDULE_CONTEXT",
+      "source_ids": [
+        "PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025"
       ]
     },
     {
@@ -434,23 +476,24 @@
   },
   "input_manifest": {
     "acquisition_contract_path": "data/model/ai_attribution_panel_acquisition_contract_v0.1.json",
-    "acquisition_contract_sha256": "2357b79475442c2681ecc4c2bc93e31c6315d52426d00884bbc91843bc6ed1b4",
+    "acquisition_contract_sha256": "d71986f67fcedf43cccecf2a77e368429811093b2ceff42fde248cc81712cb7d",
     "attribution_contract_path": "data/model/ai_attribution_panel_contract_v0.1.json",
-    "attribution_contract_sha256": "6537510eac09b73bddf5a974ca70c9cc97f8de3e4771dae3a71787b74adefdc4",
+    "attribution_contract_sha256": "1c53deb5653265bddc5f38fd62c7b3ca99c396f2f13b6d246fd220dcd079d77b",
     "code_sha256": "629e5b79c1213b0084a81841a9c6c9c02a3dd49e99ba82d893d51cb20033f211",
     "evidence_artifact_sha256": {
-      "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json": "c108ca2d1ff6a6fe2d9a90134b8d0b315b8f2defcc190acf4a6fd33e47934333",
+      "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json": "ffc76192d9f2b6956ebaa5a80d5380e3abb4121a9614dea98d85e624ee7e352a",
       "data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json": "88862880dda6b03809699b39eeb956184d1170632c473ce99da593f846474170",
       "data/model-runs/building_investment_controls_canada_v0.1.json": "efc353850648d0f3d919ae9494535c5238a7f96f7f06ac25e42f71f1d1a2fc31",
       "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json": "597ad07e642e6d619a56243de4af3c0a241f919e9599544acdff54218c82a19c",
       "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json": "787436ff826347ad672cb5543434498505e97a56cdd278a6795925837605a782",
       "data/model-runs/information_sector_construction_capex_screen_v0.1.json": "62d7a268cb7aaa37f07a155237bc488f9fa1720b7454a3eaa0a3fdc1be0189fe",
       "data/model-runs/oago_audited_project_outcomes_v0.1.json": "9106612b664aac9617e67782e976b08ff0d6b2c4a9fe0bc89cdc27bc8af4e0bb",
+      "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json": "54210f1298d845a42112c3c74406e807d3b79dad95546894a83ecdb6bee6169b",
       "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json": "dc2f3d7d6c2644edf34e82eebde08c86b365fd9fa451617507869ccbe90f559f",
       "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json": "df2df36431380339a7ab57d94203b87c9607ee7b6c891088eaf1fbefbd48f8e9"
     },
     "source_registry_path": "data/registry/sources.json",
-    "source_registry_sha256": "f0e98225614a2c9fe4bb99a50b6b8719d5f3090d108c6fdfe7bf666b786a5f8b"
+    "source_registry_sha256": "f760a2dc2f929dce3d9f9039bfa0842b4a3612118325b8f5b78766e47a10427e"
   },
   "panel_assembly": {
     "reason": "The preflight inventories candidate evidence and covers every locked field with an acquisition task, but zero regions, asset classes or panel rows are eligible for estimation.",
@@ -487,16 +530,16 @@
     },
     {
       "authorizing_receipt_count": 0,
-      "candidate_receipt_count": 3,
-      "candidate_variable_count": 10,
+      "candidate_receipt_count": 4,
+      "candidate_variable_count": 12,
       "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",
       "eligibility_status": "pending_authorizing_evidence",
       "required_field_count": 9
     },
     {
       "authorizing_receipt_count": 0,
-      "candidate_receipt_count": 2,
-      "candidate_variable_count": 5,
+      "candidate_receipt_count": 3,
+      "candidate_variable_count": 7,
       "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
       "eligibility_status": "pending_authorizing_evidence",
       "required_field_count": 9

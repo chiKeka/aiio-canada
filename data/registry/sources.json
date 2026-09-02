@@ -705,6 +705,24 @@
       "notes": "The public release reports regional commercial and institutional building floor area, energy consumption and intensity. It does not publish data-centre-specific region-quarter construction activity or respondent microdata."
     },
     {
+      "source_id": "PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025",
+      "title": "Real property projects delivered within scope, on time and on budget, 2024-2025",
+      "publisher": "Public Services and Procurement Canada",
+      "canonical_url": "https://open.canada.ca/data/en/dataset/7feed847-28c4-4f5d-83d3-f66e0c25f63a",
+      "retrieval_url": "https://donnees-data.tpsgc-pwgsc.gc.ca/br1/projimmobiliersbudget-realpropertyprojbudget/projimmobiliersbudget-realpropertyprojbudget-2024-2025.csv",
+      "source_type": "federal_real_property_project_performance_file",
+      "domain": "public_project_cost_and_schedule_outcomes",
+      "geography": "Canada; federal real-property projects",
+      "as_of_date": "2025-03-31",
+      "last_verified": "2026-09-02",
+      "licence_note": "Open Government Licence - Canada; retain fiscal-year vintage, project identifiers, data dictionary and retrieval hash.",
+      "access_method": "csv",
+      "update_frequency": "annual public file from an underlying quarterly monitoring process",
+      "evidence_status": "observed",
+      "status": "candidate",
+      "notes": "Project-level time, budget and scope status may support outcome diagnostics. The public file must be profiled for stable identifiers, geography, asset class, baseline vintages and whether ordinal status can be linked longitudinally."
+    },
+    {
       "source_id": "STATCAN_CMA_INDUSTRY_EMPLOYMENT_14100468",
       "title": "Employment by industry and census metropolitan area, annual",
       "publisher": "Statistics Canada",

@@ -149,6 +149,34 @@
       ]
     },
     {
+      "receipt_id": "PSPC_REAL_PROPERTY_OUTCOME_CONTEXT",
+      "domain_id": "PUBLIC_PROJECT_COST_OUTCOMES",
+      "geography_ids": ["CA"],
+      "source_ids": ["PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025"],
+      "artifact_path": "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json",
+      "evidence_status": "candidate_outcome",
+      "authorizing_status": "non_authorizing",
+      "available_variables": ["anonymous_project_on_budget_status", "anonymous_project_overall_health_status"],
+      "assertions": [
+        {"json_path": "record_count", "equals": 691},
+        {"json_path": "publication_boundary.project_outcome_authorized", "equals": false}
+      ]
+    },
+    {
+      "receipt_id": "PSPC_REAL_PROPERTY_SCHEDULE_CONTEXT",
+      "domain_id": "PUBLIC_PROJECT_SCHEDULE_OUTCOMES",
+      "geography_ids": ["CA"],
+      "source_ids": ["PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025"],
+      "artifact_path": "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json",
+      "evidence_status": "candidate_outcome",
+      "authorizing_status": "non_authorizing",
+      "available_variables": ["anonymous_project_on_time_status", "anonymous_project_on_scope_status"],
+      "assertions": [
+        {"json_path": "record_count", "equals": 691},
+        {"json_path": "publication_boundary.project_outcome_authorized", "equals": false}
+      ]
+    },
+    {
       "receipt_id": "CANADABUYS_PROCUREMENT_COMPETITION",
       "domain_id": "PROCUREMENT_COMPETITION",
       "geography_ids": ["CA"],
@@ -312,6 +340,7 @@
       "candidate_source_ids": [
         "CANADABUYS_PROCUREMENT_DATA",
         "GC_PROACTIVE_CONTRACTS",
+        "PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025",
         "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
         "QUEBEC_PQI_PROJECT_DASHBOARD"
       ],
@@ -337,6 +366,7 @@
       "minimum_frequency": "project_event_to_quarter",
       "candidate_source_ids": [
         "CANADABUYS_PROCUREMENT_DATA",
+        "PSPC_REAL_PROPERTY_PROJECT_PERFORMANCE_2024_2025",
         "OAGO_SELECTED_INFRASTRUCTURE_PROJECTS_2024",
         "QUEBEC_PQI_PROJECT_DASHBOARD",
         "QUEBEC_PQI_ARCHIVE_CATALOG"

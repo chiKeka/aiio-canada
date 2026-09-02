@@ -1,6 +1,6 @@
 {
-  "artifact_count": 29,
-  "artifact_manifest_sha256": "sha256:2136cfabe36e3446110da858e74b02df01fb9fca04d6b84a768a8acce3f4a546",
+  "artifact_count": 32,
+  "artifact_manifest_sha256": "sha256:90f6b58b96d9983ff142e9d46cb9a89593dbcbe558bac1e4dcc5a2ef71cb3690",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -30,7 +30,7 @@
       "artifact_id": "source_registry",
       "evidence_role": "source_provenance",
       "path": "data/registry/sources.json",
-      "sha256": "sha256:f0e98225614a2c9fe4bb99a50b6b8719d5f3090d108c6fdfe7bf666b786a5f8b"
+      "sha256": "sha256:f760a2dc2f929dce3d9f9039bfa0842b4a3612118325b8f5b78766e47a10427e"
     },
     {
       "artifact_id": "pspe_method_lineage",
@@ -108,31 +108,49 @@
       "artifact_id": "attribution_readiness",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_identification_readiness_v0.1.json",
-      "sha256": "sha256:db85036c1604439d5aaef550a4429f9c8c5952632df22bde06347797da90da98"
+      "sha256": "sha256:a3cb428185ea1355e055480fa26233102cae29d02679a8ef69c75fc7a35f4d7a"
     },
     {
       "artifact_id": "panel_preflight",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
-      "sha256": "sha256:e989fb144d4823016f762ae0c21dc5850e9f66f46bce1ba2d1ea1b06e212c1fa"
+      "sha256": "sha256:daf2ef7dc46d3e531e58a8d76f1afab09d971c6129a076691681f15b039b8868"
     },
     {
       "artifact_id": "empirical_covariate_panel",
       "evidence_role": "observed_descriptive",
       "path": "data/model-runs/ai_attribution_empirical_covariate_panel_v0.1.json",
-      "sha256": "sha256:abd7fa173366758ba6d4a88b2ddf5b1a167f77b3705c9b9846b591fcf76f25c5"
+      "sha256": "sha256:66e141922ae503b4fc85c7f5c7200b075beb13c424bafb2a562ad7c743b2f68c"
     },
     {
       "artifact_id": "empirical_estimation",
       "evidence_role": "withheld_model_output",
       "path": "data/model-runs/ai_attribution_empirical_estimation_v0.1.json",
-      "sha256": "sha256:4d9b84e25864e80fb4058efef0fa6df19b6e75b427eeced74756e5dd76e6965a"
+      "sha256": "sha256:d4d979aa6ffdb20db64f9198643328a015cd1fea2d868758d67e8dd420d5d721"
+    },
+    {
+      "artifact_id": "reconstructed_ai_construction_proxy",
+      "evidence_role": "inferred_proxy",
+      "path": "data/model-runs/ai_construction_proxy_alberta_v0.1.json",
+      "sha256": "sha256:80ca06e36e2316c9646395ad23e8a6ec4b22e64f80ae3e6cc457a929c4375899"
+    },
+    {
+      "artifact_id": "proxy_association",
+      "evidence_role": "descriptive_proxy_analysis",
+      "path": "data/model-runs/ai_attribution_proxy_association_v0.1.json",
+      "sha256": "sha256:19b2cf40c66900327910101c6da2d7609a51d4b5b7eca97f4f2d32a61f4597f8"
+    },
+    {
+      "artifact_id": "pspc_outcome_feasibility",
+      "evidence_role": "observed_reference",
+      "path": "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json",
+      "sha256": "sha256:54210f1298d845a42112c3c74406e807d3b79dad95546894a83ecdb6bee6169b"
     },
     {
       "artifact_id": "treatment_source_feasibility",
       "evidence_role": "governance",
       "path": "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
-      "sha256": "sha256:c108ca2d1ff6a6fe2d9a90134b8d0b315b8f2defcc190acf4a6fd33e47934333"
+      "sha256": "sha256:ffc76192d9f2b6956ebaa5a80d5380e3abb4121a9614dea98d85e624ee7e352a"
     },
     {
       "artifact_id": "building_investment_controls",

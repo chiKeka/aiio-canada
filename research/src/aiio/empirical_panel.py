@@ -38,6 +38,8 @@ FIELDS = [
     "non_residential_building_investment_constant_cad", "cpi_all_items_index",
     "cpi_shelter_index", "population", "construction_weekly_earnings_cad",
     "housing_starts_saar", "trade_job_vacancies", "trade_average_offered_wage_cad",
+    "reconstructed_ai_construction_proxy_low_cad", "reconstructed_ai_construction_proxy_central_cad",
+    "reconstructed_ai_construction_proxy_high_cad", "proxy_treatment_coverage_status",
     "realized_ai_construction_spend_cad", "data_centre_construction_labour_hours",
     "public_project_cost_change", "public_project_schedule_change_days",
     "authorizing_treatment_present", "authorizing_outcome_present", "estimation_eligible",
@@ -54,6 +56,7 @@ def build_empirical_covariate_panel(
     investment_path: Path,
     macro_path: Path,
     labour_path: Path,
+    proxy_treatment_path: Path,
     output_csv_path: Path,
     output_json_path: Path,
 ) -> dict[str, Any]:
@@ -85,6 +88,7 @@ def build_empirical_covariate_panel(
         statistic = row["statistic"]
         if statistic in {"Job vacancies", "Average offered hourly wage"}:
             labour_groups[(row["geography_id"], row["period_end"])][statistic].append(float(row["value"]))
+    proxy = {(row["geography_id"], row["period_end"]): row for row in _csv(proxy_treatment_path)}
 
     periods = sorted(
         set(period for geography, _, period in bcpi if geography in REGIONS)
@@ -113,6 +117,7 @@ def build_empirical_covariate_panel(
                 missing = sorted(name for name, item in macro_values.items() if item is None)
                 vacancies = labour.get("Job vacancies", [])
                 wages = labour.get("Average offered hourly wage", [])
+                proxy_row = proxy.get((geography_id, period_end))
                 row = {
                     "panel_row_id": _row_id(geography_id, asset_class, period_end),
                     "geography_id": geography_id, "geography_label": geography_label, "province_id": province_id,
@@ -124,6 +129,10 @@ def build_empirical_covariate_panel(
                     **{name: _format(item) for name, item in macro_values.items()},
                     "trade_job_vacancies": _format(sum(vacancies)) if vacancies else "",
                     "trade_average_offered_wage_cad": _format(sum(wages) / len(wages)) if wages else "",
+                    "reconstructed_ai_construction_proxy_low_cad": proxy_row["reconstructed_proxy_low_cad"] if proxy_row else "",
+                    "reconstructed_ai_construction_proxy_central_cad": proxy_row["reconstructed_proxy_central_cad"] if proxy_row else "",
+                    "reconstructed_ai_construction_proxy_high_cad": proxy_row["reconstructed_proxy_high_cad"] if proxy_row else "",
+                    "proxy_treatment_coverage_status": "alberta_reconstruction_available" if proxy_row else "not_observed_outside_alberta",
                     "realized_ai_construction_spend_cad": "", "data_centre_construction_labour_hours": "",
                     "public_project_cost_change": "", "public_project_schedule_change_days": "",
                     "authorizing_treatment_present": "false", "authorizing_outcome_present": "false", "estimation_eligible": "false",
@@ -138,7 +147,7 @@ def build_empirical_covariate_panel(
         writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
         writer.writeheader(); writer.writerows(rows)
 
-    inputs = [attribution_contract_path, acquisition_contract_path, alberta_bcpi_path, comparison_bcpi_path, investment_path, macro_path, labour_path]
+    inputs = [attribution_contract_path, acquisition_contract_path, alberta_bcpi_path, comparison_bcpi_path, investment_path, macro_path, labour_path, proxy_treatment_path]
     report = {
         "schema_version": "1.0.0", "panel_id": PANEL_ID,
         "unit_of_analysis": attribution["unit_of_analysis"], "frequency": "quarterly",
@@ -152,6 +161,8 @@ def build_empirical_covariate_panel(
             for field in [*MACRO_IDS.values(), "trade_job_vacancies", "trade_average_offered_wage_cad"]
         },
         "authorizing_treatment_cell_count": 0, "authorizing_outcome_cell_count": 0, "estimation_eligible_row_count": 0,
+        "proxy_treatment_cell_count": sum(bool(row["reconstructed_ai_construction_proxy_central_cad"]) for row in rows),
+        "proxy_treatment_geography_count": len({row["geography_id"] for row in rows if row["reconstructed_ai_construction_proxy_central_cad"]}),
         "input_manifest": {str(path.relative_to(root)): "sha256:" + _sha(path) for path in inputs},
         "output_path": "data/processed/ai_attribution_empirical_covariate_panel_v0.1.csv", "output_sha256": "sha256:" + _sha(output_csv_path),
         "publication_boundary": {
