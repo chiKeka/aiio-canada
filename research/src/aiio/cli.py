@@ -102,6 +102,7 @@ from .public_projects import run_public_project_exposure
 from .registry import load_registry
 from .readiness import audit_program_readiness, require_release_ready
 from .research_surface import build_research_surface_manifest
+from .source_freshness import build_source_freshness_report
 from .pspe_lineage import build_pspe_method_lineage
 from .retrieval import retrieve
 from .schemas import ValidationError
@@ -443,6 +444,15 @@ def main() -> None:
     )
     research_surface_parser.add_argument(
         "--output", type=Path, default=Path("public/data/research-surface.json")
+    )
+
+    source_freshness_parser = subparsers.add_parser(
+        "build-source-freshness-report",
+        help="evaluate every registered source against its declared publication cadence",
+    )
+    source_freshness_parser.add_argument("--as-of", default=utc_today)
+    source_freshness_parser.add_argument(
+        "--output", type=Path, default=Path("public/data/source-freshness.json")
     )
 
     canada_coverage_parser = subparsers.add_parser(
@@ -1546,6 +1556,12 @@ def main() -> None:
                     }
                 )
             )
+        elif args.command == "build-source-freshness-report":
+            output_path = (args.output if args.output.is_absolute() else root / args.output).resolve()
+            report = build_source_freshness_report(
+                root / "data/registry/sources.json", args.as_of, output_path
+            )
+            print(json.dumps({"status": report["status"], "output": str(output_path), "source_count": report["source_count"], "stale_count": report["stale_count"]}))
         elif args.command == "build-canada-cross-domain-coverage":
             output_path = (
                 args.output if args.output.is_absolute() else root / args.output

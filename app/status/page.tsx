@@ -6,10 +6,12 @@ import digest from '@/public/data/latest-digest.json';
 import gates from '@/data/governance/program-gates.json';
 import surface from '@/public/data/research-surface.json';
 import release from '@/public/data/latest.json';
+import freshness from '@/public/data/source-freshness.json';
 
 const checks = [
   { icon: Database, label: 'Evidence surface', value: `${surface.artifact_count} hash-locked artifacts`, ok: surface.artifact_count > 0 },
   { icon: Clock3, label: 'Latest evidence digest', value: `${digest.edition_date} · ${digest.status}`, ok: true },
+  { icon: Database, label: 'Registered source freshness', value: `${freshness.current_count}/${freshness.source_count} current`, ok: freshness.status === 'operational' },
   { icon: ShieldCheck, label: 'Deployment gate', value: gates.deployment.status, ok: gates.deployment.status === 'authorized' },
   { icon: Activity, label: 'Forecast authorization', value: 'Withheld pending calibration', ok: false },
 ];

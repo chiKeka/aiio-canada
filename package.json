@@ -48,6 +48,7 @@
     "digest:audit": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-digest-cadence",
     "evidence:refresh-weekly": "python3 research/scripts/weekly_evidence_refresh.py --root .",
     "research-surface:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-research-surface-manifest",
+    "sources:freshness": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-source-freshness-report",
     "canada:coverage": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-canada-cross-domain-coverage",
     "pspe:lineage": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-pspe-method-lineage",
     "program:audit": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-program-readiness",
