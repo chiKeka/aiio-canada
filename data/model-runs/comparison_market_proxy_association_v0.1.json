@@ -2,7 +2,7 @@
   "design": "Pooled Vancouver-Toronto-Montreal market-quarter-asset panel with market, quarter and asset fixed effects",
   "exposure": "log(1 + classified data-centre permit records issued in market-quarter)",
   "input_manifest": {
-    "panel_report_sha256": "sha256:74072ac7bff94f0aaf52c6f4e18b3e5d556604d18e7a23b3ffbf05b2fbd0e08f",
+    "panel_report_sha256": "sha256:acd50f8696f30f7910d68f68d33330f6a7bd4ba0b1fa3a598d03cc7b4249ad62",
     "panel_sha256": "sha256:8f3d2ee57fe5d5498d2b6fd17e02f29e415afdc9119372143aeb23e7476c0d82"
   },
   "limitations": [
