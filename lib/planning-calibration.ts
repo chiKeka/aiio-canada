@@ -8,7 +8,7 @@ export type MonthlyEscalationCalibration = {
   as_of_date: string | null;
   geography_id: string;
   model_version: string | null;
-  monthly_series: Array<{ month: string; baseline_mom_pct: number | null; ai_increment_mom_pct: number | null; combined_mom_pct: number | null; lower_bound_pct: number | null; upper_bound_pct: number | null }>;
+  monthly_series: Array<{ month: string; baseline_mom_pct: number | null; ai_increment_mom_pct: number | null; combined_mom_pct: number | null; lower_bound_pct: number | null; upper_bound_pct: number | null; cumulative_baseline_pct?: number | null; cumulative_ai_increment_pct?: number | null; cumulative_combined_pct?: number | null; cumulative_lower_pct?: number | null; cumulative_upper_pct?: number | null }>;
   drivers: Array<{ driver_id: string; label: string; tier: 'primary' | 'secondary'; contribution_pct_points: number | null; peak_month: string | null; confidence: 'low' | 'medium' | 'high' | null; node_ids: string[] }>;
   nodes: Array<{ node_id: string; label: string; layer: string; pressure_score: number | null }>;
   edges: Array<{ source: string; target: string; contribution_pct_points: number | null }>;
@@ -58,15 +58,30 @@ export function buildPlanningCalibration({ assetOutcome, durationYears, projectS
   });
   const peakIndex = Math.max(...peakMonthIndex);
   const peakAnnualIncrement = assumptions.peakAiAnnualPctPoints * captureScale;
+  let baselineIndex = 1;
+  let combinedIndex = 1;
+  let lowerIndex = 1;
+  let upperIndex = 1;
   const monthly_series = peakMonthIndex.map((flowIndex, index) => {
     const date = new Date(Date.UTC(projectStart, index, 1));
     const aiAnnual = peakAnnualIncrement * flowIndex;
     const aiMom = (Math.pow(1 + aiAnnual / 100, 1 / 12) - 1) * 100;
     const uncertainty = aiMom * assumptions.uncertaintyPct / 100;
+    const lowerMom = baselineMom + Math.max(0, aiMom - uncertainty);
+    const upperMom = baselineMom + aiMom + uncertainty;
+    baselineIndex *= 1 + baselineMom / 100;
+    combinedIndex *= 1 + (baselineMom + aiMom) / 100;
+    lowerIndex *= 1 + lowerMom / 100;
+    upperIndex *= 1 + upperMom / 100;
     return {
       month: date.toISOString().slice(0, 7),
       baseline_mom_pct: round(baselineMom), ai_increment_mom_pct: round(aiMom), combined_mom_pct: round(baselineMom + aiMom),
-      lower_bound_pct: round(baselineMom + Math.max(0, aiMom - uncertainty)), upper_bound_pct: round(baselineMom + aiMom + uncertainty),
+      lower_bound_pct: round(lowerMom), upper_bound_pct: round(upperMom),
+      cumulative_baseline_pct: round((baselineIndex - 1) * 100),
+      cumulative_ai_increment_pct: round((combinedIndex - baselineIndex) * 100),
+      cumulative_combined_pct: round((combinedIndex - 1) * 100),
+      cumulative_lower_pct: round((lowerIndex - 1) * 100),
+      cumulative_upper_pct: round((upperIndex - 1) * 100),
     };
   });
   const peakMonth = monthly_series.reduce((best, row) => (row.ai_increment_mom_pct ?? 0) > (best.ai_increment_mom_pct ?? 0) ? row : best, monthly_series[0]);
