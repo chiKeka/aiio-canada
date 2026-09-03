@@ -370,3 +370,36 @@
     break-inside: avoid;
   }
 }
+
+.executive-print-record {
+  display: none;
+}
+
+@media print {
+  .executive-print-record {
+    display: block;
+    color: #102f35;
+    font-family: Arial, sans-serif;
+  }
+
+  .executive-print-record header {
+    border-bottom: 3px solid #155f5a;
+    padding-bottom: 18px;
+  }
+
+  .executive-print-record header p,
+  .executive-print-record dt {
+    color: #527078;
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .executive-print-record h1 { font-size: 28pt; margin: 8px 0; }
+  .executive-print-record h2 { font-size: 15pt; margin: 20px 0 10px; }
+  .executive-print-record p { font-size: 10pt; line-height: 1.5; }
+  .executive-print-record dl { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .executive-print-record dl > div { border: 1px solid #d6e1e3; padding: 10px; }
+  .executive-print-record dd { font-size: 11pt; margin: 4px 0 0; }
+  .executive-print-record .print-decision { color: #155f5a; font-size: 20pt; font-weight: 700; }
+}

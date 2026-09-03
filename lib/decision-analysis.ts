@@ -76,7 +76,7 @@ export function buildDecisionAnalysis({ assetId, duration, metroId, startYear }:
     analysisDate: releaseData.baseline.as_of_date, asset, concurrentProjectCount: concurrentProjects.length,
     directEdges, dominantNode, dominantPathYears, dominantPaths, endYear, labourRows, leadingPath,
     marketComposite, materials, metroId, powerEvidence: releaseData.power_evidence, publicAssetSummary,
-    scenarioId: releaseData.scenario.scenario_id, scenarioWindowEnd: Math.max(...scenarioYears),
+    scenarioId: releaseData.scenario.scenario_id, startYear, scenarioWindowEnd: Math.max(...scenarioYears),
     scenarioWindowStart: Math.min(...scenarioYears), scenarioWindowYears,
     sourceIds: [releaseData.material_cost_screen.source_id, releaseData.labour_pressure.vacancy_source_id,
       releaseData.labour_pressure.workforce_source_id, releaseData.public_project_exposure.source_id,
