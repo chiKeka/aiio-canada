@@ -7,11 +7,13 @@ import gates from '@/data/governance/program-gates.json';
 import surface from '@/public/data/research-surface.json';
 import release from '@/public/data/latest.json';
 import freshness from '@/public/data/source-freshness.json';
+import practicalRoute from '@/data/model-runs/practical_evidence_route_current.json';
 
 const checks = [
   { icon: Database, label: 'Evidence surface', value: `${surface.artifact_count} hash-locked artifacts`, ok: surface.artifact_count > 0 },
   { icon: Clock3, label: 'Latest evidence digest', value: `${digest.edition_date} · ${digest.status}`, ok: true },
   { icon: Database, label: 'Registered source freshness', value: `${freshness.current_count}/${freshness.source_count} current`, ok: freshness.status === 'operational' },
+  { icon: Activity, label: 'Prospective outcome tracking', value: `${practicalRoute.tracks.prospective_public_project_tracking.project_count.toLocaleString()} projects · ${practicalRoute.tracks.prospective_public_project_tracking.province_count} provinces`, ok: practicalRoute.gate_evaluation.prospective_baseline_implemented },
   { icon: ShieldCheck, label: 'Deployment gate', value: gates.deployment.status, ok: gates.deployment.status === 'authorized' },
   { icon: Activity, label: 'Forecast authorization', value: 'Withheld pending calibration', ok: false },
 ];

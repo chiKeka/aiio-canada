@@ -24,6 +24,7 @@ def main() -> None:
     from aiio.digest import build_digest
 from aiio.research_surface import build_research_surface_manifest
 from aiio.source_freshness import build_source_freshness_report
+from aiio.practical_route import build_practical_evidence_route
 
     as_of = args.edition_date.isoformat()
     raw_root = root / "data" / "raw"
@@ -156,6 +157,15 @@ from aiio.source_freshness import build_source_freshness_report
     )
     freshness = build_source_freshness_report(
         root / "data/registry/sources.json", as_of, root / "public/data/source-freshness.json"
+    )
+    practical_route = build_practical_evidence_route(
+        root,
+        as_of,
+        root / "data/processed/ai_construction_proxy_alberta_v0.1.csv",
+        root / "data/processed/public_projects_bc_on_qc.csv",
+        root / "data/processed/quebec_pqi_authorized_revision_events.csv",
+        root / "data/processed/public_project_prospective_snapshot_current.csv",
+        root / "data/model-runs/practical_evidence_route_current.json",
     )
     surface = build_research_surface_manifest(root, root / "public/data/research-surface.json")
     print(json.dumps({"status": "review_pr_required", "edition_date": as_of, "candidate_counts": {"edmonton": edmonton_report["data_centre_candidate_count"], **{city: reports[city]["data_centre_candidate_count"] for city in reports}}, "comparison_panel_rows": panel_report["row_count"], "research_surface_artifacts": surface["artifact_count"], "automatic_model_change": False}, indent=2, sort_keys=True))
