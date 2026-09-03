@@ -1,6 +1,6 @@
 {
-  "artifact_count": 38,
-  "artifact_manifest_sha256": "sha256:076a9bfacb9a9e739772a99d0917eb7123551895893aa70a1cdeed8daa52d1d3",
+  "artifact_count": 39,
+  "artifact_manifest_sha256": "sha256:8a6f6b356047b11b7272851aab01a53965ee136d5f1f87a384dc0c8bcd6464d4",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -37,6 +37,12 @@
       "evidence_role": "source_provenance",
       "path": "data/registry/sources.json",
       "sha256": "sha256:4bea23fa75e7311e5a2b59f2c1b81432c3902f2e0cd72d55759c98ad6f03edcf"
+    },
+    {
+      "artifact_id": "source_freshness",
+      "evidence_role": "governance",
+      "path": "public/data/source-freshness.json",
+      "sha256": "sha256:e53b771138698b5164e209ff87195523acf64d9e940b1911941fe0f04bc78637"
     },
     {
       "artifact_id": "pspe_method_lineage",

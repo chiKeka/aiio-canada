@@ -2,6 +2,7 @@ import digest from '@/public/data/latest-digest.json';
 import gates from '@/data/governance/program-gates.json';
 import surface from '@/public/data/research-surface.json';
 import release from '@/public/data/latest.json';
+import freshness from '@/public/data/source-freshness.json';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +11,7 @@ export function GET() {
   const ageDays = Math.max(0, Math.floor((Date.now() - digestDate.getTime()) / 86_400_000));
   const cadence = ageDays <= 10 ? 'current' : 'stale';
   const integrity = surface.artifact_count > 0 && Boolean(surface.artifact_manifest_sha256);
-  const operational = integrity && cadence === 'current';
+  const operational = integrity && cadence === 'current' && freshness.status === 'operational';
 
   return Response.json(
     {
@@ -24,6 +25,13 @@ export function GET() {
         cadence,
         artifact_count: surface.artifact_count,
         manifest_sha256: surface.artifact_manifest_sha256,
+        source_freshness: {
+          as_of_date: freshness.as_of_date,
+          status: freshness.status,
+          current_count: freshness.current_count,
+          stale_count: freshness.stale_count,
+          stale_source_ids: freshness.stale_source_ids,
+        },
       },
       release: {
         version: release.manifest.version,

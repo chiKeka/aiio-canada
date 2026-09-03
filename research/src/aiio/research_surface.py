@@ -16,6 +16,7 @@ ARTIFACTS = [
     ("program_gates", "data/governance/program-gates.json", "governance"),
     ("executive_monthly_escalation", "data/model-runs/executive_monthly_escalation_current.json", "withheld_model_output"),
     ("source_registry", "data/registry/sources.json", "source_provenance"),
+    ("source_freshness", "public/data/source-freshness.json", "governance"),
     ("pspe_method_lineage", "data/model-runs/pspe_method_lineage_v0.1.json", "method_lineage"),
     ("canada_cross_domain_coverage", "data/model-runs/canada_cross_domain_coverage_v0.1.json", "coverage_inventory"),
     ("alberta_graph", "data/model/alberta_graph_v0.2.json", "assumption"),
