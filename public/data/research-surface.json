@@ -1,6 +1,6 @@
 {
-  "artifact_count": 39,
-  "artifact_manifest_sha256": "sha256:8a6f6b356047b11b7272851aab01a53965ee136d5f1f87a384dc0c8bcd6464d4",
+  "artifact_count": 41,
+  "artifact_manifest_sha256": "sha256:8f3ffbaf4132cbecb56f4c343cb1e893d89e66034df092dc44916b68f691e5f4",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -43,6 +43,18 @@
       "evidence_role": "governance",
       "path": "public/data/source-freshness.json",
       "sha256": "sha256:e53b771138698b5164e209ff87195523acf64d9e940b1911941fe0f04bc78637"
+    },
+    {
+      "artifact_id": "practical_evidence_route",
+      "evidence_role": "governance",
+      "path": "data/model-runs/practical_evidence_route_current.json",
+      "sha256": "sha256:97639047a2a60afd946c65dd0f8d5127aacb7a2d60ff7c95a249d5917522273e"
+    },
+    {
+      "artifact_id": "authorized_revision_estimand_contract",
+      "evidence_role": "method_lineage",
+      "path": "data/model/authorized_revision_estimand_contract_v0.1.json",
+      "sha256": "sha256:e4b91122e675accc274e542059d7bad58d4c5653ff52a41ebde00664a9c679d1"
     },
     {
       "artifact_id": "pspe_method_lineage",

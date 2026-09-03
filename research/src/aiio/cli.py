@@ -103,6 +103,7 @@ from .registry import load_registry
 from .readiness import audit_program_readiness, require_release_ready
 from .research_surface import build_research_surface_manifest
 from .source_freshness import build_source_freshness_report
+from .practical_route import build_practical_evidence_route
 from .pspe_lineage import build_pspe_method_lineage
 from .retrieval import retrieve
 from .schemas import ValidationError
@@ -454,6 +455,12 @@ def main() -> None:
     source_freshness_parser.add_argument(
         "--output", type=Path, default=Path("public/data/source-freshness.json")
     )
+
+    practical_route_parser = subparsers.add_parser(
+        "build-practical-evidence-route",
+        help="build the reconstructed treatment, prospective project and narrow revision gate",
+    )
+    practical_route_parser.add_argument("--as-of", default=utc_today)
 
     canada_coverage_parser = subparsers.add_parser(
         "build-canada-cross-domain-coverage",
@@ -1562,6 +1569,17 @@ def main() -> None:
                 root / "data/registry/sources.json", args.as_of, output_path
             )
             print(json.dumps({"status": report["status"], "output": str(output_path), "source_count": report["source_count"], "stale_count": report["stale_count"]}))
+        elif args.command == "build-practical-evidence-route":
+            report = build_practical_evidence_route(
+                root,
+                args.as_of,
+                root / "data/processed/ai_construction_proxy_alberta_v0.1.csv",
+                root / "data/processed/public_projects_bc_on_qc.csv",
+                root / "data/processed/quebec_pqi_authorized_revision_events.csv",
+                root / "data/processed/public_project_prospective_snapshot_current.csv",
+                root / "data/model-runs/practical_evidence_route_current.json",
+            )
+            print(json.dumps({"status": report["status"], "as_of_date": report["as_of_date"], "gate_evaluation": report["gate_evaluation"]}))
         elif args.command == "build-canada-cross-domain-coverage":
             output_path = (
                 args.output if args.output.is_absolute() else root / args.output

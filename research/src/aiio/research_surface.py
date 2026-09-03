@@ -17,6 +17,8 @@ ARTIFACTS = [
     ("executive_monthly_escalation", "data/model-runs/executive_monthly_escalation_current.json", "withheld_model_output"),
     ("source_registry", "data/registry/sources.json", "source_provenance"),
     ("source_freshness", "public/data/source-freshness.json", "governance"),
+    ("practical_evidence_route", "data/model-runs/practical_evidence_route_current.json", "governance"),
+    ("authorized_revision_estimand_contract", "data/model/authorized_revision_estimand_contract_v0.1.json", "method_lineage"),
     ("pspe_method_lineage", "data/model-runs/pspe_method_lineage_v0.1.json", "method_lineage"),
     ("canada_cross_domain_coverage", "data/model-runs/canada_cross_domain_coverage_v0.1.json", "coverage_inventory"),
     ("alberta_graph", "data/model/alberta_graph_v0.2.json", "assumption"),
