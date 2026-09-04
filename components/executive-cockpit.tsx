@@ -3,11 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Activity,
-  ArrowRight,
   Building2,
   Clipboard,
-  ChevronLeft,
-  ChevronRight,
   CircleAlert,
   Factory,
   Gauge,
@@ -19,6 +16,7 @@ import {
 } from 'lucide-react';
 
 import { SiteHeader } from '@/components/site-shell';
+import { GuidedProjectStory } from '@/components/guided-project-story';
 import { DecisionCockpitView, type PinnedDecision } from '@/components/decision-cockpit-view';
 import { buildDecisionOutlook, decisionAction } from '@/lib/decision-outlook';
 import { Badge } from '@/components/ui/badge';
@@ -41,38 +39,11 @@ const views: { id: View; label: string; icon: typeof Gauge }[] = [
   { id: 'evidence', label: 'Evidence lens', icon: Layers3 },
 ];
 
-const tour = [
-  {
-    kicker: '01 · Define',
-    title: 'Shape the decision.',
-    body: 'Asset · market · value · window',
-    visual: 'project',
-  },
-  {
-    kicker: '02 · Observe',
-    title: 'Scan four signals.',
-    body: 'Materials · labour · delivery · power',
-    visual: 'signals',
-  },
-  {
-    kicker: '03 · Trace',
-    title: 'Trace the mechanism.',
-    body: 'Investment → constraints → project exposure',
-    visual: 'graph',
-  },
-  {
-    kicker: '04 · Decide',
-    title: 'Act on gates.',
-    body: 'Test market · coordinate utilities · refresh estimate',
-    visual: 'decision',
-  },
-] as const;
 
 type ExecutiveReadiness = { proxyPlanning: { status: string; passed_check_count: number; check_count: number; checks: { id: string; status: string; finding: string; next_step: string | null }[] }; currentSources: number; totalSources: number; trackedProjects: number; representedRegions: number; targetRegions: number; passedIdentificationChecks: number; totalIdentificationChecks: number };
 
 export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness }) {
   const [view, setView] = useState<View>('outlook');
-  const [tourStep, setTourStep] = useState(0);
   const [assetId, setAssetId] = useState<AssetId>('hospital');
   const [metroId, setMetroId] = useState<MetroId>('CMA_835');
   const [budgetMillions, setBudgetMillions] = useState(1200);
@@ -192,7 +163,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
               ) : view === 'cockpit' ? (
                 <DecisionCockpitView analysis={analysis} assessment={assessment} inputs={decisionInputs} approvalStage={approvalStage} projectName={projectName} comparison={comparison} planningChecks={`${readiness.proxyPlanning.passed_check_count}/${readiness.proxyPlanning.check_count}`} />
               ) : view === 'walkthrough' ? (
-                <Walkthrough analysis={analysis} budgetMillions={budgetMillions} readiness={readiness} setTourStep={setTourStep} tourStep={tourStep} />
+                <GuidedProjectStory analysis={analysis} assessment={assessment} inputs={decisionInputs} projectName={projectName} approvalStage={approvalStage} planningChecks={`${readiness.proxyPlanning.passed_check_count}/${readiness.proxyPlanning.check_count}`} onExplore={setView} />
               ) : (
                 <EvidenceView analysis={analysis} completeLabour={completeLabour} readiness={readiness} requestedGw={requestedGw} />
               )}
@@ -206,52 +177,6 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
 }
 
 
-function ImpactMap({ analysis }: { analysis: ReturnType<typeof buildDecisionAnalysis> }) {
-  const [selected, setSelected] = useState<'shock' | 'constraint' | 'exposure'>('constraint');
-  const trade = analysis.dominantNode?.label ?? 'Priority trade pathway';
-  const detail = {
-    shock: ['$50B AI infrastructure scenario', 'Counterfactual capital flow over 10 years—not observed spending.'],
-    constraint: [trade, `${analysis.directEdges.length} direct constraint edges feed this asset's delivery outcome.`],
-    exposure: [analysis.asset.label, `${analysis.scenarioWindowYears.length} intersecting scenario years. AI-attributable impact remains uncalibrated.`],
-  }[selected];
-  return <div className="relative my-5 flex min-h-[280px] flex-1 items-center justify-center overflow-hidden rounded-2xl border border-white/8 bg-[#081f28] p-4">
-    <div className="cockpit-orbit absolute size-[420px] rounded-full border border-[#4fc5b6]/12" aria-hidden="true" />
-    <div className="cockpit-orbit absolute size-[300px] rounded-full border border-[#4fc5b6]/16" aria-hidden="true" />
-    <div className="relative grid w-full max-w-3xl grid-cols-[1fr_36px_1fr_36px_1fr] items-center gap-1 text-center">
-      <MapNode eyebrow="Shock" icon={Factory} onSelect={() => setSelected('shock')} selected={selected === 'shock'} title="$50B scenario" tone="teal" />
-      <FlowLine />
-      <MapNode eyebrow="Constraint" icon={Users} onSelect={() => setSelected('constraint')} selected={selected === 'constraint'} title={trade} tone="blue" />
-      <FlowLine />
-      <MapNode eyebrow="Exposure" icon={Building2} onSelect={() => setSelected('exposure')} selected={selected === 'exposure'} title={analysis.asset.label} tone="orange" />
-    </div>
-    <div className="absolute inset-x-4 bottom-3 rounded-lg border border-white/8 bg-[#061820]/90 px-3 py-2 text-left"><p className="text-[9px] font-medium text-[#dff7f1]">{detail[0]}</p><p className="mt-0.5 text-[8px] leading-3 text-[#78949a]">{detail[1]}</p></div>
-  </div>;
-}
-
-function Walkthrough({ analysis, budgetMillions, readiness, setTourStep, tourStep }: { analysis: ReturnType<typeof buildDecisionAnalysis>; budgetMillions: number; readiness: ExecutiveReadiness; setTourStep: (value: number) => void; tourStep: number }) {
-  const step = tour[tourStep];
-  return <section className="flex h-full min-h-[610px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0d2933]/92 shadow-2xl shadow-black/20 lg:min-h-0">
-    <div className="grid grid-cols-4 border-b border-white/10 bg-black/15">
-      {tour.map((item, index) => <button className={`relative px-2 py-4 text-left transition ${index === tourStep ? 'bg-white/6 text-white' : 'text-[#779198] hover:text-white'}`} key={item.kicker} onClick={() => setTourStep(index)} type="button"><span className="block text-[9px] uppercase tracking-[0.12em]">{item.kicker}</span>{index === tourStep ? <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[#62d2c4]" /> : null}</button>)}
-    </div>
-    <div className="grid min-h-0 flex-1 lg:grid-cols-[.8fr_1.2fr]">
-      <div className="flex flex-col justify-center border-b border-white/10 p-7 lg:border-b-0 lg:border-r">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-[#72cfc3]">{step.kicker}</p>
-        <h2 className="mt-4 text-4xl font-medium leading-[1.05] tracking-[-0.045em]">{step.title}</h2>
-        <p className="mt-5 font-mono text-xs uppercase tracking-[0.1em] text-[#a9bcc1]">{step.body}</p>
-        <div className="mt-8 flex gap-2"><Button className="border border-white/10 bg-white/5 text-white hover:bg-white/10" disabled={tourStep === 0} onClick={() => setTourStep(Math.max(0, tourStep - 1))}><ChevronLeft /> Back</Button><Button className="bg-[#dff7f1] text-[#113b3b] hover:bg-white" disabled={tourStep === tour.length - 1} onClick={() => setTourStep(Math.min(tour.length - 1, tourStep + 1))}>Next <ChevronRight /></Button></div>
-      </div>
-      <TourVisual analysis={analysis} budgetMillions={budgetMillions} kind={step.visual} readiness={readiness} />
-    </div>
-  </section>;
-}
-
-function TourVisual({ analysis, budgetMillions, kind, readiness }: { analysis: ReturnType<typeof buildDecisionAnalysis>; budgetMillions: number; kind: typeof tour[number]['visual']; readiness: ExecutiveReadiness }) {
-  if (kind === 'graph') return <div className="flex min-h-[360px] items-center p-6"><ImpactMap analysis={analysis} /></div>;
-  if (kind === 'signals') { const labour = analysis.labourRows.filter((row) => row.vacancies_per_1_000_2021_employed !== null).sort((a, b) => (b.vacancies_per_1_000_2021_employed ?? 0) - (a.vacancies_per_1_000_2021_employed ?? 0))[0]; return <div className="grid content-center gap-3 p-6 sm:grid-cols-2"><BigNumber label="Leading material · observed YoY" value={analysis.materials[0] ? signed(analysis.materials[0].year_over_year_percent_change) : 'n/a'} /><BigNumber label="Leading labour · vacancies/1k" value={labour?.vacancies_per_1_000_2021_employed?.toFixed(1) ?? 'n/a'} /><BigNumber label="Tracked public projects · BC/ON/QC" value={readiness.trackedProjects.toLocaleString()} /><BigNumber label="Requested power · not connected" value={`${(analysis.powerEvidence.requested_load.latest_requested_load_mw / 1000).toFixed(1)} GW`} /></div>; }
-  if (kind === 'decision') return <div className="flex items-center justify-center p-8"><div className="w-full max-w-xl"><div className="text-center"><CircleAlert className="mx-auto size-7 text-[#ff9d66]" /><p className="mt-3 text-2xl font-medium">Market-test before approval</p><p className="mt-2 text-xs text-[#a9bcc1]">AI premium remains withheld</p></div><div className="mt-6 grid gap-2 sm:grid-cols-2">{['Retain independent baseline','Test priority trade market','Confirm utility interfaces','Refresh at every estimate gate'].map((gate, index) => <div className="rounded-xl border border-white/10 bg-[#081f28] p-3 text-[10px] text-[#cbdadc]" key={gate}><span className="mr-2 font-mono text-[#72cfc3]">0{index + 1}</span>{gate}</div>)}</div></div></div>;
-  return <div className="flex items-center justify-center p-8"><div className="grid w-full max-w-lg gap-3 sm:grid-cols-2"><BigNumber label="Capital decision" value={`$${budgetMillions.toLocaleString()}M`} /><BigNumber label="Delivery" value={`${analysis.endYear - (analysis.endYear - analysis.scenarioWindowYears.length + 1) + 1 || 0} yrs`} /><BigNumber label="Region" value={METROS[analysis.metroId].replace(' region', '')} /><BigNumber label="Asset" value={analysis.asset.label.split(' or ')[0]} /></div></div>;
-}
 
 function EvidenceView({ analysis, completeLabour, readiness, requestedGw }: { analysis: ReturnType<typeof buildDecisionAnalysis>; completeLabour: ReturnType<typeof buildDecisionAnalysis>['labourRows']; readiness: ExecutiveReadiness; requestedGw: number }) {
   const channels = [
@@ -282,9 +207,6 @@ function ExecutivePrintRecord({ analysis, approvalStage, assumptions, budgetMill
 }
 
 function Control({ children, label }: { children: React.ReactNode; label: string }) { return <label className="block"><span className="mb-1.5 block text-[9px] uppercase tracking-[0.1em] text-[#8fa8ae]">{label}</span>{children}</label>; }
-function FlowLine() { return <div className="relative h-px bg-gradient-to-r from-[#58cbbd] to-[#ef9664]"><ArrowRight className="absolute -right-1.5 -top-2 size-4 text-[#ef9664]" /></div>; }
-function MapNode({ eyebrow, icon: Icon, onSelect, selected, title, tone }: { eyebrow: string; icon: typeof Factory; onSelect: () => void; selected: boolean; title: string; tone: 'teal' | 'blue' | 'orange' }) { const styles = tone === 'orange' ? 'border-[#ee9665]/40 bg-[#ee9665]/12 text-[#ffc6a3]' : tone === 'blue' ? 'border-[#75aebe]/35 bg-[#75aebe]/10 text-[#b9e0e8]' : 'border-[#58cbbd]/40 bg-[#58cbbd]/10 text-[#a9eee4]'; return <button aria-pressed={selected} className={`relative z-10 flex min-h-36 flex-col items-center justify-center rounded-full border p-3 shadow-xl shadow-black/20 transition hover:scale-[1.03] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dff7f1] ${selected ? 'ring-2 ring-white/50' : ''} ${styles}`} onClick={onSelect} type="button"><Icon className="size-5" /><p className="mt-3 text-[8px] uppercase tracking-[0.14em] opacity-70">{eyebrow}</p><p className="mt-1 max-w-28 text-xs font-medium leading-4">{title}</p></button>; }
-function BigNumber({ label, value }: { label: string; value: string }) { return <div className="rounded-2xl border border-white/10 bg-[#081f28] p-5"><p className="font-mono text-2xl text-[#dff7f1]">{value}</p><p className="mt-3 text-[9px] uppercase tracking-[0.12em] text-[#829ca2]">{label}</p></div>; }
 function Maturity({ label, note, tone, value }: { label: string; note: string; tone: 'teal' | 'blue' | 'amber' | 'orange'; value: number }) {
   const colors = { teal: 'bg-[#61cfc1]', blue: 'bg-[#75aebe]', amber: 'bg-[#d2b06d]', orange: 'bg-[#ef9664]' };
   return <div><div className="flex justify-between text-xs"><span>{label}</span><span className="font-mono text-[#9eb2b7]">{value}%</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-white/8"><div className={`h-full rounded-full ${colors[tone]}`} style={{ width: `${value}%` }} /></div><p className="mt-1.5 text-[9px] text-[#78949a]">{note}</p></div>;
