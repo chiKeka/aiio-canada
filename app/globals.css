@@ -402,4 +402,14 @@
   .executive-print-record dl > div { border: 1px solid #d6e1e3; padding: 10px; }
   .executive-print-record dd { font-size: 11pt; margin: 4px 0 0; }
   .executive-print-record .print-decision { color: #155f5a; font-size: 20pt; font-weight: 700; }
+
+  /* The visible brief is nested in the dashboard: remove constrained ancestors. */
+  main, .executive-screen, .executive-screen div { height: auto !important; min-height: 0 !important; overflow: visible !important; }
+  #executive-decision-brief { display: block !important; color: #102f35 !important; background: white !important; padding: 0 !important; font-family: Arial, sans-serif; }
+  #executive-decision-brief h1 { font-size: 20pt; }
+  #executive-decision-brief h2, #executive-decision-brief summary { font-size: 12pt; }
+  #executive-decision-brief p, #executive-decision-brief li, #executive-decision-brief dt { font-size: 9pt; line-height: 1.35; }
+  #executive-decision-brief dd { font-size: 14pt; }
+  #executive-decision-brief a { overflow-wrap: anywhere; }
+  #executive-decision-brief details > * { display: block !important; }
 }

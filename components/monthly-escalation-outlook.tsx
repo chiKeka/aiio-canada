@@ -23,6 +23,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 type Props = {
+  selectedMonth: string | null; setSelectedMonth: (value: string) => void;
+  selectedDriver: string | null; setSelectedDriver: (value: string) => void;
   calibration: MonthlyEscalationCalibration; assumptions: PlanningAssumptions;
   budgetMillions: number; contingencyPct: number;
   onAssumptionsChange: (value: PlanningAssumptions) => void;
@@ -31,10 +33,8 @@ type Props = {
   projectStart: number; durationYears: number; assetOutcome: string;
 };
 
-export function MonthlyEscalationOutlook({ assumptions, budgetMillions, calibration, contingencyPct, onAssumptionsChange, onSpendingProfileChange, spendingProfile, priceBasis, projectStart, durationYears, assetOutcome }: Props) {
-  const [selectedDriver, setSelectedDriver] = useState<string | null>(null);
+export function MonthlyEscalationOutlook({ selectedMonth, setSelectedMonth, selectedDriver, setSelectedDriver, assumptions, budgetMillions, calibration, contingencyPct, onAssumptionsChange, onSpendingProfileChange, spendingProfile, priceBasis, projectStart, durationYears, assetOutcome }: Props) {
   const [selectedMitigations, setSelectedMitigations] = useState<string[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [chartMode, setChartMode] = useState<'monthly' | 'cumulative' | 'spending'>('spending');
   const assessment = useMemo(() => buildDecisionOutlook({ assetOutcome, durationYears, projectStart, assumptions, priceBasis, budgetMillions, spendingProfile }, calibration), [assetOutcome, assumptions, durationYears, projectStart, priceBasis, budgetMillions, spendingProfile, calibration]);
   if (!assessment) return <section className="rounded-2xl border border-[#ef9664]/40 bg-[#0d2933] p-6" role="alert">Results withheld: enter a valid project window, positive budget and price basis no later than project start.</section>;

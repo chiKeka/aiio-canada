@@ -5,16 +5,19 @@ import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 import test from 'node:test';
 import ts from 'typescript';
+import { webcrypto, createHash } from 'node:crypto';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 function load(path) {
   const source = readFileSync(resolve(root, path), 'utf8');
   const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
   const testModule = { exports: {} };
-  runInNewContext(compiled, { module: testModule, exports: testModule.exports, require: (name) => {
+  runInNewContext(compiled, { crypto: webcrypto, TextEncoder, module: testModule, exports: testModule.exports, require: (name) => {
     if (name === './project-cashflow') return load('lib/project-cashflow.ts');
     if (name === './planning-calibration') return load('lib/planning-calibration.ts');
     if (name === './decision-analysis') return load('lib/decision-analysis.ts');
+    if (name === './executive-evidence') return load('lib/executive-evidence.ts');
+    if (name === './decision-outlook') return load('lib/decision-outlook.ts');
     if (name.startsWith('@/') && name.endsWith('.json')) return JSON.parse(readFileSync(resolve(root, name.slice(2)), 'utf8'));
     throw new Error(`Unexpected test import: ${name}`);
   } });
@@ -25,6 +28,28 @@ const { buildPlanningCalibration } = load('lib/planning-calibration.ts');
 const { buildDecisionOutlook, decisionAction, deliveryYears } = load('lib/decision-outlook.ts');
 const { buildDecisionAnalysis } = load('lib/decision-analysis.ts');
 const { buildExecutiveEvidence } = load('lib/executive-evidence.ts');
+const { buildAssessmentRecord, encodeAssessmentRecord, resolveFocus } = load('lib/assessment-record.ts');
+
+test('snapshot detaches inputs, reconciles recorded cashflow, and carries an integrity checksum', async () => {
+  const analysis = buildDecisionAnalysis({ assetId: 'hospital', metroId: 'CMA_835', startYear: 2029, duration: 2 });
+  const inputs = { ...config, budgetMillions: 1200, spendingProfile: 'bell', assumptions: { ...assumptions } };
+  const assessment = buildDecisionOutlook(inputs, buildPlanningCalibration(config));
+  const args = { inputs, assessment, analysis, projectName: 'Test hospital', approvalStage: 'treasury_board', contingencyPct: 12, comparison: { inputs, assessment, market: 'Edmonton region' }, selectedMonth: '2030-03', selectedDriver: 'missing', generatedAt: '2026-09-04T12:00:00Z', planning: { status: 'incomplete', passed_check_count: 2, check_count: 7 } };
+  const record = buildAssessmentRecord(args);
+  const restored = buildCashflowOutlook(record.monthly_prices, record.project.inputs.budgetMillions, record.project.inputs.spendingProfile);
+  near(restored.combinedSpend, record.result.combinedSpend);
+  near(record.comparison.scenario_spend_delta_millions, 0);
+  assert.equal(record.focus.month, '2030-03');
+  assert.equal(record.boundary.causal_ai_effect_authorized, false);
+  inputs.assumptions.annualBaselinePct = 11;
+  assert.notEqual(record.project.inputs.assumptions.annualBaselinePct, 11);
+  const envelope = JSON.parse(await encodeAssessmentRecord(record));
+  assert.equal(createHash('sha256').update(envelope.payload).digest('hex'), envelope.sha256);
+  assert.notEqual(createHash('sha256').update(envelope.payload + ' ').digest('hex'), envelope.sha256);
+  assert.equal(buildAssessmentRecord({ ...args, assessment: null }), null);
+  assert.equal(buildAssessmentRecord({ ...args, comparison: { ...args.comparison, inputs: { ...inputs, priceBasis: '2027-01' } } }).comparison.scenario_spend_delta_millions, null);
+  assert.equal(resolveFocus(assessment, '2050-01', 'missing').month, '2029-01');
+});
 
 test('executive evidence is scoped context with resolvable sources, not rate inputs', () => {
   const analysis = buildDecisionAnalysis({ assetId: 'hospital', metroId: 'CMA_835', startYear: 2029, duration: 5 });

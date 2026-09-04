@@ -16,7 +16,9 @@ import { SiteHeader } from '@/components/site-shell';
 import { ExecutiveEvidenceLens } from '@/components/executive-evidence-lens';
 import { GuidedProjectStory } from '@/components/guided-project-story';
 import { DecisionCockpitView, type PinnedDecision } from '@/components/decision-cockpit-view';
-import { buildDecisionOutlook, decisionAction } from '@/lib/decision-outlook';
+import { buildDecisionOutlook } from '@/lib/decision-outlook';
+import { buildAssessmentRecord, encodeAssessmentRecord, resolveFocus } from '@/lib/assessment-record';
+import { ExecutiveDecisionBrief } from '@/components/executive-decision-brief';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,7 +30,7 @@ import releaseData from '@/public/data/latest.json';
 import type { PlanningAssumptions } from '@/lib/planning-calibration';
 import { monthNumber, queryNumber, SPENDING_PROFILES, type SpendingProfile } from '@/lib/project-cashflow';
 
-type View = 'outlook' | 'cockpit' | 'walkthrough' | 'evidence';
+type View = 'outlook' | 'cockpit' | 'walkthrough' | 'evidence' | 'brief';
 
 const views: { id: View; label: string; icon: typeof Gauge }[] = [
   { id: 'outlook', label: 'Monthly outlook', icon: Activity },
@@ -53,7 +55,10 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
   const [contingencyPct, setContingencyPct] = useState(12);
   const [spendingProfile, setSpendingProfile] = useState<SpendingProfile>('bell');
   const [assumptions, setAssumptions] = useState<PlanningAssumptions>({ annualBaselinePct: 3.5, peakAiAnnualPctPoints: 1.25, localCapturePct: 36, lagMonths: 3, uncertaintyPct: 40 });
-  const [shareState, setShareState] = useState('Share assessment');
+  const [shareState, setShareState] = useState('Share inputs');
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [selectedDriver, setSelectedDriver] = useState<string | null>(null);
+  const [exportStatus, setExportStatus] = useState('');
   const [comparison, setComparison] = useState<PinnedDecision | null>(null);
 
   useEffect(() => {
@@ -88,6 +93,18 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
 
   const decisionInputs = { assumptions, budgetMillions, priceBasis, projectStart: startYear, durationYears: duration, assetOutcome: analysis.asset.outcome, spendingProfile };
   const assessment = buildDecisionOutlook(decisionInputs, monthlyCalibration as MonthlyEscalationCalibration);
+  const focus = resolveFocus(assessment, selectedMonth, selectedDriver);
+  const record = buildAssessmentRecord({ inputs: decisionInputs, assessment, analysis, projectName, approvalStage, contingencyPct, comparison, selectedMonth: focus.month, selectedDriver: focus.driverId, generatedAt: new Date().toISOString(), planning: readiness.proxyPlanning });
+  const downloadSnapshot = async () => {
+    if (!record) return;
+    try {
+      const data = await encodeAssessmentRecord({ ...record, generated_at: new Date().toISOString() });
+      const url = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+      const link = document.createElement('a'); link.href = url; link.download = 'aiio-assessment-snapshot.json'; link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setExportStatus('Snapshot downloaded. Store it with the brief; it is not uploaded.');
+    } catch { setExportStatus('Snapshot export failed. Your assessment is unchanged; try again.'); }
+  };
   const shareAssessment = async () => {
     const url = new URL(window.location.href);
     const values = { asset: assetId, metro: metroId, budget: String(budgetMillions), start: String(startYear), years: String(duration), name: projectName, basis: priceBasis, stage: approvalStage, contingency: String(contingencyPct), baseline: String(assumptions.annualBaselinePct), peak: String(assumptions.peakAiAnnualPctPoints), capture: String(assumptions.localCapturePct), lag: String(assumptions.lagMonths), uncertainty: String(assumptions.uncertaintyPct) };
@@ -96,7 +113,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
     window.history.replaceState(null, '', url);
     try { await navigator.clipboard.writeText(url.toString()); setShareState('Link copied'); }
     catch { setShareState('Copy link from address bar'); }
-    window.setTimeout(() => setShareState('Share assessment'), 1800);
+    window.setTimeout(() => setShareState('Share inputs'), 1800);
   };
 
   return (
@@ -124,7 +141,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
                   <Icon className="size-3.5" /> {label}
                 </button>
               ))}
-            </nav><Button className="h-10 border border-white/10 bg-white/5 px-3 text-xs text-white hover:bg-white/10" onClick={shareAssessment}><Clipboard className="size-3.5" />{shareState}</Button><Button aria-label="Print decision record" className="h-10 border border-white/10 bg-white/5 px-3 text-white hover:bg-white/10" onClick={() => window.print()}><Printer className="size-3.5" /></Button></div>
+            </nav><Button className="h-10 border border-white/10 bg-white/5 px-3 text-xs text-white hover:bg-white/10" onClick={shareAssessment}><Clipboard className="size-3.5" />{shareState}</Button><Button aria-label="Open decision brief" className="h-10 border border-white/10 bg-white/5 px-3 text-white hover:bg-white/10" onClick={() => setView('brief')}><Printer className="size-3.5" />Brief</Button></div>
           </header>
 
           <div className="mt-4 grid min-h-0 flex-1 gap-4 lg:grid-cols-[270px_minmax(0,1fr)]">
@@ -153,11 +170,13 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
 
             <div className="min-h-0">
               {view === 'outlook' ? (
-                <MonthlyEscalationOutlook assumptions={assumptions} assetOutcome={analysis.asset.outcome} budgetMillions={budgetMillions} calibration={monthlyCalibration as MonthlyEscalationCalibration} contingencyPct={contingencyPct} durationYears={duration} onAssumptionsChange={setAssumptions} onSpendingProfileChange={setSpendingProfile} priceBasis={priceBasis} projectStart={startYear} spendingProfile={spendingProfile} />
+                <MonthlyEscalationOutlook selectedMonth={focus.month} setSelectedMonth={setSelectedMonth} selectedDriver={focus.driverId} setSelectedDriver={setSelectedDriver} assumptions={assumptions} assetOutcome={analysis.asset.outcome} budgetMillions={budgetMillions} calibration={monthlyCalibration as MonthlyEscalationCalibration} contingencyPct={contingencyPct} durationYears={duration} onAssumptionsChange={setAssumptions} onSpendingProfileChange={setSpendingProfile} priceBasis={priceBasis} projectStart={startYear} spendingProfile={spendingProfile} />
               ) : view === 'cockpit' ? (
                 <DecisionCockpitView analysis={analysis} assessment={assessment} inputs={decisionInputs} approvalStage={approvalStage} projectName={projectName} comparison={comparison} planningChecks={`${readiness.proxyPlanning.passed_check_count}/${readiness.proxyPlanning.check_count}`} />
               ) : view === 'walkthrough' ? (
-                <GuidedProjectStory analysis={analysis} assessment={assessment} inputs={decisionInputs} projectName={projectName} approvalStage={approvalStage} planningChecks={`${readiness.proxyPlanning.passed_check_count}/${readiness.proxyPlanning.check_count}`} onExplore={setView} />
+                <GuidedProjectStory selectedMonth={focus.month} setSelectedMonth={setSelectedMonth} selectedDriver={focus.driverId} setSelectedDriver={setSelectedDriver} analysis={analysis} assessment={assessment} inputs={decisionInputs} projectName={projectName} approvalStage={approvalStage} planningChecks={`${readiness.proxyPlanning.passed_check_count}/${readiness.proxyPlanning.check_count}`} onExplore={setView} />
+              ) : view === 'brief' ? (
+                <div className="flex h-full min-h-0 flex-col gap-3"><div className="flex flex-wrap items-center gap-2"><Button disabled={!record} onClick={() => window.print()}>Print / Save PDF</Button><Button disabled={!record} onClick={downloadSnapshot}>Download snapshot</Button><p className="text-xs text-[#b5cbd0]">Share inputs reopens the current model. Download preserves this result.</p><output className="text-xs text-[#8be0d3]">{exportStatus}</output></div><ExecutiveDecisionBrief record={record} visible /></div>
               ) : (
                 <ExecutiveEvidenceLens analysis={analysis} assessment={assessment} inputs={decisionInputs} planning={readiness.proxyPlanning} projectName={projectName} />
               )}
@@ -165,7 +184,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
           </div>
         </div>
       </section>
-      <ExecutivePrintRecord analysis={analysis} approvalStage={approvalStage} assumptions={assumptions} budgetMillions={budgetMillions} contingencyPct={contingencyPct} priceBasis={priceBasis} projectName={projectName} readiness={readiness} spendingProfile={spendingProfile} />
+      {view !== 'brief' ? <ExecutiveDecisionBrief record={record} visible={false} /> : null}
     </main>
   );
 }
@@ -173,14 +192,5 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
 
 
 
-function ExecutivePrintRecord({ analysis, approvalStage, assumptions, budgetMillions, contingencyPct, priceBasis, projectName, readiness, spendingProfile }: { analysis: ReturnType<typeof buildDecisionAnalysis>; approvalStage: string; assumptions: PlanningAssumptions; budgetMillions: number; contingencyPct: number; priceBasis: string; projectName: string; readiness: ExecutiveReadiness; spendingProfile: SpendingProfile }) {
-  return <article className="executive-print-record" id="executive-decision-brief">
-    <header><p>AI Infrastructure Impact Observatory</p><h1>Executive decision record</h1><p>Generated {new Date().toLocaleDateString('en-CA')}</p></header>
-    <section><h2>{projectName}</h2><dl><div><dt>Asset</dt><dd>{analysis.asset.label}</dd></div><div><dt>Market</dt><dd>{METROS[analysis.metroId]}</dd></div><div><dt>Estimate</dt><dd>${budgetMillions.toLocaleString()}M · {priceBasis} dollars</dd></div><div><dt>Approval stage</dt><dd>{approvalStage.replaceAll('_', ' ')}</dd></div><div><dt>Delivery</dt><dd>{analysis.startYear}–{analysis.endYear}</dd></div><div><dt>Existing contingency</dt><dd>{contingencyPct}% · ${(budgetMillions * contingencyPct / 100).toLocaleString()}M</dd></div></dl></section>
-    <section><h2>Decision</h2><p className="print-decision">{decisionAction(approvalStage).title}</p><p>{decisionAction(approvalStage).why} {decisionAction(approvalStage).when}. No causal AI attribution or quantified mitigation savings.</p></section>
-    <section><h2>Scenario boundary</h2><p>Spending profile: {SPENDING_PROFILES[spendingProfile]} (assumed). Base budget excludes contingency; the price-basis month has index 1.</p><dl><div><dt>Scenario</dt><dd>$50B over 10 years</dd></div><div><dt>Baseline</dt><dd>{assumptions.annualBaselinePct}% annually</dd></div><div><dt>Peak AI increment</dt><dd>{assumptions.peakAiAnnualPctPoints} percentage points</dd></div><div><dt>Local capture</dt><dd>{assumptions.localCapturePct}%</dd></div><div><dt>Lag</dt><dd>{assumptions.lagMonths} months</dd></div><div><dt>Uncertainty</dt><dd>±{assumptions.uncertaintyPct}%</dd></div></dl><p><strong>AI-attributable cost and delay remain uncalibrated.</strong> Scenario dollars are planning sensitivity, not a forecast or approved estimate adjustment.</p></section>
-    <section><h2>Evidence readiness</h2><dl><div><dt>Fresh sources</dt><dd>{readiness.currentSources}/{readiness.totalSources}</dd></div><div><dt>Target regions</dt><dd>{readiness.representedRegions}/{readiness.targetRegions}</dd></div><div><dt>Identification checks</dt><dd>{readiness.passedIdentificationChecks}/{readiness.totalIdentificationChecks}</dd></div><div><dt>Authorizing treatment</dt><dd>0/8</dd></div></dl></section>
-  </article>;
-}
 
 function Control({ children, label }: { children: React.ReactNode; label: string }) { return <label className="block"><span className="mb-1.5 block text-[9px] uppercase tracking-[0.1em] text-[#8fa8ae]">{label}</span>{children}</label>; }
