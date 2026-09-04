@@ -5,6 +5,7 @@ import attributionReadiness from '@/data/model-runs/ai_attribution_identificatio
 
 export default function Home() {
   return <ExecutiveCockpit readiness={{
+    proxyPlanning: practicalRoute.proxy_planning_validation,
     currentSources: sourceFreshness.current_count,
     totalSources: sourceFreshness.source_count,
     trackedProjects: practicalRoute.tracks.prospective_public_project_tracking.project_count,

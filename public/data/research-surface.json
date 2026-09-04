@@ -1,6 +1,6 @@
 {
   "artifact_count": 41,
-  "artifact_manifest_sha256": "sha256:8f3ffbaf4132cbecb56f4c343cb1e893d89e66034df092dc44916b68f691e5f4",
+  "artifact_manifest_sha256": "sha256:499a3c7c51332c5bbadfc364f46ef2c0187ffaf293a5b100dfa5703c9def6179",
   "artifacts": [
     {
       "artifact_id": "frozen_release_bundle",
@@ -48,7 +48,7 @@
       "artifact_id": "practical_evidence_route",
       "evidence_role": "governance",
       "path": "data/model-runs/practical_evidence_route_current.json",
-      "sha256": "sha256:97639047a2a60afd946c65dd0f8d5127aacb7a2d60ff7c95a249d5917522273e"
+      "sha256": "sha256:66855d52d3cce50aac86c567e09f365669a5099207956a7cf0fe2563fd54b7f9"
     },
     {
       "artifact_id": "authorized_revision_estimand_contract",

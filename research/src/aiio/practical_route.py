@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from .schemas import ValidationError
+from .planning_validation import assess_proxy_planning
 
 
 RUN_ID = "AIIO_PRACTICAL_EVIDENCE_ROUTE_0_1"
@@ -103,6 +104,7 @@ def build_practical_evidence_route(
     revision_estimand_ready = len(event_geographies) >= 2 and len({row["asset_class"] for row in revision_cells}) >= 2
 
     report = {
+        "proxy_planning_validation": assess_proxy_planning(root),
         "schema_version": "1.0.0",
         "run_id": RUN_ID,
         "as_of_date": as_of,
