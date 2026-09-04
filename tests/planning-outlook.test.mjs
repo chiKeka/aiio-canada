@@ -13,6 +13,7 @@ function load(path) {
   const testModule = { exports: {} };
   runInNewContext(compiled, { module: testModule, exports: testModule.exports, require: (name) => {
     if (name === './project-cashflow') return load('lib/project-cashflow.ts');
+    if (name === './planning-calibration') return load('lib/planning-calibration.ts');
     if (name.startsWith('@/') && name.endsWith('.json')) return JSON.parse(readFileSync(resolve(root, name.slice(2)), 'utf8'));
     throw new Error(`Unexpected test import: ${name}`);
   } });
@@ -20,10 +21,34 @@ function load(path) {
 }
 const { queryNumber, monthNumber, spendingShares, buildCashflowOutlook, allocateMonthlyDrivers } = load('lib/project-cashflow.ts');
 const { buildPlanningCalibration } = load('lib/planning-calibration.ts');
+const { buildDecisionOutlook, decisionAction, deliveryYears } = load('lib/decision-outlook.ts');
 const assumptions = { annualBaselinePct: 6, peakAiAnnualPctPoints: 1.25, localCapturePct: 36, lagMonths: 3, uncertaintyPct: 40 };
 const config = { assetOutcome: 'SCHEDULE_HOSPITALS_DELAY_PRESSURE', durationYears: 2, projectStart: 2029, priceBasis: '2028-01', assumptions };
 const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-9, `${a} != ${b}`);
 const priceRow = (month, baseline, combined) => ({ month, cumulative_baseline_pct: baseline, cumulative_combined_pct: combined, cumulative_lower_pct: baseline, cumulative_upper_pct: combined + 1 });
+
+test('shared cockpit calculation reconciles to monthly outlook and responds to assumptions', () => {
+  const calibration = buildPlanningCalibration(config);
+  const input = { ...config, budgetMillions: 1200, spendingProfile: 'bell' };
+  const result = buildDecisionOutlook(input, calibration);
+  near(result.cashflow.combinedSpend, buildCashflowOutlook(calibration.monthly_series, 1200, 'bell').combinedSpend);
+  assert.equal(result.isOfficial, false);
+  assert.ok(buildDecisionOutlook({ ...input, assumptions: { ...assumptions, peakAiAnnualPctPoints: 3 } }, calibration).cashflow.aiIncrement > result.cashflow.aiIncrement);
+  assert.equal(buildDecisionOutlook({ ...input, priceBasis: '2031-01' }, calibration), null);
+  const official = { ...calibration, status: 'calibrated', publication_boundary: { ...calibration.publication_boundary, monthly_ai_increment_authorized: true, combined_project_escalation_authorized: true } };
+  assert.equal(buildDecisionOutlook(input, official).isOfficial, true);
+  assert.equal(buildDecisionOutlook({ ...input, assetOutcome: 'OTHER' }, official).isOfficial, false);
+});
+
+test('decision changes with approval stage and timeline retains uncovered delivery years', () => {
+  assert.notEqual(decisionAction('procurement').title, decisionAction('concept').title);
+  const partial = deliveryYears(2034, 2038, 2026, 2035);
+  assert.equal(partial.length, 5);
+  assert.equal(partial[0].year, 2034);
+  assert.equal(partial.filter((row) => row.overlap).length, 2);
+  assert.equal(deliveryYears(2038, 2042, 2026, 2035).filter((row) => row.overlap).length, 0);
+  assert.equal(deliveryYears(2029.5, 2034, 2026, 2035).length, 0);
+});
 
 test('empty/partial links preserve defaults; explicit zero is valid', () => {
   for (const value of [new URLSearchParams(), new URLSearchParams('baseline='), new URLSearchParams('baseline=Infinity'), new URLSearchParams('baseline=-1'), new URLSearchParams('baseline=13')]) assert.equal(queryNumber(value, 'baseline', 0, 12) ?? 3.5, 3.5);

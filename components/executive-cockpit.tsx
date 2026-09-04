@@ -1,12 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import {
   Activity,
   ArrowRight,
   Building2,
-  Check,
   Clipboard,
   ChevronLeft,
   ChevronRight,
@@ -15,13 +13,14 @@ import {
   Gauge,
   Layers3,
   Route,
-  Sparkles,
   Printer,
   Users,
   Zap,
 } from 'lucide-react';
 
 import { SiteHeader } from '@/components/site-shell';
+import { DecisionCockpitView, type PinnedDecision } from '@/components/decision-cockpit-view';
+import { buildDecisionOutlook, decisionAction } from '@/lib/decision-outlook';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -86,7 +85,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
   const [spendingProfile, setSpendingProfile] = useState<SpendingProfile>('bell');
   const [assumptions, setAssumptions] = useState<PlanningAssumptions>({ annualBaselinePct: 3.5, peakAiAnnualPctPoints: 1.25, localCapturePct: 36, lagMonths: 3, uncertaintyPct: 40 });
   const [shareState, setShareState] = useState('Share assessment');
-  const [comparison, setComparison] = useState<{ assetId: AssetId; metroId: MetroId; budgetMillions: number; startYear: number; duration: number } | null>(null);
+  const [comparison, setComparison] = useState<PinnedDecision | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -121,7 +120,8 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
   const completeLabour = analysis.labourRows
     .filter((row) => row.vacancies_per_1_000_2021_employed !== null)
     .sort((a, b) => (b.vacancies_per_1_000_2021_employed ?? 0) - (a.vacancies_per_1_000_2021_employed ?? 0));
-  const leadingMaterial = analysis.materials[0];
+  const decisionInputs = { assumptions, budgetMillions, priceBasis, projectStart: startYear, durationYears: duration, assetOutcome: analysis.asset.outcome, spendingProfile };
+  const assessment = buildDecisionOutlook(decisionInputs, monthlyCalibration as MonthlyEscalationCalibration);
   const requestedGw = analysis.powerEvidence.requested_load.latest_requested_load_mw / 1000;
   const shareAssessment = async () => {
     const url = new URL(window.location.href);
@@ -180,7 +180,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
                 <Control label="Approval stage"><NativeSelect className="w-full [&>select]:h-9 [&>select]:border-white/10 [&>select]:bg-white/6 [&>select]:text-white" onChange={(e) => setApprovalStage(e.target.value)} value={approvalStage}><NativeSelectOption value="concept">Concept</NativeSelectOption><NativeSelectOption value="business_case">Business case</NativeSelectOption><NativeSelectOption value="treasury_board">Treasury Board</NativeSelectOption><NativeSelectOption value="procurement">Procurement</NativeSelectOption><NativeSelectOption value="delivery">Delivery</NativeSelectOption></NativeSelect></Control>
                 <Control label={`Delivery window · ${duration} years`}><input aria-label="Delivery duration" className="scenario-range mt-2 w-full" max="10" min="2" onChange={(e) => setDuration(Number(e.target.value))} type="range" value={duration} /></Control>
               </div>
-              <button className="mt-3 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-left text-[10px] text-[#b8cccf] hover:bg-white/10" onClick={() => setComparison(comparison ? null : { assetId, metroId, budgetMillions, startYear, duration })} type="button">{comparison ? `Comparison pinned · Δ budget $${(budgetMillions - comparison.budgetMillions).toLocaleString()}M` : 'Pin current configuration for comparison'}</button>
+              <button className="mt-3 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-[#b8cccf] hover:bg-white/10" onClick={() => setComparison(comparison ? null : { inputs: decisionInputs, assessment, market: METROS[metroId] })} type="button">{comparison ? 'Configuration pinned · click to clear' : 'Pin current configuration for comparison'}</button>
               <div className="mt-4 rounded-xl border border-[#ee9665]/30 bg-[#ee9665]/10 p-3">
                 <div className="flex items-center gap-2"><CircleAlert className="size-4 shrink-0 text-[#ffab78]" /><p className="text-[10px] font-medium uppercase tracking-[0.08em] text-[#efc4aa]">AI cost + delay unquantified</p></div>
               </div>
@@ -190,7 +190,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
               {view === 'outlook' ? (
                 <MonthlyEscalationOutlook assumptions={assumptions} assetOutcome={analysis.asset.outcome} budgetMillions={budgetMillions} calibration={monthlyCalibration as MonthlyEscalationCalibration} contingencyPct={contingencyPct} durationYears={duration} onAssumptionsChange={setAssumptions} onSpendingProfileChange={setSpendingProfile} priceBasis={priceBasis} projectStart={startYear} spendingProfile={spendingProfile} />
               ) : view === 'cockpit' ? (
-                <CockpitView analysis={analysis} approvalStage={approvalStage} budgetMillions={budgetMillions} completeLabour={completeLabour} leadingMaterial={leadingMaterial} projectName={projectName} requestedGw={requestedGw} />
+                <DecisionCockpitView analysis={analysis} assessment={assessment} inputs={decisionInputs} approvalStage={approvalStage} projectName={projectName} comparison={comparison} planningChecks={`${readiness.proxyPlanning.passed_check_count}/${readiness.proxyPlanning.check_count}`} />
               ) : view === 'walkthrough' ? (
                 <Walkthrough analysis={analysis} budgetMillions={budgetMillions} readiness={readiness} setTourStep={setTourStep} tourStep={tourStep} />
               ) : (
@@ -205,44 +205,6 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
   );
 }
 
-function CockpitView({ analysis, approvalStage, budgetMillions, completeLabour, leadingMaterial, projectName, requestedGw }: {
-  analysis: ReturnType<typeof buildDecisionAnalysis>;
-  approvalStage: string;
-  budgetMillions: number;
-  completeLabour: ReturnType<typeof buildDecisionAnalysis>['labourRows'];
-  leadingMaterial: ReturnType<typeof buildDecisionAnalysis>['materials'][number] | undefined;
-  requestedGw: number;
-  projectName: string;
-}) {
-  return <div className="grid h-full min-h-0 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,.55fr)]">
-    <section className="flex min-h-[570px] flex-col rounded-2xl border border-white/10 bg-[#0d2933]/88 p-5 shadow-2xl shadow-black/20 backdrop-blur lg:min-h-0">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div><p className="text-[9px] uppercase tracking-[0.16em] text-[#72cfc3]">{approvalStage.replaceAll('_', ' ')} · {projectName}</p><h2 className="mt-1 text-2xl font-medium tracking-[-0.035em]">Impact path</h2></div>
-        <div className="text-right"><p className="font-mono text-xl text-[#dff7f1]">${budgetMillions.toLocaleString()}M</p><p className="text-[9px] uppercase tracking-[0.1em] text-[#8fa8ae]">{analysis.asset.label}</p></div>
-      </div>
-      <ImpactMap analysis={analysis} />
-      <div className="mt-auto grid gap-2 sm:grid-cols-4">
-        <SignalTile icon={Factory} label="Leading material" value={leadingMaterial ? signed(leadingMaterial.year_over_year_percent_change) : 'n/a'} note="YoY observed" />
-        <SignalTile icon={Users} label="Leading labour" value={completeLabour[0]?.vacancies_per_1_000_2021_employed?.toFixed(1) ?? 'n/a'} note="vacancies / 1k" />
-        <SignalTile icon={Zap} label="Requested load" value={`${requestedGw.toFixed(1)} GW`} note="not connected load" />
-        <SignalTile icon={Building2} label="Concurrent screen" value={String(analysis.concurrentProjectCount)} note="same-class records" />
-      </div>
-    </section>
-    <section className="grid min-h-0 gap-4 sm:grid-cols-2 xl:grid-cols-1 xl:grid-rows-[auto_1fr_auto]">
-      <div className="rounded-2xl border border-[#62cdbf]/25 bg-[#123840] p-5">
-        <div className="flex items-center justify-between"><p className="text-[9px] uppercase tracking-[0.14em] text-[#80d7cc]">Executive readout</p><Sparkles className="size-4 text-[#80d7cc]" /></div>
-        <p className="mt-4 text-3xl font-medium leading-none tracking-[-0.04em]">Market-test before approval.</p>
-        <div className="mt-4 flex items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-[#a9bec2]"><Check className="size-3.5 text-[#70d3c5]" /> No blanket AI premium</div><p className="mt-2 text-[10px] leading-4 text-[#8fa8ae]">Next gate: validate {analysis.dominantNode?.label.toLowerCase() ?? 'priority trade'} capacity and utility interfaces.</p>
-      </div>
-      <div className="rounded-2xl border border-white/10 bg-[#0d2933]/88 p-5">
-        <p className="text-[9px] uppercase tracking-[0.14em] text-[#8fa8ae]">Delivery window</p>
-        <Timeline start={analysis.scenarioWindowStart} end={analysis.scenarioWindowEnd} projectStart={analysis.endYear - analysis.scenarioWindowYears.length + 1} projectEnd={analysis.endYear} intersection={analysis.scenarioWindowYears} />
-        <p className="mt-4 font-mono text-xs text-[#a8bcc1]">{analysis.scenarioWindowYears.length} intersecting years</p>
-      </div>
-      <Link className="group flex items-center justify-between rounded-2xl border border-[#ef9664]/30 bg-[#ef9664]/10 p-4 text-sm text-[#ffd0b4] transition hover:bg-[#ef9664]/15" href="/research"><span>Method + audit</span><ArrowRight className="size-4 transition group-hover:translate-x-1" /></Link>
-    </section>
-  </div>;
-}
 
 function ImpactMap({ analysis }: { analysis: ReturnType<typeof buildDecisionAnalysis> }) {
   const [selected, setSelected] = useState<'shock' | 'constraint' | 'exposure'>('constraint');
@@ -313,7 +275,7 @@ function ExecutivePrintRecord({ analysis, approvalStage, assumptions, budgetMill
   return <article className="executive-print-record" id="executive-decision-brief">
     <header><p>AI Infrastructure Impact Observatory</p><h1>Executive decision record</h1><p>Generated {new Date().toLocaleDateString('en-CA')}</p></header>
     <section><h2>{projectName}</h2><dl><div><dt>Asset</dt><dd>{analysis.asset.label}</dd></div><div><dt>Market</dt><dd>{METROS[analysis.metroId]}</dd></div><div><dt>Estimate</dt><dd>${budgetMillions.toLocaleString()}M · {priceBasis} dollars</dd></div><div><dt>Approval stage</dt><dd>{approvalStage.replaceAll('_', ' ')}</dd></div><div><dt>Delivery</dt><dd>{analysis.startYear}–{analysis.endYear}</dd></div><div><dt>Existing contingency</dt><dd>{contingencyPct}% · ${(budgetMillions * contingencyPct / 100).toLocaleString()}M</dd></div></dl></section>
-    <section><h2>Decision</h2><p className="print-decision">Market-test before approval.</p><p>Do not apply a blanket AI premium. Validate {analysis.dominantNode?.label.toLowerCase() ?? 'priority trade'} capacity, confirm utility interfaces, and refresh the estimate at each approval gate.</p></section>
+    <section><h2>Decision</h2><p className="print-decision">{decisionAction(approvalStage).title}</p><p>{decisionAction(approvalStage).why} {decisionAction(approvalStage).when}. No causal AI attribution or quantified mitigation savings.</p></section>
     <section><h2>Scenario boundary</h2><p>Spending profile: {SPENDING_PROFILES[spendingProfile]} (assumed). Base budget excludes contingency; the price-basis month has index 1.</p><dl><div><dt>Scenario</dt><dd>$50B over 10 years</dd></div><div><dt>Baseline</dt><dd>{assumptions.annualBaselinePct}% annually</dd></div><div><dt>Peak AI increment</dt><dd>{assumptions.peakAiAnnualPctPoints} percentage points</dd></div><div><dt>Local capture</dt><dd>{assumptions.localCapturePct}%</dd></div><div><dt>Lag</dt><dd>{assumptions.lagMonths} months</dd></div><div><dt>Uncertainty</dt><dd>±{assumptions.uncertaintyPct}%</dd></div></dl><p><strong>AI-attributable cost and delay remain uncalibrated.</strong> Scenario dollars are planning sensitivity, not a forecast or approved estimate adjustment.</p></section>
     <section><h2>Evidence readiness</h2><dl><div><dt>Fresh sources</dt><dd>{readiness.currentSources}/{readiness.totalSources}</dd></div><div><dt>Target regions</dt><dd>{readiness.representedRegions}/{readiness.targetRegions}</dd></div><div><dt>Identification checks</dt><dd>{readiness.passedIdentificationChecks}/{readiness.totalIdentificationChecks}</dd></div><div><dt>Authorizing treatment</dt><dd>0/8</dd></div></dl></section>
   </article>;
@@ -322,8 +284,6 @@ function ExecutivePrintRecord({ analysis, approvalStage, assumptions, budgetMill
 function Control({ children, label }: { children: React.ReactNode; label: string }) { return <label className="block"><span className="mb-1.5 block text-[9px] uppercase tracking-[0.1em] text-[#8fa8ae]">{label}</span>{children}</label>; }
 function FlowLine() { return <div className="relative h-px bg-gradient-to-r from-[#58cbbd] to-[#ef9664]"><ArrowRight className="absolute -right-1.5 -top-2 size-4 text-[#ef9664]" /></div>; }
 function MapNode({ eyebrow, icon: Icon, onSelect, selected, title, tone }: { eyebrow: string; icon: typeof Factory; onSelect: () => void; selected: boolean; title: string; tone: 'teal' | 'blue' | 'orange' }) { const styles = tone === 'orange' ? 'border-[#ee9665]/40 bg-[#ee9665]/12 text-[#ffc6a3]' : tone === 'blue' ? 'border-[#75aebe]/35 bg-[#75aebe]/10 text-[#b9e0e8]' : 'border-[#58cbbd]/40 bg-[#58cbbd]/10 text-[#a9eee4]'; return <button aria-pressed={selected} className={`relative z-10 flex min-h-36 flex-col items-center justify-center rounded-full border p-3 shadow-xl shadow-black/20 transition hover:scale-[1.03] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dff7f1] ${selected ? 'ring-2 ring-white/50' : ''} ${styles}`} onClick={onSelect} type="button"><Icon className="size-5" /><p className="mt-3 text-[8px] uppercase tracking-[0.14em] opacity-70">{eyebrow}</p><p className="mt-1 max-w-28 text-xs font-medium leading-4">{title}</p></button>; }
-function SignalTile({ icon: Icon, label, note, value }: { icon: typeof Factory; label: string; note: string; value: string }) { return <article className="rounded-xl border border-white/8 bg-white/[.035] p-3"><div className="flex items-center justify-between"><Icon className="size-3.5 text-[#72cfc3]" /><span className="font-mono text-base text-[#dff7f1]">{value}</span></div><p className="mt-3 text-[10px] font-medium">{label}</p><p className="mt-0.5 text-[8px] uppercase tracking-[0.08em] text-[#78949a]">{note}</p></article>; }
-function Timeline({ start, end, projectStart, projectEnd, intersection }: { start: number; end: number; projectStart: number; projectEnd: number; intersection: number[] }) { const years = Array.from({ length: end - start + 1 }, (_, i) => start + i); return <div className="mt-5"><div className="flex gap-1">{years.map((year) => <div className={`h-12 flex-1 rounded-sm ${intersection.includes(year) ? 'bg-[#61cfc1]' : year >= projectStart && year <= projectEnd ? 'bg-[#ee9665]' : 'bg-white/7'}`} key={year} title={String(year)} />)}</div><div className="mt-2 flex justify-between font-mono text-[9px] text-[#78949a]"><span>{start}</span><span>{end}</span></div></div>; }
 function BigNumber({ label, value }: { label: string; value: string }) { return <div className="rounded-2xl border border-white/10 bg-[#081f28] p-5"><p className="font-mono text-2xl text-[#dff7f1]">{value}</p><p className="mt-3 text-[9px] uppercase tracking-[0.12em] text-[#829ca2]">{label}</p></div>; }
 function Maturity({ label, note, tone, value }: { label: string; note: string; tone: 'teal' | 'blue' | 'amber' | 'orange'; value: number }) {
   const colors = { teal: 'bg-[#61cfc1]', blue: 'bg-[#75aebe]', amber: 'bg-[#d2b06d]', orange: 'bg-[#ef9664]' };

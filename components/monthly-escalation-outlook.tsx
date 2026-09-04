@@ -5,8 +5,9 @@ import { ArrowRight, CircleAlert } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
-import { buildPlanningCalibration, type MonthlyEscalationCalibration, type PlanningAssumptions } from '@/lib/planning-calibration';
-import { allocateMonthlyDrivers, buildCashflowOutlook, monthNumber, SPENDING_PROFILES, type SpendingProfile } from '@/lib/project-cashflow';
+import { type MonthlyEscalationCalibration, type PlanningAssumptions } from '@/lib/planning-calibration';
+import { buildDecisionOutlook } from '@/lib/decision-outlook';
+import { allocateMonthlyDrivers, SPENDING_PROFILES, type SpendingProfile } from '@/lib/project-cashflow';
 export type { MonthlyEscalationCalibration } from '@/lib/planning-calibration';
 
 const chartConfig = {
@@ -35,13 +36,9 @@ export function MonthlyEscalationOutlook({ assumptions, budgetMillions, calibrat
   const [selectedMitigations, setSelectedMitigations] = useState<string[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [chartMode, setChartMode] = useState<'monthly' | 'cumulative' | 'spending'>('spending');
-  const basis = monthNumber(priceBasis);
-  const validInputs = basis !== null && basis >= 2000 * 12 && basis <= projectStart * 12 && Number.isInteger(projectStart) && projectStart >= 2026 && projectStart <= 2040 && Number.isInteger(durationYears) && durationYears >= 2 && durationYears <= 10 && Number.isFinite(budgetMillions) && budgetMillions > 0;
-  const planning = useMemo(() => validInputs ? buildPlanningCalibration({ assetOutcome, durationYears, projectStart, assumptions, priceBasis }) : null, [assetOutcome, assumptions, durationYears, projectStart, priceBasis, validInputs]);
-  if (!planning) return <section className="rounded-2xl border border-[#ef9664]/40 bg-[#0d2933] p-6 text-base" role="alert">Enter a valid start year (2026–2040), duration (2–10 years), positive budget, and price-basis month from January 2000 through the project start month. Results are withheld until these inputs are valid.</section>;
-  const isOfficial = calibration.status === 'calibrated' && calibration.publication_boundary.monthly_ai_increment_authorized && calibration.publication_boundary.combined_project_escalation_authorized && calibration.price_basis_month === priceBasis && calibration.asset_outcome === assetOutcome && calibration.geography_id === 'PR_48' && calibration.monthly_series.length === durationYears * 12 && calibration.monthly_series[0]?.month === `${projectStart}-01` && calibration.monthly_series.at(-1)?.month === `${projectStart + durationYears - 1}-12`;
-  const active = isOfficial ? calibration : planning;
-  const cashflow = buildCashflowOutlook(active.monthly_series, budgetMillions, spendingProfile);
+  const assessment = useMemo(() => buildDecisionOutlook({ assetOutcome, durationYears, projectStart, assumptions, priceBasis, budgetMillions, spendingProfile }, calibration), [assetOutcome, assumptions, durationYears, projectStart, priceBasis, budgetMillions, spendingProfile, calibration]);
+  if (!assessment) return <section className="rounded-2xl border border-[#ef9664]/40 bg-[#0d2933] p-6" role="alert">Results withheld: enter a valid project window, positive budget and price basis no later than project start.</section>;
+  const { active, cashflow, isOfficial } = assessment;
   const rows = active.monthly_series.map((row, i) => ({ ...row, ...cashflow?.monthly[i] }));
   const selectedIndex = Math.max(0, rows.findIndex((row) => row.month === selectedMonth));
   const month = rows[selectedIndex];
