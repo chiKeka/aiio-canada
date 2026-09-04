@@ -1,5 +1,6 @@
 import graphData from '@/data/model/alberta_graph_v0.2.json';
 import releaseData from '@/public/data/latest.json';
+import { monthNumber } from './project-cashflow';
 
 export type MonthlyEscalationCalibration = {
   schema_version: '1.0.0';
@@ -8,6 +9,8 @@ export type MonthlyEscalationCalibration = {
   as_of_date: string | null;
   geography_id: string;
   model_version: string | null;
+  price_basis_month?: string;
+  asset_outcome?: string;
   monthly_series: Array<{ month: string; baseline_mom_pct: number | null; ai_increment_mom_pct: number | null; combined_mom_pct: number | null; lower_bound_pct: number | null; upper_bound_pct: number | null; cumulative_baseline_pct?: number | null; cumulative_ai_increment_pct?: number | null; cumulative_combined_pct?: number | null; cumulative_lower_pct?: number | null; cumulative_upper_pct?: number | null }>;
   drivers: Array<{ driver_id: string; label: string; tier: 'primary' | 'secondary'; contribution_pct_points: number | null; peak_month: string | null; confidence: 'low' | 'medium' | 'high' | null; node_ids: string[] }>;
   nodes: Array<{ node_id: string; label: string; layer: string; pressure_score: number | null }>;
@@ -37,13 +40,17 @@ const MITIGATIONS: Record<string, Array<[string, 'now' | 'design' | 'procurement
   MATERIAL_CONCRETE: [['Index or bulk-buy concrete inputs', 'procurement'], ['Optimize structural quantities', 'design']],
 };
 
-export function buildPlanningCalibration({ assetOutcome, durationYears, projectStart, assumptions }: {
+export function buildPlanningCalibration({ assetOutcome, durationYears, projectStart, assumptions, priceBasis = `${projectStart}-01` }: {
   assetOutcome: string;
   durationYears: number;
   projectStart: number;
   assumptions: PlanningAssumptions;
+  priceBasis?: string;
 }): MonthlyEscalationCalibration {
-  const months = Math.max(24, Math.min(120, durationYears * 12));
+  const basis = monthNumber(priceBasis);
+  const start = projectStart * 12;
+  if (basis === null || basis > start || basis < 2000 * 12 || !Number.isInteger(durationYears) || durationYears < 2 || durationYears > 10) throw new Error('Invalid price basis or project duration');
+  const months = start + durationYears * 12 - basis;
   const annualFlows = releaseData.scenario.annual_flows;
   const peakFlow = Math.max(...annualFlows.map((row) => row.local_civil_cad + row.local_electrical_mechanical_cad + row.local_grid_construction_cad));
   const baselineMom = (Math.pow(1 + assumptions.annualBaselinePct / 100, 1 / 12) - 1) * 100;
@@ -51,7 +58,7 @@ export function buildPlanningCalibration({ assetOutcome, durationYears, projectS
   const inbound = graphData.edges.filter((edge) => edge.target === assetOutcome && edge.sign > 0);
   const weightTotal = inbound.reduce((sum, edge) => sum + edge.weight_central, 0) || 1;
   const peakMonthIndex = Array.from({ length: months }, (_, index) => {
-    const date = new Date(Date.UTC(projectStart, index, 1));
+    const date = new Date(Date.UTC(Math.floor(basis / 12), basis % 12 + index, 1));
     const lagged = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() - assumptions.lagMonths, 1));
     const flow = annualFlows.find((row) => row.year === lagged.getUTCFullYear());
     return flow ? (flow.local_civil_cad + flow.local_electrical_mechanical_cad + flow.local_grid_construction_cad) / peakFlow : 0;
@@ -63,40 +70,43 @@ export function buildPlanningCalibration({ assetOutcome, durationYears, projectS
   let lowerIndex = 1;
   let upperIndex = 1;
   const monthly_series = peakMonthIndex.map((flowIndex, index) => {
-    const date = new Date(Date.UTC(projectStart, index, 1));
+    const date = new Date(Date.UTC(Math.floor(basis / 12), basis % 12 + index, 1));
     const aiAnnual = peakAnnualIncrement * flowIndex;
     const aiMom = (Math.pow(1 + aiAnnual / 100, 1 / 12) - 1) * 100;
     const uncertainty = aiMom * assumptions.uncertaintyPct / 100;
     const lowerMom = baselineMom + Math.max(0, aiMom - uncertainty);
     const upperMom = baselineMom + aiMom + uncertainty;
-    baselineIndex *= 1 + baselineMom / 100;
-    combinedIndex *= 1 + (baselineMom + aiMom) / 100;
-    lowerIndex *= 1 + lowerMom / 100;
-    upperIndex *= 1 + upperMom / 100;
+    // Month-level prices: the basis month is index 1; later months compound.
+    if (index > 0) {
+      baselineIndex *= 1 + baselineMom / 100;
+      combinedIndex *= 1 + (baselineMom + aiMom) / 100;
+      lowerIndex *= 1 + lowerMom / 100;
+      upperIndex *= 1 + upperMom / 100;
+    }
     return {
       month: date.toISOString().slice(0, 7),
-      baseline_mom_pct: round(baselineMom), ai_increment_mom_pct: round(aiMom), combined_mom_pct: round(baselineMom + aiMom),
+      baseline_mom_pct: baselineMom, ai_increment_mom_pct: aiMom, combined_mom_pct: baselineMom + aiMom,
       lower_bound_pct: round(lowerMom), upper_bound_pct: round(upperMom),
-      cumulative_baseline_pct: round((baselineIndex - 1) * 100),
-      cumulative_ai_increment_pct: round((combinedIndex - baselineIndex) * 100),
-      cumulative_combined_pct: round((combinedIndex - 1) * 100),
-      cumulative_lower_pct: round((lowerIndex - 1) * 100),
-      cumulative_upper_pct: round((upperIndex - 1) * 100),
+      cumulative_baseline_pct: (baselineIndex - 1) * 100,
+      cumulative_ai_increment_pct: (combinedIndex - baselineIndex) * 100,
+      cumulative_combined_pct: (combinedIndex - 1) * 100,
+      cumulative_lower_pct: (lowerIndex - 1) * 100,
+      cumulative_upper_pct: (upperIndex - 1) * 100,
     };
-  });
+  }).filter((row) => row.month >= `${projectStart}-01`);
   const peakMonth = monthly_series.reduce((best, row) => (row.ai_increment_mom_pct ?? 0) > (best.ai_increment_mom_pct ?? 0) ? row : best, monthly_series[0]);
   const primaryShare = 0.82;
   const primary = inbound.map((edge) => {
     const upstream = graphData.edges.filter((candidate) => candidate.target === edge.source && candidate.sign > 0).sort((a, b) => b.weight_central - a.weight_central)[0]?.source;
     return {
     driver_id: edge.source, label: LABELS.get(edge.source) ?? edge.source, tier: 'primary' as const,
-    contribution_pct_points: round(peakAnnualIncrement * peakIndex * primaryShare * edge.weight_central / weightTotal), peak_month: peakMonth?.month ?? null,
+    contribution_pct_points: peakAnnualIncrement * peakIndex * primaryShare * edge.weight_central / weightTotal, peak_month: peakMonth?.month ?? null,
     confidence: 'low' as const, node_ids: [upstream, edge.source, assetOutcome].filter((value): value is string => Boolean(value)),
   }; });
   const secondaryShare = peakAnnualIncrement * peakIndex * 0.18;
   const secondary = [
     ['SECONDARY_WAGE', 'Wage spillover'], ['SECONDARY_PROCUREMENT', 'Procurement congestion'], ['SECONDARY_SCHEDULE', 'Schedule extension'],
-  ].map(([driver_id, label]) => ({ driver_id, label, tier: 'secondary' as const, contribution_pct_points: round(secondaryShare / 3), peak_month: peakMonth?.month ?? null, confidence: 'low' as const, node_ids: [driver_id, assetOutcome] }));
+  ].map(([driver_id, label]) => ({ driver_id, label, tier: 'secondary' as const, contribution_pct_points: secondaryShare / 3, peak_month: peakMonth?.month ?? null, confidence: 'low' as const, node_ids: [driver_id, assetOutcome] }));
   const drivers = [...primary, ...secondary];
   const nodes = Array.from(new Set(drivers.flatMap((driver) => driver.node_ids))).map((nodeId) => ({
     node_id: nodeId, label: LABELS.get(nodeId) ?? drivers.find((driver) => driver.driver_id === nodeId)?.label ?? nodeId,
@@ -107,7 +117,7 @@ export function buildPlanningCalibration({ assetOutcome, durationYears, projectS
   const mitigations = primary.flatMap((driver) => (MITIGATIONS[driver.driver_id] ?? [['Run targeted market sounding', 'now'] as const]).map(([label, timing]) => ({ driver_id: driver.driver_id, label, timing, evidence_status: 'strategy candidate' })));
   return {
     schema_version: '1.0.0', calibration_id: `planning-${releaseData.scenario.scenario_id}`, status: 'planning_sandbox', as_of_date: releaseData.baseline.as_of_date,
-    geography_id: 'PR_48', model_version: graphData.model_id, monthly_series, drivers, nodes, edges, mitigations,
+    geography_id: 'PR_48', price_basis_month: priceBasis, asset_outcome: assetOutcome, model_version: graphData.model_id, monthly_series, drivers, nodes, edges, mitigations,
     expected_driver_slots: drivers.map(({ driver_id, label, tier }) => ({ driver_id, label, tier })),
     publication_boundary: {
       monthly_ai_increment_authorized: false, combined_project_escalation_authorized: false, driver_contribution_authorized: false,
