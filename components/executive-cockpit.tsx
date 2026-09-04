@@ -6,16 +6,14 @@ import {
   Building2,
   Clipboard,
   CircleAlert,
-  Factory,
   Gauge,
   Layers3,
   Route,
   Printer,
-  Users,
-  Zap,
 } from 'lucide-react';
 
 import { SiteHeader } from '@/components/site-shell';
+import { ExecutiveEvidenceLens } from '@/components/executive-evidence-lens';
 import { GuidedProjectStory } from '@/components/guided-project-story';
 import { DecisionCockpitView, type PinnedDecision } from '@/components/decision-cockpit-view';
 import { buildDecisionOutlook, decisionAction } from '@/lib/decision-outlook';
@@ -88,12 +86,8 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
     [assetId, duration, metroId, startYear],
   );
 
-  const completeLabour = analysis.labourRows
-    .filter((row) => row.vacancies_per_1_000_2021_employed !== null)
-    .sort((a, b) => (b.vacancies_per_1_000_2021_employed ?? 0) - (a.vacancies_per_1_000_2021_employed ?? 0));
   const decisionInputs = { assumptions, budgetMillions, priceBasis, projectStart: startYear, durationYears: duration, assetOutcome: analysis.asset.outcome, spendingProfile };
   const assessment = buildDecisionOutlook(decisionInputs, monthlyCalibration as MonthlyEscalationCalibration);
-  const requestedGw = analysis.powerEvidence.requested_load.latest_requested_load_mw / 1000;
   const shareAssessment = async () => {
     const url = new URL(window.location.href);
     const values = { asset: assetId, metro: metroId, budget: String(budgetMillions), start: String(startYear), years: String(duration), name: projectName, basis: priceBasis, stage: approvalStage, contingency: String(contingencyPct), baseline: String(assumptions.annualBaselinePct), peak: String(assumptions.peakAiAnnualPctPoints), capture: String(assumptions.localCapturePct), lag: String(assumptions.lagMonths), uncertainty: String(assumptions.uncertaintyPct) };
@@ -165,7 +159,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
               ) : view === 'walkthrough' ? (
                 <GuidedProjectStory analysis={analysis} assessment={assessment} inputs={decisionInputs} projectName={projectName} approvalStage={approvalStage} planningChecks={`${readiness.proxyPlanning.passed_check_count}/${readiness.proxyPlanning.check_count}`} onExplore={setView} />
               ) : (
-                <EvidenceView analysis={analysis} completeLabour={completeLabour} readiness={readiness} requestedGw={requestedGw} />
+                <ExecutiveEvidenceLens analysis={analysis} assessment={assessment} inputs={decisionInputs} planning={readiness.proxyPlanning} projectName={projectName} />
               )}
             </div>
           </div>
@@ -178,23 +172,6 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
 
 
 
-function EvidenceView({ analysis, completeLabour, readiness, requestedGw }: { analysis: ReturnType<typeof buildDecisionAnalysis>; completeLabour: ReturnType<typeof buildDecisionAnalysis>['labourRows']; readiness: ExecutiveReadiness; requestedGw: number }) {
-  const channels = [
-    { icon: Factory, label: 'Materials', value: analysis.materials[0] ? signed(analysis.materials[0].year_over_year_percent_change) : 'n/a', note: 'leading observed component change' },
-    { icon: Users, label: 'Labour', value: completeLabour[0]?.vacancies_per_1_000_2021_employed?.toFixed(1) ?? 'n/a', note: 'vacancies per 1,000 employed' },
-    { icon: Building2, label: 'Tracked projects', value: readiness.trackedProjects.toLocaleString(), note: 'hospital, education and civic · BC/ON/QC' },
-    { icon: Zap, label: 'Power', value: `${requestedGw.toFixed(1)} GW`, note: 'requested—not connected—load' },
-  ];
-  const maturity = [
-    { label: 'Source freshness', value: Math.round(readiness.currentSources / readiness.totalSources * 100), note: `${readiness.currentSources}/${readiness.totalSources} verified within cadence`, tone: 'teal' as const },
-    { label: 'Target-region baseline', value: Math.round(readiness.representedRegions / readiness.targetRegions * 100), note: `${readiness.representedRegions}/${readiness.targetRegions} candidate regions represented`, tone: 'blue' as const },
-    { label: 'Causal identification only', value: Math.round(readiness.passedIdentificationChecks / readiness.totalIdentificationChecks * 100), note: `${readiness.passedIdentificationChecks}/${readiness.totalIdentificationChecks} checks passed · not a planning prerequisite`, tone: 'amber' as const },
-  ];
-  return <section className="grid h-full min-h-[610px] gap-4 lg:min-h-0 lg:grid-cols-[1.1fr_.9fr]">
-    <div className="rounded-2xl border border-white/10 bg-[#0d2933]/90 p-5"><p className="text-[9px] uppercase tracking-[0.15em] text-[#72cfc3]">Evidence lens · {analysis.analysisDate}</p><h2 className="mt-2 text-2xl font-medium">Four signals. No forced composite.</h2><div className="mt-5 grid gap-3 sm:grid-cols-2">{channels.map(({ icon: Icon, label, note, value }) => <article className="rounded-2xl border border-white/10 bg-[#081f28] p-5" key={label}><div className="flex items-center justify-between"><Icon className="size-5 text-[#72cfc3]" /><span className="font-mono text-3xl text-[#dff7f1]">{value}</span></div><p className="mt-7 text-[10px] font-medium uppercase tracking-[0.1em] text-[#a9bcc1]">{label}</p><p className="mt-1 text-[9px] leading-4 text-[#78949a]">{note}</p></article>)}</div></div>
-    <div className="flex flex-col overflow-y-auto rounded-2xl border border-white/10 bg-[#0d2933]/90 p-5"><p className="text-sm text-[#72cfc3]">Three evidence levels</p><dl className="mt-3 space-y-3 text-sm"><div><dt className="text-[#8be0d3]">Observed conditions</dt><dd>Available with source dates and scope</dd></div><div><dt className="text-[#ffd0b4]">Proxy-based planning</dt><dd>Scenarios available · validation incomplete</dd><dd className="mt-1 text-xs text-[#a9bcc1]">{readiness.proxyPlanning.passed_check_count}/{readiness.proxyPlanning.check_count} checks passed. No private spending or labour-hour data required.</dd></div><div><dt className="text-[#a9bcc1]">Causal AI attribution</dt><dd>Separate identification gate · withheld</dd></div></dl><details className="mt-4 rounded-xl border border-white/10 p-3"><summary className="cursor-pointer text-sm">Planning validation and next steps</summary><ul className="mt-3 space-y-3 text-sm">{readiness.proxyPlanning.checks.map((check) => <li key={check.id}><p className="font-medium">{check.id.replaceAll('_', ' ')} · {check.status.replaceAll('_', ' ')}</p><p className="mt-1 text-[#a9bcc1]">{check.finding}</p>{check.next_step ? <p className="mt-1 text-[#dff7f1]">Next: {check.next_step}</p> : null}</li>)}</ul></details><div className="mt-5 space-y-5">{maturity.map((item) => <Maturity key={item.label} {...item} />)}</div><p className="mt-4 text-xs text-[#a9bcc1]">Coverage ratios are not probability or confidence.</p></div>
-  </section>;
-}
 
 function ExecutivePrintRecord({ analysis, approvalStage, assumptions, budgetMillions, contingencyPct, priceBasis, projectName, readiness, spendingProfile }: { analysis: ReturnType<typeof buildDecisionAnalysis>; approvalStage: string; assumptions: PlanningAssumptions; budgetMillions: number; contingencyPct: number; priceBasis: string; projectName: string; readiness: ExecutiveReadiness; spendingProfile: SpendingProfile }) {
   return <article className="executive-print-record" id="executive-decision-brief">
@@ -207,8 +184,3 @@ function ExecutivePrintRecord({ analysis, approvalStage, assumptions, budgetMill
 }
 
 function Control({ children, label }: { children: React.ReactNode; label: string }) { return <label className="block"><span className="mb-1.5 block text-[9px] uppercase tracking-[0.1em] text-[#8fa8ae]">{label}</span>{children}</label>; }
-function Maturity({ label, note, tone, value }: { label: string; note: string; tone: 'teal' | 'blue' | 'amber' | 'orange'; value: number }) {
-  const colors = { teal: 'bg-[#61cfc1]', blue: 'bg-[#75aebe]', amber: 'bg-[#d2b06d]', orange: 'bg-[#ef9664]' };
-  return <div><div className="flex justify-between text-xs"><span>{label}</span><span className="font-mono text-[#9eb2b7]">{value}%</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-white/8"><div className={`h-full rounded-full ${colors[tone]}`} style={{ width: `${value}%` }} /></div><p className="mt-1.5 text-[9px] text-[#78949a]">{note}</p></div>;
-}
-function signed(value: number) { return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`; }
