@@ -14,6 +14,7 @@
     "start:sites": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",
     "test:a11y": "node scripts/a11y-audit.mjs",
+    "test:planning": "node --test tests/planning-outlook.test.mjs",
     "format": "oxfmt",
     "db:generate": "drizzle-kit generate",
     "research:validate": "PYTHONPATH=research/src python3 -m aiio.cli --root . validate-registry",

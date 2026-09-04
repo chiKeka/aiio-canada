@@ -31,6 +31,7 @@ import { ASSETS, buildDecisionAnalysis, METROS, type AssetId, type MetroId } fro
 import monthlyCalibration from '@/data/model-runs/executive_monthly_escalation_current.json';
 import releaseData from '@/public/data/latest.json';
 import type { PlanningAssumptions } from '@/lib/planning-calibration';
+import { monthNumber, queryNumber, SPENDING_PROFILES, type SpendingProfile } from '@/lib/project-cashflow';
 
 type View = 'outlook' | 'cockpit' | 'walkthrough' | 'evidence';
 
@@ -82,6 +83,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
   const [priceBasis, setPriceBasis] = useState('2026-06');
   const [approvalStage, setApprovalStage] = useState('business_case');
   const [contingencyPct, setContingencyPct] = useState(12);
+  const [spendingProfile, setSpendingProfile] = useState<SpendingProfile>('bell');
   const [assumptions, setAssumptions] = useState<PlanningAssumptions>({ annualBaselinePct: 3.5, peakAiAnnualPctPoints: 1.25, localCapturePct: 36, lagMonths: 3, uncertaintyPct: 40 });
   const [shareState, setShareState] = useState('Share assessment');
   const [comparison, setComparison] = useState<{ assetId: AssetId; metroId: MetroId; budgetMillions: number; startYear: number; duration: number } | null>(null);
@@ -91,17 +93,23 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
       const query = new URLSearchParams(window.location.search);
       const asset = query.get('asset') as AssetId | null;
       const metro = query.get('metro') as MetroId | null;
-      if (asset && ASSETS[asset]) setAssetId(asset);
-      if (metro && METROS[metro]) setMetroId(metro);
-      const budget = Number(query.get('budget')); if (budget > 0) setBudgetMillions(budget);
-      const start = Number(query.get('start')); if (start >= 2026 && start <= 2040) setStartYear(start);
-      const years = Number(query.get('years')); if (years >= 2 && years <= 10) setDuration(years);
-      if (query.get('name')) setProjectName(query.get('name')!);
-      if (query.get('basis')) setPriceBasis(query.get('basis')!);
-      if (query.get('stage')) setApprovalStage(query.get('stage')!);
-      const contingency = Number(query.get('contingency')); if (contingency >= 0 && contingency <= 40) setContingencyPct(contingency);
-      const nextAssumptions = { annualBaselinePct: Number(query.get('baseline')), peakAiAnnualPctPoints: Number(query.get('peak')), localCapturePct: Number(query.get('capture')), lagMonths: Number(query.get('lag')), uncertaintyPct: Number(query.get('uncertainty')) };
-      if (Object.values(nextAssumptions).every(Number.isFinite)) setAssumptions(nextAssumptions);
+      if (asset && Object.hasOwn(ASSETS, asset)) setAssetId(asset);
+      if (metro && Object.hasOwn(METROS, metro)) setMetroId(metro);
+      const budget = queryNumber(query, 'budget', 1, 1_000_000); if (budget !== undefined) setBudgetMillions(budget);
+      const start = queryNumber(query, 'start', 2026, 2040, true); if (start !== undefined) setStartYear(start);
+      const years = queryNumber(query, 'years', 2, 10, true); if (years !== undefined) setDuration(years);
+      if (query.get('name')) setProjectName(query.get('name')!.slice(0, 160));
+      const basis = query.get('basis'); if (basis && monthNumber(basis) !== null) setPriceBasis(basis);
+      const stage = query.get('stage'); if (stage && ['concept', 'business_case', 'treasury_board', 'procurement', 'delivery'].includes(stage)) setApprovalStage(stage);
+      const profile = query.get('profile'); if (profile && Object.hasOwn(SPENDING_PROFILES, profile)) setSpendingProfile(profile as SpendingProfile);
+      const contingency = queryNumber(query, 'contingency', 0, 40); if (contingency !== undefined) setContingencyPct(contingency);
+      setAssumptions((current) => ({
+        annualBaselinePct: queryNumber(query, 'baseline', 0, 12) ?? current.annualBaselinePct,
+        peakAiAnnualPctPoints: queryNumber(query, 'peak', 0, 8) ?? current.peakAiAnnualPctPoints,
+        localCapturePct: queryNumber(query, 'capture', 0, 80) ?? current.localCapturePct,
+        lagMonths: queryNumber(query, 'lag', 0, 24, true) ?? current.lagMonths,
+        uncertaintyPct: queryNumber(query, 'uncertainty', 0, 100) ?? current.uncertaintyPct,
+      }));
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
@@ -119,9 +127,10 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
     const url = new URL(window.location.href);
     const values = { asset: assetId, metro: metroId, budget: String(budgetMillions), start: String(startYear), years: String(duration), name: projectName, basis: priceBasis, stage: approvalStage, contingency: String(contingencyPct), baseline: String(assumptions.annualBaselinePct), peak: String(assumptions.peakAiAnnualPctPoints), capture: String(assumptions.localCapturePct), lag: String(assumptions.lagMonths), uncertainty: String(assumptions.uncertaintyPct) };
     Object.entries(values).forEach(([key, value]) => url.searchParams.set(key, value));
-    await navigator.clipboard.writeText(url.toString());
+    url.searchParams.set('profile', spendingProfile);
     window.history.replaceState(null, '', url);
-    setShareState('Link copied');
+    try { await navigator.clipboard.writeText(url.toString()); setShareState('Link copied'); }
+    catch { setShareState('Copy link from address bar'); }
     window.setTimeout(() => setShareState('Share assessment'), 1800);
   };
 
@@ -164,7 +173,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
                 <Control label="Asset class"><NativeSelect className="w-full [&>select]:h-9 [&>select]:border-white/10 [&>select]:bg-white/6 [&>select]:text-white" onChange={(e) => setAssetId(e.target.value as AssetId)} value={assetId}>{Object.entries(ASSETS).map(([id, asset]) => <NativeSelectOption key={id} value={id}>{asset.label}</NativeSelectOption>)}</NativeSelect></Control>
                 <Control label="Market"><NativeSelect className="w-full [&>select]:h-9 [&>select]:border-white/10 [&>select]:bg-white/6 [&>select]:text-white" onChange={(e) => setMetroId(e.target.value as MetroId)} value={metroId}>{Object.entries(METROS).map(([id, label]) => <NativeSelectOption key={id} value={id}>{label}</NativeSelectOption>)}</NativeSelect></Control>
                 <div className="grid grid-cols-2 gap-2">
-                  <Control label="Estimate ($M)"><Input className="h-9 border-white/10 bg-white/6 font-mono text-white" min="1" onChange={(e) => setBudgetMillions(Math.max(1, Number(e.target.value) || 1))} type="number" value={budgetMillions} /></Control>
+                  <Control label="Base budget ($M)"><Input className="h-9 border-white/10 bg-white/6 font-mono text-white" min="1" onChange={(e) => setBudgetMillions(Math.max(1, Number(e.target.value) || 1))} type="number" value={budgetMillions} /></Control>
                   <Control label="Start"><Input className="h-9 border-white/10 bg-white/6 font-mono text-white" max="2040" min="2026" onChange={(e) => setStartYear(Number(e.target.value) || 2026)} type="number" value={startYear} /></Control>
                 </div>
                 <div className="grid grid-cols-2 gap-2"><Control label="Price basis"><Input className="h-9 border-white/10 bg-white/6 font-mono text-white" onChange={(e) => setPriceBasis(e.target.value)} type="month" value={priceBasis} /></Control><Control label="Contingency"><Input className="h-9 border-white/10 bg-white/6 font-mono text-white" max="40" min="0" onChange={(e) => setContingencyPct(Math.max(0, Number(e.target.value) || 0))} type="number" value={contingencyPct} /></Control></div>
@@ -179,7 +188,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
 
             <div className="min-h-0">
               {view === 'outlook' ? (
-                <MonthlyEscalationOutlook assumptions={assumptions} assetOutcome={analysis.asset.outcome} budgetMillions={budgetMillions} calibration={monthlyCalibration as MonthlyEscalationCalibration} contingencyPct={contingencyPct} durationYears={duration} onAssumptionsChange={setAssumptions} priceBasis={priceBasis} projectStart={startYear} />
+                <MonthlyEscalationOutlook assumptions={assumptions} assetOutcome={analysis.asset.outcome} budgetMillions={budgetMillions} calibration={monthlyCalibration as MonthlyEscalationCalibration} contingencyPct={contingencyPct} durationYears={duration} onAssumptionsChange={setAssumptions} onSpendingProfileChange={setSpendingProfile} priceBasis={priceBasis} projectStart={startYear} spendingProfile={spendingProfile} />
               ) : view === 'cockpit' ? (
                 <CockpitView analysis={analysis} approvalStage={approvalStage} budgetMillions={budgetMillions} completeLabour={completeLabour} leadingMaterial={leadingMaterial} projectName={projectName} requestedGw={requestedGw} />
               ) : view === 'walkthrough' ? (
@@ -191,7 +200,7 @@ export function ExecutiveCockpit({ readiness }: { readiness: ExecutiveReadiness 
           </div>
         </div>
       </section>
-      <ExecutivePrintRecord analysis={analysis} approvalStage={approvalStage} assumptions={assumptions} budgetMillions={budgetMillions} contingencyPct={contingencyPct} priceBasis={priceBasis} projectName={projectName} readiness={readiness} />
+      <ExecutivePrintRecord analysis={analysis} approvalStage={approvalStage} assumptions={assumptions} budgetMillions={budgetMillions} contingencyPct={contingencyPct} priceBasis={priceBasis} projectName={projectName} readiness={readiness} spendingProfile={spendingProfile} />
     </main>
   );
 }
@@ -300,12 +309,12 @@ function EvidenceView({ analysis, completeLabour, readiness, requestedGw }: { an
   </section>;
 }
 
-function ExecutivePrintRecord({ analysis, approvalStage, assumptions, budgetMillions, contingencyPct, priceBasis, projectName, readiness }: { analysis: ReturnType<typeof buildDecisionAnalysis>; approvalStage: string; assumptions: PlanningAssumptions; budgetMillions: number; contingencyPct: number; priceBasis: string; projectName: string; readiness: ExecutiveReadiness }) {
+function ExecutivePrintRecord({ analysis, approvalStage, assumptions, budgetMillions, contingencyPct, priceBasis, projectName, readiness, spendingProfile }: { analysis: ReturnType<typeof buildDecisionAnalysis>; approvalStage: string; assumptions: PlanningAssumptions; budgetMillions: number; contingencyPct: number; priceBasis: string; projectName: string; readiness: ExecutiveReadiness; spendingProfile: SpendingProfile }) {
   return <article className="executive-print-record" id="executive-decision-brief">
     <header><p>AI Infrastructure Impact Observatory</p><h1>Executive decision record</h1><p>Generated {new Date().toLocaleDateString('en-CA')}</p></header>
     <section><h2>{projectName}</h2><dl><div><dt>Asset</dt><dd>{analysis.asset.label}</dd></div><div><dt>Market</dt><dd>{METROS[analysis.metroId]}</dd></div><div><dt>Estimate</dt><dd>${budgetMillions.toLocaleString()}M · {priceBasis} dollars</dd></div><div><dt>Approval stage</dt><dd>{approvalStage.replaceAll('_', ' ')}</dd></div><div><dt>Delivery</dt><dd>{analysis.startYear}–{analysis.endYear}</dd></div><div><dt>Existing contingency</dt><dd>{contingencyPct}% · ${(budgetMillions * contingencyPct / 100).toLocaleString()}M</dd></div></dl></section>
     <section><h2>Decision</h2><p className="print-decision">Market-test before approval.</p><p>Do not apply a blanket AI premium. Validate {analysis.dominantNode?.label.toLowerCase() ?? 'priority trade'} capacity, confirm utility interfaces, and refresh the estimate at each approval gate.</p></section>
-    <section><h2>Scenario boundary</h2><dl><div><dt>Scenario</dt><dd>$50B over 10 years</dd></div><div><dt>Baseline</dt><dd>{assumptions.annualBaselinePct}% annually</dd></div><div><dt>Peak AI increment</dt><dd>{assumptions.peakAiAnnualPctPoints} percentage points</dd></div><div><dt>Local capture</dt><dd>{assumptions.localCapturePct}%</dd></div><div><dt>Lag</dt><dd>{assumptions.lagMonths} months</dd></div><div><dt>Uncertainty</dt><dd>±{assumptions.uncertaintyPct}%</dd></div></dl><p><strong>AI-attributable cost and delay remain uncalibrated.</strong> Scenario dollars are planning sensitivity, not a forecast or approved estimate adjustment.</p></section>
+    <section><h2>Scenario boundary</h2><p>Spending profile: {SPENDING_PROFILES[spendingProfile]} (assumed). Base budget excludes contingency; the price-basis month has index 1.</p><dl><div><dt>Scenario</dt><dd>$50B over 10 years</dd></div><div><dt>Baseline</dt><dd>{assumptions.annualBaselinePct}% annually</dd></div><div><dt>Peak AI increment</dt><dd>{assumptions.peakAiAnnualPctPoints} percentage points</dd></div><div><dt>Local capture</dt><dd>{assumptions.localCapturePct}%</dd></div><div><dt>Lag</dt><dd>{assumptions.lagMonths} months</dd></div><div><dt>Uncertainty</dt><dd>±{assumptions.uncertaintyPct}%</dd></div></dl><p><strong>AI-attributable cost and delay remain uncalibrated.</strong> Scenario dollars are planning sensitivity, not a forecast or approved estimate adjustment.</p></section>
     <section><h2>Evidence readiness</h2><dl><div><dt>Fresh sources</dt><dd>{readiness.currentSources}/{readiness.totalSources}</dd></div><div><dt>Target regions</dt><dd>{readiness.representedRegions}/{readiness.targetRegions}</dd></div><div><dt>Identification checks</dt><dd>{readiness.passedIdentificationChecks}/{readiness.totalIdentificationChecks}</dd></div><div><dt>Authorizing treatment</dt><dd>0/8</dd></div></dl></section>
   </article>;
 }
