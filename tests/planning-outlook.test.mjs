@@ -14,6 +14,7 @@ function load(path) {
   runInNewContext(compiled, { module: testModule, exports: testModule.exports, require: (name) => {
     if (name === './project-cashflow') return load('lib/project-cashflow.ts');
     if (name === './planning-calibration') return load('lib/planning-calibration.ts');
+    if (name === './decision-analysis') return load('lib/decision-analysis.ts');
     if (name.startsWith('@/') && name.endsWith('.json')) return JSON.parse(readFileSync(resolve(root, name.slice(2)), 'utf8'));
     throw new Error(`Unexpected test import: ${name}`);
   } });
@@ -22,6 +23,27 @@ function load(path) {
 const { queryNumber, monthNumber, spendingShares, buildCashflowOutlook, allocateMonthlyDrivers } = load('lib/project-cashflow.ts');
 const { buildPlanningCalibration } = load('lib/planning-calibration.ts');
 const { buildDecisionOutlook, decisionAction, deliveryYears } = load('lib/decision-outlook.ts');
+const { buildDecisionAnalysis } = load('lib/decision-analysis.ts');
+const { buildExecutiveEvidence } = load('lib/executive-evidence.ts');
+
+test('executive evidence is scoped context with resolvable sources, not rate inputs', () => {
+  const analysis = buildDecisionAnalysis({ assetId: 'hospital', metroId: 'CMA_835', startYear: 2029, duration: 5 });
+  const signals = buildExecutiveEvidence(analysis);
+  assert.equal(signals.length, 4);
+  assert.ok(signals.every((signal) => signal.role === 'Context only'));
+  assert.ok(signals.flatMap((signal) => signal.sources).every((source) => source.record?.canonical_url.startsWith('https://')));
+  assert.equal(signals[0].scope, 'Edmonton region');
+  assert.equal(signals[3].value, String(analysis.concurrentProjectCount));
+  const missing = buildExecutiveEvidence({ ...analysis, materials: [], labourRows: [], concurrentProjectCount: 0 });
+  assert.equal(missing[0].value, 'Unavailable');
+  assert.equal(missing[1].value, 'Unavailable');
+  assert.equal(missing[3].value, '0');
+  assert.equal(missing[0].sources.length, 0);
+  const road = buildExecutiveEvidence(buildDecisionAnalysis({ assetId: 'road', metroId: 'CMA_825', startYear: 2038, duration: 5 }));
+  assert.equal(road[0].scope, 'Calgary region');
+  assert.match(road[0].limitation, /must not be read as a road-construction index/);
+  assert.match(road[3].detail, /2038–2042/);
+});
 const assumptions = { annualBaselinePct: 6, peakAiAnnualPctPoints: 1.25, localCapturePct: 36, lagMonths: 3, uncertaintyPct: 40 };
 const config = { assetOutcome: 'SCHEDULE_HOSPITALS_DELAY_PRESSURE', durationYears: 2, projectStart: 2029, priceBasis: '2028-01', assumptions };
 const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-9, `${a} != ${b}`);
