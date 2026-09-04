@@ -21,6 +21,75 @@
   "output_manifest": {
     "data/processed/public_project_prospective_snapshot_current.csv": "sha256:05d9b4178f970f57e121e89a5358a1e899b7c00661322b548e551a9b2d29aae6"
   },
+  "proxy_planning_validation": {
+    "assessment_id": "AIIO_PROXY_PLANNING_VALIDATION_0_1",
+    "check_count": 7,
+    "checks": [
+      {
+        "finding": "Reconstruction input hashes and quarterly output reconcile.",
+        "id": "lineage",
+        "next_step": null,
+        "status": "pass"
+      },
+      {
+        "finding": "Ordered exposure sensitivity cases are checked; these are not predictive intervals.",
+        "id": "uncertainty_cases",
+        "next_step": "Validate interval coverage on held-out observations.",
+        "status": "pass"
+      },
+      {
+        "finding": "1 costed project, 6 permit candidates; 2 markets. No validated project/horizon domain.",
+        "id": "scope_coverage",
+        "next_step": "Lock the target market, asset, outcome, horizon and minimum independent-event coverage before fitting.",
+        "status": "not_assessed"
+      },
+      {
+        "finding": "Quarterly allocation uses an assumed construction profile; permit issue is not expenditure timing.",
+        "id": "timing_validation",
+        "next_step": "Compare timing alternatives against dated construction milestones; disclose monthly interpolation.",
+        "status": "not_assessed"
+      },
+      {
+        "finding": "Existing association fit is in-sample; repeated asset rows are not independent events.",
+        "id": "out_of_sample_performance",
+        "next_step": "Run time-blocked rolling-origin backtests against a baseline-only benchmark, with locked error and interval-coverage tolerances.",
+        "status": "not_assessed"
+      },
+      {
+        "finding": "Permit/project linkage is unresolved; separate components do not establish non-overlap.",
+        "id": "overlap_and_double_counting",
+        "next_step": "Link records or bound overlap, test leave-one-project/source-out sensitivity, and reconcile baseline versus incremental pressure.",
+        "status": "not_assessed"
+      },
+      {
+        "finding": "No scope-specific proxy-planning validation receipt has been accepted.",
+        "id": "independent_planning_review",
+        "next_step": "Review the frozen model, validation metrics, source coverage and claim language; bind the verdict to input/model hashes.",
+        "status": "not_assessed"
+      }
+    ],
+    "input_manifest": {
+      "data/model-runs/ai_attribution_proxy_association_v0.1.json": "sha256:19b2cf40c66900327910101c6da2d7609a51d4b5b7eca97f4f2d32a61f4597f8",
+      "data/model-runs/ai_construction_proxy_alberta_v0.1.json": "sha256:63053c4316fb2d634020588602fd8f6fdf9ad8f6f4c2fa0b389fcee292fb5fb6",
+      "data/processed/ai_construction_proxy_alberta_v0.1.csv": "sha256:774eb46d94af9356a776c6a6ef9f979b777a72b84336c61d18a2307bac77f0ef"
+    },
+    "levels": {
+      "assumption_scenarios": "available_not_validated_estimates",
+      "causal_attribution": "separate_identification_gate",
+      "observed_evidence": "display_with_source_scope_and_date",
+      "proxy_planning": "validation_incomplete"
+    },
+    "passed_check_count": 2,
+    "publication_boundary": {
+      "ai_attributable_effect": null,
+      "causal_attribution_allowed": false,
+      "requires_private_realized_spending_or_labour_hours": false,
+      "scenario_sensitivity_allowed": true,
+      "validated_proxy_estimate_allowed": false
+    },
+    "schema_version": "1.0.0",
+    "status": "validation_incomplete"
+  },
   "publication_boundary": {
     "authorized_revisions_may_be_described": true,
     "authorized_revisions_must_not_be_labelled_final_outturn": true,
