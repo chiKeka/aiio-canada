@@ -2,8 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import { Activity, ExternalLink } from 'lucide-react';
+import { EvidencePill } from '@/components/site-shell';
 
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
 import regionalMacroControls from '@/data/model-runs/regional_macro_controls_canada_v0.1.json';
 
 const metricOrder = [
@@ -46,49 +50,84 @@ export function RegionalMacroExplorer() {
   const selectedByMetric = new Map(
     selected.map((item) => [item.indicator_id, item]),
   );
-  const geographyLabel = geographies.find((item) => item.id === geographyId)?.label;
+  const geographyLabel = geographies.find(
+    (item) => item.id === geographyId,
+  )?.label;
   const coverage = regionalMacroControls.metric_coverage as Record<
     MetricId,
     { source_url: string }
   >;
 
   return (
-    <section className="border-t border-[#d5ddd8] bg-[#eef1ec]">
-      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
+    <section className="border-t border-line bg-workspace">
+      <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-end">
           <div>
-            <div className="flex items-center gap-2 text-[#24746c]">
+            <div className="flex items-center gap-2 text-brand">
               <Activity className="size-4" />
-              <h2 className="text-xl font-medium">Regional macro control panel</h2>
+              <h2 className="text-xl font-medium">
+                Regional macro control panel
+              </h2>
             </div>
-            <p className="mt-3 max-w-4xl text-sm leading-6 text-[#52645f]">
-              Seven separate Statistics Canada indicators provide dated regional context through {regionalMacroControls.common_latest_period_end}. Select a jurisdiction to compare the latest year-over-year movement without collapsing unlike measures into a score.
+            <p className="mt-3 max-w-4xl text-sm leading-6 text-subtle">
+              Seven separate Statistics Canada indicators provide dated regional
+              context through {regionalMacroControls.common_latest_period_end}.
+              Select a jurisdiction to compare the latest year-over-year
+              movement without collapsing unlike measures into a score.
             </p>
           </div>
           <label className="block">
-            <span className="mb-2 block font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#52645f]">Jurisdiction</span>
-            <NativeSelect value={geographyId} onChange={(event) => setGeographyId(event.target.value)} aria-label="Regional macro jurisdiction">
-              {geographies.map((item) => <NativeSelectOption key={item.id} value={item.id}>{item.label}</NativeSelectOption>)}
+            <span className="mb-2 block font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-subtle">
+              Jurisdiction
+            </span>
+            <NativeSelect
+              value={geographyId}
+              onChange={(event) => setGeographyId(event.target.value)}
+              aria-label="Regional macro jurisdiction"
+            >
+              {geographies.map((item) => (
+                <NativeSelectOption key={item.id} value={item.id}>
+                  {item.label}
+                </NativeSelectOption>
+              ))}
             </NativeSelect>
           </label>
         </div>
 
         <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {metricOrder.map((metricId) => {
-            const item = selectedByMetric.get(metricId) as LatestControl | undefined;
+            const item = selectedByMetric.get(metricId) as
+              | LatestControl
+              | undefined;
             return (
-              <article className="rounded-xl border border-[#cfd9d5] bg-white p-5" key={metricId}>
+              <article
+                className="rounded-lg border border-line bg-white p-5"
+                key={metricId}
+              >
                 <div className="flex items-start justify-between gap-3">
-                  <p className="text-xs font-medium text-[#52645f]">{shortLabels[metricId]}</p>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.08em] text-[#536b65]">{item?.evidence_status ?? 'unavailable'}</span>
+                  <p className="text-xs font-medium text-subtle">
+                    {shortLabels[metricId]}
+                  </p>
+                  <EvidencePill
+                    status={item?.evidence_status ?? 'unavailable'}
+                  />
                 </div>
-                <p className={`mt-4 font-mono text-2xl font-semibold ${item?.year_over_year_change_percent !== undefined && item?.year_over_year_change_percent !== null && item.year_over_year_change_percent < 0 ? 'text-[#a14f29]' : 'text-[#155d58]'}`}>
+                <p
+                  className={`mt-4 font-mono text-2xl font-semibold ${item?.year_over_year_change_percent !== undefined && item?.year_over_year_change_percent !== null && item.year_over_year_change_percent < 0 ? 'text-caution' : 'text-brand'}`}
+                >
                   {formatChange(item?.year_over_year_change_percent)}
                 </p>
-                <p className="mt-1 min-h-10 text-[11px] leading-5 text-[#667873]">
-                  {item ? formatValue(item) : `${geographyLabel ?? geographyId}: not published in the selected source table`}
+                <p className="mt-1 min-h-10 text-[11px] leading-5 text-subtle">
+                  {item
+                    ? formatValue(item)
+                    : `${geographyLabel ?? geographyId}: not published in the selected source table`}
                 </p>
-                <a className="mt-4 inline-flex items-center gap-1 text-[10px] font-medium text-[#2b716a] hover:underline" href={item?.source_url ?? coverage[metricId].source_url} rel="noreferrer" target="_blank">
+                <a
+                  className="mt-4 inline-flex items-center gap-1 text-[10px] font-medium text-brand hover:underline"
+                  href={item?.source_url ?? coverage[metricId].source_url}
+                  rel="noreferrer"
+                  target="_blank"
+                >
                   Official source <ExternalLink className="size-3" />
                 </a>
               </article>
@@ -96,8 +135,13 @@ export function RegionalMacroExplorer() {
           })}
         </div>
 
-        <div className="mt-5 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-4 text-sm leading-6 text-[#825a47]">
-          Descriptive controls only. CPI is not a construction bid-price index; earnings are not labour availability; housing starts are not affordability; population is not construction capacity; and investment is not a public-project outcome. These values do not identify an AI effect, calibrate the scenario, or translate into project cost or delay.
+        <div className="mt-5 rounded-lg border border-caution/30 bg-workspace p-4 text-sm leading-6 text-caution">
+          Descriptive controls only. CPI is not a construction bid-price index;
+          earnings are not labour availability; housing starts are not
+          affordability; population is not construction capacity; and investment
+          is not a public-project outcome. These values do not identify an AI
+          effect, calibrate the scenario, or translate into project cost or
+          delay.
         </div>
       </div>
     </section>
@@ -110,7 +154,8 @@ function formatChange(value: number | null | undefined) {
 }
 
 function formatValue(item: LatestControl) {
-  if (item.value === null) return `${item.geography_label}: source value unavailable`;
+  if (item.value === null)
+    return `${item.geography_label}: source value unavailable`;
   if (item.indicator_id === 'MACRO_POPULATION_QUARTERLY') {
     return `${item.value.toLocaleString('en-CA', { maximumFractionDigits: 0 })} persons`;
   }

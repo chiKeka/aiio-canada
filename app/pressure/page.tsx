@@ -4,7 +4,7 @@ import {
   EvidencePill,
   PageIntro,
   SiteFooter,
-  SiteHeader,
+  ResearchShell,
 } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
 
@@ -25,19 +25,18 @@ export default function PressurePage() {
   const maxTrade = Math.max(...trades.map((item) => item.high));
   const maxOutcome = Math.max(...outcomes.map((item) => item.high));
   return (
-    <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">
-      <SiteHeader />
+    <ResearchShell>
       <PageIntro
         eyebrow="Pressure monitor"
-        title="Separate what the market is doing from what the scenario explores."
+        title="Market pressure"
         description="Observed construction-price signals establish the baseline. The graph layer then traces a clearly labelled scenario through resources and public delivery without converting a diagnostic index into unsupported dollars, workers or delay days."
       />
-      <section className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
+      <section className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8 lg:py-8">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
               <EvidencePill status="observed" />
-              <span className="font-mono text-xs text-[#52645f]">
+              <span className="font-mono text-xs text-subtle">
                 STATCAN_BCPI_18100289
               </span>
             </div>
@@ -45,31 +44,31 @@ export default function PressurePage() {
               Latest Alberta construction-price baseline
             </h2>
           </div>
-          <span className="hidden font-mono text-xs text-[#52645f] sm:block">
+          <span className="hidden font-mono text-xs text-subtle sm:block">
             2023=100 · not seasonally adjusted
           </span>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {prices.map((price) => (
             <article
-              className="rounded-xl border border-[#d3dcd6] bg-[#fbfaf5] p-5"
+              className="rounded-lg border border-line bg-surface p-5"
               key={`${price.indicator_id}-${price.geography_id}`}
             >
-              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-[#52645f]">
+              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-subtle">
                 {price.geography_id === 'CMA_825' ? 'Calgary' : 'Edmonton'} ·{' '}
                 {price.indicator_id.includes('SCHOOL')
                   ? 'School'
                   : 'Non-residential'}
               </p>
-              <p className="mt-5 font-mono text-3xl font-semibold text-[#155d59]">
+              <p className="mt-5 font-mono text-2xl font-semibold text-brand">
                 {price.value.toFixed(1)}
               </p>
-              <p className="mt-1 text-xs text-[#52645f]">
+              <p className="mt-1 text-xs text-subtle">
                 {price.quarter_over_quarter_percent > 0 ? '+' : ''}
                 {price.quarter_over_quarter_percent.toFixed(2)}% quarter over
                 quarter
               </p>
-              <p className="mt-4 border-t border-[#e0e5e1] pt-3 text-[10px] text-[#52645f]">
+              <p className="mt-4 border-t border-line pt-3 text-[10px] text-subtle">
                 Period ending {price.period_end}
               </p>
             </article>
@@ -80,19 +79,19 @@ export default function PressurePage() {
       {projectExposure ? (
         <PublicProjectExposurePanel exposure={projectExposure} />
       ) : null}
-      <section className="bg-[#0b2a36] text-white">
-        <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
-          <div className="mb-10 grid gap-5 border-b border-white/10 pb-8 lg:grid-cols-[1fr_auto]">
+      <section className="bg-surface text-ink">
+        <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8 lg:py-8">
+          <div className="mb-10 grid gap-5 border-b border-line pb-8 lg:grid-cols-[1fr_auto]">
             <div>
               <div className="flex items-center gap-2">
                 <EvidencePill status="scenario" />
                 <EvidencePill status="assumed" />
               </div>
-              <h2 className="mt-4 text-3xl font-medium tracking-[-0.035em]">
+              <h2 className="mt-4 text-2xl font-medium tracking-[-0.035em]">
                 $50B counterfactual diagnostic · pressure ordering
               </h2>
             </div>
-            <p className="max-w-md text-sm leading-6 text-[#a7bbc1]">
+            <p className="max-w-md text-sm leading-6 text-subtle">
               Low, central and high cases co-move assumed edge weights and
               retention. They are structural stress cases, not uncertainty
               intervals. Scores are bounded display indices, not delay
@@ -111,7 +110,7 @@ export default function PressurePage() {
               max={maxOutcome}
             />
           </div>
-          <div className="mt-10 flex gap-3 rounded-xl border border-[#de9b62]/30 bg-[#7c401f]/20 p-5 text-sm leading-6 text-[#e9c7ab]">
+          <div className="mt-10 flex gap-3 rounded-lg border border-caution/30 bg-caution-soft p-5 text-sm leading-6 text-caution">
             <AlertTriangle className="mt-0.5 size-5 shrink-0" />
             <p>
               The graph receives 46% of scenario capex; 54% is deliberately
@@ -123,7 +122,7 @@ export default function PressurePage() {
         </div>
       </section>
       <SiteFooter />
-    </main>
+    </ResearchShell>
   );
 }
 
@@ -166,9 +165,9 @@ function MaterialCostPanel({ screen }: { screen: MaterialCostScreen }) {
     )
     .slice(0, 8);
   return (
-    <section className="border-t border-[#d5ddd8] bg-white">
-      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
-        <div className="grid gap-4 border-b border-[#d8dfda] pb-7 lg:grid-cols-[1fr_auto] lg:items-end">
+    <section className="border-t border-line bg-white">
+      <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8 lg:py-8">
+        <div className="grid gap-4 border-b border-line pb-7 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
             <div className="flex items-center gap-2">
               <EvidencePill status="observed" />
@@ -177,13 +176,13 @@ function MaterialCostPanel({ screen }: { screen: MaterialCostScreen }) {
             <h2 className="mt-3 text-2xl font-medium tracking-[-0.025em]">
               Shared material-cost signals
             </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#52645f]">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-subtle">
               Largest absolute year-over-year movements across selected BCPI
               building-component proxies. These are market baselines, not
               AI-attributed effects.
             </p>
           </div>
-          <span className="font-mono text-xs text-[#52645f]">
+          <span className="font-mono text-xs text-subtle">
             Period ending {screen.period_end}
           </span>
         </div>
@@ -192,22 +191,22 @@ function MaterialCostPanel({ screen }: { screen: MaterialCostScreen }) {
             const change = item.year_over_year_percent_change ?? 0;
             return (
               <article
-                className="rounded-xl border border-[#d3dcd6] bg-[#fbfaf5] p-5"
+                className="rounded-lg border border-line bg-surface p-5"
                 key={`${item.geography_id}-${item.archetype}-${item.component}`}
               >
-                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-[#52645f]">
+                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-subtle">
                   {item.geography_id === 'CMA_825' ? 'Calgary' : 'Edmonton'} ·{' '}
                   {humanize(item.archetype)}
                 </p>
-                <h3 className="mt-3 text-sm font-medium text-[#17343d]">
+                <h3 className="mt-3 text-sm font-medium text-ink">
                   {humanize(item.component)}
                 </h3>
                 <div className="mt-5 flex items-end justify-between">
-                  <span className="font-mono text-2xl font-semibold text-[#155d59]">
+                  <span className="font-mono text-2xl font-semibold text-brand">
                     {item.index_value.toFixed(1)}
                   </span>
                   <span
-                    className={`font-mono text-xs ${change >= 0 ? 'text-[#a6532b]' : 'text-[#267168]'}`}
+                    className={`font-mono text-xs ${change >= 0 ? 'text-caution' : 'text-brand'}`}
                   >
                     {change >= 0 ? '+' : ''}
                     {change.toFixed(1)}% YoY
@@ -217,7 +216,7 @@ function MaterialCostPanel({ screen }: { screen: MaterialCostScreen }) {
             );
           })}
         </div>
-        <p className="mt-5 text-xs leading-5 text-[#687974]">
+        <p className="mt-5 text-xs leading-5 text-subtle">
           Factory is an industrial-building proxy, not a data-centre index. BCPI
           does not measure commodity quantities, lead times, or physical
           capacity.
@@ -233,9 +232,9 @@ function PublicProjectExposurePanel({
   exposure: PublicProjectExposure;
 }) {
   return (
-    <section className="border-t border-[#d5ddd8] bg-[#e9ebe5]">
-      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
-        <div className="grid gap-4 border-b border-[#cfd8d2] pb-7 lg:grid-cols-[1fr_auto] lg:items-end">
+    <section className="border-t border-line bg-workspace">
+      <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8 lg:py-8">
+        <div className="grid gap-4 border-b border-line pb-7 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
             <div className="flex items-center gap-2">
               <EvidencePill status="observed" />
@@ -244,20 +243,20 @@ function PublicProjectExposurePanel({
             <h2 className="mt-3 text-2xl font-medium tracking-[-0.025em]">
               Public-delivery asset overlap
             </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#52645f]">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-subtle">
               {exposure.screened_project_count} delivery-relevant Alberta
               records, excluding classified AI and enabling-power projects.
               Overlap is a scheduling screen, not proof of competition or delay.
             </p>
           </div>
-          <span className="font-mono text-xs text-[#52645f]">
+          <span className="font-mono text-xs text-subtle">
             Window {exposure.window.start_year}–{exposure.window.end_year}
           </span>
         </div>
         <div className="mt-7 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {exposure.asset_class_summaries.map((item) => (
             <article
-              className="rounded-xl border border-[#cfd8d2] bg-[#fbfaf5] p-5"
+              className="rounded-lg border border-line bg-surface p-5"
               key={item.asset_class}
             >
               <h3 className="text-sm font-medium">
@@ -279,13 +278,13 @@ function PublicProjectExposurePanel({
                   )}
                 />
               </div>
-              <p className="mt-5 border-t border-[#e0e5e1] pt-4 font-mono text-sm font-semibold text-[#155d59]">
+              <p className="mt-5 border-t border-line pt-4 font-mono text-sm font-semibold text-brand">
                 {formatCad(item.indicative_cost_allocated_to_window_cad)}{' '}
-                <span className="font-sans text-[10px] font-normal text-[#60716c]">
+                <span className="font-sans text-[10px] font-normal text-subtle">
                   indicatively allocated to window
                 </span>
               </p>
-              <p className="mt-2 text-[10px] text-[#52645f]">
+              <p className="mt-2 text-[10px] text-subtle">
                 {item.unresolved_sponsor_signal_count} sponsor signals
                 unresolved · {item.reported_cost_project_count} records report
                 cost
@@ -301,8 +300,8 @@ function PublicProjectExposurePanel({
 function ExposureMetric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="font-mono text-lg font-semibold text-[#173f46]">{value}</p>
-      <p className="mt-1 text-[10px] text-[#52645f]">{label}</p>
+      <p className="font-mono text-lg font-semibold text-ink">{value}</p>
+      <p className="mt-1 text-[10px] text-subtle">{label}</p>
     </div>
   );
 }
@@ -336,26 +335,26 @@ function PressureList({
 }) {
   return (
     <div>
-      <h3 className="mb-5 text-sm font-medium text-[#d7e3e6]">{title}</h3>
+      <h3 className="mb-5 text-sm font-medium text-subtle">{title}</h3>
       <div className="space-y-5">
         {items.map((item, index) => (
           <div key={item.node_id}>
             <div className="mb-2 flex items-center justify-between text-xs">
               <span className="flex items-center gap-2">
-                <span className="font-mono text-[#6f939b]">0{index + 1}</span>
+                <span className="font-mono text-subtle">0{index + 1}</span>
                 {item.label}
               </span>
-              <span className="font-mono text-[#89aaa8]">
+              <span className="font-mono text-subtle">
                 {item.low.toFixed(2)}–{item.high.toFixed(2)}
               </span>
             </div>
-            <div className="relative h-2 rounded-full bg-white/8">
+            <div className="relative h-2 rounded-full bg-workspace">
               <div
-                className="absolute h-full rounded-full bg-[#2f8f83]"
+                className="absolute h-full rounded-full bg-brand"
                 style={{ width: `${(item.central / max) * 100}%` }}
               />
               <span
-                className="absolute top-1/2 size-3 -translate-y-1/2 rounded-full border-2 border-[#0b2a36] bg-[#efad65]"
+                className="absolute top-1/2 size-3 -translate-y-1/2 rounded-full border-2 border-line bg-caution-soft"
                 style={{ left: `calc(${(item.high / max) * 100}% - 6px)` }}
               />
             </div>

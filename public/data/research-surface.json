@@ -1,7 +1,37 @@
 {
-  "artifact_count": 41,
-  "artifact_manifest_sha256": "sha256:499a3c7c51332c5bbadfc364f46ef2c0187ffaf293a5b100dfa5703c9def6179",
+  "artifact_count": 46,
+  "artifact_manifest_sha256": "sha256:017e27b8f5225280fc269d302ea6ed7cdaf71a972b9ddda5289c15558fa63fe6",
   "artifacts": [
+    {
+      "artifact_id": "construction_projects",
+      "evidence_role": "observed_inventory",
+      "path": "public/data/construction/projects.json",
+      "sha256": "sha256:0463ffe5bb124570faf0cf8789a4dec2e3615ca8ce42af235a9299f02ff05e3c"
+    },
+    {
+      "artifact_id": "construction_benchmarks",
+      "evidence_role": "mixed_evidence_reference",
+      "path": "public/data/construction/benchmarks.json",
+      "sha256": "sha256:e0ce2d11c393b4ad6683ce23303c7a0ebaac686d5a842f14941799b296248b0b"
+    },
+    {
+      "artifact_id": "construction_briefing",
+      "evidence_role": "observed_and_analytical",
+      "path": "public/data/construction/briefing.json",
+      "sha256": "sha256:02d5ffce75b670bb89f23419df80337708babfea1710c05a69c9ca1fb37973f0"
+    },
+    {
+      "artifact_id": "construction_manifest",
+      "evidence_role": "provenance",
+      "path": "public/data/construction/manifest.json",
+      "sha256": "sha256:a38a93cc6befad0e023106a1be406584047f9b52141149034146fcdbc3662f14"
+    },
+    {
+      "artifact_id": "construction_snapshot",
+      "evidence_role": "published_evidence_bundle",
+      "path": "public/data/construction/snapshot.json",
+      "sha256": "sha256:8dd3114ac6aa8495e4e37c87fe2dbf73f7aec640cc1b5c8a2cefe19239bac4f1"
+    },
     {
       "artifact_id": "frozen_release_bundle",
       "evidence_role": "frozen_release",

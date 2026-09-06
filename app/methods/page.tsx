@@ -1,10 +1,11 @@
+import Link from 'next/link';
 import { CheckCircle2, GitBranch, Layers3, ShieldCheck } from 'lucide-react';
 
 import {
   EvidencePill,
   PageIntro,
   SiteFooter,
-  SiteHeader,
+  ResearchShell,
 } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
 import historicalEnvelope from '@/data/model-runs/alberta_bcpi_historical_envelope_v0.1.json';
@@ -74,57 +75,82 @@ export default function MethodsPage() {
     ...aiCapexLedger.limitations,
   ];
   return (
-    <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">
-      <SiteHeader />
+    <ResearchShell>
+      <div className="border-b border-line bg-brand-soft px-8 py-3 text-sm">
+        <Link href="/construction" className="font-medium text-brand underline">
+          Construction demand workspace: quarterly scenarios, benchmarks,
+          formulas and presentation downloads
+        </Link>
+      </div>
       <PageIntro
         eyebrow="Research method"
-        title="A pipeline of evidence, not a side model."
+        title="Methods & limitations"
         description="The graph is the analysis engine inside a larger reproducible program. Source records, transformations, scenarios, tests and publication artifacts are versioned so a reader can follow a result back to its origin."
       />
-      <section className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
+      <section className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8 lg:py-8">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {methodSteps.map(([number, title, text]) => (
             <article
-              className="rounded-xl border border-[#d3dcd6] bg-[#fbfaf5] p-5"
+              className="rounded-lg border border-line bg-surface p-5"
               key={number}
             >
-              <span className="font-mono text-xs text-[#2b776f]">{number}</span>
+              <span className="font-mono text-xs text-brand">{number}</span>
               <h2 className="mt-5 text-lg font-medium">{title}</h2>
-              <p className="mt-2 text-sm leading-6 text-[#52645f]">{text}</p>
+              <p className="mt-2 text-sm leading-6 text-subtle">{text}</p>
             </article>
           ))}
         </div>
       </section>
-      <section className="border-y border-[#b8cbd4] bg-[#edf3f5]">
-        <div className="mx-auto grid max-w-[1440px] gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[.8fr_1.2fr] lg:px-12">
+      <section className="border-y border-line bg-workspace">
+        <div className="mx-auto grid max-w-[1440px] gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[.8fr_1.2fr] lg:px-8">
           <div>
-            <div className="flex items-center gap-2 text-[#365d6d]">
+            <div className="flex items-center gap-2 text-subtle">
               <GitBranch className="size-4" />
-              <span className="font-mono text-xs uppercase tracking-[0.14em]">E2 panel acquisition preflight</span>
+              <span className="font-mono text-xs uppercase tracking-[0.14em]">
+                E2 panel acquisition preflight
+              </span>
             </div>
-            <h2 className="mt-4 text-2xl font-medium tracking-[-0.025em]">Scope can be planned before evidence is eligible.</h2>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-[#526b76]">The preflight binds ten evidence receipts to five candidate CMAs and every locked treatment/outcome field. It creates no partial observations and runs no estimator.</p>
+            <h2 className="mt-4 text-2xl font-medium tracking-[-0.025em]">
+              Scope can be planned before evidence is eligible.
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-subtle">
+              The preflight binds ten evidence receipts to five candidate CMAs
+              and every locked treatment/outcome field. It creates no partial
+              observations and runs no estimator.
+            </p>
           </div>
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               ['Candidate CMAs', panelPreflight.candidate_scope.region_count],
-              ['Asset classes', panelPreflight.candidate_scope.asset_class_count],
-              ['Fields queued', panelPreflight.field_gap_summary.required_field_instance_count],
-              ['Eligible panel rows', panelPreflight.current_eligibility.assembled_panel_row_count],
+              [
+                'Asset classes',
+                panelPreflight.candidate_scope.asset_class_count,
+              ],
+              [
+                'Fields queued',
+                panelPreflight.field_gap_summary.required_field_instance_count,
+              ],
+              [
+                'Eligible panel rows',
+                panelPreflight.current_eligibility.assembled_panel_row_count,
+              ],
             ].map(([label, value]) => (
-              <div className="rounded-lg border border-[#c5d4da] bg-white p-4" key={label}>
-                <dt className="text-xs text-[#5d7078]">{label}</dt>
-                <dd className="mt-2 font-mono text-2xl text-[#234e5d]">{value}</dd>
+              <div
+                className="rounded-lg border border-line bg-white p-4"
+                key={label}
+              >
+                <dt className="text-xs text-subtle">{label}</dt>
+                <dd className="mt-2 font-mono text-2xl text-ink">{value}</dd>
               </div>
             ))}
           </dl>
         </div>
       </section>
-      <section className="border-y border-[#dfb18d] bg-[#fff1e5]">
-        <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-12">
+      <section className="border-y border-caution/30 bg-workspace">
+        <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
             <div>
-              <div className="flex items-center gap-2 text-[#94471f]">
+              <div className="flex items-center gap-2 text-caution">
                 <ShieldCheck className="size-5" />
                 <span className="font-mono text-xs uppercase tracking-[0.14em]">
                   Independent modelling gate
@@ -133,7 +159,7 @@ export default function MethodsPage() {
               <h2 className="mt-4 text-2xl font-medium tracking-[-0.025em]">
                 The packet is ready. The verdict is not.
               </h2>
-              <p className="mt-3 max-w-xl text-sm leading-6 text-[#805843]">
+              <p className="mt-3 max-w-xl text-sm leading-6 text-caution">
                 The Alberta E1 review instrument hash-locks the model artifact,
                 implementation, tests and claim boundaries. It cannot authorize
                 publication itself, and a future pass would apply only to an
@@ -148,16 +174,16 @@ export default function MethodsPage() {
                   ],
                   [
                     'Eligible horizons',
-                    referenceCostReview.facts_to_reconcile
-                      .gate_passing_horizons.length,
+                    referenceCostReview.facts_to_reconcile.gate_passing_horizons
+                      .length,
                   ],
                 ].map(([label, value]) => (
                   <div
-                    className="rounded-lg border border-[#e0b18b] bg-[#fff8f1] p-3"
+                    className="rounded-lg border border-caution/30 bg-surface p-3"
                     key={label}
                   >
-                    <dt className="text-xs text-[#8d654f]">{label}</dt>
-                    <dd className="mt-1 font-mono text-xl text-[#743b20]">
+                    <dt className="text-xs text-caution">{label}</dt>
+                    <dd className="mt-1 font-mono text-xl text-caution">
                       {value}
                     </dd>
                   </div>
@@ -167,23 +193,23 @@ export default function MethodsPage() {
             <div className="space-y-3">
               {reviewerStates.map(([reviewer, gate]) => (
                 <article
-                  className="rounded-lg border border-[#e0b18b] bg-[#fff8f1] p-4"
+                  className="rounded-lg border border-caution/30 bg-surface p-4"
                   key={reviewer}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h3 className="font-mono text-xs uppercase tracking-[0.12em] text-[#743b20]">
+                    <h3 className="font-mono text-xs uppercase tracking-[0.12em] text-caution">
                       {reviewer} review
                     </h3>
-                    <span className="rounded-full border border-[#d59d74] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-[#94471f]">
+                    <span className="rounded-full border border-caution/30 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-caution">
                       {gate.status}
                     </span>
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-[#805843]">
+                  <p className="mt-3 text-sm leading-6 text-caution">
                     {gate.reason}
                   </p>
                 </article>
               ))}
-              <p className="text-xs leading-5 text-[#8d654f]">
+              <p className="text-xs leading-5 text-caution">
                 No reviewer output, approval or replacement parameter is
                 inferred from tool availability. All public projection,
                 project-cost and AI-attribution fields remain withheld.
@@ -192,29 +218,45 @@ export default function MethodsPage() {
           </div>
         </div>
       </section>
-      <section className="bg-[#0b2a36] text-white">
-        <div className="mx-auto grid max-w-[1440px] gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[.7fr_1.3fr] lg:px-12 lg:py-16">
+      <section className="bg-surface text-ink">
+        <div className="mx-auto grid max-w-[1440px] gap-10 px-5 py-8 sm:px-8 lg:grid-cols-[.7fr_1.3fr] lg:px-8 lg:py-8">
           <div>
-            <div className="flex items-center gap-2 text-[#86cfc3]">
+            <div className="flex items-center gap-2 text-brand">
               <GitBranch className="size-4" />
               <span className="font-mono text-xs uppercase tracking-[0.14em]">
                 PSPE/S3 adaptation
               </span>
             </div>
-            <h2 className="mt-4 text-3xl font-medium tracking-[-0.035em]">
+            <h2 className="mt-4 text-2xl font-medium tracking-[-0.035em]">
               Signed paths with explicit limits.
             </h2>
-            <p className="mt-4 text-sm leading-6 text-[#a9bcc2]">
+            <p className="mt-4 text-sm leading-6 text-subtle">
               The local Git-backed PSPE mathematics repository contributes the
               documented concepts of directed graph propagation, damping and
-              path interpretation. AIIO independently implements five bounded mappings and adds
-              evidence lineage, frozen edge semantics, temporal lags, retained
-              states, scenario isolation and release controls.
+              path interpretation. AIIO independently implements five bounded
+              mappings and adds evidence lineage, frozen edge semantics,
+              temporal lags, retained states, scenario isolation and release
+              controls.
             </p>
             <dl className="mt-6 grid grid-cols-3 gap-2">
-              <div className="rounded-lg border border-white/10 bg-white/4 p-3"><dt className="text-[9px] text-[#9fb6bc]">Mapped concepts</dt><dd className="mt-1 font-mono text-xl text-[#8dd2c7]">{pspeLineage.mapping_count}</dd></div>
-              <div className="rounded-lg border border-white/10 bg-white/4 p-3"><dt className="text-[9px] text-[#9fb6bc]">Source receipt</dt><dd className="mt-1 font-mono text-xs text-[#8dd2c7]">hash-locked</dd></div>
-              <div className="rounded-lg border border-white/10 bg-white/4 p-3"><dt className="text-[9px] text-[#9fb6bc]">Method repo</dt><dd className="mt-1 font-mono text-xs text-[#8dd2c7]">commit locked</dd></div>
+              <div className="rounded-lg border border-line bg-workspace p-3">
+                <dt className="text-[9px] text-subtle">Mapped concepts</dt>
+                <dd className="mt-1 font-mono text-xl text-brand">
+                  {pspeLineage.mapping_count}
+                </dd>
+              </div>
+              <div className="rounded-lg border border-line bg-workspace p-3">
+                <dt className="text-[9px] text-subtle">Source receipt</dt>
+                <dd className="mt-1 font-mono text-xs text-brand">
+                  hash-locked
+                </dd>
+              </div>
+              <div className="rounded-lg border border-line bg-workspace p-3">
+                <dt className="text-[9px] text-subtle">Method repo</dt>
+                <dd className="mt-1 font-mono text-xs text-brand">
+                  commit locked
+                </dd>
+              </div>
             </dl>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -232,21 +274,21 @@ export default function MethodsPage() {
               'Bayesian, continuous-time ODE, curvature and other later PSPE curriculum layers are not claimed as implemented.',
             ].map((item) => (
               <div
-                className="flex gap-3 rounded-lg border border-white/10 bg-white/4 p-4 text-sm leading-5 text-[#d6e1e4]"
+                className="flex gap-3 rounded-lg border border-line bg-workspace p-4 text-sm leading-5 text-subtle"
                 key={item}
               >
-                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#77c3b7]" />
+                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand" />
                 {item}
               </div>
             ))}
           </div>
         </div>
       </section>
-      <section className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
+      <section className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8 lg:py-8">
         <div className="grid gap-8 lg:grid-cols-2">
           <div>
             <div className="flex items-center gap-2">
-              <Layers3 className="size-4 text-[#28776e]" />
+              <Layers3 className="size-4 text-brand" />
               <h2 className="text-xl font-medium">Epistemic contract</h2>
             </div>
             <div className="mt-5 space-y-3">
@@ -263,31 +305,31 @@ export default function MethodsPage() {
                 ],
               ].map(([status, text]) => (
                 <div
-                  className="flex items-start gap-3 rounded-lg border border-[#d5ddd8] bg-[#fbfaf5] p-4"
+                  className="flex items-start gap-3 rounded-lg border border-line bg-surface p-4"
                   key={status}
                 >
                   <EvidencePill status={status} />
-                  <p className="text-sm text-[#647570]">{text}</p>
+                  <p className="text-sm text-subtle">{text}</p>
                 </div>
               ))}
             </div>
           </div>
-          <div className="rounded-xl border border-[#e0b18b] bg-[#fff1e5] p-6">
-            <div className="flex items-center gap-2 text-[#94471f]">
+          <div className="rounded-lg border border-caution/30 bg-workspace p-6">
+            <div className="flex items-center gap-2 text-caution">
               <ShieldCheck className="size-5" />
               <h2 className="text-xl font-medium">Current model limitations</h2>
             </div>
-            <p className="mt-3 text-sm leading-6 text-[#805843]">
+            <p className="mt-3 text-sm leading-6 text-caution">
               Scenario and evidence-screen boundaries are published together
               here; none is a forecast.
             </p>
             <ul className="mt-5 space-y-3">
-              {limitations.map((item) => (
+              {[...new Set(limitations)].map((item) => (
                 <li
-                  className="flex gap-3 text-sm leading-6 text-[#805843]"
+                  className="flex gap-3 text-sm leading-6 text-caution"
                   key={item}
                 >
-                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-[#c06b3c]" />
+                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-caution" />
                   {item}
                 </li>
               ))}
@@ -296,6 +338,6 @@ export default function MethodsPage() {
         </div>
       </section>
       <SiteFooter />
-    </main>
+    </ResearchShell>
   );
 }

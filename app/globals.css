@@ -5,6 +5,17 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-workspace: var(--aiio-paper);
+  --color-surface: var(--aiio-white);
+  --color-ink: var(--aiio-ink);
+  --color-subtle: var(--aiio-body);
+  --color-line: var(--aiio-hairline);
+  --color-brand: var(--aiio-teal);
+  --color-brand-soft: var(--aiio-teal-wash);
+  --color-caution: var(--aiio-amber);
+  --color-caution-soft: var(--aiio-amber-wash);
+  --color-rail: var(--aiio-midnight);
+  --color-rail-active: var(--aiio-midnight-raised);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -49,46 +60,46 @@
 }
 
 :root {
-  --aiio-paper: #f7f6f1;
-  --aiio-paper-raised: #fbfaf5;
+  --aiio-paper: #f4f6f8;
+  --aiio-paper-raised: #ffffff;
   --aiio-white: #ffffff;
-  --aiio-hairline: #d8dcd7;
-  --aiio-ink: #0d2b36;
-  --aiio-body: #536764;
-  --aiio-teal: #145f59;
-  --aiio-teal-wash: #dceee8;
+  --aiio-hairline: #dde4e9;
+  --aiio-ink: #142c3c;
+  --aiio-body: #586b78;
+  --aiio-teal: #086d64;
+  --aiio-teal-wash: #e9f4f0;
   --aiio-cyan: #57c6c0;
-  --aiio-steel: #6b8798;
-  --aiio-amber: #d66b35;
-  --aiio-amber-wash: #fff0e3;
-  --aiio-midnight: #081e28;
-  --aiio-midnight-raised: #103542;
+  --aiio-steel: #446c99;
+  --aiio-amber: #8b5916;
+  --aiio-amber-wash: #fbf2e3;
+  --aiio-midnight: #112c3b;
+  --aiio-midnight-raised: #234453;
   --aiio-panel-shadow: 0 1px 2px rgba(13, 43, 54, 0.04),
     0 12px 32px rgba(13, 43, 54, 0.035);
-  --background: oklch(0.978 0.006 92);
-  --foreground: oklch(0.22 0.018 205);
-  --card: oklch(0.995 0.003 92);
-  --card-foreground: oklch(0.26 0.035 213);
-  --popover: oklch(0.99 0.005 96);
-  --popover-foreground: oklch(0.26 0.035 213);
-  --primary: oklch(0.43 0.07 196);
-  --primary-foreground: oklch(0.98 0.005 96);
-  --secondary: oklch(0.91 0.024 171);
-  --secondary-foreground: oklch(0.31 0.055 190);
-  --muted: oklch(0.925 0.011 102);
-  --muted-foreground: oklch(0.48 0.025 187);
-  --accent: oklch(0.91 0.024 171);
-  --accent-foreground: oklch(0.31 0.055 190);
+  --background: var(--aiio-paper);
+  --foreground: var(--aiio-ink);
+  --card: var(--aiio-white);
+  --card-foreground: var(--aiio-ink);
+  --popover: var(--aiio-white);
+  --popover-foreground: var(--aiio-ink);
+  --primary: var(--aiio-teal);
+  --primary-foreground: #ffffff;
+  --secondary: var(--aiio-teal-wash);
+  --secondary-foreground: var(--aiio-teal);
+  --muted: var(--aiio-paper);
+  --muted-foreground: var(--aiio-body);
+  --accent: var(--aiio-teal-wash);
+  --accent-foreground: var(--aiio-teal);
   --destructive: oklch(0.58 0.19 32);
-  --border: oklch(0.885 0.009 100);
-  --input: oklch(0.86 0.012 140);
-  --ring: oklch(0.55 0.07 186);
+  --border: var(--aiio-hairline);
+  --input: #b4c1ca;
+  --ring: var(--aiio-teal);
   --chart-1: oklch(0.55 0.1 186);
   --chart-2: oklch(0.64 0.15 51);
   --chart-3: oklch(0.52 0.07 224);
   --chart-4: oklch(0.72 0.12 85);
   --chart-5: oklch(0.6 0.07 260);
-  --radius: 0.625rem;
+  --radius: 0.5rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -343,12 +354,12 @@
     background: white !important;
   }
 
-  body * {
+  body:has(#executive-decision-brief) * {
     visibility: hidden !important;
   }
 
-  #executive-decision-brief,
-  #executive-decision-brief * {
+  .workspace #executive-decision-brief,
+  .workspace #executive-decision-brief * {
     visibility: visible !important;
   }
 
@@ -413,3 +424,34 @@
   #executive-decision-brief a { overflow-wrap: anywhere; }
   #executive-decision-brief details > * { display: block !important; }
 }
+
+/* Shared executive workspace; research pages adopt these tokens incrementally. */
+.workspace { font-size: 14px; line-height: 1.5; }
+.workspace :where(button, a, input, select, summary):focus-visible {
+  outline: 2px solid var(--aiio-teal); outline-offset: 3px;
+}
+.workspace-rail :where(button, a):focus-visible { outline-color: white; }
+.workspace :where(h1, h2, h3) { letter-spacing: -0.025em; }
+.workspace :where(input[type=number], dd) { font-variant-numeric: tabular-nums; }
+.workspace-rail { scrollbar-width: thin; }
+@media print {
+  .workspace-rail, .workspace-toolbar, .workspace-heading { display: none !important; }
+  .workspace-layout { display: block !important; }
+}
+
+/* Research routes share the executive workspace's scale and interaction rules. */
+.research-content { overflow-wrap: anywhere; }
+.research-content :where(section[id]) { scroll-margin-top: 24px; }
+.research-content :where(table) { font-variant-numeric: tabular-nums; }
+.research-content :where(thead) { background: var(--aiio-paper); }
+.research-content :where(tbody tr:hover) { background: var(--aiio-paper); }
+.research-content :where(input:not([type="range"]), select) { min-height: 40px; }
+.research-content :where(button, a) { text-underline-offset: 3px; }
+@media print {
+  .research-content { color: var(--aiio-ink); }
+}
+
+.research-content :where(.grid) > * { min-width: 0; }
+.research-content :where([id]) { scroll-margin-top: 24px; }
+
+.research-content :where(th, td) { overflow-wrap: normal; }
