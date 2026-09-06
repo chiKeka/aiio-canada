@@ -22,12 +22,13 @@ def main() -> None:
     from aiio.comparison_market_association import run_comparison_market_association
     from aiio.comparison_market_panel import build_comparison_market_panel
     from aiio.digest import build_digest
-from aiio.research_surface import build_research_surface_manifest
-from aiio.source_freshness import build_source_freshness_report
-from aiio.practical_route import build_practical_evidence_route
+    from aiio.research_surface import build_research_surface_manifest
+    from aiio.source_freshness import build_source_freshness_report
+    from aiio.practical_route import build_practical_evidence_route
 
     as_of = args.edition_date.isoformat()
     raw_root = root / "data" / "raw"
+    subprocess.run([sys.executable, str(root / "research/scripts/refresh_construction_evidence.py"), "--root", str(root), "--as-of", as_of], cwd=root, check=True)
 
     edmonton = fetch_edmonton_permit_candidates(raw_root)
     edmonton_raw = Path(edmonton["archive_path"])
@@ -167,6 +168,7 @@ from aiio.practical_route import build_practical_evidence_route
         root / "data/processed/public_project_prospective_snapshot_current.csv",
         root / "data/model-runs/practical_evidence_route_current.json",
     )
+    subprocess.run([sys.executable, str(root / "scripts/build-construction-inputs.py"), "--root", str(root)], cwd=root, check=True)
     surface = build_research_surface_manifest(root, root / "public/data/research-surface.json")
     print(json.dumps({"status": "review_pr_required", "edition_date": as_of, "candidate_counts": {"edmonton": edmonton_report["data_centre_candidate_count"], **{city: reports[city]["data_centre_candidate_count"] for city in reports}}, "comparison_panel_rows": panel_report["row_count"], "research_surface_artifacts": surface["artifact_count"], "automatic_model_change": False}, indent=2, sort_keys=True))
 

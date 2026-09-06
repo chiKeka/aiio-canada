@@ -37,6 +37,12 @@ jobs:
       - name: Test project cashflow and shared inputs
         run: npm run test:planning
 
+      - name: Test construction refresh and briefing
+        run: |
+          npm run construction:publish
+          npm run test:construction-refresh
+          npm run test:briefing
+
       - name: Validate evidence registry
         run: npm run research:validate
 

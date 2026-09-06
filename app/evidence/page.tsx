@@ -1,9 +1,28 @@
-import { Building2, BriefcaseBusiness, Database, ExternalLink, Layers3, ShieldCheck, TrendingUp } from 'lucide-react';
+import {
+  Building2,
+  BriefcaseBusiness,
+  Database,
+  ExternalLink,
+  Layers3,
+  ShieldCheck,
+  TrendingUp,
+} from 'lucide-react';
 
 import { EvidenceExplorer } from '@/components/evidence-explorer';
-import { LabourMarketExplorer, type NationalLabourAvailability, type NationalLabourPressure, type NationalWorkforceStock } from '@/components/labour-market-explorer';
+import {
+  LabourMarketExplorer,
+  type NationalLabourAvailability,
+  type NationalLabourPressure,
+  type NationalWorkforceStock,
+} from '@/components/labour-market-explorer';
 import { RegionalMacroExplorer } from '@/components/regional-macro-explorer';
-import { EvidencePill, PageIntro, SiteFooter, SiteHeader } from '@/components/site-shell';
+import {
+  EvidencePill,
+  PageIntro,
+  SiteFooter,
+  ResearchShell,
+  SectionNavigation,
+} from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
 import informationSectorCapex from '@/data/model-runs/information_sector_construction_capex_screen_v0.1.json';
 import cmaReferenceBaseline from '@/data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json';
@@ -34,45 +53,121 @@ export default function EvidencePage() {
     }
   ).labour_pressure;
   return (
-    <main className="min-h-screen bg-[#f5f3ec] text-[#17343d]">
-      <SiteHeader />
-      <PageIntro eyebrow="Evidence register" title="Inspect the record before interpreting the result." description="Every project, indicator and claim retains its public source, time stamp, geography and evidence status. The current view is Alberta-first and deliberately distinguishes reported fields from research classifications." />
-      <section className="border-b border-[#d4dcd7] bg-[#0c2c38] text-white">
-        <div className="mx-auto grid max-w-[1440px] gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="AI-relevant records" value={String(aiCapexLedger.record_count)} note={`${ledger.core_data_centre_record_count} core · ${ledger.enabling_power_record_count} enabling power`} />
-          <Metric label="Partial known estimates" value={`$${(ledger.known_reported_estimated_cost_cad / 1_000_000_000).toFixed(2)}B`} note={`${ledger.reported_estimated_cost_record_count} of ${aiCapexLedger.record_count} records report a value`} />
-          <Metric label="Construction-stage candidates" value={String(ledger.publisher_construction_stage_candidate_count)} note="Publisher stage only · onset unverified" />
-          <Metric label="Authorizing treatment" value={`${ledger.authorizing_treatment_onset_count} / ${aiCapexLedger.record_count}`} note="No realized onset or regional-period dose" />
+    <ResearchShell>
+      <PageIntro
+        eyebrow="Evidence register"
+        title="Evidence register"
+        description="Every project, indicator and claim retains its public source, time stamp, geography and evidence status. The current view is Alberta-first and deliberately distinguishes reported fields from research classifications."
+      />
+      <SectionNavigation
+        items={[
+          ['projects', 'Projects'],
+          ['labour', 'Labour'],
+          ['regional', 'Regional context'],
+          ['references', 'Cost references'],
+          ['sources', 'Sources'],
+        ]}
+      />
+      <section className="border-b border-line bg-surface text-ink">
+        <div className="mx-auto grid max-w-[1440px] gap-px bg-workspace sm:grid-cols-2 lg:grid-cols-4">
+          <Metric
+            label="AI-relevant records"
+            value={String(aiCapexLedger.record_count)}
+            note={`${ledger.core_data_centre_record_count} core · ${ledger.enabling_power_record_count} enabling power`}
+          />
+          <Metric
+            label="Partial known estimates"
+            value={`$${(ledger.known_reported_estimated_cost_cad / 1_000_000_000).toFixed(2)}B`}
+            note={`${ledger.reported_estimated_cost_record_count} of ${aiCapexLedger.record_count} records report a value`}
+          />
+          <Metric
+            label="Construction-stage candidates"
+            value={String(ledger.publisher_construction_stage_candidate_count)}
+            note="Publisher stage only · onset unverified"
+          />
+          <Metric
+            label="Authorizing treatment"
+            value={`${ledger.authorizing_treatment_onset_count} / ${aiCapexLedger.record_count}`}
+            note="No realized onset or regional-period dose"
+          />
         </div>
       </section>
-      <section className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
-        <div className="mb-8 grid gap-4 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-5 md:grid-cols-[auto_1fr]">
-          <ShieldCheck className="mt-0.5 size-5 text-[#a3532b]" />
-          <div><p className="font-medium text-[#713b25]">Announcement pipeline, not committed investment</p><p className="mt-1 text-sm leading-6 text-[#825a47]">{pipeline.warning} The formal ledger keeps the $49.01B of known core estimates separate from $6.40B of enabling-power estimates. Missing values are not zero, no stage probabilities are applied, and the $50B scenario remains a separate counterfactual.</p></div>
+      <section
+        id="projects"
+        className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8 lg:py-8"
+      >
+        <div className="mb-8 grid gap-4 rounded-lg border border-caution/30 bg-workspace p-5 md:grid-cols-[auto_1fr]">
+          <ShieldCheck className="mt-0.5 size-5 text-caution" />
+          <div>
+            <p className="font-medium text-caution">
+              Announcement pipeline, not committed investment
+            </p>
+            <p className="mt-1 text-sm leading-6 text-caution">
+              {pipeline.warning} The formal ledger keeps the $49.01B of known
+              core estimates separate from $6.40B of enabling-power estimates.
+              Missing values are not zero, no stage probabilities are applied,
+              and the $50B scenario remains a separate counterfactual.
+            </p>
+          </div>
         </div>
         <EvidenceExplorer projects={releaseData.baseline.projects} />
       </section>
-      {labourCanada ? <LabourMarketExplorer labour={labourCanada} pressure={labourPressure} workforce={workforceCanada} /> : labour ? <LabourAvailabilityPanel labour={labour} /> : null}
-      <RegionalMacroExplorer />
+      <div id="labour">
+        {labourCanada ? (
+          <LabourMarketExplorer
+            labour={labourCanada}
+            pressure={labourPressure}
+            workforce={workforceCanada}
+          />
+        ) : labour ? (
+          <LabourAvailabilityPanel labour={labour} />
+        ) : null}
+      </div>
+      <div id="regional">
+        <RegionalMacroExplorer />
+      </div>
       <InformationSectorCapexPanel />
-      <CmaReferenceCostPanel />
+      <div id="references">
+        <CmaReferenceCostPanel />
+      </div>
       <ProvinceLinkedBackcastPanel />
-      <section className="border-t border-[#d5ddd8] bg-[#e9ebe5]">
-        <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
-          <div className="mb-6 flex items-center gap-2"><Database className="size-4 text-[#24746c]" /><h2 className="text-xl font-medium">Registered public sources</h2></div>
+      <section id="sources" className="border-t border-line bg-workspace">
+        <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8">
+          <div className="mb-6 flex items-center gap-2">
+            <Database className="size-4 text-brand" />
+            <h2 className="text-xl font-medium">Registered public sources</h2>
+          </div>
           <div className="grid gap-3 md:grid-cols-2">
             {releaseData.sources.map((source) => (
-              <article className="rounded-xl border border-[#d2dad5] bg-[#f8f7f1] p-4" key={source.source_id}>
-                <div className="flex items-start justify-between gap-3"><EvidencePill status={source.evidence_status} /><span className="font-mono text-[10px] text-[#52645f]">as of {source.as_of_date}</span></div>
-                <h3 className="mt-3 text-sm font-medium">{source.title}</h3><p className="mt-1 text-xs text-[#52645f]">{source.publisher} · {source.domain.replaceAll('_', ' ')}</p>
-                <a className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-[#2b716a] hover:underline" href={source.canonical_url} rel="noreferrer" target="_blank">Open official source <ExternalLink className="size-3" /></a>
+              <article
+                className="rounded-lg border border-line bg-surface p-4"
+                key={source.source_id}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <EvidencePill status={source.evidence_status} />
+                  <span className="font-mono text-[10px] text-subtle">
+                    as of {source.as_of_date}
+                  </span>
+                </div>
+                <h3 className="mt-3 text-sm font-medium">{source.title}</h3>
+                <p className="mt-1 text-xs text-subtle">
+                  {source.publisher} · {source.domain.replaceAll('_', ' ')}
+                </p>
+                <a
+                  className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+                  href={source.canonical_url}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Open official source <ExternalLink className="size-3" />
+                </a>
               </article>
             ))}
           </div>
         </div>
       </section>
       <SiteFooter />
-    </main>
+    </ResearchShell>
   );
 }
 
@@ -81,9 +176,10 @@ function ProvinceLinkedBackcastPanel() {
     const results = provinceLinkedBaseline.reference_class_results.filter(
       (item) => item.geography_id === geographyId,
     );
-    const diagnostics = provinceLinkedBaseline.backcast_method.diagnostics.filter(
-      (item) => item.province_id === geographyId,
-    );
+    const diagnostics =
+      provinceLinkedBaseline.backcast_method.diagnostics.filter(
+        (item) => item.province_id === geographyId,
+      );
     let passedHorizons = 0;
     for (const result of results) {
       const horizons = result.horizons as readonly { status: string }[];
@@ -105,27 +201,49 @@ function ProvinceLinkedBackcastPanel() {
     };
   });
   return (
-    <section className="border-t border-[#d5ddd8] bg-[#f3efe7]">
-      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
-        <div className="flex items-center gap-2 text-[#8a5b38]">
+    <section className="border-t border-line bg-workspace">
+      <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8">
+        <div className="flex items-center gap-2 text-caution">
           <Layers3 className="size-4" />
-          <h2 className="text-xl font-medium">Province-linked historical reference bridge</h2>
+          <h2 className="text-xl font-medium">
+            Province-linked historical reference bridge
+          </h2>
         </div>
-        <p className="mt-3 max-w-4xl text-sm leading-6 text-[#665f55]">
-          Official provincial BCPI observations are preserved from 2017 onward. Earlier institutional, school and office histories are inferred by scaling Montréal, Toronto or Vancouver to the first official provincial quarter. The bridge extends model-validation history without presenting CMA values as official provincial observations.
+        <p className="mt-3 max-w-4xl text-sm leading-6 text-subtle">
+          Official provincial BCPI observations are preserved from 2017 onward.
+          Earlier institutional, school and office histories are inferred by
+          scaling Montréal, Toronto or Vancouver to the first official
+          provincial quarter. The bridge extends model-validation history
+          without presenting CMA values as official provincial observations.
         </p>
         <div className="mt-6 grid gap-3 md:grid-cols-3">
           {provinces.map((item) => (
-            <article className="rounded-xl border border-[#d8cbbd] bg-[#fffdfa] p-5" key={item.geographyId}>
-              <p className="text-xs font-medium text-[#665f55]">{item.geographyLabel}</p>
-              <p className="mt-3 font-mono text-2xl font-semibold text-[#17343d]">{item.passedHorizons} / 20</p>
-              <p className="mt-1 text-xs leading-5 text-[#71695f]">internally gate-passing horizons · {item.inferredObservations} pre-2017 inferred observations</p>
-              <p className="mt-4 border-t border-[#e5ddd3] pt-3 font-mono text-[10px] uppercase tracking-[0.08em] text-[#76583f]">max overlap MAPE {item.maximumOverlapMape.toFixed(2)}%</p>
+            <article
+              className="rounded-lg border border-line bg-surface p-5"
+              key={item.geographyId}
+            >
+              <p className="text-xs font-medium text-subtle">
+                {item.geographyLabel}
+              </p>
+              <p className="mt-3 font-mono text-2xl font-semibold text-ink">
+                {item.passedHorizons} / 20
+              </p>
+              <p className="mt-1 text-xs leading-5 text-subtle">
+                internally gate-passing horizons · {item.inferredObservations}{' '}
+                pre-2017 inferred observations
+              </p>
+              <p className="mt-4 border-t border-line pt-3 font-mono text-[10px] uppercase tracking-[0.08em] text-caution">
+                max overlap MAPE {item.maximumOverlapMape.toFixed(2)}%
+              </p>
             </article>
           ))}
         </div>
-        <div className="mt-5 rounded-xl border border-[#d8a47d] bg-[#fff0e4] p-4 text-sm leading-6 text-[#7b5138]">
-          Research display only. Nine horizons pass the unchanged internal forecast gates, all in British Columbia-linked reference classes. Ontario and Quebec remain gate-failed, the municipal-operations series remains too short, and no result is authorized for public projection, project-cost translation or AI attribution.
+        <div className="mt-5 rounded-lg border border-caution/30 bg-workspace p-4 text-sm leading-6 text-caution">
+          Research display only. Nine horizons pass the unchanged internal
+          forecast gates, all in British Columbia-linked reference classes.
+          Ontario and Quebec remain gate-failed, the municipal-operations series
+          remains too short, and no result is authorized for public projection,
+          project-cost translation or AI attribution.
         </div>
       </div>
     </section>
@@ -154,15 +272,18 @@ function CmaReferenceCostPanel() {
         .sort()[0],
     };
   });
-  const statusCounts = cmaReferenceBaseline.publication_summary.horizon_status_counts;
+  const statusCounts =
+    cmaReferenceBaseline.publication_summary.horizon_status_counts;
   return (
-    <section className="border-t border-[#d5ddd8] bg-[#eef1ec]">
-      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
-        <div className="flex items-center gap-2 text-[#24746c]">
+    <section className="border-t border-line bg-workspace">
+      <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8">
+        <div className="flex items-center gap-2 text-brand">
           <Building2 className="size-4" />
-          <h2 className="text-xl font-medium">City-market reference-cost validation</h2>
+          <h2 className="text-xl font-medium">
+            City-market reference-cost validation
+          </h2>
         </div>
-        <p className="mt-3 max-w-4xl text-sm leading-6 text-[#52645f]">
+        <p className="mt-3 max-w-4xl text-sm leading-6 text-subtle">
           The same locked BCPI validation protocol used for Alberta now runs on
           long Vancouver, Toronto and Montréal histories. These are CMA market
           references, not provincial forecasts or AI-attributable effects.
@@ -170,21 +291,21 @@ function CmaReferenceCostPanel() {
         <div className="mt-6 grid gap-3 md:grid-cols-3">
           {geographies.map((item) => (
             <article
-              className="rounded-xl border border-[#d2dad5] bg-white p-5"
+              className="rounded-lg border border-line bg-white p-5"
               key={item.geographyId}
             >
-              <p className="text-xs text-[#667873]">{item.geographyLabel}</p>
-              <p className="mt-2 font-mono text-2xl font-semibold text-[#17343d]">
+              <p className="text-xs text-subtle">{item.geographyLabel}</p>
+              <p className="mt-2 font-mono text-2xl font-semibold text-ink">
                 {item.passedHorizons} / 20
               </p>
-              <p className="mt-1 text-xs leading-5 text-[#667873]">
+              <p className="mt-1 text-xs leading-5 text-subtle">
                 internally gate-passing horizons · {item.seriesCount} reference
                 classes · long histories begin {item.firstLongHistoryQuarter}
               </p>
             </article>
           ))}
         </div>
-        <div className="mt-5 grid gap-3 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-4 text-sm leading-6 text-[#825a47] sm:grid-cols-[auto_1fr]">
+        <div className="mt-5 grid gap-3 rounded-lg border border-caution/30 bg-workspace p-4 text-sm leading-6 text-caution sm:grid-cols-[auto_1fr]">
           <span className="font-mono font-semibold">WITHHELD</span>
           <span>
             {statusCounts.gate_passed} horizons pass internally,{' '}
@@ -199,19 +320,23 @@ function CmaReferenceCostPanel() {
 }
 
 function InformationSectorCapexPanel() {
-  const selected = ['PR_48', 'PR_59', 'PR_35', 'PR_24'].map((geographyId) =>
-    informationSectorCapex.geography_summaries.find(
-      (item) => item.geography_id === geographyId,
-    ),
-  ).filter((item): item is NonNullable<typeof item> => Boolean(item));
+  const selected = ['PR_48', 'PR_59', 'PR_35', 'PR_24']
+    .map((geographyId) =>
+      informationSectorCapex.geography_summaries.find(
+        (item) => item.geography_id === geographyId,
+      ),
+    )
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
   return (
-    <section className="border-t border-[#d5ddd8] bg-[#fbfaf5]">
-      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
-        <div className="flex items-center gap-2 text-[#24746c]">
+    <section className="border-t border-line bg-surface">
+      <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8">
+        <div className="flex items-center gap-2 text-brand">
           <TrendingUp className="size-4" />
-          <h2 className="text-xl font-medium">Broad information-sector construction context</h2>
+          <h2 className="text-xl font-medium">
+            Broad information-sector construction context
+          </h2>
         </div>
-        <p className="mt-3 max-w-4xl text-sm leading-6 text-[#52645f]">
+        <p className="mt-3 max-w-4xl text-sm leading-6 text-subtle">
           Statistics Canada table 34-10-0035-01 · latest published actual or
           revised year by province. These values cover all NAICS 51 information
           and cultural industries—not data centres or AI construction alone.
@@ -219,25 +344,26 @@ function InformationSectorCapexPanel() {
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {selected.map((item) => (
             <article
-              className="rounded-xl border border-[#d2dad5] bg-white p-5"
+              className="rounded-lg border border-line bg-white p-5"
               key={item.geography_id}
             >
-              <p className="text-xs text-[#667873]">{item.geography_label}</p>
-              <p className="mt-2 font-mono text-2xl font-semibold text-[#155d58]">
+              <p className="text-xs text-subtle">{item.geography_label}</p>
+              <p className="mt-2 font-mono text-2xl font-semibold text-brand">
                 {formatCompactCad(item.latest_actual_or_revised_value_cad)}
               </p>
-              <p className="mt-1 text-xs text-[#667873]">
+              <p className="mt-1 text-xs text-subtle">
                 {item.latest_actual_or_revised_year} actual/revised ·{' '}
-                {item.withheld_or_unavailable_count} suppressed or unavailable years
+                {item.withheld_or_unavailable_count} suppressed or unavailable
+                years
               </p>
             </article>
           ))}
         </div>
-        <div className="mt-5 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-4 text-sm leading-6 text-[#825a47]">
+        <div className="mt-5 rounded-lg border border-caution/30 bg-workspace p-4 text-sm leading-6 text-caution">
           Descriptive proxy only. NAICS 518210 is not separately published in
-          this provincial table, the series is annual rather than quarterly,
-          and it cannot define AI treatment onset or dose. AI-attributable cost
-          and schedule effects remain null.
+          this provincial table, the series is annual rather than quarterly, and
+          it cannot define AI treatment onset or dose. AI-attributable cost and
+          schedule effects remain null.
         </div>
       </div>
     </section>
@@ -269,66 +395,127 @@ type LabourAvailability = {
 
 function LabourAvailabilityPanel({ labour }: { labour: LabourAvailability }) {
   const occupations = Array.from(
-    labour.observations.reduce((groups, observation) => {
-      const existing = groups.get(observation.noc_code) ?? {
-        nocCode: observation.noc_code,
-        occupation: observation.occupation_label,
-        tradeNode: observation.trade_node_id,
-        vacancies: null as LabourObservation | null,
-        wage: null as LabourObservation | null,
-      };
-      if (observation.statistic === 'Job vacancies') existing.vacancies = observation;
-      if (observation.statistic === 'Average offered hourly wage') existing.wage = observation;
-      groups.set(observation.noc_code, existing);
-      return groups;
-    }, new Map<string, { nocCode: string; occupation: string; tradeNode: string; vacancies: LabourObservation | null; wage: LabourObservation | null }>()).values(),
+    labour.observations
+      .reduce((groups, observation) => {
+        const existing = groups.get(observation.noc_code) ?? {
+          nocCode: observation.noc_code,
+          occupation: observation.occupation_label,
+          tradeNode: observation.trade_node_id,
+          vacancies: null as LabourObservation | null,
+          wage: null as LabourObservation | null,
+        };
+        if (observation.statistic === 'Job vacancies')
+          existing.vacancies = observation;
+        if (observation.statistic === 'Average offered hourly wage')
+          existing.wage = observation;
+        groups.set(observation.noc_code, existing);
+        return groups;
+      }, new Map<string, { nocCode: string; occupation: string; tradeNode: string; vacancies: LabourObservation | null; wage: LabourObservation | null }>())
+      .values(),
   );
 
   return (
-    <section className="border-t border-[#d5ddd8] bg-white">
-      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12">
+    <section className="border-t border-line bg-white">
+      <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-8">
         <div className="mb-3 flex items-center gap-2">
-          <BriefcaseBusiness className="size-4 text-[#24746c]" />
+          <BriefcaseBusiness className="size-4 text-brand" />
           <h2 className="text-xl font-medium">Alberta trade labour snapshot</h2>
         </div>
-        <p className="max-w-4xl text-sm leading-6 text-[#52645f]">
-          Statistics Canada table 14-10-0444-01 · quarter ending {labour.period_end}. Values are observed survey estimates; quality codes are retained.
+        <p className="max-w-4xl text-sm leading-6 text-subtle">
+          Statistics Canada table 14-10-0444-01 · quarter ending{' '}
+          {labour.period_end}. Values are observed survey estimates; quality
+          codes are retained.
         </p>
-        <div className="mt-6 overflow-x-auto rounded-xl border border-[#d2dad5]">
+        <div className="mt-6 overflow-x-auto rounded-lg border border-line">
           <table className="w-full min-w-[820px] border-collapse text-left text-sm">
-            <caption className="sr-only">Alberta trade labour observations</caption>
-            <thead className="bg-[#e8eeea] text-xs uppercase tracking-wide text-[#48635d]">
-              <tr><th className="px-4 py-3" scope="col">Model trade</th><th className="px-4 py-3" scope="col">Occupation</th><th className="px-4 py-3" scope="col">Vacancies</th><th className="px-4 py-3" scope="col">Offered wage</th><th className="px-4 py-3" scope="col">StatCan quality</th></tr>
+            <caption className="sr-only">
+              Alberta trade labour observations
+            </caption>
+            <thead className="bg-workspace text-xs uppercase tracking-wide text-brand">
+              <tr>
+                <th className="px-4 py-3" scope="col">
+                  Model trade
+                </th>
+                <th className="px-4 py-3" scope="col">
+                  Occupation
+                </th>
+                <th className="px-4 py-3" scope="col">
+                  Vacancies
+                </th>
+                <th className="px-4 py-3" scope="col">
+                  Offered wage
+                </th>
+                <th className="px-4 py-3" scope="col">
+                  StatCan quality
+                </th>
+              </tr>
             </thead>
-            <tbody className="divide-y divide-[#dce3de] bg-[#fbfaf5]">
+            <tbody className="divide-y divide-line bg-surface">
               {occupations.map((item) => (
                 <tr key={item.nocCode}>
-                  <td className="px-4 py-3 font-mono text-xs text-[#1f665f]">{item.tradeNode.replace('trade_', '').replaceAll('_', ' ')}</td>
-                  <td className="px-4 py-3"><span className="font-medium">{item.occupation}</span><span className="ml-2 font-mono text-xs text-[#566761]">NOC {item.nocCode}</span></td>
-                  <td className="px-4 py-3 font-mono">{formatLabourValue(item.vacancies, 'vacancies')}</td>
-                  <td className="px-4 py-3 font-mono">{formatLabourValue(item.wage, 'wage')}</td>
-                  <td className="px-4 py-3 text-xs text-[#52645f]">{qualitySummary(item.vacancies, item.wage)}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-brand">
+                    {item.tradeNode.replace('trade_', '').replaceAll('_', ' ')}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="font-medium">{item.occupation}</span>
+                    <span className="ml-2 font-mono text-xs text-subtle">
+                      NOC {item.nocCode}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 font-mono">
+                    {formatLabourValue(item.vacancies, 'vacancies')}
+                  </td>
+                  <td className="px-4 py-3 font-mono">
+                    {formatLabourValue(item.wage, 'wage')}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-subtle">
+                    {qualitySummary(item.vacancies, item.wage)}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="mt-4 rounded-xl border border-[#e1b48e] bg-[#fff3e8] p-4 text-sm leading-6 text-[#825a47]">{labour.warning}</div>
+        <div className="mt-4 rounded-lg border border-caution/30 bg-workspace p-4 text-sm leading-6 text-caution">
+          {labour.warning}
+        </div>
       </div>
     </section>
   );
 }
 
-function formatLabourValue(observation: LabourObservation | null, kind: 'vacancies' | 'wage') {
+function formatLabourValue(
+  observation: LabourObservation | null,
+  kind: 'vacancies' | 'wage',
+) {
   if (!observation || observation.value === null) return 'Not published';
-  return kind === 'wage' ? `$${observation.value.toFixed(2)}/hr` : Math.round(observation.value).toLocaleString('en-CA');
+  return kind === 'wage'
+    ? `$${observation.value.toFixed(2)}/hr`
+    : Math.round(observation.value).toLocaleString('en-CA');
 }
 
 function qualitySummary(...observations: Array<LabourObservation | null>) {
-  const statuses = observations.flatMap((observation) => observation?.quality_flags ?? []).filter((flag) => flag.startsWith('status:')).map((flag) => flag.replace('status:', ''));
+  const statuses = observations
+    .flatMap((observation) => observation?.quality_flags ?? [])
+    .filter((flag) => flag.startsWith('status:'))
+    .map((flag) => flag.replace('status:', ''));
   return statuses.length ? `Codes ${statuses.join(' / ')}` : 'No code reported';
 }
 
-function Metric({ label, value, note }: { label: string; value: string; note: string }) {
-  return <div className="bg-[#0c2c38] p-6 sm:p-8"><p className="font-mono text-3xl font-semibold text-[#b9e5dc]">{value}</p><p className="mt-2 text-sm font-medium">{label}</p><p className="mt-1 text-xs text-[#93aab1]">{note}</p></div>;
+function Metric({
+  label,
+  value,
+  note,
+}: {
+  label: string;
+  value: string;
+  note: string;
+}) {
+  return (
+    <div className="bg-surface p-6 sm:p-8">
+      <p className="font-mono text-2xl font-semibold text-subtle">{value}</p>
+      <p className="mt-2 text-sm font-medium">{label}</p>
+      <p className="mt-1 text-xs text-subtle">{note}</p>
+    </div>
+  );
 }

@@ -2,10 +2,20 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu } from 'lucide-react';
 import { useState } from 'react';
-
-import { ModeToggle } from '@/components/mode-toggle';
+import {
+  Activity,
+  BookOpen,
+  Database,
+  Download,
+  FileText,
+  FlaskConical,
+  Gauge,
+  LayoutDashboard,
+  Layers3,
+  Menu,
+  ShieldCheck,
+} from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -15,55 +25,58 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 
-const primaryLinks = [
-  {
-    href: '/evidence',
-    label: 'Evidence',
-    note: 'Source register and public evidence',
-  },
-  {
-    href: '/pressure',
-    label: 'Pressure',
-    note: 'Labour and material market screens',
-  },
-  {
-    href: '/scenario',
-    label: 'Scenario lab',
-    note: 'Bounded Alberta counterfactual',
-  },
-  {
-    href: '/methods',
-    label: 'Methods',
-    note: 'Model, definitions and limitations',
-  },
-  { href: '/digest', label: 'Digest', note: 'Living weekly evidence record' },
-] as const;
+const navigation = [
+  { href: '/', label: 'Executive dashboard', icon: LayoutDashboard },
+  { href: '/research', label: 'Research observatory', icon: FlaskConical },
+  { href: '/evidence', label: 'Evidence register', icon: Database },
+  { href: '/pressure', label: 'Market pressure', icon: Activity },
+  { href: '/scenario', label: 'Scenario lab', icon: Gauge },
+  { href: '/construction', label: 'Construction demand', icon: Layers3 },
+  { href: '/methods', label: 'Methods', icon: BookOpen },
+  { href: '/digest', label: 'Evidence digest', icon: FileText },
+  { href: '/downloads', label: 'Downloads', icon: Download },
+  { href: '/status', label: 'System status', icon: ShieldCheck },
+];
+
+export function ResearchNavigation() {
+  const pathname = usePathname();
+  return (
+    <nav
+      aria-label="Research navigation"
+      className="flex gap-1 overflow-x-auto lg:flex-col"
+    >
+      {navigation.map(({ href, label, icon: Icon }) => (
+        <Link
+          aria-current={pathname === href ? 'page' : undefined}
+          className={`flex shrink-0 items-center gap-3 rounded-md px-3 py-3 text-[13px] ${pathname === href ? 'bg-rail-active font-medium text-white' : 'text-white/75 hover:bg-rail-active hover:text-white'}`}
+          href={href}
+          key={href}
+        >
+          <Icon className="size-4 shrink-0" />
+          {label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
 
 export function DesktopNavigation() {
   const pathname = usePathname();
-
   return (
     <nav
-      className="hidden items-center gap-0.5 rounded-full border border-[#e1e2dd] bg-[#f2f2ed] p-1 text-xs font-medium xl:flex"
       aria-label="Primary navigation"
+      className="hidden gap-1 text-xs xl:flex"
     >
-      {primaryLinks.map((link) => {
-        const active = pathname === link.href;
-        return (
-          <Link
-            aria-current={active ? 'page' : undefined}
-            className={`rounded-full px-3 py-1.5 transition-all ${
-              active
-                ? 'bg-white text-[#174e4b] shadow-[0_1px_2px_rgba(13,43,54,0.08)]'
-                : 'text-[#62716e] hover:bg-white/70 hover:text-[#143f42]'
-            }`}
-            href={link.href}
-            key={link.href}
-          >
-            {link.label}
-          </Link>
-        );
-      })}
+      {navigation.slice(1, 6).map(({ href, label }) => (
+        <Link
+          aria-current={pathname === href ? 'page' : undefined}
+          className={`rounded-md px-3 py-2 ${pathname === href ? 'bg-brand-soft text-brand' : 'text-subtle hover:bg-workspace'}`}
+          href={href}
+          key={href}
+        >
+          {label}
+        </Link>
+      ))}
     </nav>
   );
 }
@@ -71,73 +84,44 @@ export function DesktopNavigation() {
 export function MobileNavigation() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-
   return (
-    <Sheet onOpenChange={setOpen} open={open}>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         aria-label="Open site navigation"
-        className="inline-flex size-10 items-center justify-center rounded-full border border-[#d5d9d4] bg-white text-[#294a49] transition-colors hover:border-[#9ebeb6] hover:bg-[#f3f8f6] xl:hidden"
+        className="inline-flex size-10 items-center justify-center rounded-md border border-line bg-surface text-ink"
       >
         <Menu className="size-4" />
       </SheetTrigger>
       <SheetContent
-        className="border-[#d8dcd7] bg-[#f7f6f1] p-0 text-[#17343d]"
         side="right"
+        className="gap-0 border-line bg-surface text-ink"
       >
-        <SheetHeader className="border-b border-[#d8dcd7] px-6 py-6">
-          <SheetTitle className="text-xl font-medium tracking-[-0.025em] text-[#0d2b36]">
-            AIIO Canada
-          </SheetTitle>
-          <SheetDescription className="text-xs leading-5 text-[#5b6d69]">
-            Move between the executive workspace and the public research record.
+        <SheetHeader className="border-b border-line px-6 py-6 pr-12">
+          <SheetTitle>AIIO Canada</SheetTitle>
+          <SheetDescription>
+            Decision tools and the public research record.
           </SheetDescription>
         </SheetHeader>
-        <div className="px-6 pt-5">
-          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.13em] text-[#28766d]">
-            View mode
-          </p>
-          <div className="mt-3">
-            <ModeToggle />
-          </div>
-        </div>
         <nav
-          className="grid gap-1 px-3 py-5"
           aria-label="Mobile primary navigation"
+          className="min-h-0 flex-1 space-y-1 overflow-y-auto p-3"
         >
-          {primaryLinks.map((link) => {
-            const active = pathname === link.href;
-            return (
-              <Link
-                aria-current={active ? 'page' : undefined}
-                className={`rounded-[10px] border px-3 py-3 transition-colors ${
-                  active
-                    ? 'border-[#9fc8bf] bg-[#e1f1ec] text-[#154f4a]'
-                    : 'border-transparent text-[#536864] hover:border-[#d8dcd7] hover:bg-white'
-                }`}
-                href={link.href}
-                key={link.href}
-                onClick={() => setOpen(false)}
-              >
-                <span className="block text-sm font-medium text-[#17343d]">
-                  {link.label}
-                </span>
-                <span className="mt-0.5 block text-[10px] leading-4">
-                  {link.note}
-                </span>
-              </Link>
-            );
-          })}
-          <Link
-            className="mt-3 rounded-[10px] border border-[#d8dcd7] bg-white px-3 py-3 text-sm font-medium text-[#17343d]"
-            href="/downloads"
-            onClick={() => setOpen(false)}
-          >
-            Downloads and release files
-          </Link>
+          {navigation.map(({ href, label, icon: Icon }) => (
+            <Link
+              aria-current={pathname === href ? 'page' : undefined}
+              className={`flex items-center gap-3 rounded-md px-3 py-3 text-sm ${pathname === href ? 'bg-brand-soft font-medium text-brand' : 'text-subtle hover:bg-workspace'}`}
+              href={href}
+              key={href}
+              onClick={() => setOpen(false)}
+            >
+              <Icon className="size-4 shrink-0" />
+              {label}
+            </Link>
+          ))}
         </nav>
-        <div className="mt-auto border-t border-[#d8dcd7] px-6 py-5 font-mono text-[9px] uppercase tracking-[0.1em] text-[#61736f]">
+        <p className="border-t border-line p-5 text-xs leading-5 text-subtle">
           Observed ≠ inferred ≠ assumed ≠ scenario
-        </div>
+        </p>
       </SheetContent>
     </Sheet>
   );
