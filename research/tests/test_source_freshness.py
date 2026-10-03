@@ -23,10 +23,14 @@ class SourceFreshnessTests(unittest.TestCase):
     def test_operational_receipts_reproduce_without_advancing_frozen_release(self):
         committed = json.loads((ROOT / "public/data/source-receipts.json").read_text())
         self.assertEqual(build_source_freshness_report(ROOT / "data/registry/sources.json", committed["as_of_date"]), committed)
-        self.assertEqual(json.loads((ROOT / "public/data/source-freshness.json").read_text())["as_of_date"], "2026-09-03")
-        alberta = next(row for row in committed["sources"] if row["source_id"] == "ALBERTA_MAJOR_PROJECTS")
-        self.assertEqual(alberta["last_success"], "2026-10-03")
-        self.assertIsNone(alberta["observation_date"])
+        frozen = json.loads((ROOT / "public/data/source-freshness.json").read_text())
+        self.assertLessEqual(frozen["as_of_date"], committed["as_of_date"])
+        self.assertEqual(build_source_freshness_report(ROOT / "data/registry/sources.json", frozen["as_of_date"]), frozen)
+        self.assertEqual(committed["source_count"], len(committed["sources"]))
+        for item in committed["sources"]:
+            if item["last_success"]:
+                self.assertEqual(item["verification_basis"], "successful_retrieval_receipt")
+                self.assertLessEqual(item["last_success"], committed["as_of_date"])
 
     def test_stale_daily_source_degrades_report(self):
         with tempfile.TemporaryDirectory() as directory:

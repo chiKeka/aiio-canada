@@ -67,6 +67,7 @@ jobs:
           path: |
             data/model-runs/construction-source-refresh.json
             data/model-runs/weekly-source-refresh.json
+            public/data/source-receipts.json
           if-no-files-found: ignore
 
       - name: Verify refreshed evidence and application
