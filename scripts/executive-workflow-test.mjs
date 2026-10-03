@@ -129,6 +129,7 @@ try {
     await brief.evaluate((element) => getComputedStyle(element).visibility),
     'visible',
   );
+  await page.waitForFunction(() => [...document.querySelectorAll('button')].filter(e => e.textContent === 'Download snapshot').every(e => getComputedStyle(e).visibility === 'hidden'));
   assert.equal(
     await page
       .getByRole('button', {
