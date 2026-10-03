@@ -461,5 +461,5 @@
 }
 
 @media print {
-  .workspace .executive-export-controls, .workspace .executive-export-controls * { visibility: hidden !important; }
+  .executive-export-controls, .executive-export-controls * { visibility: hidden !important; }
 }
