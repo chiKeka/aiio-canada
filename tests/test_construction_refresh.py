@@ -65,7 +65,7 @@ class ConstructionRefreshTests(unittest.TestCase):
     def test_publication_rebuilds_revision_and_preserves_observation_dates(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
-            paths=['data/processed/alberta_ai_projects.csv','docs/research/construction-benchmark-register.json','docs/research/construction-pressure-requirements.md','docs/research/alberta-delivery-guidance.json','lib/construction-model.ts','data/model-runs/labour_recruitment_pressure_canada_v0.1.json','data/model-runs/bcpi_material_cost_screen_alberta_v0.1.json','data/model-runs/public_project_exposure_alberta_v0.1.json','data/registry/sources.json','data/registry/construction-refresh-policy.json']
+            paths=['data/processed/public_project_exposure_alberta.csv','data/processed/alberta_ai_projects.csv','docs/research/construction-benchmark-register.json','docs/research/construction-pressure-requirements.md','docs/research/alberta-delivery-guidance.json','lib/construction-model.ts','data/model-runs/labour_recruitment_pressure_canada_v0.1.json','data/model-runs/bcpi_material_cost_screen_alberta_v0.1.json','data/model-runs/public_project_exposure_alberta_v0.1.json','data/registry/sources.json','data/registry/construction-refresh-policy.json']
             for p in paths:
                 destination=root/p;destination.parent.mkdir(parents=True,exist_ok=True);shutil.copy(ROOT/p,destination)
             def publish():

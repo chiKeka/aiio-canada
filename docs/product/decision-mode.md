@@ -138,8 +138,9 @@ The product distinguishes five channels:
    wages, housing activity, population, consumer prices and non-residential
    investment. These are descriptive context only; the AI-attributable
    spillover channel remains uncalibrated and is not quantified in the graph.
-5. Public fiscal response: capital-plan reprioritization and budget pressure.
-   This is a later policy layer, not a current model output.
+5. Public fiscal response: an enabling-asset accounting ledger identifies
+   incremental scope, baseline work and payer allocation. Capital-plan
+   reprioritization and causal public budget pressure remain unquantified.
 
 ## Product success criteria
 
@@ -151,3 +152,43 @@ The product distinguishes five channels:
 - A researcher can reproduce the same result from the release artifacts.
 - The graph reveals why a driver matters and which evidence or calibration gap
   would most improve the decision.
+
+
+## Enabling infrastructure and cost incidence
+
+`data/scenarios/alberta_enabling_infrastructure_v0.1.json` links potential
+transmission, substation, roads and water scope to the counterfactual AI program.
+These are diligence placeholders, not observed assets or commitments. Their
+costs, timing, funding and CAPEX membership are unknown; payer allocation is
+100% explicitly unknown. No incremental public cost can be inferred from them.
+The existing 8% grid-and-generation share is a $4 billion component **within**
+the $50 billion scenario, not an additional public infrastructure estimate.
+
+`lib/enabling-infrastructure.ts` validates this contract and reconciles scoped
+cost ranges in 2026 CAD. Each shared asset has one stable row and may link to
+multiple AI phases. Rows distinguish incremental, baseline or unknown scope,
+already-funded versus uncommitted or unknown funding, observed versus scenario
+cost evidence, and start/end timing. A sourced cost estimate alone establishes
+neither AI incrementality nor a funding commitment. Observed costs require
+observed source evidence; assumption ranges retain their scenario label.
+
+Payer shares must sum to one across developer, utility, ratepayer, government
+and unknown. Utility and ratepayer shares describe mutually exclusive ultimate
+incidence, avoiding a second count of utility expenditure recovered from bills.
+Payer allocation does not create a government commitment. Baseline scope is
+excluded from incremental cost. Incremental assets already inside AI CAPEX are
+reconciled against their component budget and are never added again. Only
+explicitly excluded incremental assets add to the program range. Unknown
+membership, scope or cost withholds the combined total; a known subtotal is
+never a complete fiscal estimate. Invalid allocations, duplicate assets,
+unknown phase links, unsupported observed costs and component-budget overruns
+fail closed.
+
+This ledger is an accounting and evidence contract, not a calibrated fiscal
+forecast. Analyst fixture tests verify arithmetic but do not validate empirical
+costs, induced scope, incidence or public commitments. Project-specific enabling
+scope, official cost bases, baseline funding and ultimate payer evidence are
+required before a defensible Alberta fiscal assessment can be made. The public
+hospital/school/road resource-competition calculation must consume incremental
+packages only after this scope reconciliation; it must not consume the ledger's
+unknown placeholders as measured construction demand.

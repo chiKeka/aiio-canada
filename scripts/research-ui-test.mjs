@@ -23,6 +23,8 @@ page.on('console', (message) => {
     errors.push(message.text());
 });
 const routes = [
+  ['/', 'Alberta delivery outlook'],
+  ['/delivery', 'From evidence to delivery action'],
   ['/research', 'Research observatory'],
   ['/evidence', 'Evidence register'],
   ['/pressure', 'Market pressure'],

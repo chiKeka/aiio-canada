@@ -8,10 +8,30 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 
 
+def record_fetch(receipt_path: Path, source_id: str, checked_date: str, operation):
+    """Persist actual attempt dates; failure retains last success and last-good values."""
+    report = json.loads(receipt_path.read_text()) if receipt_path.exists() else {"sources": {}}
+    old = report["sources"].get(source_id, {})
+    try:
+        result = operation()
+        report["sources"][source_id] = {**old, "last_attempt": checked_date, "last_success": checked_date, "status": "checked"}
+    except Exception as exc:
+        report["sources"][source_id] = {**old, "last_attempt": checked_date, "status": "error", "error_type": type(exc).__name__, "reason": "source_fetch_failed_last_good_retained"}
+        print(json.dumps({"source_id": source_id, **report["sources"][source_id]}), file=sys.stderr)
+        raise
+    finally:
+        receipt_path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = receipt_path.with_suffix(".tmp")
+        temporary.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+        temporary.replace(receipt_path)
+    return result
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Refresh AIIO's review-gated weekly public evidence")
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--edition-date", type=date.fromisoformat, default=datetime.now(UTC).date())
+    parser.add_argument("--check-receipts", action="store_true", help="Offline read-only check of local receipts; no fetch, edition, commit, or publication")
     args = parser.parse_args()
     root = args.root.resolve()
     sys.path.insert(0, str(root / "research" / "src"))
@@ -27,10 +47,19 @@ def main() -> None:
     from aiio.practical_route import build_practical_evidence_route
 
     as_of = args.edition_date.isoformat()
+    checked_date = datetime.now(UTC).date().isoformat()
+    if args.check_receipts:
+        report = build_source_freshness_report(root / "data/registry/sources.json", checked_date)
+        print(json.dumps({"mode": "offline_receipt_check", "evaluated_at": checked_date, "source_count": report["source_count"], "stale_source_ids": report["stale_source_ids"], "writes": False, "network": False}, indent=2))
+        return
     raw_root = root / "data" / "raw"
-    subprocess.run([sys.executable, str(root / "research/scripts/refresh_construction_evidence.py"), "--root", str(root), "--as-of", as_of], cwd=root, check=True)
+    subprocess.run([sys.executable, str(root / "research/scripts/refresh_construction_evidence.py"), "--root", str(root), "--as-of", checked_date], cwd=root, check=True)
 
-    edmonton = fetch_edmonton_permit_candidates(raw_root)
+    receipt_path = root / "data/model-runs/weekly-source-refresh.json"
+    def fetch_with_receipt(source_id, operation):
+        return record_fetch(receipt_path, source_id, checked_date, operation)
+
+    edmonton = fetch_with_receipt("EDMONTON_GENERAL_BUILDING_PERMITS", lambda: fetch_edmonton_permit_candidates(raw_root))
     edmonton_raw = Path(edmonton["archive_path"])
     edmonton_report = normalize_edmonton_permit_proxy(
         edmonton_raw,
@@ -40,7 +69,7 @@ def main() -> None:
         retrieval_manifest_path=edmonton_raw.with_suffix(".json.manifest.json"),
     )
 
-    vancouver = fetch_vancouver_permit_candidates(raw_root)
+    vancouver = fetch_with_receipt("VANCOUVER_ISSUED_BUILDING_PERMITS", lambda: fetch_vancouver_permit_candidates(raw_root))
     vancouver_raw = Path(vancouver["archive_path"])
     vancouver_report = normalize_vancouver_permit_proxy(
         vancouver_raw,
@@ -52,7 +81,7 @@ def main() -> None:
 
     reports = {"vancouver": vancouver_report}
     for city in ("toronto", "montreal"):
-        receipt = fetch_ckan_permit_candidates(city, raw_root)
+        receipt = fetch_with_receipt({"toronto": "TORONTO_CLEARED_BUILDING_PERMITS", "montreal": "MONTREAL_CONSTRUCTION_PERMITS"}[city], lambda: fetch_ckan_permit_candidates(city, raw_root))
         raw_path = Path(receipt["archive_path"])
         reports[city] = normalize_ckan_permit_proxy(
             city,
@@ -115,7 +144,7 @@ def main() -> None:
                 )
             ],
             "observed_change": (
-                f"Official municipal APIs were retrieved on {as_of}. The controlled screens retain "
+                f"Official municipal APIs were retrieved on {checked_date}. The controlled screens retain "
                 f"{edmonton_report['data_centre_candidate_count']} Edmonton, "
                 f"{reports['vancouver']['data_centre_candidate_count']} Vancouver, "
                 f"{reports['toronto']['data_centre_candidate_count']} Toronto and "
@@ -157,7 +186,7 @@ def main() -> None:
         json.dumps(latest_digest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     freshness = build_source_freshness_report(
-        root / "data/registry/sources.json", as_of, root / "public/data/source-freshness.json"
+        root / "data/registry/sources.json", checked_date, root / "public/data/source-receipts.json"
     )
     practical_route = build_practical_evidence_route(
         root,

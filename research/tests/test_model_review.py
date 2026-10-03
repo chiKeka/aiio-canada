@@ -65,7 +65,7 @@ class ReferenceCostModelReviewTests(unittest.TestCase):
     def test_committed_package_is_deterministic_and_fail_closed(self) -> None:
         self.assertEqual(
             hashlib.sha256(PACKAGE_PATH.read_bytes()).hexdigest(),
-            "14c61c2a56923d65db164415da8d6a16b60290ceda048215a39d6474f8725404",
+            "7b25aa5ce1be78811316c3370507f8f64539892edb5a0d76fce6754d344b2212",
         )
         with tempfile.TemporaryDirectory() as directory:
             generated_package = Path(directory) / "package.json"

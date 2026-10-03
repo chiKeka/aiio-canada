@@ -11,6 +11,7 @@ from typing import Any
 
 from .schemas import ValidationError
 from .planning_validation import assess_proxy_planning
+from .project_longitudinal import retain_snapshot, build_history
 
 
 RUN_ID = "AIIO_PRACTICAL_EVIDENCE_ROUTE_0_1"
@@ -48,10 +49,19 @@ def build_practical_evidence_route(
             positive_cells += 1
             treatment_geographies[row["geography_id"]].add(row["quarter"])
 
+    # Alberta's stable official project IDs join the prospective comparator inventory.
+    # Preserve the publisher vintage; the weekly build date is not an observation.
+    alberta_path = root / "data/processed/public_project_exposure_alberta.csv"
+    if alberta_path.exists():
+        for row in _rows(alberta_path):
+            projects.append({**row, "source_record_id": row["project_id"].removeprefix("ABMP_"),
+                             "geography_id": "PR_48", "province": "Alberta",
+                             "start_period": row.get("start_year", ""),
+                             "completion_period": row.get("end_year", "")})
     target_projects = [row for row in projects if row["asset_class"] in TARGET_ASSETS]
     snapshot_rows = [
         {
-            "snapshot_date": as_of,
+            "snapshot_date": row["as_of_date"],
             "project_id": row["project_id"],
             "source_record_id": row["source_record_id"],
             "name": row["name"],
@@ -74,6 +84,23 @@ def build_practical_evidence_route(
         writer = csv.DictWriter(handle, fieldnames=SNAPSHOT_FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(snapshot_rows)
+
+    archive = root / "data/processed/public_project_snapshots"
+    snapshot_receipt = retain_snapshot(snapshot_rows, archive)
+    longitudinal_report = build_history(archive)
+    comparator_path = root / "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json"
+    if comparator_path.exists():
+        comparator = json.loads(comparator_path.read_text())
+        longitudinal_report["existing_comparator_archive"] = {
+            "province": "Quebec", "report_path": str(comparator_path.relative_to(root)),
+            "report_hash": "sha256:" + hashlib.sha256(comparator_path.read_bytes()).hexdigest(),
+            "limitations": comparator["limitations"],
+            "publication_boundary": comparator["publication_boundary"],
+            "linked_change_diagnostics": comparator["linked_change_diagnostics"],
+        }
+    longitudinal_report["alberta_outcome_gap"] = "Released Alberta evidence has one capture. Review candidate observations are not released outcomes; inventory capture dates are not revision effective dates."
+    longitudinal_path = root / "data/model-runs/public_project_longitudinal_current.json"
+    longitudinal_path.write_text(json.dumps(longitudinal_report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     quarterly_revisions: dict[tuple[str, str, str, str, str], list[float]] = defaultdict(list)
     for row in events:
@@ -124,6 +151,8 @@ def build_practical_evidence_route(
                 "provinces": project_provinces,
                 "asset_classes": project_assets,
                 "snapshot_path": str(snapshot_output_path.relative_to(root)),
+                "immutable_observation": snapshot_receipt,
+                "longitudinal_report_path": str(longitudinal_path.relative_to(root)),
                 "next_observation_required": "A later official snapshot with the same stable project IDs, followed by reconciled estimate, stage and schedule changes.",
             },
             "authorized_revision_estimand": {
@@ -152,7 +181,7 @@ def build_practical_evidence_route(
         },
         "input_manifest": {
             str(path.relative_to(root)): "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
-            for path in (treatment_proxy_path, public_projects_path, revision_events_path)
+            for path in (treatment_proxy_path, public_projects_path, revision_events_path, *([alberta_path] if alberta_path.exists() else []))
         },
         "output_manifest": {
             str(snapshot_output_path.relative_to(root)): "sha256:" + hashlib.sha256(snapshot_output_path.read_bytes()).hexdigest()

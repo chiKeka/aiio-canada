@@ -1,7 +1,31 @@
 {
-  "artifact_count": 46,
-  "artifact_manifest_sha256": "sha256:017e27b8f5225280fc269d302ea6ed7cdaf71a972b9ddda5289c15558fa63fe6",
+  "artifact_count": 53,
+  "artifact_manifest_sha256": "sha256:d24c09043f8684bbc1b33ea5a3b92358cdf7c31551d452f6561115769e018ccd",
   "artifacts": [
+    {
+      "artifact_id": "source_receipts",
+      "evidence_role": "governance",
+      "path": "public/data/source-receipts.json",
+      "sha256": "sha256:b6caf26735a20eca996162b494d01180a5cd1a71f7f30f1e302a453ff913eb7b"
+    },
+    {
+      "artifact_id": "enabling_infrastructure",
+      "evidence_role": "assumption",
+      "path": "data/scenarios/alberta_enabling_infrastructure_v0.1.json",
+      "sha256": "sha256:177f7e46f815811b9bd08a384b9fc4533359eb6ef23804e0d034ffa8ee6df520"
+    },
+    {
+      "artifact_id": "alberta_delivery_register",
+      "evidence_role": "governance",
+      "path": "data/governance/alberta-delivery-register.json",
+      "sha256": "sha256:70fc3d6cfb9a9393993d02f14907ac12472b2cccc9359624aa96d26ade8bd215"
+    },
+    {
+      "artifact_id": "alberta_comparison_baseline",
+      "evidence_role": "published_evidence_bundle",
+      "path": "data/governance/alberta-comparison-baseline.json",
+      "sha256": "sha256:92a95d754ffb155862b297148a36669cc54b27e4209d90bfebd80de1c309648c"
+    },
     {
       "artifact_id": "construction_projects",
       "evidence_role": "observed_inventory",
@@ -24,13 +48,31 @@
       "artifact_id": "construction_manifest",
       "evidence_role": "provenance",
       "path": "public/data/construction/manifest.json",
-      "sha256": "sha256:a38a93cc6befad0e023106a1be406584047f9b52141149034146fcdbc3662f14"
+      "sha256": "sha256:d6323e09605ed32586b8dfab130835eceacbedf0389e71d5298f92f92867fcb9"
     },
     {
       "artifact_id": "construction_snapshot",
       "evidence_role": "published_evidence_bundle",
       "path": "public/data/construction/snapshot.json",
-      "sha256": "sha256:8dd3114ac6aa8495e4e37c87fe2dbf73f7aec640cc1b5c8a2cefe19239bac4f1"
+      "sha256": "sha256:27b7452b8eca00d63f315c29dba66ffc936446a5761fa700c250ecab39a9f0cf"
+    },
+    {
+      "artifact_id": "adm_evidence",
+      "evidence_role": "observed_and_analytical",
+      "path": "public/data/construction/adm-evidence.json",
+      "sha256": "sha256:11a68c166b25cfdbd6ef3f9317c254e6cbdae6d411507d344e1e22145310d0f3"
+    },
+    {
+      "artifact_id": "adm_deck_pointer",
+      "evidence_role": "provenance",
+      "path": "public/data/construction/adm-deck.json",
+      "sha256": "sha256:998826e5fd6f30fa0ce09446f9efe8da6a02199217a515a7aeba595d3d9b448f"
+    },
+    {
+      "artifact_id": "alberta_boom_analog",
+      "evidence_role": "observed_historical_comparison",
+      "path": "public/data/alberta-boom-analog.json",
+      "sha256": "sha256:cd98bfea9564c3cf9e0543bf7b24ec44faadcc838ab472953527a9d761bf6259"
     },
     {
       "artifact_id": "frozen_release_bundle",
@@ -72,13 +114,13 @@
       "artifact_id": "source_freshness",
       "evidence_role": "governance",
       "path": "public/data/source-freshness.json",
-      "sha256": "sha256:e53b771138698b5164e209ff87195523acf64d9e940b1911941fe0f04bc78637"
+      "sha256": "sha256:e35e6d9ea9827b5498edf1b7e84757f5672372a7ed73aab149fd035228b7321a"
     },
     {
       "artifact_id": "practical_evidence_route",
       "evidence_role": "governance",
       "path": "data/model-runs/practical_evidence_route_current.json",
-      "sha256": "sha256:66855d52d3cce50aac86c567e09f365669a5099207956a7cf0fe2563fd54b7f9"
+      "sha256": "sha256:014b7e0ab0ecacc0dc71eb6abe7963a8a294525d01b70e2376c66c95e4e8291c"
     },
     {
       "artifact_id": "authorized_revision_estimand_contract",
@@ -126,7 +168,7 @@
       "artifact_id": "reference_review",
       "evidence_role": "governance",
       "path": "data/model-runs/alberta_reference_cost_review_package_v0.1.json",
-      "sha256": "sha256:14c61c2a56923d65db164415da8d6a16b60290ceda048215a39d6474f8725404"
+      "sha256": "sha256:7b25aa5ce1be78811316c3370507f8f64539892edb5a0d76fce6754d344b2212"
     },
     {
       "artifact_id": "information_sector_capex",

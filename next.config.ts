@@ -14,6 +14,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   outputFileTracingIncludes: {
+    '/api/construction/demand': ['./public/data/construction/snapshot.json'],
+    '/': ['./public/data/construction/snapshot.json'],
+    '/delivery': ['./public/data/construction/snapshot.json'],
     '/api/briefing': [
       './assets/presentations/alberta-briefing-template.pptx',
       './public/data/construction/snapshot.json',

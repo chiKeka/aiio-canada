@@ -1,0 +1,1328 @@
+{
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "THIRD_PARTY_DATA.md",
+      "sha256": "240852de6493a6dd82225696afc31521f49a73a1c61c1014d0db948d43deae4e"
+    },
+    {
+      "path": "app/api/health/route.ts",
+      "sha256": "c2a1c2e51bb76df48c765fd9f46ddb34f01699ee9334e9773767246e531baaff"
+    },
+    {
+      "path": "app/digest/page.tsx",
+      "sha256": "8eab4fe7a1627b1324bb7c60e048d326fa09b296ac2ce5e5932ffd989ad353ae"
+    },
+    {
+      "path": "app/downloads/page.tsx",
+      "sha256": "2cc77573a8baafb95c3ff994d9a2165ca272f84b9e166f006d3d1f63a2c2b6ea"
+    },
+    {
+      "path": "app/error.tsx",
+      "sha256": "1e95556b138dd5d564f3f035358ca1ccb130e4caf89238199c4ea9d712d1c8eb"
+    },
+    {
+      "path": "app/evidence/page.tsx",
+      "sha256": "dbdb2af523f4aed588a48e3a47c9e95f1d5371cebbe7ce40592cbdf482719014"
+    },
+    {
+      "path": "app/globals.css",
+      "sha256": "f8e910c97e2739e227d6b9e0a13c03cdbe9b3306d6c3b1c259dffb31e8030cad"
+    },
+    {
+      "path": "app/layout.tsx",
+      "sha256": "29fd996ef4ede10c32185094e566e4c660a5cb8158891ae63d480c1f76f3fcb0"
+    },
+    {
+      "path": "app/methods/page.tsx",
+      "sha256": "0a160deaad5fb881eae699573ed80aef0fe464e8be91c0c42cdc3b1b127fcdc9"
+    },
+    {
+      "path": "app/not-found.tsx",
+      "sha256": "acc924db2c0db9a9b2589b2b87aa24b2c268b278b5a085d5152652ba740a3efc"
+    },
+    {
+      "path": "app/page.tsx",
+      "sha256": "b884967bec33f4cf3f8261d556633908d280dc1fcd3b0a4f9bf8815a76713c85"
+    },
+    {
+      "path": "app/pressure/page.tsx",
+      "sha256": "764ffa5d7f8857b9e446f3d2fbe23692e24b1adad02dccaa4fb6fcea54a610ae"
+    },
+    {
+      "path": "app/research/page.tsx",
+      "sha256": "bd5d061fc88302625b46d9470899249d20b481f97fcdaa5afc37d030c299ba21"
+    },
+    {
+      "path": "app/robots.ts",
+      "sha256": "9f309fc7d9651c99d936c031529791ee9c4739297d0d9906df03bc01b6716556"
+    },
+    {
+      "path": "app/scenario/page.tsx",
+      "sha256": "8afed8af3059f1556de364d662de3ea25c88eabf9643af0046eb9c70373ed952"
+    },
+    {
+      "path": "app/sitemap.ts",
+      "sha256": "60e204b71d66e0425475bbbe4f28cb5d8ce1ed8fde9e6f19dc42e0355633b61f"
+    },
+    {
+      "path": "app/status/page.tsx",
+      "sha256": "32db00c332e78e4c3e2186112447f35492a407bf68f32dc263926381df36bf24"
+    },
+    {
+      "path": "components.json",
+      "sha256": "9928283696d86836422959a2c520df83a718d31ffbcab533a14ca8dca2c8d475"
+    },
+    {
+      "path": "components/decision-cockpit-view.tsx",
+      "sha256": "6663aac5113fdbeb4bac8073c6477fe079077ad55ddc93acca3e03738a12b779"
+    },
+    {
+      "path": "components/decision-workbench.tsx",
+      "sha256": "349e4f44ecc1bb4049e808c8941c2cdbf089049e465fd60909983a2302bac8cf"
+    },
+    {
+      "path": "components/evidence-explorer.tsx",
+      "sha256": "d7dc0d444c980e76a33e64aa77d335943e92b77ce27063f7053a4077a9cca0d9"
+    },
+    {
+      "path": "components/executive-cockpit.tsx",
+      "sha256": "bab412a70deca6cf7edd033f7b4d241f6fa946722bd3baed3c035e284b964722"
+    },
+    {
+      "path": "components/executive-decision-brief.tsx",
+      "sha256": "575cc80091cd99d306994377a2ba5bd8bd7af0567b31fd439c093491cbee63b1"
+    },
+    {
+      "path": "components/executive-evidence-lens.tsx",
+      "sha256": "e7e55eb7be44f24cc1071bd467fe5d9cce03397ed84980f6e0c61cf5032fd965"
+    },
+    {
+      "path": "components/guided-project-story.tsx",
+      "sha256": "2a7aeecdcab8d0dfe8800b09cbfce372fa28a0e6d7724429a124db8fd7e012f9"
+    },
+    {
+      "path": "components/impact-path-graph.tsx",
+      "sha256": "8702fdadfd715d2d3bebaee8b1da7f5a4a1a6beb97701a9a2743ced5df0e6ca5"
+    },
+    {
+      "path": "components/labour-market-explorer.tsx",
+      "sha256": "b71ce452687e5e03476121a7cb0889c0c84116a4e8ea4567bcb219eb6dea34c4"
+    },
+    {
+      "path": "components/mode-toggle.tsx",
+      "sha256": "ecb90ad921e2e351b8a8a6b53db70cba507e4efe187c35c485e7b2dc59ab5634"
+    },
+    {
+      "path": "components/monthly-escalation-outlook.tsx",
+      "sha256": "c7a3116eb8e428f59a02e7e1ea705acde8737134a7594b9fb0e29200886844e4"
+    },
+    {
+      "path": "components/observatory-dashboard.tsx",
+      "sha256": "55d80f49575973a6283c5efc339702b841cec05c2ee6a1317354b4e561eba0e3"
+    },
+    {
+      "path": "components/project-assumptions-drawer.tsx",
+      "sha256": "a74cac26266a06baa1d02172552ea4b542ae0e9e8450d059638f52232dbcdd3a"
+    },
+    {
+      "path": "components/regional-macro-explorer.tsx",
+      "sha256": "378729dca408b08694dba21b157488bb3d55cda6c9f3244908a4f8fbcdf8d08b"
+    },
+    {
+      "path": "components/scenario-lab.tsx",
+      "sha256": "72a8e1c7f6f8155c8c48da0db63f269da2b037ee8e2a5c7afa72234977f0a855"
+    },
+    {
+      "path": "components/site-navigation.tsx",
+      "sha256": "88788b3a2407285b99ec13d490ab309d840fdb06c91840a705f72acd70a71396"
+    },
+    {
+      "path": "components/site-shell.tsx",
+      "sha256": "6d125a1325e386c59ac860bd6bde2590f6ab65398d48b9965585146219c2ed9e"
+    },
+    {
+      "path": "components/ui/accordion.tsx",
+      "sha256": "33e1c60ba503f4eb36f9a8b1f68b236174b11656d8efea6bac65abddda2f9019"
+    },
+    {
+      "path": "components/ui/alert-dialog.tsx",
+      "sha256": "ed0f1fc432bca4c72f9dd8741ae2268a00d2d3429ff1149bf463c4271b13d8e9"
+    },
+    {
+      "path": "components/ui/alert.tsx",
+      "sha256": "e760c470414c9e617d7292094146d906352fee3b1526b790a611d4a118e79196"
+    },
+    {
+      "path": "components/ui/aspect-ratio.tsx",
+      "sha256": "b7fb499905e441a0602392ce118828425ad059079060109694d01f9fac00ad20"
+    },
+    {
+      "path": "components/ui/attachment.tsx",
+      "sha256": "dcb9e899f1322158f016d75c400fa8cce9b797ea49bec65528bac686cee2ec5c"
+    },
+    {
+      "path": "components/ui/avatar.tsx",
+      "sha256": "342f32b683937b826cdff2999d5e3057836d459aa43eadb0c3538b818d195b9a"
+    },
+    {
+      "path": "components/ui/badge.tsx",
+      "sha256": "5706189b86e8670499fb33f37147dd6f65c39d59eef5211e34157f2952c35e32"
+    },
+    {
+      "path": "components/ui/breadcrumb.tsx",
+      "sha256": "b28b76d6f8d0feafbbeff2220cf83f9a6b03d8c81f0145b3af4c7d19933ab2c0"
+    },
+    {
+      "path": "components/ui/bubble.tsx",
+      "sha256": "dfb9f52ae3b89e4a419b336c3893ab6fb658fc324fb402759d878d54e3b2db5a"
+    },
+    {
+      "path": "components/ui/button-group.tsx",
+      "sha256": "79ad8fb6644a775cc49131c1aa737ca26cae6a563beec0fa52ef6e8d85202fab"
+    },
+    {
+      "path": "components/ui/button.tsx",
+      "sha256": "081d2a1cb4f3aec636a6894d9eff4e90d476d5db85b82d0399c1f4d18517112e"
+    },
+    {
+      "path": "components/ui/calendar.tsx",
+      "sha256": "e7bc682eff8f2215e6b0aab40d1afb7ee927c5f5bef348ccff207631b9261658"
+    },
+    {
+      "path": "components/ui/card.tsx",
+      "sha256": "625fce5e16577a45108a86d7afcd70b8931cb2032abe0d6a3faf1010f666d672"
+    },
+    {
+      "path": "components/ui/carousel.tsx",
+      "sha256": "7444126492d4e0b85b1270f0d83a0955350fa95b3d3fb7b88edc2a5c2b4e5d14"
+    },
+    {
+      "path": "components/ui/chart.tsx",
+      "sha256": "56ab0e0b41f0cc7902414e046ea4f710bdbf0b756028672ea8c7e5137a278f2b"
+    },
+    {
+      "path": "components/ui/checkbox.tsx",
+      "sha256": "56b2869e5478f38238e6a3d8aefabfbe8af565b38b2ffad06466487b3eacf154"
+    },
+    {
+      "path": "components/ui/collapsible.tsx",
+      "sha256": "3fdf7ef1ca89c4d85de5ecbb25813d0f572003a53b021baf43c5f3523e48ec97"
+    },
+    {
+      "path": "components/ui/combobox.tsx",
+      "sha256": "282041e2e8c52cc12e7bbc717bbd3f8c9c5ba18e7fa75b97053bc79687e1181e"
+    },
+    {
+      "path": "components/ui/command.tsx",
+      "sha256": "9c1eae65aa105935a34c6b736f673b71a2ef939dde53dce29d986221edbf1f9f"
+    },
+    {
+      "path": "components/ui/context-menu.tsx",
+      "sha256": "05c3646b452f5e3b9eb952eeba3d90657606d2b0875cb77652cdb5eadba0eb5c"
+    },
+    {
+      "path": "components/ui/dialog.tsx",
+      "sha256": "8bc85def62538b4e62e8530c6b0ba167a192c38519c05f104bf6e10de73b811f"
+    },
+    {
+      "path": "components/ui/direction.tsx",
+      "sha256": "2dea8a95accb1723db2454ccc858697d5b1f1454568cf4da5e8fcbd0cf7cc1ee"
+    },
+    {
+      "path": "components/ui/drawer.tsx",
+      "sha256": "b7ac53d0e5d1fed25fc3f2ac5f5a36e247ca684c677ac376829fa8a7c039b79e"
+    },
+    {
+      "path": "components/ui/dropdown-menu.tsx",
+      "sha256": "efc088f3d79f64cf96e222701ae23dcf385b53947b3cd57ffb7be6f5dadcbfe2"
+    },
+    {
+      "path": "components/ui/empty.tsx",
+      "sha256": "bf54bac4881b79f6a53f55e70c18640f58a058add88aed763c71be35c4f64f59"
+    },
+    {
+      "path": "components/ui/field.tsx",
+      "sha256": "79023ca89aae39f9cffa83a9483c9c672099b4547cc821486283db61c6ae9327"
+    },
+    {
+      "path": "components/ui/hover-card.tsx",
+      "sha256": "d8cb7270c5893213fc00b5f270f9bc461e2d7ce5b81f77b8778253a1aeda6a2c"
+    },
+    {
+      "path": "components/ui/input-group.tsx",
+      "sha256": "2e65ddecb4401220be374cc6cfc42344538266cafeb2e590b3c760c7ed6b490a"
+    },
+    {
+      "path": "components/ui/input-otp.tsx",
+      "sha256": "867f568259caac95f682d128d72e681b3fe7c31701a396eacc9284401d917a6a"
+    },
+    {
+      "path": "components/ui/input.tsx",
+      "sha256": "6763c86c34c1c07826386d376f5da8fe2e41585bff3615716d5da88915e088d8"
+    },
+    {
+      "path": "components/ui/item.tsx",
+      "sha256": "9c5e45e6c4aae5b9c4c1304e1f1208d32681ab616a6e0de9de6e0d6b22690592"
+    },
+    {
+      "path": "components/ui/kbd.tsx",
+      "sha256": "bdfb38a4f7b9b604e196b5cee0d86f12311dae72946f0dbf5928c8ad0638178f"
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "sha256": "e4a6fb662c44a44c468d16d79d02b3a3e5bf7b77bd50aef1e586c4d9613df0f6"
+    },
+    {
+      "path": "components/ui/marker.tsx",
+      "sha256": "cd1e872384cf5001e48b4dc3cc2bb011eba9700561d41c83a89e872b60baf175"
+    },
+    {
+      "path": "components/ui/menubar.tsx",
+      "sha256": "a3715f8e8b78261f5784929c532e100759c58e831c91e842438730797bc9a124"
+    },
+    {
+      "path": "components/ui/message-scroller.tsx",
+      "sha256": "9512c586d1b0885cf3ae4f1c3dd4281cbdfec7428fe98ff48a66b4ba2a7319f4"
+    },
+    {
+      "path": "components/ui/message.tsx",
+      "sha256": "2fedcc64ed8563a44f6697615e77574d96f819fe6e5e2fa8a555e30f8ed6bbd7"
+    },
+    {
+      "path": "components/ui/native-select.tsx",
+      "sha256": "3aafb74b98c039dae4eb2c64c47ec6f5d61fdc888c057de47550346f702f434b"
+    },
+    {
+      "path": "components/ui/navigation-menu.tsx",
+      "sha256": "c8e64bf5241145b512ae18f1062da8275691edf927736496a3860bec76ad6fa1"
+    },
+    {
+      "path": "components/ui/pagination.tsx",
+      "sha256": "1f3c1713e8824cca7c3c0edacf9da7b0114bfda58640771b8fe0bc6179b370ce"
+    },
+    {
+      "path": "components/ui/popover.tsx",
+      "sha256": "7376624438588e2d64b6e0c5cdf82cbc5fd4530bbcf1f0235c5f3ee08d12e877"
+    },
+    {
+      "path": "components/ui/progress.tsx",
+      "sha256": "0d8ddec9731940e104b851cf3ac67d2fa8589b289824317a9e8f326e090ba65a"
+    },
+    {
+      "path": "components/ui/radio-group.tsx",
+      "sha256": "43f2d6c2f5bdd4a26c57d93e6f141be20472f9bb8777d9a0d61cd8a5e281a999"
+    },
+    {
+      "path": "components/ui/resizable.tsx",
+      "sha256": "ea7b85817d4dc70866e0bcf15264e7e1bd7e1893eb4404261fbc23a4d6ff9029"
+    },
+    {
+      "path": "components/ui/scroll-area.tsx",
+      "sha256": "730c4cc49f8f1b705eb1389cd32c774056a0a2a7a48a9b092cbe44c608be3a0b"
+    },
+    {
+      "path": "components/ui/select.tsx",
+      "sha256": "45489c502a21fdd5271481d64ad8f762181c9653d8d26bdc6f75450b78c3c852"
+    },
+    {
+      "path": "components/ui/separator.tsx",
+      "sha256": "92ad5065f03d7edc98f367e729f3ec84ece1d99ee8cd0d3a8137f266d4ab3d8a"
+    },
+    {
+      "path": "components/ui/sheet.tsx",
+      "sha256": "adb432b6f9d7a4733caa45ba8bf510a8a7ff0f6d0dd3aa1f013959fb61268234"
+    },
+    {
+      "path": "components/ui/sidebar.tsx",
+      "sha256": "aa3322ca63f098aa1d2abf750f9d097da07362fce25939357f2cefc9b6a03988"
+    },
+    {
+      "path": "components/ui/skeleton.tsx",
+      "sha256": "4c342102b2bbf5bd8c04fa151fe5c13c42faee2f9587a3586c27322020ca35d1"
+    },
+    {
+      "path": "components/ui/slider.tsx",
+      "sha256": "af657e73d672f4dd205f19abf151d21a172cf36abfdca49fd7014a20e12367a9"
+    },
+    {
+      "path": "components/ui/spinner.tsx",
+      "sha256": "8ddbb330e5564a1f53026da36c2322ed4b027687e91a88f63348ab10f26ae0cb"
+    },
+    {
+      "path": "components/ui/switch.tsx",
+      "sha256": "04b085443a1c6a72d408e6eb7dd45df881ca27814415b81b39f614806b52c8fc"
+    },
+    {
+      "path": "components/ui/table.tsx",
+      "sha256": "88f2ba7877eea7f34a5da18b7fa096eb2c7bed602677ce54f5494b494c5afc2e"
+    },
+    {
+      "path": "components/ui/tabs.tsx",
+      "sha256": "dd914d769bc223b5d5ea56839a7752e534eb475f8d2897d5675606c368bbca1f"
+    },
+    {
+      "path": "components/ui/textarea.tsx",
+      "sha256": "7ae7f0f5d907be24658652c771fee1685193102bf3200aafbf578d144d379fbf"
+    },
+    {
+      "path": "components/ui/toast.tsx",
+      "sha256": "9126b09f47f0b117bf748cf19aaa4987a1f72d0813d10bfc4b4b0128e6439e48"
+    },
+    {
+      "path": "components/ui/toggle-group.tsx",
+      "sha256": "9b006523be0fe3230cd75f7adf78a501829d594fd3506c56c55bb38211ff1850"
+    },
+    {
+      "path": "components/ui/toggle.tsx",
+      "sha256": "6bf41d6f6ffe602c3e28274a82ac029e6ee1331ba3c670a6d814048e1823cc28"
+    },
+    {
+      "path": "components/ui/tooltip.tsx",
+      "sha256": "b86e51969931c3d62e88d0bdacd1cd8219105dc6d6b6a588a80011bf92e987cd"
+    },
+    {
+      "path": "components/workspace-empty-state.tsx",
+      "sha256": "50b3cd8edf3265a43ceead119b0e13229f1a57fb12ef560da921c035c71ba07f"
+    },
+    {
+      "path": "components/workspace-metric.tsx",
+      "sha256": "786e6579e6d9b51b1a4e1cf625239fea17a8811a95db096cfe9018de71fc36b1"
+    },
+    {
+      "path": "components/workspace-scroll-region.tsx",
+      "sha256": "cb75d282802443ee516802c136ccdfb806a876f6a4fc5fabc0507b9a40b1f64a"
+    },
+    {
+      "path": "data/digests/2026-08-31.md",
+      "sha256": "eea7bc518256b5eeb5be4199d3a6658dd74f7bdb7e9153fd925b3e2a7063c250"
+    },
+    {
+      "path": "data/digests/2026-09-01.manifest.json",
+      "sha256": "0b28242a24bcccf7836d6243ebb842ff3f528ac68fd12855283b1cce42d8bcdd"
+    },
+    {
+      "path": "data/digests/2026-09-01.md",
+      "sha256": "a218aa86b8bdb18584581940431eca32e3371e1721cf812423ddc2130373cb08"
+    },
+    {
+      "path": "data/digests/2026-09-02.manifest.json",
+      "sha256": "f2ec83eaf5f71a80e2937e5ee62c5095e5b7a4b57d60236411ca02121f0a0b74"
+    },
+    {
+      "path": "data/digests/2026-09-02.md",
+      "sha256": "0f4b333ac7ef7bf5b7e951010f074c76b46a32ff21bf6dd242c78c5c96cc1654"
+    },
+    {
+      "path": "data/digests/2026-09-03.manifest.json",
+      "sha256": "01daa8b4cc928fcfadb452cf03c418037c770e93c3183e8bc672a6f2b08bd89e"
+    },
+    {
+      "path": "data/digests/2026-09-03.md",
+      "sha256": "2804de2eebc20e6529233894d6ba8f0f8e09db9c16db99dd2637ff741d938aa1"
+    },
+    {
+      "path": "data/digests/items/2026-08-31.json",
+      "sha256": "158d7212f0482681efad4bd05be324db66d7ff827cacab7cf311cabf554ef58e"
+    },
+    {
+      "path": "data/digests/items/2026-09-01.json",
+      "sha256": "0d3b73f3bd25233f9e4c27115d3a75611ddc7e8fd8ee6efa9ac5c93909386747"
+    },
+    {
+      "path": "data/digests/items/2026-09-02.json",
+      "sha256": "40861e1a86b06b39117a478c607983ebf5a6e27b78d02b809bee706b32478877"
+    },
+    {
+      "path": "data/digests/items/2026-09-03.json",
+      "sha256": "800a2be662fd4e7120899ecd3ad43f6748c257f3220d2faaf2fa8405af752f56"
+    },
+    {
+      "path": "data/governance/program-gates.json",
+      "sha256": "0e2162499164246b644718132a096ead9d5f34f32850c27e5dd05acdf53bd486"
+    },
+    {
+      "path": "data/manual/aeso_data_centre_update_2025_09_page1.json",
+      "sha256": "e5408f8360983ff15ee50686b0569da47c131fde225f64dc11776c14e06e466d"
+    },
+    {
+      "path": "data/manual/oago_selected_infrastructure_outcomes_2024.json",
+      "sha256": "b519e0eef6b5266a2b9374a187a1ed41073f8f9f496fd6341c8a40b258e9a7f2"
+    },
+    {
+      "path": "data/manual/provincial_power_planning_extract_2026_09.json",
+      "sha256": "7981705fc82e2fee6d08e3a336c9731d41cd6b2b7f77d7ad9a148e194fcfcf07"
+    },
+    {
+      "path": "data/model-runs/ai_attribution_empirical_covariate_panel_v0.1.json",
+      "sha256": "66e141922ae503b4fc85c7f5c7200b075beb13c424bafb2a562ad7c743b2f68c"
+    },
+    {
+      "path": "data/model-runs/ai_attribution_empirical_estimation_v0.1.json",
+      "sha256": "d4d979aa6ffdb20db64f9198643328a015cd1fea2d868758d67e8dd420d5d721"
+    },
+    {
+      "path": "data/model-runs/ai_attribution_identification_readiness_v0.1.json",
+      "sha256": "fda82cf129952cbb92969953d2805053520933573b712e33d132f1c8061dc04e"
+    },
+    {
+      "path": "data/model-runs/ai_attribution_panel_preflight_v0.1.json",
+      "sha256": "bfa3bd76724978203b197d71dec699e449ee07aaac5b8f3b23a070148d6488b6"
+    },
+    {
+      "path": "data/model-runs/ai_attribution_proxy_association_v0.1.json",
+      "sha256": "19b2cf40c66900327910101c6da2d7609a51d4b5b7eca97f4f2d32a61f4597f8"
+    },
+    {
+      "path": "data/model-runs/ai_attribution_treatment_source_feasibility_v0.1.json",
+      "sha256": "76d0b0261f98fe3e4e9c95fb0530f562b2642587a57bf16b41917074be8b1f56"
+    },
+    {
+      "path": "data/model-runs/ai_construction_proxy_alberta_v0.1.json",
+      "sha256": "63053c4316fb2d634020588602fd8f6fdf9ad8f6f4c2fa0b389fcee292fb5fb6"
+    },
+    {
+      "path": "data/model-runs/alberta_50b_constrained_delivery_v0.1.json",
+      "sha256": "53809d06ac4efed1e13878a634706000327c20410f84e0076dbd58ebab35a354"
+    },
+    {
+      "path": "data/model-runs/alberta_50b_counterfactual_v0.2.json",
+      "sha256": "d8f421a41b7c76453b56a26581ede066ff40dbad4c1c21e238eabd28c027c8c9"
+    },
+    {
+      "path": "data/model-runs/alberta_50b_front_loaded_v0.1.json",
+      "sha256": "7ee37bab215acab2aff2628141408b38b55df9859d92132dc17d238e9c9b4263"
+    },
+    {
+      "path": "data/model-runs/alberta_50b_high_local_capture_v0.1.json",
+      "sha256": "85da5b26c13240fb3858400b8545b3e94da3b690af7921507f5213eec4661836"
+    },
+    {
+      "path": "data/model-runs/alberta_50b_scenario_suite_v0.1.json",
+      "sha256": "bdf508cb07a8d8ac903c15a78cd65ca02c08aa28ddfb3cb28afcaa99e4914772"
+    },
+    {
+      "path": "data/model-runs/alberta_50b_staggered_v0.1.json",
+      "sha256": "c4d90554551edf2599235f26ec32b0c5f5460d19ee3fc48df760430141b29e16"
+    },
+    {
+      "path": "data/model-runs/alberta_ai_capex_announcement_ledger_v0.1.json",
+      "sha256": "88862880dda6b03809699b39eeb956184d1170632c473ce99da593f846474170"
+    },
+    {
+      "path": "data/model-runs/alberta_bcpi_historical_envelope_v0.1.json",
+      "sha256": "a6f64d8755b88a25cf54236c118921959cc746c41d8e7754cdc376c8193ed217"
+    },
+    {
+      "path": "data/model-runs/alberta_bcpi_reference_baseline_v0.1.json",
+      "sha256": "9909c2d10a6c67f9699d98cd16dead6e619635b3a16b535c389ae9efa518bd40"
+    },
+    {
+      "path": "data/model-runs/alberta_power_overlay_v0.1.json",
+      "sha256": "17aedd0b731cf27238b299dbf103e1547f898196860f2c4ad3e90624cf470c12"
+    },
+    {
+      "path": "data/model-runs/alberta_project_historical_analog_matrix_v0.1.json",
+      "sha256": "b60294b20f83c10f5d54e8fc411cfdd8f73cba75b27db4ab6e336510b8ab9642"
+    },
+    {
+      "path": "data/model-runs/alberta_reference_cost_review_package_v0.1.json",
+      "sha256": "14c61c2a56923d65db164415da8d6a16b60290ceda048215a39d6474f8725404"
+    },
+    {
+      "path": "data/model-runs/bc_on_qc_bcpi_reference_baseline_v0.1.json",
+      "sha256": "b79e81862d8e70865a21ff72781d5d45589948de347abf191b81b78d91ca3969"
+    },
+    {
+      "path": "data/model-runs/bc_on_qc_province_linked_reference_baseline_v0.1.json",
+      "sha256": "4a9a19269a889db967b1c170173ce017722161eeb335122e89ee1730147c5d0b"
+    },
+    {
+      "path": "data/model-runs/bc_on_qc_province_linked_review_package_v0.1.json",
+      "sha256": "cff7083d10641ee4f78f93b7b47014148f36b9be4358fa9248e48c7f2320af70"
+    },
+    {
+      "path": "data/model-runs/bcpi_material_cost_screen_alberta_v0.1.json",
+      "sha256": "d9fcdbe28f5359c5998532906b898cb89379f2f4c7e8529a90df66b3e215f2d0"
+    },
+    {
+      "path": "data/model-runs/bcpi_material_cost_screen_provinces_v0.1.json",
+      "sha256": "34574b7f4479a5fa9877c4f3e06d6dff1e98ad42feb4b40a9e72ab5ce32dfcfc"
+    },
+    {
+      "path": "data/model-runs/building_investment_controls_canada_v0.1.json",
+      "sha256": "efc353850648d0f3d919ae9494535c5238a7f96f7f06ac25e42f71f1d1a2fc31"
+    },
+    {
+      "path": "data/model-runs/canada_cross_domain_coverage_v0.1.json",
+      "sha256": "fea5c9e6322739a79ead4a00f0ff8a01f7ad069ccb08ee9970d6d34abf8d2b51"
+    },
+    {
+      "path": "data/model-runs/canadabuys_construction_outcome_feasibility_v0.1.json",
+      "sha256": "597ad07e642e6d619a56243de4af3c0a241f919e9599544acdff54218c82a19c"
+    },
+    {
+      "path": "data/model-runs/comparison_market_permit_bcpi_panel_v0.1.json",
+      "sha256": "acd50f8696f30f7910d68f68d33330f6a7bd4ba0b1fa3a598d03cc7b4249ad62"
+    },
+    {
+      "path": "data/model-runs/comparison_market_proxy_association_v0.1.json",
+      "sha256": "b3d52c3e61aa7d932911e92ee2638d3c85d546bcb8352ba19db560e1edbedda9"
+    },
+    {
+      "path": "data/model-runs/edmonton_data_centre_permit_proxy_v0.1.json",
+      "sha256": "cdd6b47f7c7054088018b1db828f47595e24e07a007b070bfb0b0deb0a86ae76"
+    },
+    {
+      "path": "data/model-runs/executive_monthly_escalation_current.json",
+      "sha256": "add335d85e5e344f5df94d4a3226050aced806fdc019feea13fa3d503ccf3411"
+    },
+    {
+      "path": "data/model-runs/information_sector_construction_capex_screen_v0.1.json",
+      "sha256": "06ed4e591bf350ea7c82a31e60558c4495c716cbd9e5479f27328c04fd742a6e"
+    },
+    {
+      "path": "data/model-runs/labour_recruitment_pressure_canada_v0.1.json",
+      "sha256": "04c726ae96667decb2eb7d995e9807a3a4f61409a28efc9c4a6289bf93b1c07e"
+    },
+    {
+      "path": "data/model-runs/montreal_data_centre_permit_proxy_v0.1.json",
+      "sha256": "00fd96d0efca9d051766a634fc95e9ec86234c1195130c6f3e8b4af3dd3ab61a"
+    },
+    {
+      "path": "data/model-runs/oago_audited_project_outcomes_v0.1.json",
+      "sha256": "9106612b664aac9617e67782e976b08ff0d6b2c4a9fe0bc89cdc27bc8af4e0bb"
+    },
+    {
+      "path": "data/model-runs/power_evidence_alberta_v0.1.json",
+      "sha256": "21162fac6ec3bf4dffef118183d4b80fc73a4360d74e54ce71cc2f00b20a031d"
+    },
+    {
+      "path": "data/model-runs/practical_evidence_route_current.json",
+      "sha256": "66855d52d3cce50aac86c567e09f365669a5099207956a7cf0fe2563fd54b7f9"
+    },
+    {
+      "path": "data/model-runs/program_readiness_current.json",
+      "sha256": "c9b3f580fcda67305df73f52cdfc954c4b929d0015b3298c3f90c7e36a9b17e6"
+    },
+    {
+      "path": "data/model-runs/provincial_power_planning_contract_v0.1.json",
+      "sha256": "137ac23f574ec9d9d3b1661c1ca99087487704edc2dc58ebbff61bae08c26cc3"
+    },
+    {
+      "path": "data/model-runs/pspc_real_property_outcome_feasibility_v0.1.json",
+      "sha256": "860f6b43d4703b75f0473073166366ea72c5250356acaf42daf9433bf65ad660"
+    },
+    {
+      "path": "data/model-runs/pspe_method_lineage_v0.1.json",
+      "sha256": "504cf2997a3cce457a345e2ab84fe93eb7002ec6ae054ce8119afb68df61d218"
+    },
+    {
+      "path": "data/model-runs/public_project_exposure_alberta_v0.1.json",
+      "sha256": "d8afd4e7849e9e87288365b233d6a1b9395a14531280c108214fd3a35ba37d4d"
+    },
+    {
+      "path": "data/model-runs/public_projects_bc_on_qc_intake_v0.1.json",
+      "sha256": "f518be27e58e7df2e83ec72b53c8ef1b43c2787a2319c82a455bd96e72421acd"
+    },
+    {
+      "path": "data/model-runs/quebec_pqi_authorized_project_revisions_v0.1.json",
+      "sha256": "54f52ac6203ea24aab5798c30af50f1c3ef248abc5740b3e8ddb1dd2cda49160"
+    },
+    {
+      "path": "data/model-runs/quebec_pqi_full_archive_longitudinal_v0.1.json",
+      "sha256": "0e1b1fdd98732ce7882b3294e8dd16388132f059cc14bcbf88c1e9dd121f8095"
+    },
+    {
+      "path": "data/model-runs/quebec_pqi_milestone_longitudinal_v0.1.json",
+      "sha256": "0f20f2e86e516f1f8c13194b6582e5ef1dccb6d829ffd825661b053e5b9a08fd"
+    },
+    {
+      "path": "data/model-runs/quebec_pqi_parser_review_package_v0.1.json",
+      "sha256": "6f1d2816c2d1ae47a2152304639f083b82f09a1ca8e95135d44ff28b6f10097c"
+    },
+    {
+      "path": "data/model-runs/regional_macro_controls_canada_v0.1.json",
+      "sha256": "43bd0642c78fdb5ecb0b1633534246f041221bc412835677a37b0d2cd1f1e3c8"
+    },
+    {
+      "path": "data/model-runs/toronto_data_centre_permit_proxy_v0.1.json",
+      "sha256": "a58e2ec323b94ae5074495a742a84467b1fe13556e270f3253a4d7605ff2e801"
+    },
+    {
+      "path": "data/model-runs/vancouver_data_centre_permit_proxy_v0.1.json",
+      "sha256": "0acfe3badf535412e6b372d997baa9e88f040331098ee77b6fe7c08e147b5d0e"
+    },
+    {
+      "path": "data/model-runs/vancouver_toronto_montreal_bcpi_reference_baseline_v0.1.json",
+      "sha256": "642a7149014dfb9f39c96b7aea2a743fd5db4e720f05a147a605a24c38dc0f0f"
+    },
+    {
+      "path": "data/model/ai_attribution_panel_acquisition_contract_v0.1.json",
+      "sha256": "d71986f67fcedf43cccecf2a77e368429811093b2ceff42fde248cc81712cb7d"
+    },
+    {
+      "path": "data/model/ai_attribution_panel_contract_v0.1.json",
+      "sha256": "1c53deb5653265bddc5f38fd62c7b3ca99c396f2f13b6d246fd220dcd079d77b"
+    },
+    {
+      "path": "data/model/ai_attribution_treatment_source_feasibility_contract_v0.1.json",
+      "sha256": "8a1fb433b2a76d1c0582bb6bae811ce1af323532b4a363e3a5dcdf67263e736b"
+    },
+    {
+      "path": "data/model/alberta_50b_scenario_suite_contract_v0.1.json",
+      "sha256": "d8774e658ce2b2a2a95cfda47290ff0c19bc88ae30dd56b7cb1076b575176388"
+    },
+    {
+      "path": "data/model/alberta_graph_v0.1.json",
+      "sha256": "581f7ab9104ea8edac697422c233a786af91627c45cb9ce378de2c570771a5fe"
+    },
+    {
+      "path": "data/model/alberta_graph_v0.2.json",
+      "sha256": "4ae7347787f0fa53e670f8f03b80c1f7c93f03bc8d75a6b99168e3a3763e1a22"
+    },
+    {
+      "path": "data/model/authorized_revision_estimand_contract_v0.1.json",
+      "sha256": "e4b91122e675accc274e542059d7bad58d4c5653ff52a41ebde00664a9c679d1"
+    },
+    {
+      "path": "data/model/pspe_method_lineage_contract_v0.1.json",
+      "sha256": "9a13967af03a4c8a208b13431abd0f7da9cabadfe1f005a8de25e18f3270e5d0"
+    },
+    {
+      "path": "data/model/quebec_pqi_full_archive_contract_v0.1.json",
+      "sha256": "bb0ba8db5cb3baac50a57f53a71e6d67d938e93cce00e8799c05561bbb59a4ae"
+    },
+    {
+      "path": "data/model/quebec_pqi_milestone_vintage_contract_v0.1.json",
+      "sha256": "a9a63dbee5b85cf7dfdb68345d33370c142538498c3b4e468df6daf3a89b2a35"
+    },
+    {
+      "path": "data/processed/ai_attribution_empirical_covariate_panel_v0.1.csv",
+      "sha256": "399d320e4be4057eee482ac0e3d7838dc17f1e19efde258c5345c4ad3d788620"
+    },
+    {
+      "path": "data/processed/ai_construction_proxy_alberta_v0.1.csv",
+      "sha256": "774eb46d94af9356a776c6a6ef9f979b777a72b84336c61d18a2307bac77f0ef"
+    },
+    {
+      "path": "data/processed/alberta_ai_projects.csv",
+      "sha256": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199"
+    },
+    {
+      "path": "data/processed/alberta_major_projects.csv",
+      "sha256": "06856bea409f15de2059e8e758e2e49fcef01d8b173b190a7b9b66e263ef0769"
+    },
+    {
+      "path": "data/processed/bcpi_alberta.csv",
+      "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
+    },
+    {
+      "path": "data/processed/bcpi_material_cost_screen_alberta.csv",
+      "sha256": "383210a67f771f3c0e63f1e415dc07601c7a6326382ec54736ce5eedf2bfbbaf"
+    },
+    {
+      "path": "data/processed/bcpi_material_cost_screen_provinces.csv",
+      "sha256": "69d9ce2e2cb9c1df94a472cb3ab737d2c30712bd25a0954c701f11dbec881581"
+    },
+    {
+      "path": "data/processed/bcpi_material_provinces.csv",
+      "sha256": "9394f1d5cbd322b1f872ce1aee0cc2cac06865725e4b18fc98e12204fec0e74c"
+    },
+    {
+      "path": "data/processed/bcpi_province_linked_history_bc_on_qc.csv",
+      "sha256": "be1fb4655cf4a3625cad0e96dd304a5e0a1d4ee932be8d42d80d7965cc0f2f0f"
+    },
+    {
+      "path": "data/processed/bcpi_reference_bc_on_qc.csv",
+      "sha256": "8d6f2bce624176f736d68ac40f87fc5a3e78aec68d7ad0493ee26b3cfba60a5e"
+    },
+    {
+      "path": "data/processed/bcpi_reference_van_tor_mtl.csv",
+      "sha256": "ac7f0603d84460c8049f335042d2ebc305671f1dab97174fdea159cfdbea1d4c"
+    },
+    {
+      "path": "data/processed/building_investment_controls_canada.csv",
+      "sha256": "95121c9ffe97ad972509d481d2517b8231c32af5d3f34d743f0910305996d33e"
+    },
+    {
+      "path": "data/processed/canadabuys_construction_outcome_feasibility.csv",
+      "sha256": "9414587341995435f4eb71c466d0db1d1d2c2221dc2e00a1b768b5435da15435"
+    },
+    {
+      "path": "data/processed/comparison_market_permit_bcpi_panel_v0.1.csv",
+      "sha256": "8f3d2ee57fe5d5498d2b6fd17e02f29e415afdc9119372143aeb23e7476c0d82"
+    },
+    {
+      "path": "data/processed/edmonton_data_centre_permit_proxy.csv",
+      "sha256": "c76ff46006f6425be98824f09645d817f602b572b444cfe4e1c1e07bda3569b2"
+    },
+    {
+      "path": "data/processed/information_sector_construction_capex_canada.csv",
+      "sha256": "f052c75db8b2771aa841d54477a53de415acaccbb3a8622392fd3eba4ebe8465"
+    },
+    {
+      "path": "data/processed/labour_availability_alberta.csv",
+      "sha256": "9454b563aafd4f2919fb996ba84950c55e4e635f1b67ef8b1bcf80f741ac5c24"
+    },
+    {
+      "path": "data/processed/labour_availability_canada.csv",
+      "sha256": "47652b4a8b2dd9ab6eb77b1b16a44b5bbc62a018dd33272fdbefda710ea56f79"
+    },
+    {
+      "path": "data/processed/labour_workforce_stock_canada.csv",
+      "sha256": "ddaeab6d7eff569738d3e3dac3576dbdd57890f0e0a06d3cc1c98bb202557a89"
+    },
+    {
+      "path": "data/processed/montreal_data_centre_permit_proxy.csv",
+      "sha256": "5c28108fc7f77f657c95f092cbfd7dbe9eded79e0299635283f041a79e40f94f"
+    },
+    {
+      "path": "data/processed/oago_audited_project_outcomes.csv",
+      "sha256": "6ec3e52b2205bcd31d06df9c5d042a4f7758e8800d2ba5570d4426f5925af8dd"
+    },
+    {
+      "path": "data/processed/power_evidence_alberta.csv",
+      "sha256": "198317e01894f9ffba558067c58d7777cda7a4c80e9bcf5c8cee5c5ce5b7917d"
+    },
+    {
+      "path": "data/processed/provincial_power_planning_metrics.csv",
+      "sha256": "c0770af42e51dea7845ba2c8a593eb585825213965ffd3286c7ac1b67bedb691"
+    },
+    {
+      "path": "data/processed/pspc_real_property_outcome_context_2024_2025.csv",
+      "sha256": "296e51e0496b41dd859eee925e77103b576fa2d8f143e964e45f5f7f501975f3"
+    },
+    {
+      "path": "data/processed/public_project_exposure_alberta.csv",
+      "sha256": "748550be78361f31562bd64f494f3f9ff51be398c5877ae65e1404434d8f707d"
+    },
+    {
+      "path": "data/processed/public_project_prospective_snapshot_current.csv",
+      "sha256": "05d9b4178f970f57e121e89a5358a1e899b7c00661322b548e551a9b2d29aae6"
+    },
+    {
+      "path": "data/processed/public_projects_bc_on_qc.csv",
+      "sha256": "aecba64233970132e94950067dc0ada365a324393a0cf3adb3165539bc7d5f8a"
+    },
+    {
+      "path": "data/processed/quebec_pqi_authorized_project_revisions.csv",
+      "sha256": "29bb8d9c7f443e05a2dc8ea93830e2f28a718a8759cc2571aa78965ae0705c8f"
+    },
+    {
+      "path": "data/processed/quebec_pqi_authorized_revision_events.csv",
+      "sha256": "79393b0c6e1a9cbfc3071a0f21b8fbbcd9d51179ca3165a43979afef571323d6"
+    },
+    {
+      "path": "data/processed/quebec_pqi_full_archive_project_lifecycles.csv",
+      "sha256": "3333800021805cd8270fc68337b69da8d803272e106135fe6938a8967b160d54"
+    },
+    {
+      "path": "data/processed/quebec_pqi_full_archive_project_vintages.csv",
+      "sha256": "adbfa7d998260a0b99f31924216d8792b05f30a205a0c1f4db229b49edeb3b4a"
+    },
+    {
+      "path": "data/processed/quebec_pqi_full_archive_transitions.csv",
+      "sha256": "9d210ed003c5d13af0a82b1d0f349dba586858f5fc94afdf4fb800f676e6f071"
+    },
+    {
+      "path": "data/processed/quebec_pqi_milestone_project_lifecycles.csv",
+      "sha256": "ac51cde9b327b39dc6a1693bddebd9ffdffad3af7def1118480b7dae5360bd0d"
+    },
+    {
+      "path": "data/processed/quebec_pqi_milestone_project_vintages.csv",
+      "sha256": "5a68dd09c94f860c1382b3c92d5856e15029dfb2a8d8b6be5051a717edf0a25e"
+    },
+    {
+      "path": "data/processed/regional_macro_controls_canada.csv",
+      "sha256": "512312573bc3f8e67e444279effd9b575b8b62cb5092b959446e032e91288908"
+    },
+    {
+      "path": "data/processed/toronto_data_centre_permit_proxy.csv",
+      "sha256": "3f25a13eebb31c4aad47841f1f6383aba50f47df1ff45a7fd0506bfb9b15dd31"
+    },
+    {
+      "path": "data/processed/vancouver_data_centre_permit_proxy.csv",
+      "sha256": "b9f932db163c7d4bf7dc161a3c15cf4ce1ec0a1a6834e8ae7542917c8e22e84c"
+    },
+    {
+      "path": "data/registry/sources.json",
+      "sha256": "4bea23fa75e7311e5a2b59f2c1b81432c3902f2e0cd72d55759c98ad6f03edcf"
+    },
+    {
+      "path": "data/releases/0.1.0-dev/alberta_ai_projects.csv",
+      "sha256": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199"
+    },
+    {
+      "path": "data/releases/0.1.0-dev/baseline.json",
+      "sha256": "fccb881e40be17cca0d52cf23c0fa6b85b7d46ee9a174ae99692de0380abaa8a"
+    },
+    {
+      "path": "data/releases/0.1.0-dev/bcpi_alberta.csv",
+      "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
+    },
+    {
+      "path": "data/releases/0.1.0-dev/digest.json",
+      "sha256": "5a25a81b49b65443f1d3e7be45195e690cf47faabadb699d299e3ca1c3d8f69e"
+    },
+    {
+      "path": "data/releases/0.1.0-dev/manifest.json",
+      "sha256": "5d7ffc02dad43bfdc364b21c38ba17d5b2276f47beb3800b28fe40c9a246184b"
+    },
+    {
+      "path": "data/releases/0.1.0-dev/publication-artifacts.json",
+      "sha256": "59cb97adaad1d4da4c36cd200be93593dfd39fe3250ef78f746c8cf27406d689"
+    },
+    {
+      "path": "data/releases/0.1.0-dev/scenario.json",
+      "sha256": "170338f23c2282142f1eb4b7549a66481bef50e6c7c2ab532e74ac0edd08a24b"
+    },
+    {
+      "path": "data/releases/0.1.0-dev/sources.json",
+      "sha256": "954266d34c086a6927871fff967e8ff20d2febf8e9634dcaae2e73454cc5f310"
+    },
+    {
+      "path": "data/releases/0.2.0-dev/alberta_ai_projects.csv",
+      "sha256": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199"
+    },
+    {
+      "path": "data/releases/0.2.0-dev/baseline.json",
+      "sha256": "fccb881e40be17cca0d52cf23c0fa6b85b7d46ee9a174ae99692de0380abaa8a"
+    },
+    {
+      "path": "data/releases/0.2.0-dev/bcpi_alberta.csv",
+      "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
+    },
+    {
+      "path": "data/releases/0.2.0-dev/digest.json",
+      "sha256": "5a25a81b49b65443f1d3e7be45195e690cf47faabadb699d299e3ca1c3d8f69e"
+    },
+    {
+      "path": "data/releases/0.2.0-dev/manifest.json",
+      "sha256": "c8d04b489f17159bd7cb082efbc0f1c2a22b0538a2cb050388a42f4374578d3a"
+    },
+    {
+      "path": "data/releases/0.2.0-dev/power_overlay.json",
+      "sha256": "5f1a10ebcd409b3378fb232a8333db278e9c8743f5b74b30b99cad8efec2b6a9"
+    },
+    {
+      "path": "data/releases/0.2.0-dev/publication-artifacts.json",
+      "sha256": "82568eb118ae6cc13f96392dd947009d7dad864e0b6ce7c53a6262cc2d01603f"
+    },
+    {
+      "path": "data/releases/0.2.0-dev/scenario.json",
+      "sha256": "fcb81fd9149300e6c9a75539f554823870954153d1d21d240b6468d44e02f59f"
+    },
+    {
+      "path": "data/releases/0.2.0-dev/sources.json",
+      "sha256": "954266d34c086a6927871fff967e8ff20d2febf8e9634dcaae2e73454cc5f310"
+    },
+    {
+      "path": "data/releases/0.3.0-dev/alberta_ai_projects.csv",
+      "sha256": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199"
+    },
+    {
+      "path": "data/releases/0.3.0-dev/baseline.json",
+      "sha256": "78086410ca0bc5259c585d8e147494bb7f495e1a98ae0d97ebafc4430748d907"
+    },
+    {
+      "path": "data/releases/0.3.0-dev/bcpi_alberta.csv",
+      "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
+    },
+    {
+      "path": "data/releases/0.3.0-dev/digest.json",
+      "sha256": "5a25a81b49b65443f1d3e7be45195e690cf47faabadb699d299e3ca1c3d8f69e"
+    },
+    {
+      "path": "data/releases/0.3.0-dev/labour_availability_alberta.csv",
+      "sha256": "9454b563aafd4f2919fb996ba84950c55e4e635f1b67ef8b1bcf80f741ac5c24"
+    },
+    {
+      "path": "data/releases/0.3.0-dev/manifest.json",
+      "sha256": "bb3aa2076b4674488aa4ba947af2ed167ecdac0dc22f463746f841e12b8f8997"
+    },
+    {
+      "path": "data/releases/0.3.0-dev/power_overlay.json",
+      "sha256": "5f1a10ebcd409b3378fb232a8333db278e9c8743f5b74b30b99cad8efec2b6a9"
+    },
+    {
+      "path": "data/releases/0.3.0-dev/publication-artifacts.json",
+      "sha256": "aebc6d3d645fd3bdd50f0a4deb46bc3f885f5f72c7a8eb1e7d212b4f8ef85945"
+    },
+    {
+      "path": "data/releases/0.3.0-dev/scenario.json",
+      "sha256": "fcb81fd9149300e6c9a75539f554823870954153d1d21d240b6468d44e02f59f"
+    },
+    {
+      "path": "data/releases/0.3.0-dev/sources.json",
+      "sha256": "954266d34c086a6927871fff967e8ff20d2febf8e9634dcaae2e73454cc5f310"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/alberta_ai_projects.csv",
+      "sha256": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/baseline.json",
+      "sha256": "45380ea386aae019c1ce5aa7f398a882894fbcc8612a4c3e85a4be8b5f4e9d1e"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/bcpi_alberta.csv",
+      "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/digest.json",
+      "sha256": "5a25a81b49b65443f1d3e7be45195e690cf47faabadb699d299e3ca1c3d8f69e"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/labour_availability_alberta.csv",
+      "sha256": "9454b563aafd4f2919fb996ba84950c55e4e635f1b67ef8b1bcf80f741ac5c24"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/labour_availability_canada.csv",
+      "sha256": "47652b4a8b2dd9ab6eb77b1b16a44b5bbc62a018dd33272fdbefda710ea56f79"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/manifest.json",
+      "sha256": "deb692a46b24f0a7b9096990ebd0d141570af4d6ecd4f036915ca0f73666f2d6"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/power_overlay.json",
+      "sha256": "5f1a10ebcd409b3378fb232a8333db278e9c8743f5b74b30b99cad8efec2b6a9"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/publication-artifacts.json",
+      "sha256": "b988bd0952746336914a2e6375f060036e42100b62a25dfb5e27009b9ff2f4e4"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/scenario.json",
+      "sha256": "fcb81fd9149300e6c9a75539f554823870954153d1d21d240b6468d44e02f59f"
+    },
+    {
+      "path": "data/releases/0.4.0-dev/sources.json",
+      "sha256": "954266d34c086a6927871fff967e8ff20d2febf8e9634dcaae2e73454cc5f310"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/alberta_ai_projects.csv",
+      "sha256": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/baseline.json",
+      "sha256": "4584a47a97045a564917cbb81e34853f89df88f90579e398f9a081398885764a"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/bcpi_alberta.csv",
+      "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/digest.json",
+      "sha256": "5a25a81b49b65443f1d3e7be45195e690cf47faabadb699d299e3ca1c3d8f69e"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/labour_availability_alberta.csv",
+      "sha256": "9454b563aafd4f2919fb996ba84950c55e4e635f1b67ef8b1bcf80f741ac5c24"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/labour_availability_canada.csv",
+      "sha256": "47652b4a8b2dd9ab6eb77b1b16a44b5bbc62a018dd33272fdbefda710ea56f79"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/labour_pressure.json",
+      "sha256": "04c726ae96667decb2eb7d995e9807a3a4f61409a28efc9c4a6289bf93b1c07e"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/labour_workforce_stock_canada.csv",
+      "sha256": "ddaeab6d7eff569738d3e3dac3576dbdd57890f0e0a06d3cc1c98bb202557a89"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/manifest.json",
+      "sha256": "5af101e28bfb82099cc113e2a54463ae60e4329bab45894f9cd6a6772e5e1b37"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/power_overlay.json",
+      "sha256": "5f1a10ebcd409b3378fb232a8333db278e9c8743f5b74b30b99cad8efec2b6a9"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/publication-artifacts.json",
+      "sha256": "c365f1ed6b01c5ed213545b61b769e0275d0b41fd21c55f7cea0267ceb87ebf0"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/scenario.json",
+      "sha256": "fcb81fd9149300e6c9a75539f554823870954153d1d21d240b6468d44e02f59f"
+    },
+    {
+      "path": "data/releases/0.5.0-dev/sources.json",
+      "sha256": "42672ef1af55eb7d7795eb319fb6d56400de5e22dca8423f97283223b16c31ca"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/alberta_ai_projects.csv",
+      "sha256": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/baseline.json",
+      "sha256": "4584a47a97045a564917cbb81e34853f89df88f90579e398f9a081398885764a"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/bcpi_alberta.csv",
+      "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/bcpi_material_cost_screen_alberta.csv",
+      "sha256": "383210a67f771f3c0e63f1e415dc07601c7a6326382ec54736ce5eedf2bfbbaf"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/digest.json",
+      "sha256": "c798a767fc3f95de3fb4b146dfe0f0cda5c0e2cf31fa7efc5d45116211e2da06"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/labour_availability_alberta.csv",
+      "sha256": "9454b563aafd4f2919fb996ba84950c55e4e635f1b67ef8b1bcf80f741ac5c24"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/labour_availability_canada.csv",
+      "sha256": "47652b4a8b2dd9ab6eb77b1b16a44b5bbc62a018dd33272fdbefda710ea56f79"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/labour_pressure.json",
+      "sha256": "04c726ae96667decb2eb7d995e9807a3a4f61409a28efc9c4a6289bf93b1c07e"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/labour_workforce_stock_canada.csv",
+      "sha256": "ddaeab6d7eff569738d3e3dac3576dbdd57890f0e0a06d3cc1c98bb202557a89"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/manifest.json",
+      "sha256": "82c3a116d18ad0eb07041b99355cc32e687e2b47991b159252effa3ab29bfe01"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/material_cost_screen.json",
+      "sha256": "1ee019d0f8410538136d21e4b894c7448a3fef96a47d06a85e3dddf715b42412"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/power_evidence.json",
+      "sha256": "90ffe5c20a2ef23e1cc70a4a3d6b1e1251c4131cdbf6cddc3e86d49b82c07bb7"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/power_evidence_alberta.csv",
+      "sha256": "198317e01894f9ffba558067c58d7777cda7a4c80e9bcf5c8cee5c5ce5b7917d"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/power_overlay.json",
+      "sha256": "5f1a10ebcd409b3378fb232a8333db278e9c8743f5b74b30b99cad8efec2b6a9"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/public_project_exposure.json",
+      "sha256": "b77c53adc05330e1b47cb06ccf2a327124b17794127dce92de6f368bc836402a"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/public_project_exposure_alberta.csv",
+      "sha256": "748550be78361f31562bd64f494f3f9ff51be398c5877ae65e1404434d8f707d"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/publication-artifacts.json",
+      "sha256": "8762540dd2b7d15ce880fee5c61e97d70ffe50ccda65bfc5738c478d5b7a0f2b"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/scenario.json",
+      "sha256": "fcb81fd9149300e6c9a75539f554823870954153d1d21d240b6468d44e02f59f"
+    },
+    {
+      "path": "data/releases/0.6.0-dev/sources.json",
+      "sha256": "ce4368cab012556a00c6f5eed27c0c7b6b2b394790434c22e07244f4f2fd1567"
+    },
+    {
+      "path": "data/reviews/quebec_pqi_parser_review_sample_v0.1.csv",
+      "sha256": "32a853fd7ffdb9fac67c1bf64ed8afba2b21b0693523c5a69d0f822ea5931aff"
+    },
+    {
+      "path": "data/scenarios/alberta_50b_constrained_delivery_v0.1.json",
+      "sha256": "280fc365a203f051ea9160ae7f6e69dea849f415b49efb83f01b7f327ad5b5ff"
+    },
+    {
+      "path": "data/scenarios/alberta_50b_counterfactual_v0.2.json",
+      "sha256": "12dcc5146212bc9b812f21bc81fa12313226b4fad665c8435be886a6baf15ca0"
+    },
+    {
+      "path": "data/scenarios/alberta_50b_front_loaded_v0.1.json",
+      "sha256": "c452a6e405759031eb46d086afea3e173a52a4782042ceede267a048184ea50b"
+    },
+    {
+      "path": "data/scenarios/alberta_50b_high_local_capture_v0.1.json",
+      "sha256": "1bc501310f5ebbb7af330886df547167a18a2782ba44995e38323f08cc787610"
+    },
+    {
+      "path": "data/scenarios/alberta_50b_staggered.json",
+      "sha256": "ec03441e4bf4f51d9211e5e2593fe20b2df49aab432801d753b2073bba4c4efb"
+    },
+    {
+      "path": "data/scenarios/alberta_power_overlay_v0.1.json",
+      "sha256": "71990595c2ce91009dbebdc42939b57c58efbe6ca170e54665d3112713f9f9f9"
+    },
+    {
+      "path": "db/env.d.ts",
+      "sha256": "1723a1488b36046bd2b41abeb0f928f50cba17c6702fca09ba65de3f17cdd258"
+    },
+    {
+      "path": "db/index.ts",
+      "sha256": "991de9c107b00a37ad6540bf3540e2efe1eb2c30a04203daf4bd36f83f62d230"
+    },
+    {
+      "path": "db/schema.ts",
+      "sha256": "3f261ecf85271a254285e91e5927f7c79e3f3eb9190bf1994f483874cf37903e"
+    },
+    {
+      "path": "drizzle.config.ts",
+      "sha256": "9a41cce699b66a99925d6cf0d0e8a50802a420138a71b41959bb823e0402ff86"
+    },
+    {
+      "path": "drizzle/0000_dry_slapstick.sql",
+      "sha256": "51f5d67321a94f7ee7263f4656b7aacd8ff4bad83c5555cf561cb82e5b97a5a3"
+    },
+    {
+      "path": "drizzle/meta/0000_snapshot.json",
+      "sha256": "f34f3e1ac4cb04d0550cda70b1bebd2599a7d1ecac9c2a0b8cb375553fe4ff6e"
+    },
+    {
+      "path": "drizzle/meta/_journal.json",
+      "sha256": "e9f4ff4810047338e17e4e9cc40df88aaac8feae06f004e0f7c277a46ed754d4"
+    },
+    {
+      "path": "hooks/use-mobile.ts",
+      "sha256": "82bff42ff087bd5dc90a5d17609cc428b8688de92d1333073a839af5ad3c9cbd"
+    },
+    {
+      "path": "lib/assessment-record.ts",
+      "sha256": "b8d702350a6dc31e2687090462e583b2cc832724ca8542342392c451d75fc388"
+    },
+    {
+      "path": "lib/decision-analysis.ts",
+      "sha256": "def96f9b97eee073881bd05f97b0258955c0cf61475666d98cd6da894f578820"
+    },
+    {
+      "path": "lib/decision-outlook.ts",
+      "sha256": "472d788e9caf52ba66c2aebb5dc7ecf9cd17fa70963b35927e17dd8fadb02cf7"
+    },
+    {
+      "path": "lib/executive-evidence.ts",
+      "sha256": "09cd21118a692a4de43f87eae2cdf6ba51b24e9eb0b66ffd6b39a82fd07d4550"
+    },
+    {
+      "path": "lib/planning-calibration.ts",
+      "sha256": "e7c76351d1e1b816e8bdaec6d49aea89c96176ccd3904f7799fba6a5b2fa4e03"
+    },
+    {
+      "path": "lib/project-cashflow.ts",
+      "sha256": "46227b872d100aa2687ca813f1ca78d26f4af1dab9b55f853161ee21c2641c6c"
+    },
+    {
+      "path": "lib/utils.ts",
+      "sha256": "9304a861c8673bee09e0f12de31773abbde503b02e59dfd74763ddec2e37cf05"
+    },
+    {
+      "path": "next.config.ts",
+      "sha256": "08bc590980057c747900023c783cb6525087ff3bb737e3bf9af2457c01c73998"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "23afacbab4b3ed868faaa1c8c272dad46c8f237ed6d392fc2e46685c252f7094"
+    },
+    {
+      "path": "package.json",
+      "sha256": "f7c207e1ca8ae77db6a475900ed94dbc68ffd8bad76f741eee3a789bd3af01a3"
+    },
+    {
+      "path": "postcss.config.mjs",
+      "sha256": "9ca55411b62b2c9cc5631a3e6c631d80c8b8171c7b9ea1e19f83400f4100e910"
+    },
+    {
+      "path": "public/data/latest-digest.json",
+      "sha256": "fed4bf0b4129729b675b1ad9e822b8180121701015ae88967c1dff631288bd7a"
+    },
+    {
+      "path": "public/data/latest.json",
+      "sha256": "7e2a3079f8003448aeb34d03c81dc42daef256819cf0dfbee7ed77b827272b9f"
+    },
+    {
+      "path": "public/data/manifest.json",
+      "sha256": "82c3a116d18ad0eb07041b99355cc32e687e2b47991b159252effa3ab29bfe01"
+    },
+    {
+      "path": "public/data/publication-artifacts.json",
+      "sha256": "8762540dd2b7d15ce880fee5c61e97d70ffe50ccda65bfc5738c478d5b7a0f2b"
+    },
+    {
+      "path": "public/data/research-surface.json",
+      "sha256": "4d30b3043629d94a4761745f2edaf31926df1a978ebab00689ecd82be8d810c7"
+    },
+    {
+      "path": "public/data/source-freshness.json",
+      "sha256": "e53b771138698b5164e209ff87195523acf64d9e940b1911941fe0f04bc78637"
+    },
+    {
+      "path": "public/downloads/AIIO_Alberta_Pilot_0.1.0-dev.xlsx",
+      "sha256": "34d15f70a8016422a9c6aa82572927dc4241f507f1b416c0378e42b6057e9c3f"
+    },
+    {
+      "path": "public/downloads/AIIO_Alberta_Pilot_0.2.0-dev.xlsx",
+      "sha256": "65b371ebc50c666b6e83bff0cc75529806fa389fe97e0534bd93ba7119df3f7e"
+    },
+    {
+      "path": "public/downloads/AIIO_Alberta_Pilot_0.3.0-dev.xlsx",
+      "sha256": "6f84950351eea6a08406762e0953c4f3be9e1da255650631a48ee0e139433bf8"
+    },
+    {
+      "path": "public/downloads/AIIO_Alberta_Pilot_0.4.0-dev.xlsx",
+      "sha256": "dbb36af7ae563e376d763da76e1076e3f300ba7df42f474a56338647f19a0b14"
+    },
+    {
+      "path": "public/downloads/AIIO_Alberta_Pilot_0.5.0-dev.xlsx",
+      "sha256": "37b63499e49474a0e0ba1e27750cc2b022492d342d2c906e4e91dd5facf8533e"
+    },
+    {
+      "path": "public/downloads/AIIO_Alberta_Pilot_0.6.0-dev.xlsx",
+      "sha256": "e298c3787e53c06b0624cff70433a735e403f45bd257be87d9fc33e74fb1b747"
+    },
+    {
+      "path": "public/downloads/alberta_ai_projects.csv",
+      "sha256": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199"
+    },
+    {
+      "path": "public/downloads/bcpi_alberta.csv",
+      "sha256": "4ea07e72d839df3e66b81f5e9b213932c153e39020af7bc96cc0ce6cdb2f36c1"
+    },
+    {
+      "path": "public/downloads/bcpi_material_cost_screen_alberta.csv",
+      "sha256": "383210a67f771f3c0e63f1e415dc07601c7a6326382ec54736ce5eedf2bfbbaf"
+    },
+    {
+      "path": "public/downloads/labour_availability_alberta.csv",
+      "sha256": "9454b563aafd4f2919fb996ba84950c55e4e635f1b67ef8b1bcf80f741ac5c24"
+    },
+    {
+      "path": "public/downloads/labour_availability_canada.csv",
+      "sha256": "47652b4a8b2dd9ab6eb77b1b16a44b5bbc62a018dd33272fdbefda710ea56f79"
+    },
+    {
+      "path": "public/downloads/labour_workforce_stock_canada.csv",
+      "sha256": "ddaeab6d7eff569738d3e3dac3576dbdd57890f0e0a06d3cc1c98bb202557a89"
+    },
+    {
+      "path": "public/downloads/power_evidence_alberta.csv",
+      "sha256": "198317e01894f9ffba558067c58d7777cda7a4c80e9bcf5c8cee5c5ce5b7917d"
+    },
+    {
+      "path": "public/downloads/public_project_exposure_alberta.csv",
+      "sha256": "748550be78361f31562bd64f494f3f9ff51be398c5877ae65e1404434d8f707d"
+    },
+    {
+      "path": "public/favicon.svg",
+      "sha256": "a06493f2e350756fb5e28e266fb5e0d15b17251c03967353b4c3a36ba0bee60c"
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "0d12e69a412c0f8cbee827debdf8de7ba4511b8d1ba311a57d96f989bc96e903"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+import { ScenarioInterpretation } from '@/components/scenario-interpretation';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Activity,
@@ -50,11 +52,11 @@ import {
 type View = 'outlook' | 'cockpit' | 'walkthrough' | 'evidence' | 'brief';
 
 const views: { id: View; label: string; icon: typeof Gauge }[] = [
+  { id: 'walkthrough', label: 'Guided story', icon: Route },
   { id: 'outlook', label: 'Overview', icon: Activity },
   { id: 'cockpit', label: 'Scenario comparison', icon: Gauge },
   { id: 'evidence', label: 'Evidence', icon: Layers3 },
   { id: 'brief', label: 'Decision brief', icon: Printer },
-  { id: 'walkthrough', label: 'Guided story', icon: Route },
 ];
 
 type ExecutiveReadiness = {
@@ -83,7 +85,7 @@ export function ExecutiveCockpit({
 }: {
   readiness: ExecutiveReadiness;
 }) {
-  const [view, setView] = useState<View>('outlook');
+  const [view, setView] = useState<View>('walkthrough');
   const [assetId, setAssetId] = useState<AssetId>('hospital');
   const [metroId, setMetroId] = useState<MetroId>('CMA_835');
   const [budgetMillions, setBudgetMillions] = useState(1200);
@@ -112,6 +114,9 @@ export function ExecutiveCockpit({
   useEffect(() => {
     const timer = window.setTimeout(() => {
       const query = new URLSearchParams(window.location.search);
+      const requestedView = query.get('view');
+      if (views.some((v) => v.id === requestedView))
+        setView(requestedView as View);
       const asset = query.get('asset') as AssetId | null;
       const metro = query.get('metro') as MetroId | null;
       if (asset && Object.hasOwn(ASSETS, asset)) setAssetId(asset);
@@ -234,6 +239,7 @@ export function ExecutiveCockpit({
       url.searchParams.set(key, value),
     );
     url.searchParams.set('profile', spendingProfile);
+    url.searchParams.set('view', view);
     window.history.replaceState(null, '', url);
     try {
       await navigator.clipboard.writeText(url.toString());
@@ -257,6 +263,12 @@ export function ExecutiveCockpit({
           className="flex gap-1 overflow-x-auto lg:flex-col"
           aria-label="Executive dashboard views"
         >
+          <Link href="/" className="px-3 py-3 text-sm text-white">
+            ← Alberta overview
+          </Link>
+          <Link href="/delivery" className="px-3 py-3 text-sm text-white">
+            Delivery decisions
+          </Link>
           {views.map(({ id, label, icon: Icon }) => (
             <button
               aria-current={view === id ? 'page' : undefined}
@@ -355,6 +367,11 @@ export function ExecutiveCockpit({
           />
         </div>
       </header>
+      <ScenarioInterpretation
+        assessment={assessment}
+        inputs={decisionInputs}
+        contingencyPct={contingencyPct}
+      />
       <div className="min-w-0">
         {view === 'outlook' ? (
           <MonthlyEscalationOutlook
@@ -400,7 +417,7 @@ export function ExecutiveCockpit({
           />
         ) : view === 'brief' ? (
           <div className="flex min-h-0 flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="executive-export-controls flex flex-wrap items-center gap-2">
               <Button disabled={!record} onClick={() => window.print()}>
                 Print / Save PDF
               </Button>

@@ -1,5 +1,10 @@
 'use client';
 
+import {
+  scenarioMoney as money,
+  scenarioRate,
+} from '@/lib/public-presentation.mjs';
+
 import { useMemo, useState } from 'react';
 import { WorkspaceMetric } from '@/components/workspace-metric';
 import { ArrowRight, CircleAlert } from 'lucide-react';
@@ -236,9 +241,9 @@ export function MonthlyEscalationOutlook({
                             ?.label ?? String(name)}
                         </span>
                         <b>
-                          {Number(value).toFixed(
-                            chartMode === 'spending' ? 2 : 3,
-                          )}
+                          {chartMode === 'spending'
+                            ? money(Number(value))
+                            : scenarioRate(Number(value))}
                         </b>
                       </span>
                     )}
@@ -327,7 +332,7 @@ export function MonthlyEscalationOutlook({
             value={
               month.combined_mom_pct === null
                 ? '—'
-                : `${month.combined_mom_pct.toFixed(3)}%`
+                : `${scenarioRate(month.combined_mom_pct)}%`
             }
           />
         </div>
@@ -353,7 +358,7 @@ export function MonthlyEscalationOutlook({
                       <span className="block font-mono">
                         {row.contribution_pct_points === null
                           ? 'Not allocated'
-                          : `${row.contribution_pct_points.toFixed(4)} pp MoM`}
+                          : `${scenarioRate(row.contribution_pct_points)} pp MoM`}
                       </span>
                     </button>
                   ))}
@@ -415,7 +420,7 @@ function NodalPanel({
       <p className="mt-1 font-mono text-caution">
         {driver?.contribution_pct_points == null
           ? 'Monthly allocation unavailable'
-          : `${driver.contribution_pct_points.toFixed(4)} pp MoM (assumed)`}
+          : `${scenarioRate(driver.contribution_pct_points)} pp MoM (assumed)`}
       </p>
       <p className="mt-2 text-xs text-subtle">
         Path structure is illustrative; upstream arrows do not add another cost
@@ -502,9 +507,4 @@ function MitigationPanel({
       </p>
     </div>
   );
-}
-function money(value: number | null | undefined) {
-  return value == null
-    ? '—'
-    : `$${value.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`;
 }

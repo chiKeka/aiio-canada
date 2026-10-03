@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { publicReviews } from '@/lib/public-presentation.mjs';
+import practicalRoute from '@/data/model-runs/practical_evidence_route_current.json';
 import { CheckCircle2, GitBranch, Layers3, ShieldCheck } from 'lucide-react';
 
 import {
@@ -54,7 +56,9 @@ const methodSteps = [
 ];
 
 export default function MethodsPage() {
-  const reviewerStates = Object.entries(programGates.independent_review);
+  const reviewerStates = Object.entries(
+    publicReviews(programGates.independent_review),
+  );
   const evidenceScreens = releaseData as typeof releaseData & {
     material_cost_screen?: { limitations: string[] };
     public_project_exposure?: { limitations: string[] };
@@ -335,6 +339,37 @@ export default function MethodsPage() {
               ))}
             </ul>
           </div>
+        </div>
+      </section>
+      <section
+        id="planning-gates"
+        className="mx-auto max-w-[1440px] scroll-mt-24 px-5 py-8 sm:px-8"
+      >
+        <h2 className="text-2xl font-semibold">Planning validation gates</h2>
+        <p className="mt-3 text-sm">
+          {practicalRoute.proxy_planning_validation.passed_check_count} of{' '}
+          {practicalRoute.proxy_planning_validation.check_count} checks pass.
+          Each remaining check identifies the evidence needed; this count is not
+          a confidence score.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {practicalRoute.proxy_planning_validation.checks.map((check) => (
+            <article
+              className="rounded-lg border border-line bg-surface p-4"
+              key={check.id}
+            >
+              <h3 className="font-semibold">
+                {check.id.replaceAll('_', ' ')} ·{' '}
+                {check.status.replaceAll('_', ' ')}
+              </h3>
+              <p className="mt-2 text-sm">{check.finding}</p>
+              {check.next_step ? (
+                <p className="mt-2 text-sm text-subtle">
+                  Next: {check.next_step}
+                </p>
+              ) : null}
+            </article>
+          ))}
         </div>
       </section>
       <SiteFooter />

@@ -10,11 +10,18 @@ from .schemas import ValidationError
 
 SURFACE_ID = "AIIO_CANADA_RESEARCH_SURFACE_0_1"
 ARTIFACTS = [
+    ("source_receipts", "public/data/source-receipts.json", "governance"),
+    ("enabling_infrastructure", "data/scenarios/alberta_enabling_infrastructure_v0.1.json", "assumption"),
+    ("alberta_delivery_register", "data/governance/alberta-delivery-register.json", "governance"),
+    ("alberta_comparison_baseline", "data/governance/alberta-comparison-baseline.json", "published_evidence_bundle"),
     ("construction_projects", "public/data/construction/projects.json", "observed_inventory"),
     ("construction_benchmarks", "public/data/construction/benchmarks.json", "mixed_evidence_reference"),
     ("construction_briefing", "public/data/construction/briefing.json", "observed_and_analytical"),
     ("construction_manifest", "public/data/construction/manifest.json", "provenance"),
     ("construction_snapshot", "public/data/construction/snapshot.json", "published_evidence_bundle"),
+    ("adm_evidence", "public/data/construction/adm-evidence.json", "observed_and_analytical"),
+    ("adm_deck_pointer", "public/data/construction/adm-deck.json", "provenance"),
+    ("alberta_boom_analog", "public/data/alberta-boom-analog.json", "observed_historical_comparison"),
     ("frozen_release_bundle", "public/data/latest.json", "frozen_release"),
     ("frozen_release_manifest", "public/data/manifest.json", "governance"),
     ("latest_digest_pointer", "public/data/latest-digest.json", "governance"),

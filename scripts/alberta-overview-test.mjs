@@ -5,17 +5,14 @@ import AxeBuilder from '@axe-core/playwright';
 const evidence = JSON.parse(
   fs.readFileSync('public/data/construction/briefing.json', 'utf8'),
 );
-const browser = await chromium.launch({
-  executablePath:
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  headless: true,
-});
+import { baseUrl, browserOptions } from './browser-config.mjs';
+const browser = await chromium.launch(browserOptions());
 try {
   const context = await browser.newContext();
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto('http://localhost:3002/construction');
+  await page.goto(`${baseUrl}/construction`);
   const overview = page.getByTestId('alberta-overview');
   await overview.waitFor();
   assert.equal(

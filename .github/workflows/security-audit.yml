@@ -35,6 +35,12 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
+      - name: Verify vendored security patches and installed consumers
+        run: npm run test:dependency-security
+
+      - name: Audit all dependencies including development tooling
+        run: npm audit
+
       - name: Audit production dependencies
         run: npm audit --omit=dev
 

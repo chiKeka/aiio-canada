@@ -681,6 +681,7 @@ await workbook.comments.addThread(
 
 await fs.mkdir(outputDir, { recursive: true });
 await fs.mkdir(previewDir, { recursive: true });
+workbook.recalculate();
 
 const inspectDashboard = await workbook.inspect({
   kind: 'table',
@@ -887,6 +888,13 @@ const errors = await workbook.inspect({
   summary: 'final formula error scan',
 });
 console.log(errors.ndjson);
+
+const coverageCheck = checks.getRange('B55').values[0][0];
+if (coverageCheck !== 'PASS') throw new Error('Canada coverage reconciliation failed');
+const errorRecords = errors.ndjson.trim().split('\n').filter(Boolean).map((line) => JSON.parse(line));
+if (!errorRecords.some((record) => record.kind === 'notice' && record.message === 'Cell search matched 0 entries.')) {
+  throw new Error('Workbook formula scan did not confirm zero errors');
+}
 
 const previewRanges = {
   'Read Me': 'A1:H59',

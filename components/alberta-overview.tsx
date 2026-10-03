@@ -236,6 +236,17 @@ export function AlbertaOverview({
     mv_switchgear: 'Medium-voltage switchgear',
     ups: 'UPS',
   };
+  const procurementScale = Math.max(
+    20,
+    Math.ceil(
+      Math.max(
+        ...Object.keys(equipment).map((id) => {
+          const value = parameter(`procurement_${id}`)?.value;
+          return Array.isArray(value) ? Math.max(...value.map(Number)) : 0;
+        }),
+      ) / 20,
+    ) * 20,
+  );
   const guidance = evidence.guidance;
   const buildforce = source('BUILDFORCE'),
     fiscal = source('AB_Q1'),
@@ -243,11 +254,9 @@ export function AlbertaOverview({
   return (
     <div className="space-y-5" data-testid="alberta-overview">
       <div className="rounded-lg bg-workspace p-5 text-sm leading-6 text-ink">
-        <p className="font-semibold">
-          The evidence behind the Alberta presentation
-        </p>
+        <p className="font-semibold">Alberta construction evidence</p>
         <p className="mt-1 text-subtle">
-          Evidence through {manifest.asOf}. All presentation metrics are shown
+          Evidence through {manifest.asOf}. Key market indicators are shown
           below, alongside their source periods. Reported observations,
           published forecasts and analytical recommendations retain their
           separate meanings.
@@ -276,7 +285,7 @@ export function AlbertaOverview({
         </nav>
       </div>
       <ConstructionLiveUpdate revision={revision} />
-      <details className="rounded-lg border border-line bg-surface p-5" open>
+      <details className="rounded-lg border border-line bg-surface p-5">
         <summary className="cursor-pointer font-semibold text-ink">
           Source updates and freshness
         </summary>
@@ -392,7 +401,11 @@ export function AlbertaOverview({
           headers={['Project / phase', 'Stage', 'Completion year']}
           rows={
             scheduled.length
-              ? scheduled.map((p) => [p.name, p.stage, format(p.end)])
+              ? scheduled.map((p) => [
+                  p.name,
+                  p.stage,
+                  p.end == null ? 'Not published' : String(p.end),
+                ])
               : [['No completion years reported', '—', 'Not published']]
           }
         />
@@ -433,8 +446,8 @@ export function AlbertaOverview({
                   </span>
                 </span>,
                 p.stage,
-                format(p.start),
-                format(p.end),
+                p.start == null ? 'Not published' : String(p.start),
+                p.end == null ? 'Not published' : String(p.end),
                 money(p.cost),
               ])}
             />
@@ -545,8 +558,8 @@ export function AlbertaOverview({
         }
       >
         <p className="text-sm text-subtle">
-          All eight component changes used in the PPT, compared with the same
-          quarter one year earlier.
+          Eight component changes, compared with the same quarter one year
+          earlier.
         </p>
         <Table
           caption="Calgary and Edmonton year-over-year construction price changes"
@@ -639,6 +652,38 @@ export function AlbertaOverview({
           </>
         }
       >
+        <figure
+          aria-label="Equipment lead-time ranges in weeks; exact values follow in the table"
+          className="space-y-3"
+        >
+          <p className="text-xs text-subtle">
+            Published US benchmark ranges · common scale 0–{procurementScale}{' '}
+            weeks
+          </p>
+          {Object.entries(equipment).map(([id, label]) => {
+            const value = parameter(`procurement_${id}`)?.value;
+            if (!Array.isArray(value) || value.length !== 2) return null;
+            const low = Number(value[0]),
+              high = Number(value[1]);
+            return (
+              <div
+                key={id}
+                className="grid grid-cols-[8rem_1fr] items-center gap-3 text-xs sm:grid-cols-[12rem_1fr]"
+              >
+                <span>{label}</span>
+                <div className="relative h-4 rounded bg-workspace">
+                  <div
+                    className="absolute h-full rounded bg-brand"
+                    style={{
+                      left: `${(low / procurementScale) * 100}%`,
+                      width: `${((high - low) / procurementScale) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </figure>
         <Table
           caption="Published equipment procurement lead-time ranges"
           headers={[

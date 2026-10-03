@@ -58,3 +58,53 @@ Stop the edition when a source is unregistered, a URL differs from its registry
 record, a date disagrees with its filename, a source is inaccessible, evidence
 status is ambiguous, or a deterministic rebuild changes an older edition.
 Record the gap rather than filling it with an assumption.
+
+## Availability, receipt checks and frozen vintage
+
+`/api/availability` measures application liveness. `/api/health` reports artifact
+integrity and separate evidence readiness reasons. A stale digest or overdue
+source verification degrades readiness while the last-good evidence remains
+available and visibly dated. The production monitor logs the exact route and
+HTTP status and retains machine-readable diagnostics; overdue evidence appears
+as a warning rather than a claim that the whole website is unavailable.
+
+`public/data/source-freshness.json` retains the frozen review vintage.
+`public/data/source-receipts.json` records current operational verification,
+which status and health age against the request clock. A successful unchanged
+fetch advances verification, never an observation date. A failed attempt retains
+the previous success and last-good values. Unknown publication dates remain
+unknown. Retrieval timestamps use the actual UTC check date, independently of
+an optional digest edition date.
+
+For an offline, read-only receipt check, run:
+
+```sh
+python3 research/scripts/weekly_evidence_refresh.py --root . --check-receipts
+PYTHONPATH=research/src python3 -m unittest research/tests/test_weekly_refresh.py research/tests/test_source_freshness.py
+python3 -m unittest discover -s tests -p test_construction_refresh.py
+```
+
+The receipt check reads local registry and archived receipts, prints the source
+IDs whose cadence is overdue, and performs no fetch or file write. Fixtures
+verify success, unchanged verification, failed attempts, and retained values.
+These checks do not establish that remote sources or GitHub-hosted runners will
+succeed. The live weekly workflow remains review gated; its diagnostic artifacts
+are retained even when source refresh fails. An edition passing local fixture
+checks has not been published, dispatched, merged, or deployed.
+
+## September 28 runner failure: unresolved
+
+The September 28, 2026 refresh run
+[36483370891](https://github.com/chiKeka/aiio-canada/actions/runs/36483370891)
+reported failure with an empty recorded step list for job `109134212289`.
+There are no executed refresh steps or source-fetch diagnostics establishing a
+pipeline or source failure. Its runner/infrastructure cause remains unresolved;
+the receipt and monitoring changes do not claim to repair that incident. A
+future authorized run with recorded steps is needed to diagnose any recurrence.
+
+The October 3 production monitor run
+[37149353943](https://github.com/chiKeka/aiio-canada/actions/runs/37149353943)
+failed its public-route loop on a 503 without printing the route. The old health
+implementation intentionally returned 503 for overdue evidence. That incident
+supports correcting the availability/readiness contract and diagnostic logging;
+it does not establish a whole-site outage or failure of every official source.

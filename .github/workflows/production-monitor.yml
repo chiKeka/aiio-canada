@@ -22,9 +22,17 @@ jobs:
         run: |
           set -euo pipefail
           BASE='https://aiio-canada.vercel.app'
-          for route in / /scenario /evidence /digest /status /api/health; do
-            curl --fail --silent --show-error --location --retry 3 --max-time 20 "${BASE}${route}" >/dev/null
+          failed=0
+          for route in / /scenario /evidence /digest /status /api/availability /api/health; do
+            code="$(curl --silent --show-error --location --retry 3 --max-time 20 -o response.json -w '%{http_code}' "${BASE}${route}")" || code=000
+            echo "route=${route} status=${code}"
+            if [ "$code" != 200 ]; then
+              echo "::error::Availability failure route=${route} status=${code}"
+              if [ "$route" = /api/health ]; then cat response.json; fi
+              failed=1
+            fi
           done
+          if [ "$failed" = 1 ]; then exit 1; fi
           headers="$(curl --fail --silent --show-error --head "${BASE}/")"
           grep -qi '^x-content-type-options: nosniff' <<<"$headers"
           grep -qi '^x-frame-options: DENY' <<<"$headers"
@@ -39,7 +47,20 @@ jobs:
           with open('health.json', encoding='utf-8') as handle:
               health = json.load(handle)
           assert health['status'] == 'operational', health
-          assert health['evidence']['cadence'] == 'current', health
+          assert health['availability'] == 'available', health
+          if health['readiness'] != 'ready':
+              print('::warning::Evidence readiness degraded: ' + ', '.join(health['readiness_reasons']))
+          print(json.dumps({'route': '/api/health', 'availability': health['availability'], 'readiness': health['readiness'], 'reasons': health['readiness_reasons'], 'source_freshness': health['evidence']['source_freshness']}, sort_keys=True))
           assert health['evidence']['artifact_count'] >= 1, health
           assert health['release']['forecast_authorized'] is False, health
           PY
+
+      - name: Retain health diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-health-diagnostics
+          path: |
+            health.json
+            response.json
+          if-no-files-found: ignore
