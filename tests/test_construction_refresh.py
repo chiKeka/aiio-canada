@@ -7,6 +7,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import ssl
+from urllib.error import HTTPError, URLError
 from datetime import date
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
@@ -15,6 +17,26 @@ module=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 class ConstructionRefreshTests(unittest.TestCase):
+    def test_safe_route_diagnostics_and_bounded_transient_retry(self):
+        route='https://www150.statcan.gc.ca/n1/tbl/csv/14100444-eng.zip'
+        error=URLError(ConnectionResetError(54, 'sensitive detail'))
+        diagnostic=module.failure_diagnostic(error,route)
+        self.assertEqual(diagnostic['registered_retrieval_url'],route)
+        self.assertEqual(diagnostic['transport_reason_class'],'ConnectionResetError')
+        self.assertEqual(diagnostic['transport_errno'],54)
+        self.assertNotIn('sensitive',json.dumps(diagnostic))
+        calls=[]; waits=[]
+        def recover():
+            calls.append(True)
+            if len(calls)<3:raise error
+            return 'last attempt succeeds'
+        self.assertEqual(module.fetch_with_retry(recover,'JVWS',route,wait=waits.append),'last attempt succeeds')
+        self.assertEqual(waits,[1,2])
+        self.assertTrue(module.transient_fetch_error(HTTPError(route,503,'sensitive',{},None)))
+        self.assertFalse(module.transient_fetch_error(HTTPError(route,404,'sensitive',{},None)))
+        self.assertFalse(module.transient_fetch_error(URLError(ssl.SSLCertVerificationError('certificate'))))
+        self.assertEqual(module.failure_diagnostic(HTTPError(route,429,'sensitive',{},None),route)['http_status'],429)
+
     def test_weekly_checks_and_failed_attempts_do_not_erase_success(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
@@ -32,6 +54,8 @@ class ConstructionRefreshTests(unittest.TestCase):
             self.assertEqual(len(calls),6)
             def fail(*args): raise ValueError('not included in report')
             failed=module.refresh(root,date(2026,9,20),fail)
+            self.assertEqual(failed['status'],'partial_refresh')
+            self.assertEqual(len(failed['failed_source_ids']),3)
             for item in failed['sources'].values():
                 self.assertEqual(item['last_success'],'2026-09-13')
                 self.assertEqual(item['content_hash'],'sha256:previous')

@@ -1,12 +1,12 @@
 {
   "artifact_count": 53,
-  "artifact_manifest_sha256": "sha256:d24c09043f8684bbc1b33ea5a3b92358cdf7c31551d452f6561115769e018ccd",
+  "artifact_manifest_sha256": "sha256:f924623a4183f8195ebacba7d480056b39a169de9b0c90b644a090b85a741d12",
   "artifacts": [
     {
       "artifact_id": "source_receipts",
       "evidence_role": "governance",
       "path": "public/data/source-receipts.json",
-      "sha256": "sha256:b6caf26735a20eca996162b494d01180a5cd1a71f7f30f1e302a453ff913eb7b"
+      "sha256": "sha256:7febfe823eb8967ed651d690b7f293b02937dab22728419b59dc2f9240044e99"
     },
     {
       "artifact_id": "enabling_infrastructure",
@@ -48,13 +48,13 @@
       "artifact_id": "construction_manifest",
       "evidence_role": "provenance",
       "path": "public/data/construction/manifest.json",
-      "sha256": "sha256:d6323e09605ed32586b8dfab130835eceacbedf0389e71d5298f92f92867fcb9"
+      "sha256": "sha256:5839ee3f173df889e96ae9226348fcc296092cee7114e6ef49c6d67566fd1f56"
     },
     {
       "artifact_id": "construction_snapshot",
       "evidence_role": "published_evidence_bundle",
       "path": "public/data/construction/snapshot.json",
-      "sha256": "sha256:27b7452b8eca00d63f315c29dba66ffc936446a5761fa700c250ecab39a9f0cf"
+      "sha256": "sha256:7c74ca29458b9c4f7df7bc235b879c2a78819c71d2ac9b1b65f8551be1cdb5bb"
     },
     {
       "artifact_id": "adm_evidence",
