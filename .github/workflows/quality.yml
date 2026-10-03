@@ -44,6 +44,7 @@ jobs:
           npm run construction:publish
           npm run test:construction
           npm run test:pilot-stress
+          npm run test:dependency-security
           npm run test:evidence-health
           npm run test:construction-refresh
           npm run test:briefing

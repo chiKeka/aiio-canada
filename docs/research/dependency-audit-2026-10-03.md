@@ -1,5 +1,7 @@
 # Dependency audit triage — 2026-10-03
 
+**Latest status:** the late-October3 follow-up replaces both remaining vulnerable leaf implementations with tested, source-auditable local forks. Full and production npm audits report zero findings after a clean locked install. This supersedes the residual blocker described in the earlier triage below. npm does not audit local code: the additional provenance/runtime-resolution/security gate is required. See [local remediation](dependency-security-remediation-2026-10-03.md). Empirical validation and independent review gates remain pending; no merge/deployment is authorized.
+
 The initial `npm audit --omit=dev --json` reported 15 vulnerable package entries (1 critical, 12 high, 2 moderate). These are package entries, including propagated dependency findings, rather than 15 independent advisories. The original report is `/tmp/aiio-audit.json` in the review workspace. `npm explain`, application import searches, upstream registry metadata, and `origin/main` lockfile comparisons underpin this triage. This document does not claim deployment exploitability has been proved or disproved.
 
 ## Baseline and exposure
@@ -9,7 +11,7 @@ All audited leaf package versions were already present in the remote baseline lo
 | Dependency path | Observed use and implication |
 | --- | --- |
 | Direct `next` | Native production server framework. No `next/og` or `ImageResponse` use was found in app/components/lib/scripts. Patch to 16.3.6 or later compatible 16.x regardless; absence of a direct import is not a runtime reachability proof. |
-| `shadcn → fast-glob → micromatch → braces` and `shadcn → ts-morph → @ts-morph/common → fast-glob` | Component generation/CLI tooling declared as a production dependency. No application import of shadcn was found. Installed-package audit classifies it production; ordinary application request handling is not shown to invoke this glob parser. |
+| `shadcn → fast-glob → micromatch → braces` and `shadcn → ts-morph → @ts-morph/common → fast-glob` | Component generation/CLI tooling declared as a production dependency. The initial JavaScript import search found none; follow-up confirmed app/globals.css imports shadcn/tailwind.css, which is retained. Installed-package audit classifies it production; ordinary application request handling is not shown to invoke this glob parser. |
 | `vinext → vite-plugin-commonjs → vite-plugin-dynamic-import → fast-glob → micromatch → braces` | Sites build/dev transform chain. Native `next start` does not invoke the vinext command. The alternative Sites build needs separate validation and artifact inspection. |
 | `shadcn → @modelcontextprotocol/sdk → hono / express-rate-limit → ip-address` and `shadcn → socks → ip-address` | CLI/MCP/network tooling; no application imports found. This is not evidence that an MCP server is deployed. |
 | `shadcn → undici`, `shadcn → @dotenvx/dotenvx → undici`, plus dev `miniflare → undici` | Tooling HTTP/client paths. Shared dependency also appears in dev Cloudflare tooling. A production audit can still include the shared package via shadcn. |

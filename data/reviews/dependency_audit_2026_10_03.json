@@ -1057,5 +1057,40 @@
   },
   "risk_accepted": false,
   "schema_version": "1.0.0",
-  "status": "residual_review_required"
+  "status": "residual_review_required",
+  "local_remediation": {
+    "checked_at": "2026-10-03T23:15:31.542193+00:00",
+    "lock_sha256": "26205cb909fed286edbcda85cff9b9025b6477779f0b3e98d485e2096d357799",
+    "full_audit_counts": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "production_audit_counts": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "forks": [
+      "vendor/braces-depth-guard/patch-manifest.json",
+      "vendor/esbuild-kit-core-utils/provenance.json"
+    ],
+    "npm_coverage_boundary": "npm advisory database does not cover local fork implementation; additional fail-closed provenance/runtime-resolution and security tests required",
+    "security_regression_tests": 15,
+    "ordinary_braces_parity_results": 650,
+    "upstream_stack_exhaustion_reproduction": {
+      "input_characters": 9001,
+      "original": "RangeError: Maximum call stack size exceeded",
+      "fork": "SyntaxError: nesting exceeds fixed limit64"
+    },
+    "offline_drizzle_generated_sql_sha256": "51f5d67321a94f7ee7263f4656b7aacd8ff4bad83c5555cf561cb82e5b97a5a3",
+    "registry_version_changes": "No new registry package versions; original braces/core-utils and legacy esbuild0.18.20 platform packages removed. Existing patched esbuild0.25.12 reused.",
+    "merge_or_deployment": false
+  }
 }

@@ -31,7 +31,9 @@
     "coverage/**",
     "next-env.d.ts",
     "components/ui/**",
-    "hooks/use-mobile.ts"
+    "hooks/use-mobile.ts",
+    "**/node_modules/**",
+    "vendor/esbuild-kit-core-utils/dist/**"
   ],
   "rules": {
     "no-array-constructor": "error",
@@ -54,5 +56,15 @@
     "typescript/no-require-imports": "error",
     "typescript/no-unnecessary-type-constraint": "error",
     "typescript/no-unsafe-function-type": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "vendor/braces-depth-guard/**/*.js"
+      ],
+      "rules": {
+        "typescript/no-require-imports": "off"
+      }
+    }
+  ]
 }
