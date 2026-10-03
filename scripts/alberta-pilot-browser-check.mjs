@@ -36,6 +36,10 @@ try {
     return payload;
   }
   const initial = await exportRun();
+  assert.equal(initial.evidence.facts.publicWholeProjectEstimateCad.value, 64300000);
+  assert.equal(initial.evidence.facts.actualTradeCapacity.value, null);
+  assert.equal(initial.evidence.facts.publicUncommittedExposureCad.value, null);
+  assert.match(await page.getByRole("main").innerText(), /\$64\.3 million/);
   assert.ok(await page.getByTestId('pilot-result').innerText());
 
   await capacity.selectOption('100');

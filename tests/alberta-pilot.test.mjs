@@ -38,7 +38,7 @@ test('source pointers preserve receipt hashes and review-only status', () => {
   assert.match(source.sha256,/^[0-9a-f]{64}$/);
   if(source.receiptPath) {
    const receipt=JSON.parse(readFileSync(new URL(`../${source.receiptPath}`,import.meta.url)));
-   assert.equal(receipt.sha256 ?? receipt.content_hash.replace('sha256:',''),source.sha256);
+   assert.equal(receipt.sha256 ?? receipt.web_extract_sha256 ?? receipt.content_hash.replace('sha256:',''),source.sha256);
    assert.equal(source.reviewStatus,'candidate_only');
   }
  }
@@ -67,4 +67,16 @@ test('frozen artifact matches implementation and reproduced case hashes', () => 
  const r=reverseStress(buildPilotSensitivityInput());
  assert.equal(createHash('sha256').update(JSON.stringify(r.cases)).digest('hex'),artifact.casesSha256);
  assert.deepEqual(r.thresholds,artifact.thresholds);
+});
+
+test("new payer and workforce context never becomes priced scope or measured capacity", () => {
+ assert.equal(pilotEvidence.facts.publicWholeProjectEstimateCad.value, 64300000);
+ assert.equal(pilotEvidence.facts.publicUncommittedExposureCad.value, null);
+ assert.equal(pilotEvidence.facts.actualTradeCapacity.value, null);
+ assert.equal(pilotEvidence.facts.calgaryElectricalEmploymentContext.value.stockBaseYear, null);
+ const water=pilotEvidence.enablingAssets.find(a=>a.id==="CAL3_HIGH_PLAINS_WATER_WASTEWATER");
+ assert.equal(water.payerObligations.status, "observed");
+ assert.equal(water.payer.value, null);
+ assert.equal(water.costCad.value, null);
+ assert.deepEqual(water.aiPhaseIds, []);
 });

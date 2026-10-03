@@ -4,7 +4,7 @@
   "evidenceCutoff": "2026-10-03",
   "publicationStatus": "scenario_demonstration_not_release_promoted",
   "sha256": {
-    "data/pilots/alberta-cal3-windsong-v0.1.json": "058ad2fb753c9989a0c33bdbdd654f83b40834193adf40161de4f6ce8ab4f09f",
+    "data/pilots/alberta-cal3-windsong-v0.1.json": "59740c9c78513c25d92e15fa8aba1628b18ff6713bc8f30736562c335a798bd2",
     "lib/alberta-pilot.ts": "a5792f822cb710918f48bcd74041c3425c5fb245653484c66e60ef4b0bbc5b41",
     "lib/pilot-stress.ts": "62efc83b69e256be5e1f9b2e8bcf7e4d283581e667a0ec5ccb62db5d1e39db56",
     "lib/construction-model.ts": "86b36337e5c869b09e5c507eeca4ba7dc2b2a5cce082818a17d0871aa9027406",
@@ -17,7 +17,12 @@
     "WINDSONG_OWNER_AWARD": "5fdde7173188466ddb00c989d5241d1b647f2310f17fe7dac688ca70105c9252",
     "WINDSONG_CONTRACTOR_CLOSE": "a05deb4962f8246e9c17f70e30ebef6490b58389de315f73419386768dc45d50",
     "WINDSONG_OWNER_STATUS": "a81b5829d70668e3bee9ecff13de50b1ce4c1826dc504a2e61a4ed0ea2b3915f",
-    "ALBERTA_REGISTER_RELEASE": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199"
+    "ALBERTA_REGISTER_RELEASE": "46724bd528df98fb9ccc301f8fa7b11e11fab9561a877a822f89cfb8be498199",
+    "CAL3_MUNICIPAL_CONDITIONS": "ae7965236a50083e05e13cb5b1ba029a0d231514588f0245093d55b33343f4d7",
+    "WINDSONG_PROJECT_ESTIMATE": "d2e748df8c53196f2481ba239443f43672bc8974d2b35988b77b7dcc3677da85",
+    "WINDSONG_OWNER_DBFM": "39eea9dd536b5387db377f8c5181c6a574dfb061b7e58550512afddb5947e1f3",
+    "WINDSONG_BUNDLE_PAYMENT_TIMING": "7ed81834122165679645cd57cc02cf254198013cfdd23ca6e05da66ffa1ea4ea",
+    "CALGARY_ELECTRICAL_CONTEXT": "1a7ffc77949dbb472c573863a5567566a1063b95b0bf6ebe4524baee8fd93bca"
   },
   "input": {
     "packages": [

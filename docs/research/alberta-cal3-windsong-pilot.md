@@ -142,3 +142,11 @@ terms; and evidence of genuinely overlapping trade demand and relevant supply.
 Authenticated filing access and independent review remain external blockers.
 No third parties were contacted and no costs, payer shares or reviewer decisions
 were supplied by inference.
+
+## Follow-up primary evidence (October 3, 2026)
+
+The evidence ledger now includes the County’s actual CAL3 permit conditions: meter payment by the Applicant/Owner, conditional extra service-capacity purchases beyond the preallocated 2.56m³/day, water/wastewater ties and pre-occupancy offsite-servicing requirements. These obligations are scoped charges and prerequisites, not a priced enabling-asset budget or proven Phase 1 allocation. Whole-asset costs and ultimate payer shares remain unknown. See [permit and Fortis follow-up](../pilot-enabling-source-followup.md).
+
+South Windsong’s official $64.3m estimated whole-project envelope and the owner’s DBFM responsibilities are captured. Province financial statements identify September 2027 bundle completion/payment-start timing (issuer-primary web extract only, full retrieval403). These do not price the school electrical package or remaining uncommitted public exposure. The governing agreement and schedules could not be retrieved. See [contract follow-up](../pilot-public-source-followup.md).
+
+JobBank reports approximately 6,290 Calgary installation electricians and 88% construction employment share; workforce baseyear is unspecified. Historical shortage and forward outlook periods are preserved separately. No public source establishes actual paid-hour availability, contractor backlog or a site-specific crew overlap. Stock is not converted to capacity. See [capacity follow-up](../pilot-capacity-source-followup.md). Scenario results remain unchanged after these contextual additions.

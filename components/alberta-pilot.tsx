@@ -93,7 +93,46 @@ export function AlbertaPilot() {
           JSON export. Capture dates verify what was available; they do not
           establish new project observations or completed milestones.
         </p>
+        <p className="mt-3 text-sm leading-6">
+          The municipal permit assigns meter fees and conditional extra
+          water-service capacity purchases to the Applicant/Owner. It requires
+          site water and wastewater ties, but supplies no incremental asset
+          budget, ultimate cost shares or Phase 1 allocation. South Windsong’s
+          official $64.3 million estimate covers the whole school; its exposed
+          electrical scope remains unknown.
+        </p>
+        <p className="mt-3 text-sm leading-6">
+          Job Bank reports approximately 6,290 Calgary installation
+          electricians, with 88% in construction. This is employment context,
+          with an unspecified stock base year, not available contractor hours.
+          Historical shortage assessments and forward outlooks do not establish
+          spare crews for these projects.
+        </p>
         <ul className="mt-3 space-y-2 text-sm">
+          <li>
+            <a
+              className="text-brand underline"
+              href="https://gis.rockyview.ca/planning/PRDP/PRDP20251314_Online_Package.pdf"
+            >
+              County: CAL-3 service and payment conditions
+            </a>
+          </li>
+          <li>
+            <a
+              className="text-brand underline"
+              href="https://majorprojects.alberta.ca/details/New-K-8-School-in-Windsong-SW-Airdrie/11248"
+            >
+              Alberta inventory: South Windsong estimated project envelope
+            </a>
+          </li>
+          <li>
+            <a
+              className="text-brand underline"
+              href="https://www.jobbank.gc.ca/marketreport/outlook-occupation/20684/geo25411"
+            >
+              Job Bank: Calgary electrical employment context
+            </a>
+          </li>
           <li>
             <a
               className="text-brand underline"
