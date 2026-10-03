@@ -15,6 +15,7 @@ import gates from '@/data/governance/program-gates.json';
 import surface from '@/public/data/research-surface.json';
 import release from '@/public/data/latest.json';
 import freshness from '@/public/data/source-freshness.json';
+import receipts from '@/public/data/source-receipts.json';
 import practicalRoute from '@/data/model-runs/practical_evidence_route_current.json';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,7 @@ export default function StatusPage() {
     freshness: currentFreshness,
     ageDays,
     cadence,
-  } = evaluateEvidenceHealth(digest, freshness, surface);
+  } = evaluateEvidenceHealth(digest, { ...receipts, release_vintage: freshness.as_of_date }, surface);
   const checks = [
     {
       icon: Database,

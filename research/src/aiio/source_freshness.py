@@ -53,7 +53,12 @@ def build_source_freshness_report(
         if attempts_path.exists():
             for source_id, item in json.loads(attempts_path.read_text()).get("sources", {}).items():
                 if item.get("last_attempt", "") <= as_of:
-                    receipts[source_id] = {**receipts.get(source_id, {}), **item}
+                    old = receipts.get(source_id, {})
+                    merged = {**old, **item}
+                    successes = [value for value in (old.get("last_success"), item.get("last_success")) if value]
+                    if successes:
+                        merged["last_success"] = max(successes)
+                    receipts[source_id] = merged
     sources = []
     by_domain: dict[str, dict[str, int]] = {}
     for source in sorted(load_registry(registry_path), key=lambda item: item.source_id):

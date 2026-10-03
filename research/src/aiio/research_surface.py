@@ -10,6 +10,7 @@ from .schemas import ValidationError
 
 SURFACE_ID = "AIIO_CANADA_RESEARCH_SURFACE_0_1"
 ARTIFACTS = [
+    ("source_receipts", "public/data/source-receipts.json", "governance"),
     ("enabling_infrastructure", "data/scenarios/alberta_enabling_infrastructure_v0.1.json", "assumption"),
     ("alberta_delivery_register", "data/governance/alberta-delivery-register.json", "governance"),
     ("alberta_comparison_baseline", "data/governance/alberta-comparison-baseline.json", "published_evidence_bundle"),

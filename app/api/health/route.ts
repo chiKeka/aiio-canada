@@ -5,6 +5,7 @@ import gates from '@/data/governance/program-gates.json';
 import surface from '@/public/data/research-surface.json';
 import release from '@/public/data/latest.json';
 import freshness from '@/public/data/source-freshness.json';
+import receipts from '@/public/data/source-receipts.json';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +17,7 @@ export function GET() {
     integrity,
     ready,
     reasons,
-  } = evaluateEvidenceHealth(digest, freshness, surface);
+  } = evaluateEvidenceHealth(digest, { ...receipts, release_vintage: freshness.as_of_date }, surface);
 
   return Response.json(
     {
