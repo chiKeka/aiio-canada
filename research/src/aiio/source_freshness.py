@@ -9,7 +9,7 @@ from .registry import load_registry
 from .schemas import ValidationError
 
 
-POLICY_VERSION = "AIIO_SOURCE_FRESHNESS_0_1"
+POLICY_VERSION = "AIIO_SOURCE_FRESHNESS_0_2"
 
 
 def _maximum_age_days(frequency: str) -> int:
@@ -37,10 +37,29 @@ def build_source_freshness_report(
     except ValueError as exc:
         raise ValidationError(f"as_of must be an ISO date: {as_of!r}") from exc
 
+    # Receipts supersede registry metadata, but an unsuccessful attempt never
+    # advances last success or the observation date of last-good evidence.
+    root = registry_path.parent.parent.parent
+    receipts: dict[str, dict[str, Any]] = {}
+    for path in sorted((root / "data/raw").glob("**/*.manifest.json")):
+        item = json.loads(path.read_text(encoding="utf-8"))
+        source_id = item.get("source_id")
+        success = item.get("retrieved_at", "")[:10]
+        if source_id and item.get("result") == "success" and success <= as_of:
+            old = receipts.get(source_id, {})
+            if success >= old.get("last_success", ""):
+                receipts[source_id] = {"last_success": success, "last_attempt": success, "status": "checked", "receipt_path": str(path.relative_to(root))}
+    for attempts_path in (root / "data/model-runs/construction-source-refresh.json", root / "data/model-runs/weekly-source-refresh.json"):
+        if attempts_path.exists():
+            for source_id, item in json.loads(attempts_path.read_text()).get("sources", {}).items():
+                if item.get("last_attempt", "") <= as_of:
+                    receipts[source_id] = {**receipts.get(source_id, {}), **item}
     sources = []
     by_domain: dict[str, dict[str, int]] = {}
     for source in sorted(load_registry(registry_path), key=lambda item: item.source_id):
-        verified = date.fromisoformat(source.last_verified)
+        receipt = receipts.get(source.source_id, {})
+        success = receipt.get("last_success")
+        verified = date.fromisoformat(success or source.last_verified)
         age_days = (report_date - verified).days
         if age_days < 0:
             raise ValidationError(f"source {source.source_id} was verified after report date")
@@ -50,7 +69,13 @@ def build_source_freshness_report(
             "source_id": source.source_id,
             "domain": source.domain,
             "registry_status": source.status.value,
-            "last_verified": source.last_verified,
+            "last_verified": verified.isoformat(),
+            "verification_basis": "successful_retrieval_receipt" if success else "registry_verification_only",
+            "last_attempt": receipt.get("last_attempt"),
+            "last_success": success,
+            "last_attempt_status": receipt.get("status", "unrecorded"),
+            "observation_date": receipt.get("observation_date"),
+            "review_due": date.fromordinal(verified.toordinal() + maximum_age_days).isoformat(),
             "age_days": age_days,
             "maximum_age_days": maximum_age_days,
             "update_frequency": source.update_frequency,
@@ -76,7 +101,7 @@ def build_source_freshness_report(
         ],
         "sources": sources,
         "methodology": {
-            "basis": "calendar days since registry last_verified",
+            "basis": "calendar days since last successful retrieval receipt; explicit registry-only fallback where receipts are unavailable",
             "policy": "daily/continuous=10; monthly=45; quarterly=120; annual/quinquennial=400; event, irregular, periodic and documentary sources=190",
             "boundary": "Freshness confirms source verification cadence only. It does not authorize causal attribution or forecasts.",
         },

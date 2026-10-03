@@ -13,7 +13,7 @@ export default async function ConstructionPage() {
       <PageIntro
         eyebrow="Alberta construction intelligence"
         title="Construction demand & capacity"
-        description="Explore the Alberta pipeline, workforce, construction prices and procurement pressures behind the presentation. Review delivery implications and mitigations, then explore conditional demand in the scenario model."
+        description="Explore the Alberta pipeline, workforce, construction prices and procurement procurement signals. Review delivery implications and mitigations, then explore conditional demand in the scenario model."
       />
       <ConstructionWorkspace
         evidenceAsOf={data.manifest.asOf}

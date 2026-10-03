@@ -1,5 +1,7 @@
 'use client';
 
+import { scenarioMoney as money } from '@/lib/public-presentation.mjs';
+
 import { useState } from 'react';
 import { WorkspaceMetric } from '@/components/workspace-metric';
 import Link from 'next/link';
@@ -18,10 +20,6 @@ export type PinnedDecision = {
   assessment: Assessment;
   market: string;
 };
-const money = (value: number | undefined) =>
-  value === undefined
-    ? 'Unavailable'
-    : `$${value.toLocaleString(undefined, { maximumFractionDigits: 1 })}M`;
 const panel = 'rounded-lg border border-line bg-surface p-4';
 
 export function DecisionCockpitView({
@@ -108,8 +106,10 @@ export function DecisionCockpitView({
               <h3 className="mt-2 text-2xl">{action.title}</h3>
               <p className="mt-2 text-sm text-subtle">{action.why}</p>
               <p className="mt-2 text-xs text-caution">
-                Proxy-planning checks: {planningChecks}. No causal attribution
-                or quantified mitigation savings.
+                <Link href="/methods#planning-gates" className="underline">
+                  Planning checks: {planningChecks}
+                </Link>
+                . No causal attribution or quantified mitigation savings.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2">

@@ -14,6 +14,10 @@ import {
 import projects from '@/public/data/construction/projects.json';
 import benchmarks from '@/public/data/construction/benchmarks.json';
 import manifest from '@/public/data/construction/manifest.json';
+import enablingLedgerData from '@/data/scenarios/alberta_enabling_infrastructure_v0.1.json';
+import { summarizeEnablingLedger, type EnablingLedger } from '@/lib/enabling-infrastructure';
+const enablingLedger = enablingLedgerData as EnablingLedger;
+const enablingSummary = summarizeEnablingLedger(enablingLedger);
 
 const number = (x: number) => Math.round(x).toLocaleString('en-CA');
 const panel = 'rounded-lg border border-line bg-surface p-5';
@@ -119,6 +123,7 @@ export function ConstructionWorkspace({
         benchmarks,
         manifest,
         formulas,
+        enablingInfrastructure: { ledger: enablingLedger, summary: enablingSummary, relationshipToSelection: 'Separate fixed $50B counterfactual diligence ledger; not scaled by selected project phases or added to their demand.' },
         procurementWeeksUntilRequired: need,
         illustrativeEscalation: {
           uncommittedCAD: exposure * 1e6,
@@ -320,6 +325,12 @@ export function ConstructionWorkspace({
                       min={1}
                       onChange={(n) => listUpdate('wages', i, n)}
                     />
+                    <Field
+                      label="Other private annual paid hours (assumption)"
+                      value={options.privateHours?.[i] ?? 0}
+                      min={0}
+                      onChange={(n) => setOptions((o) => ({ ...o, privateHours: trades.map((_, j) => j === i ? n : (o.privateHours?.[j] ?? 0)) }))}
+                    />
                     <label className="text-xs text-subtle">
                       Total available FTE (blank = unknown)
                       <input
@@ -500,6 +511,55 @@ export function ConstructionWorkspace({
                   </p>
                 ))}
               </section>
+              <section className={panel} aria-label="Enabling infrastructure cost allocation">
+                <h2 className="text-lg font-semibold">Enabling infrastructure &amp; cost allocation</h2>
+                <p className="mt-2 text-sm text-subtle">
+                  Separate $50B counterfactual diligence ledger: the $4B grid-and-generation
+                  assumption is already inside AI CAPEX. It is not an additional public cost
+                  and is not scaled by the selected project phases.
+                </p>
+                <p className="mt-2 text-sm">
+                  {enablingSummary.unresolvedAssets} enabling asset scopes remain unresolved.
+                  Incremental costs, funding, timing and ultimate payers are unknown.
+                  Combined program cost: {enablingSummary.totalProgramCad === null ? 'withheld' : 'available as a scenario range'}.
+                </p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-subtle">
+                  {enablingLedger.assets.map(asset => <li key={asset.id}>
+                    {asset.assetClass}: cost {asset.costCad === null ? 'unknown' : `$${number(asset.costCad.low)}–$${number(asset.costCad.high)} CAD (${asset.costBasis})`};
+                    payer {Object.entries(asset.payerShares).map(([payer, share]) => `${payer} ${Math.round(share * 100)}%`).join(', ')};
+                    AI CAPEX membership {asset.aiCapexMembership}.
+                  </li>)}
+                </ul>
+                <p className="mt-2 text-xs text-subtle">
+                  These are scenario dependency placeholders, not observed assets or commitments.
+                  Baseline work is excluded from incremental cost; included costs cannot be counted
+                  twice. Unknown assets do not supply measured demand to the schedule.
+                  The JSON export preserves phase links, evidence, payer shares and reconciliation.
+                </p>
+              </section>
+              <section className={panel}>
+                <h2 className="text-lg font-semibold">Paired resource schedule</h2>
+                <p className="mt-2 text-sm text-subtle">
+                  Same background demand in both cases; pro-rata allocation by Alberta trade,
+                  with civil enabling works preceding electrical and mechanical packages.
+                  This precedence is a scenario assumption, not an observed project network.
+                  Other private demand defaults to zero and therefore remains omitted until entered.
+                </p>
+                <p className="mt-2 text-sm">
+                  Unfinished paid hours at the extended horizon: baseline {number(run.scheduling.baseline.tailHours)},
+                  with DC {number(run.scheduling.withDC.tailHours)}.
+                  {run.scheduling.impacts.filter((p) => (p.incrementalDelayMonths ?? 0) > 0).length} background
+                  packages have a modelled incremental delay;
+                  {run.scheduling.impacts.filter((p) => p.incrementalDelayMonths === null).length} have unknown completion.
+                </p>
+                <p className="mt-2 text-xs text-subtle">
+                  Monthly allocations, carried backlog, completion dates, paired impacts and
+                  horizon tails are included in the JSON export. Capacity is an assumption;
+                  unknown capacity produces unknown completion. No public package cost
+                  exposure is supplied, so this run does not estimate owner cost escalation.
+                  The separate delay illustration remains user entered.
+                </p>
+              </section>
               <section className={panel}>
                 <div className="flex flex-wrap justify-between gap-3">
                   <h2 className="text-lg font-semibold">
@@ -511,13 +571,14 @@ export function ConstructionWorkspace({
                       download(
                         'construction-quarterly.csv',
                         [
-                          'quarter,trade,dc_hours,public_hours,dc_fte,capacity_hours,ratio,unmet_hours',
+                          'quarter,trade,dc_hours,public_hours,private_hours,dc_fte,capacity_hours,ratio,unmet_hours',
                           ...run.rows.map((r) =>
                             [
                               r.quarter,
                               r.trade,
                               r.dcHours,
                               r.publicHours,
+                              r.privateHours,
                               r.dcFte,
                               r.capacityHours ?? '',
                               r.ratio ?? '',
@@ -553,6 +614,7 @@ export function ConstructionWorkspace({
                           'Trade',
                           'DC hours',
                           'Public hours',
+                          'Private hours',
                           'DC FTE',
                           'Demand / capacity',
                           'Unmet hours',
@@ -573,6 +635,7 @@ export function ConstructionWorkspace({
                           <td>{r.trade}</td>
                           <td>{number(r.dcHours)}</td>
                           <td>{number(r.publicHours)}</td>
+                          <td>{number(r.privateHours)}</td>
                           <td>{number(r.dcFte)}</td>
                           <td>
                             {r.ratio === null

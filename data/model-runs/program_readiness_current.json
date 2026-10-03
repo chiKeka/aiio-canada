@@ -1,6 +1,6 @@
 {
-  "as_of_date": "2026-09-02",
-  "audit_id": "AIIO_PROGRAM_READINESS_2026_09_02",
+  "as_of_date": "2026-09-29",
+  "audit_id": "AIIO_PROGRAM_READINESS_2026_09_29",
   "checks": [
     {
       "category": "research_design",
@@ -46,11 +46,11 @@
       "check_id": "public_evidence_registry",
       "evidence": [
         "data/registry/sources.json",
-        "raw_manifest_count=100"
+        "raw_manifest_count=113"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The public-source registry validates with 41 unique sources."
+      "summary": "The public-source registry validates with 44 unique sources."
     },
     {
       "category": "analysis_engine",
@@ -225,14 +225,14 @@
       "category": "living_program",
       "check_id": "weekly_evidence_operation",
       "evidence": [
-        "data/digests/items/2026-09-01.json",
-        "data/digests/2026-09-01.md",
-        "data/digests/2026-09-01.manifest.json",
-        "age_days=1"
+        "data/digests/items/2026-09-21.json",
+        "data/digests/2026-09-21.md",
+        "data/digests/2026-09-21.manifest.json",
+        "age_days=8"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The weekly digest is current at 2026-09-01, hash-reconciled and cannot change the model automatically."
+      "summary": "The weekly digest is current at 2026-09-21, hash-reconciled and cannot change the model automatically."
     },
     {
       "category": "product",
@@ -261,19 +261,19 @@
       "check_id": "research_surface_provenance",
       "evidence": [
         "public/data/research-surface.json",
-        "artifact_manifest_sha256=sha256:90f6b58b96d9983ff142e9d46cb9a89593dbcbe558bac1e4dcc5a2ef71cb3690",
+        "artifact_manifest_sha256=sha256:5ae75d6c34599acc83f36bd79c5ba5f6206523fffe2b83a0a688ae43e526faf5",
         "research/src/aiio/research_surface.py"
       ],
       "release_gate": true,
       "status": "pass",
-      "summary": "The evolving research website reconciles 32 hash-locked artifacts above the frozen release without promoting them."
+      "summary": "The evolving research website reconciles 51 hash-locked artifacts above the frozen release without promoting them."
     },
     {
       "category": "product",
       "check_id": "auditable_workbook_component",
       "evidence": [
         "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.27.0-dev.xlsx",
-        "workbook_sha256=sha256:5c08344fd8ee9bcd9405f5e335dc3b98283a6f3cad46ec4c42c570166d1a01c9",
+        "workbook_sha256=sha256:6d4b08a7937f717a236e7bc3835b588ca2de81d4330a44a349b73a72fe5b3905",
         "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.27.0-dev.xlsx.inspect.ndjson",
         "outputs/01a0579f-936b-77b3-93e5-be6035628b16/AIIO_Canada_Research_0.27.0-dev.xlsx.receipt.json"
       ],

@@ -30,7 +30,23 @@ def main() -> None:
     raw_root = root / "data" / "raw"
     subprocess.run([sys.executable, str(root / "research/scripts/refresh_construction_evidence.py"), "--root", str(root), "--as-of", as_of], cwd=root, check=True)
 
-    edmonton = fetch_edmonton_permit_candidates(raw_root)
+    receipt_path = root / "data/model-runs/weekly-source-refresh.json"
+    attempt_report = json.loads(receipt_path.read_text()) if receipt_path.exists() else {"sources": {}}
+    def fetch_with_receipt(source_id, operation):
+        old = attempt_report["sources"].get(source_id, {})
+        try:
+            result = operation()
+            attempt_report["sources"][source_id] = {**old, "last_attempt": as_of, "last_success": as_of, "status": "checked"}
+        except Exception as exc:
+            attempt_report["sources"][source_id] = {**old, "last_attempt": as_of, "status": "error", "error_type": type(exc).__name__, "reason": "source_fetch_failed_last_good_retained"}
+            print(json.dumps({"source_id": source_id, **attempt_report["sources"][source_id]}), file=sys.stderr)
+            raise
+        finally:
+            receipt_path.parent.mkdir(parents=True, exist_ok=True)
+            receipt_path.write_text(json.dumps(attempt_report, indent=2, sort_keys=True) + "\n")
+        return result
+
+    edmonton = fetch_with_receipt("EDMONTON_GENERAL_BUILDING_PERMITS", lambda: fetch_edmonton_permit_candidates(raw_root))
     edmonton_raw = Path(edmonton["archive_path"])
     edmonton_report = normalize_edmonton_permit_proxy(
         edmonton_raw,
@@ -40,7 +56,7 @@ def main() -> None:
         retrieval_manifest_path=edmonton_raw.with_suffix(".json.manifest.json"),
     )
 
-    vancouver = fetch_vancouver_permit_candidates(raw_root)
+    vancouver = fetch_with_receipt("VANCOUVER_ISSUED_BUILDING_PERMITS", lambda: fetch_vancouver_permit_candidates(raw_root))
     vancouver_raw = Path(vancouver["archive_path"])
     vancouver_report = normalize_vancouver_permit_proxy(
         vancouver_raw,
@@ -52,7 +68,7 @@ def main() -> None:
 
     reports = {"vancouver": vancouver_report}
     for city in ("toronto", "montreal"):
-        receipt = fetch_ckan_permit_candidates(city, raw_root)
+        receipt = fetch_with_receipt({"toronto": "TORONTO_CLEARED_BUILDING_PERMITS", "montreal": "MONTREAL_CONSTRUCTION_PERMITS"}[city], lambda: fetch_ckan_permit_candidates(city, raw_root))
         raw_path = Path(receipt["archive_path"])
         reports[city] = normalize_ckan_permit_proxy(
             city,

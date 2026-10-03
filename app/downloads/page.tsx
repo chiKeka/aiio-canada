@@ -12,6 +12,14 @@ import researchSurface from '@/public/data/research-surface.json';
 
 const downloads = [
   {
+    icon: FileJson2,
+    title: 'Alberta historical boom comparison',
+    detail:
+      '2005–2008 institutional construction-price observations, index repricing formula, source vintages and interpretation limits.',
+    href: '/data/alberta-boom-analog.json',
+    format: 'JSON',
+  },
+  {
     icon: FileSpreadsheet,
     title: 'Alberta delivery briefing',
     detail:

@@ -6,7 +6,7 @@
     "benchmarks.json": "e0ce2d11c393b4ad6683ce23303c7a0ebaac686d5a842f14941799b296248b0b",
     "requirements.md": "7b2b5df2999eba77433797fa82e7ca9550dcb793ef15f43613f5f1678f983a97",
     "briefing.json": "02d5ffce75b670bb89f23419df80337708babfea1710c05a69c9ca1fb37973f0",
-    "lib/construction-model.ts": "b930dfd481fa14de88dd41ba7f308314861f36cd09126a09d09b00c53349dbfd"
+    "lib/construction-model.ts": "86b36337e5c869b09e5c507eeca4ba7dc2b2a5cce082818a17d0871aa9027406"
   },
   "refresh": {
     "scheduler": "Existing weekly evidence refresh",

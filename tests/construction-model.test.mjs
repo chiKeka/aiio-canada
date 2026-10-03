@@ -160,3 +160,49 @@ test('platform register equals research source and references resolve', () => {
     for (const id of p.source_ids)
       assert.ok(r.sources.some((s) => s.id === id));
 });
+
+const task = (id, kind = 'background', extra = {}) => ({ id, kind, region: 'Calgary', trade: 'Electrical', hours: 100, releaseMonth: 0, plannedFinishMonth: 1, predecessors: [], ...extra });
+const scheduleOptions = { startMonth: 0, endMonth: 6, capacity: { 'Calgary:Electrical': 100 }, policy: 'pro-rata', annualEscalation: 0.12 };
+test('paired capacity allocation conserves hours, carries backlog and exposes only commitments', async () => {
+  const { pairedSchedule } = await import('../lib/construction-model.ts');
+  const r = pairedSchedule([task('school', 'background', { uncommittedExposureCAD: 1000 }), task('dc', 'dc')], scheduleOptions);
+  assert.equal(r.baseline.packages[0].completionMonth, 1);
+  assert.equal(r.withDC.packages[0].completionMonth, 2);
+  assert.equal(r.impacts[0].incrementalDelayMonths, 1);
+  assert.ok(Math.abs(r.impacts[0].incrementalEscalationCAD - escalation(1000, 0.12, 1)) < 1e-8);
+  for (const row of r.withDC.monthly) assert.ok(row.allocatedHours <= row.capacityHours + 1e-8);
+  for (const p of r.withDC.packages) assert.ok(Math.abs(p.servedHours + p.remainingHours - p.hours) < 1e-8);
+  assert.equal(r.withDC.monthly[0].backlogHours, 100);
+});
+test('precedence, catchments, allocation policies and unknown capacity remain explicit', async () => {
+  const { schedulePackages } = await import('../lib/construction-model.ts');
+  const r = schedulePackages([task('civil'), task('fitout', 'dc', { predecessors: ['civil'] }), task('remote', 'dc', { region: 'Edmonton' })], scheduleOptions);
+  const first = r.allocations.find((a) => a.packageId === 'fitout');
+  assert.ok(first.month >= r.packages[0].completionMonth);
+  assert.equal(r.packages[2].completionMonth, null);
+  assert.equal(r.packages[2].remainingHours, 100);
+  const protectedRun = schedulePackages([task('school'), task('dc', 'dc')], { ...scheduleOptions, policy: 'protect-background' });
+  assert.equal(protectedRun.packages[0].completionMonth, 1);
+  assert.throws(() => schedulePackages([task('a', 'dc', { predecessors: ['b'] }), task('b', 'dc', { predecessors: ['a'] })], scheduleOptions), /Cyclic/);
+});
+test('zero DC has zero paired effect and unfinished horizon retains all unserved work', async () => {
+  const { pairedSchedule } = await import('../lib/construction-model.ts');
+  const r = pairedSchedule([task('school', 'background', { uncommittedExposureCAD: 1000 })], scheduleOptions);
+  assert.equal(r.impacts[0].incrementalDelayMonths, 0);
+  assert.equal(r.impacts[0].incrementalEscalationCAD, 0);
+  const blocked = pairedSchedule([task('school'), task('dc', 'dc')], { ...scheduleOptions, capacity: { 'Calgary:Electrical': 0 } });
+  assert.equal(blocked.withDC.tailHours, 200);
+  assert.equal(blocked.impacts[0].incrementalDelayMonths, null);
+  assert.equal(blocked.withDC.packages[0].escalationCAD, null);
+});
+test('private demand is additional background in both paired cases', () => {
+  const r = calculate([], {}, { ...defaults, privateHours: [1200, 2400, 3600] });
+  assert.equal(r.rows[0].privateHours, 300);
+  assert.deepEqual(r.scheduling.baseline, r.scheduling.withDC);
+});
+test('responsive monthly supply is explicit and missing trajectory capacity remains unknown', async () => {
+  const { schedulePackages } = await import('../lib/construction-model.ts');
+  const r = schedulePackages([task('school')], { ...scheduleOptions, capacity: { 'Calgary:Electrical': 0 }, monthlyCapacity: { 'Calgary:Electrical': { 0: null, 1: 100 } } });
+  assert.equal(r.monthly[0].allocatedHours, null);
+  assert.equal(r.packages[0].completionMonth, 2);
+});

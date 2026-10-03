@@ -1,3 +1,4 @@
+import { uniqueMaterialSignals } from '@/lib/public-presentation.mjs';
 import { AlertTriangle } from 'lucide-react';
 
 import {
@@ -92,10 +93,8 @@ export default function PressurePage() {
               </h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-subtle">
-              Low, central and high cases co-move assumed edge weights and
-              retention. They are structural stress cases, not uncertainty
-              intervals. Scores are bounded display indices, not delay
-              percentages.
+              Low, central and high cases vary assumed pathway weights and local
+              retention. Read them alongside the interpretation boundary below.
             </p>
           </div>
           <div className="grid gap-8 lg:grid-cols-2">
@@ -156,7 +155,7 @@ type PublicProjectExposure = {
 };
 
 function MaterialCostPanel({ screen }: { screen: MaterialCostScreen }) {
-  const observations = [...screen.observations]
+  const observations = uniqueMaterialSignals(screen.observations)
     .filter((item) => item.year_over_year_percent_change !== null)
     .sort(
       (left, right) =>
@@ -177,9 +176,9 @@ function MaterialCostPanel({ screen }: { screen: MaterialCostScreen }) {
               Shared material-cost signals
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-subtle">
-              Largest absolute year-over-year movements across selected BCPI
-              building-component proxies. These are market baselines, not
-              AI-attributed effects.
+              Largest absolute year-over-year movements. Each identical
+              city/component series appears once, with its asset mappings
+              listed.
             </p>
           </div>
           <span className="font-mono text-xs text-subtle">
@@ -196,7 +195,7 @@ function MaterialCostPanel({ screen }: { screen: MaterialCostScreen }) {
               >
                 <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-subtle">
                   {item.geography_id === 'CMA_825' ? 'Calgary' : 'Edmonton'} ·{' '}
-                  {humanize(item.archetype)}
+                  {item.archetypes.map(humanize).join(' / ')}
                 </p>
                 <h3 className="mt-3 text-sm font-medium text-ink">
                   {humanize(item.component)}

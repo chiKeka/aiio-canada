@@ -4,13 +4,8 @@ import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { chromium } from 'playwright-core';
 
-const baseUrl = process.env.AIIO_BASE_URL ?? 'http://127.0.0.1:3002';
-const browser = await chromium.launch({
-  executablePath:
-    process.env.CHROME_EXECUTABLE ??
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  headless: true,
-});
+import { baseUrl, browserOptions } from './browser-config.mjs';
+const browser = await chromium.launch(browserOptions());
 const context = await browser.newContext({
   acceptDownloads: true,
   reducedMotion: 'reduce',
@@ -19,7 +14,7 @@ const page = await context.newPage();
 const errors = [];
 page.on('pageerror', (error) => errors.push(error.message));
 try {
-  await page.goto(baseUrl, { waitUntil: 'networkidle' });
+  await page.goto(`${baseUrl}/project-scenario?view=outlook`, { waitUntil: 'networkidle' });
   await page
     .getByRole('slider', { name: 'Selected project month', exact: true })
     .fill('14');
@@ -173,7 +168,7 @@ try {
     /no later than the project start/,
   );
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
-  await page.goto(`${baseUrl}/?basis=2041-01`, { waitUntil: 'networkidle' });
+  await page.goto(`${baseUrl}/project-scenario?basis=2041-01`, { waitUntil: 'networkidle' });
   await page
     .getByRole('button', { name: 'Open decision brief', exact: true })
     .click();
@@ -184,7 +179,7 @@ try {
     true,
   );
   assert.match(await brief.innerText(), /withheld/);
-  await page.goto(baseUrl, { waitUntil: 'networkidle' });
+  await page.goto(`${baseUrl}/project-scenario`, { waitUntil: 'networkidle' });
   await page.setViewportSize({ width: 390, height: 844 });
   await page
     .getByRole('button', { name: 'Edit assumptions', exact: true })

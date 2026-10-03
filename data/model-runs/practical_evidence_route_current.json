@@ -15,11 +15,12 @@
   },
   "input_manifest": {
     "data/processed/ai_construction_proxy_alberta_v0.1.csv": "sha256:774eb46d94af9356a776c6a6ef9f979b777a72b84336c61d18a2307bac77f0ef",
+    "data/processed/public_project_exposure_alberta.csv": "sha256:748550be78361f31562bd64f494f3f9ff51be398c5877ae65e1404434d8f707d",
     "data/processed/public_projects_bc_on_qc.csv": "sha256:aecba64233970132e94950067dc0ada365a324393a0cf3adb3165539bc7d5f8a",
     "data/processed/quebec_pqi_authorized_revision_events.csv": "sha256:79393b0c6e1a9cbfc3071a0f21b8fbbcd9d51179ca3165a43979afef571323d6"
   },
   "output_manifest": {
-    "data/processed/public_project_prospective_snapshot_current.csv": "sha256:05d9b4178f970f57e121e89a5358a1e899b7c00661322b548e551a9b2d29aae6"
+    "data/processed/public_project_prospective_snapshot_current.csv": "sha256:01cae387ae4182dce19dca3d80f5c11892dc92713a02bcab34c6886be31d5bb3"
   },
   "proxy_planning_validation": {
     "assessment_id": "AIIO_PROXY_PLANNING_VALIDATION_0_1",
@@ -730,10 +731,25 @@
         "health_facilities",
         "schools_and_postsecondary"
       ],
+      "immutable_observation": {
+        "archive_content_hash": "sha256:f560919a82b4c99ead11a79e867f4dafc063130b2031e7c694110f875b03693d",
+        "archive_file": "4276b63a567776450debbac661109302d49c311071b9e06701d0a5d3cf1ff15c.json",
+        "disappearance_implies_completion": false,
+        "observation_dates": [
+          "2024-12-01",
+          "2026-06-12",
+          "2026-08-20",
+          "2026-08-31"
+        ],
+        "observation_hash": "sha256:4276b63a567776450debbac661109302d49c311071b9e06701d0a5d3cf1ff15c",
+        "repeated_fetch_is_new_observation": false
+      },
+      "longitudinal_report_path": "data/model-runs/public_project_longitudinal_current.json",
       "next_observation_required": "A later official snapshot with the same stable project IDs, followed by reconciled estimate, stage and schedule changes.",
-      "project_count": 3661,
-      "province_count": 3,
+      "project_count": 3970,
+      "province_count": 4,
       "provinces": [
+        "Alberta",
         "British Columbia",
         "Ontario",
         "Quebec"

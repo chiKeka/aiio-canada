@@ -1,11 +1,13 @@
 'use client';
+import Link from 'next/link';
+
+import {
+  scenarioMoney as money,
+  scenarioRate,
+} from '@/lib/public-presentation.mjs';
 
 import { type AssessmentRecord } from '@/lib/assessment-record';
 import { SPENDING_PROFILES } from '@/lib/project-cashflow';
-const money = (value: number | null | undefined) =>
-  value == null
-    ? 'Withheld'
-    : `$${value.toLocaleString(undefined, { maximumFractionDigits: 1 })}M`;
 
 export function ExecutiveDecisionBrief({
   record,
@@ -103,7 +105,7 @@ export function ExecutiveDecisionBrief({
               {driver.label} · {driver.tier} ·{' '}
               {driver.selected_month_allocation_pp === null
                 ? 'allocation withheld'
-                : `${driver.selected_month_allocation_pp.toFixed(3)} pp assumed monthly allocation`}
+                : `${scenarioRate(driver.selected_month_allocation_pp)} pp assumed monthly allocation`}
             </li>
           ))}
         </ul>
@@ -143,8 +145,11 @@ export function ExecutiveDecisionBrief({
       <section className="mt-5">
         <h2 className="text-lg">Evidence and limitations</h2>
         <p className="mt-2 text-sm">
-          Planning checks: {record.planning_validation.passed_check_count}/
-          {record.planning_validation.check_count}. {record.boundary.note}
+          <Link href="/methods#planning-gates" className="underline">
+            Planning checks: {record.planning_validation.passed_check_count}/
+            {record.planning_validation.check_count}
+          </Link>
+          . {record.boundary.note}
         </p>
         <ul className="mt-2 space-y-2 text-sm">
           {record.evidence.map((signal) => (

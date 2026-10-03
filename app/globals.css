@@ -455,3 +455,11 @@
 .research-content :where([id]) { scroll-margin-top: 24px; }
 
 .research-content :where(th, td) { overflow-wrap: normal; }
+
+@media print {
+  #executive-decision-brief button { visibility: hidden !important; }
+}
+
+@media print {
+  .workspace .executive-export-controls, .workspace .executive-export-controls * { visibility: hidden !important; }
+}

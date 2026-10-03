@@ -55,6 +55,16 @@ jobs:
             npm run evidence:refresh-weekly
           fi
 
+      - name: Retain refresh diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-refresh-receipts
+          path: |
+            data/model-runs/construction-source-refresh.json
+            data/model-runs/weekly-source-refresh.json
+          if-no-files-found: ignore
+
       - name: Verify refreshed evidence and application
         run: |
           npm run research:validate

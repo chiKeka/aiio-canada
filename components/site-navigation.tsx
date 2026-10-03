@@ -26,12 +26,23 @@ import {
 } from '@/components/ui/sheet';
 
 const navigation = [
-  { href: '/', label: 'Executive dashboard', icon: LayoutDashboard },
+  { href: '/', label: 'Alberta overview', icon: LayoutDashboard },
+  {
+    href: '/project-scenario?view=walkthrough',
+    label: 'Guided story',
+    icon: BookOpen,
+  },
+  { href: '/delivery', label: 'Delivery decisions', icon: Layers3 },
   { href: '/research', label: 'Research observatory', icon: FlaskConical },
   { href: '/evidence', label: 'Evidence register', icon: Database },
   { href: '/pressure', label: 'Market pressure', icon: Activity },
   { href: '/scenario', label: 'Scenario lab', icon: Gauge },
   { href: '/construction', label: 'Construction demand', icon: Layers3 },
+  {
+    href: '/historical-analog',
+    label: 'Historical comparison',
+    icon: BookOpen,
+  },
   { href: '/methods', label: 'Methods', icon: BookOpen },
   { href: '/digest', label: 'Evidence digest', icon: FileText },
   { href: '/downloads', label: 'Downloads', icon: Download },
@@ -47,8 +58,8 @@ export function ResearchNavigation() {
     >
       {navigation.map(({ href, label, icon: Icon }) => (
         <Link
-          aria-current={pathname === href ? 'page' : undefined}
-          className={`flex shrink-0 items-center gap-3 rounded-md px-3 py-3 text-[13px] ${pathname === href ? 'bg-rail-active font-medium text-white' : 'text-white/75 hover:bg-rail-active hover:text-white'}`}
+          aria-current={pathname === href.split('?')[0] ? 'page' : undefined}
+          className={`flex shrink-0 items-center gap-3 rounded-md px-3 py-3 text-[13px] ${pathname === href.split('?')[0] ? 'bg-rail-active font-medium text-white' : 'text-white/75 hover:bg-rail-active hover:text-white'}`}
           href={href}
           key={href}
         >
@@ -69,8 +80,8 @@ export function DesktopNavigation() {
     >
       {navigation.slice(1, 6).map(({ href, label }) => (
         <Link
-          aria-current={pathname === href ? 'page' : undefined}
-          className={`rounded-md px-3 py-2 ${pathname === href ? 'bg-brand-soft text-brand' : 'text-subtle hover:bg-workspace'}`}
+          aria-current={pathname === href.split('?')[0] ? 'page' : undefined}
+          className={`rounded-md px-3 py-2 ${pathname === href.split('?')[0] ? 'bg-brand-soft text-brand' : 'text-subtle hover:bg-workspace'}`}
           href={href}
           key={href}
         >
@@ -108,8 +119,10 @@ export function MobileNavigation() {
         >
           {navigation.map(({ href, label, icon: Icon }) => (
             <Link
-              aria-current={pathname === href ? 'page' : undefined}
-              className={`flex items-center gap-3 rounded-md px-3 py-3 text-sm ${pathname === href ? 'bg-brand-soft font-medium text-brand' : 'text-subtle hover:bg-workspace'}`}
+              aria-current={
+                pathname === href.split('?')[0] ? 'page' : undefined
+              }
+              className={`flex items-center gap-3 rounded-md px-3 py-3 text-sm ${pathname === href.split('?')[0] ? 'bg-brand-soft font-medium text-brand' : 'text-subtle hover:bg-workspace'}`}
               href={href}
               key={href}
               onClick={() => setOpen(false)}

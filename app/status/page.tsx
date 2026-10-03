@@ -1,3 +1,4 @@
+import { evaluateEvidenceHealth } from '@/lib/evidence-health.mjs';
 import {
   Activity,
   CheckCircle2,
@@ -16,46 +17,53 @@ import release from '@/public/data/latest.json';
 import freshness from '@/public/data/source-freshness.json';
 import practicalRoute from '@/data/model-runs/practical_evidence_route_current.json';
 
-const checks = [
-  {
-    icon: Database,
-    label: 'Evidence surface',
-    value: `${surface.artifact_count} hash-locked artifacts`,
-    ok: surface.artifact_count > 0,
-  },
-  {
-    icon: Clock3,
-    label: 'Latest evidence digest',
-    value: `${digest.edition_date} · ${digest.status}`,
-    ok: true,
-  },
-  {
-    icon: Database,
-    label: 'Registered source freshness',
-    value: `${freshness.current_count}/${freshness.source_count} current`,
-    ok: freshness.status === 'operational',
-  },
-  {
-    icon: Activity,
-    label: 'Prospective outcome tracking',
-    value: `${practicalRoute.tracks.prospective_public_project_tracking.project_count.toLocaleString()} projects · ${practicalRoute.tracks.prospective_public_project_tracking.province_count} provinces`,
-    ok: practicalRoute.gate_evaluation.prospective_baseline_implemented,
-  },
-  {
-    icon: ShieldCheck,
-    label: 'Deployment gate',
-    value: gates.deployment.status,
-    ok: gates.deployment.status === 'authorized',
-  },
-  {
-    icon: Activity,
-    label: 'Forecast authorization',
-    value: 'Withheld pending calibration',
-    ok: false,
-  },
-];
+export const dynamic = 'force-dynamic';
 
 export default function StatusPage() {
+  const {
+    freshness: currentFreshness,
+    ageDays,
+    cadence,
+  } = evaluateEvidenceHealth(digest, freshness, surface);
+  const checks = [
+    {
+      icon: Database,
+      label: 'Evidence surface',
+      value: `${surface.artifact_count} hash-locked artifacts`,
+      ok: surface.artifact_count > 0,
+    },
+    {
+      icon: Clock3,
+      label: 'Latest evidence digest',
+      value: `${digest.edition_date} · ${cadence} · ${ageDays} days old`,
+      ok: cadence === 'current',
+    },
+    {
+      icon: Database,
+      label: 'Registered source freshness',
+      value: `${currentFreshness.current_count}/${currentFreshness.source_count} current`,
+      ok: currentFreshness.status === 'operational',
+    },
+    {
+      icon: Activity,
+      label: 'Prospective outcome tracking',
+      value: `${practicalRoute.tracks.prospective_public_project_tracking.project_count.toLocaleString()} projects · ${practicalRoute.tracks.prospective_public_project_tracking.province_count} provinces`,
+      ok: practicalRoute.gate_evaluation.prospective_baseline_implemented,
+    },
+    {
+      icon: ShieldCheck,
+      label: 'Deployment gate',
+      value: gates.deployment.status,
+      ok: gates.deployment.status === 'authorized',
+    },
+    {
+      icon: Activity,
+      label: 'Forecast authorization',
+      value: 'Withheld pending calibration',
+      ok: false,
+    },
+  ];
+
   return (
     <ResearchShell>
       <PageIntro
@@ -105,7 +113,10 @@ export default function StatusPage() {
           </div>
         </div>
         <p className="mt-6 text-xs text-subtle">
-          Machine-readable status:{' '}
+          Last-good evidence is retained when a refresh fails or review is
+          overdue. Frozen release vintage: {freshness.as_of_date}; freshness
+          evaluated {currentFreshness.as_of_date}. Successful unchanged fetches
+          advance verification only. Machine-readable status:{' '}
           <Link className="underline" href="/api/health">
             /api/health
           </Link>

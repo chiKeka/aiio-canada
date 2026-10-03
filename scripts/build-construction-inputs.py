@@ -85,3 +85,8 @@ temporary = destination / 'snapshot.json.tmp'
 temporary.write_text(json.dumps(snapshot, separators=(',', ':')))
 temporary.replace(destination / 'snapshot.json')
 print(f'Published {len(projects)} phase records and the research register with SHA-256 provenance.')
+
+# ADM screen uses the same canonical inventory.
+import subprocess
+import sys
+subprocess.run([sys.executable, str(Path(__file__).resolve().with_name("build-adm-evidence.py")), "--root", str(root)], check=True)

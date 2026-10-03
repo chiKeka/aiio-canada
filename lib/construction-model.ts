@@ -26,6 +26,7 @@ export type Options = {
   labour: number[];
   wages: number[];
   capacity: (number | null)[];
+  privateHours?: number[];
 };
 export const defaults: Options = {
   years: 5,
@@ -41,6 +42,7 @@ export const defaults: Options = {
   labour: [0.35, 0.25, 0.3],
   wages: [85, 105, 100],
   capacity: [null, null, null],
+  privateHours: [0, 0, 0],
 };
 export const formulas = [
   [
@@ -71,7 +73,7 @@ export const formulas = [
     'F05',
     'Conditional pressure',
     'Ratio = (background hours + DC hours) ÷ total available hours',
-    'Capacity is unknown until entered. Background here covers the public envelope only; private work is omitted.',
+    'Capacity is unknown until entered. Private competing paid hours are an explicit annual scenario input; zero means omitted, not observed absence.',
   ],
   [
     'F06',
@@ -150,6 +152,7 @@ export function calculate(
   ];
   if (
     !numeric.every(Number.isFinite) ||
+    [o.shares, o.labour, o.wages, o.capacity, o.privateHours ?? [0, 0, 0]].some((values) => values.length !== 3) ||
     ![3, 5, 10].includes(o.years) ||
     o.duration < 1 ||
     ![4, 5].includes(o.cohortYears) ||
@@ -162,6 +165,7 @@ export function calculate(
       (x) => x < 0 || x > 1,
     ) ||
     Math.abs(o.shares.reduce((a, b) => a + b, 0) - 1) > 0.00001 ||
+    (o.privateHours ?? [0, 0, 0]).some((x) => !Number.isFinite(x) || x < 0) ||
     o.capacity.some((x) => x !== null && (!Number.isFinite(x) || x < 0))
   )
     throw new Error(
@@ -228,6 +232,7 @@ export function calculate(
   }
   const invalidCohorts = cohorts.some((c) => c.commitment < 0);
   const rows = [];
+  const packages: ResourcePackage[] = [];
   let totalHours = 0;
   const windows: [number, number][] = [
     [0, 0.5],
@@ -257,6 +262,8 @@ export function calculate(
               (b - a);
           }
         }
+        const privateHours = (o.privateHours?.[i] ?? 0) / 4;
+        background += privateHours;
         totalHours += dc;
         const cap =
           o.capacity[i] === null ? null : (o.capacity[i]! * o.annualHours) / 4;
@@ -264,15 +271,40 @@ export function calculate(
           quarter: `${y} Q${q + 1}`,
           trade: trades[i],
           dcHours: dc,
-          publicHours: background,
+          publicHours: background - privateHours,
+          privateHours,
           dcFte: dc / (o.annualHours / 4),
           capacityHours: cap,
           ratio: cap === null || cap === 0 ? null : (dc + background) / cap,
           gap: cap === null ? null : Math.max(0, dc + background - cap),
         });
       }
+  // Named public outcomes need package take-offs before assigning owner cost exposure.
+  // Anonymous envelope tasks represent competing work, never additional commitments.
+  const firstMonth = Math.min(month(2026, 8), ...phases.map((p) => p.startMonth));
+  const finalMonth = Math.max(month(2027 + o.years), ...phases.map((p) => p.endMonth));
+  for (let m = firstMonth; m < finalMonth; m++) {
+    const fy = Math.floor(m / 12) - (m % 12 < 3 ? 1 : 0);
+    for (let i = 0; i < 3; i++) packages.push({
+      id: `background:${m}:${i}`, region: 'Alberta', trade: trades[i], kind: 'background',
+      releaseMonth: m, plannedFinishMonth: m + 1, predecessors: [],
+      hours: publicAnnual(fy, o) / 12 * o.publicShare * o.shares[i] * o.labour[i] / o.wages[i] * o.hoursFactor + (o.privateHours?.[i] ?? 0) / 12,
+    });
+  }
+  for (const p of phases) for (let i = 0; i < 3; i++) packages.push({
+    id: `${p.id}:${i}`, region: 'Alberta', trade: trades[i], kind: 'dc', hours: p.hours[i],
+    releaseMonth: Math.ceil(p.startMonth + (p.endMonth - p.startMonth) * windows[i][0]),
+    plannedFinishMonth: Math.ceil(p.startMonth + (p.endMonth - p.startMonth) * windows[i][1]),
+    predecessors: i === 0 ? [] : [`${p.id}:0`],
+  });
+  const scheduling = pairedSchedule(packages, {
+    startMonth: firstMonth, endMonth: finalMonth + 120,
+    capacity: Object.fromEntries(trades.map((t, i) => [`Alberta:${t}`, o.capacity[i] === null ? null : o.capacity[i]! * o.annualHours / 12])),
+    policy: 'pro-rata', annualEscalation: o.inflation,
+  });
   return {
-    version: 'construction-0.1',
+    version: 'construction-0.2',
+    scheduling,
     options: o,
     phases,
     rows,
@@ -284,6 +316,93 @@ export function calculate(
       phases.reduce((s, p) => s + p.hours.reduce((a, b) => a + b, 0), 0) -
       totalHours,
     scope:
-      'Conditional Alberta public-envelope + selected DC scenario; other private construction omitted; no causal forecast',
+      'Uncalibrated Alberta paired public-envelope + explicit private-demand + selected DC scenario; capacity assumptions and enabling-work precedence are conditional; no causal forecast',
   };
+}
+
+export type ResourcePackage = {
+  id: string; region: string; trade: Trade; kind: 'background' | 'dc';
+  hours: number; releaseMonth: number; plannedFinishMonth: number;
+  predecessors: string[];
+  // Only explicitly uncommitted, remaining package costs may reprice.
+  uncommittedExposureCAD?: number;
+  incrementalSiteOverheadCADPerMonth?: number;
+};
+export type ScheduleOptions = {
+  startMonth: number; endMonth: number;
+  capacity: Record<string, number | null>;
+  monthlyCapacity?: Record<string, Record<number, number | null>>;
+  policy: 'pro-rata' | 'protect-background' | 'prefer-dc';
+  annualEscalation: number;
+};
+export function schedulePackages(packages: ResourcePackage[], options: ScheduleOptions) {
+  const ids = new Set(packages.map((p) => p.id));
+  if (ids.size !== packages.length || !Number.isInteger(options.startMonth) || !Number.isInteger(options.endMonth) || options.endMonth <= options.startMonth || !Number.isFinite(options.annualEscalation) || options.annualEscalation <= -1 || !['pro-rata', 'protect-background', 'prefer-dc'].includes(options.policy)) throw new Error('Invalid schedule contract');
+  for (const p of packages) {
+    if (![p.hours, p.releaseMonth, p.plannedFinishMonth, p.uncommittedExposureCAD ?? 0, p.incrementalSiteOverheadCADPerMonth ?? 0].every(Number.isFinite) || p.hours < 0 || (p.uncommittedExposureCAD ?? 0) < 0 || (p.incrementalSiteOverheadCADPerMonth ?? 0) < 0 || !Number.isInteger(p.releaseMonth) || !Number.isInteger(p.plannedFinishMonth) || p.releaseMonth < options.startMonth || p.plannedFinishMonth <= p.releaseMonth || p.predecessors.some((id) => !ids.has(id))) throw new Error('Invalid resource package');
+  }
+  const visiting = new Set<string>(), visited = new Set<string>();
+  const visit = (id: string) => {
+    if (visiting.has(id)) throw new Error('Cyclic package precedence');
+    if (visited.has(id)) return;
+    visiting.add(id);
+    for (const predecessor of packages.find((p) => p.id === id)!.predecessors) visit(predecessor);
+    visiting.delete(id); visited.add(id);
+  };
+  packages.forEach((p) => visit(p.id));
+  for (const cap of Object.values(options.capacity)) if (cap !== null && (!Number.isFinite(cap) || cap < 0)) throw new Error('Invalid monthly capacity');
+  for (const series of Object.values(options.monthlyCapacity ?? {})) for (const cap of Object.values(series)) if (cap !== null && (!Number.isFinite(cap) || cap < 0)) throw new Error('Invalid monthly capacity trajectory');
+  const state = packages.map((p) => ({ ...p, remainingHours: p.hours, servedHours: 0, completionMonth: null as number | null }));
+  const allocations: { month: number; packageId: string; region: string; trade: Trade; hours: number }[] = [];
+  const monthly: { month: number; resource: string; capacityHours: number | null; allocatedHours: number | null; backlogHours: number | null }[] = [];
+  for (let m = options.startMonth; m < options.endMonth; m++) {
+    for (const p of state) if (p.hours === 0 && p.releaseMonth <= m && p.completionMonth === null && p.predecessors.every((id) => { const previous = state.find((x) => x.id === id)!; return previous.completionMonth !== null && previous.completionMonth <= m; })) p.completionMonth = m;
+    const active = state.filter((p) => p.releaseMonth <= m && p.remainingHours > 1e-8 && p.predecessors.every((id) => {
+      const predecessor = state.find((x) => x.id === id)!;
+      return predecessor.completionMonth !== null && predecessor.completionMonth <= m;
+    }));
+    for (const resource of new Set(state.map((p) => `${p.region}:${p.trade}`))) {
+      const trajectory = options.monthlyCapacity?.[resource];
+      const cap = trajectory && Object.hasOwn(trajectory, m) ? trajectory[m] : (options.capacity[resource] ?? null);
+      const candidates = active.filter((p) => `${p.region}:${p.trade}` === resource);
+      let available = cap ?? 0, used = 0;
+      const tiers = options.policy === 'pro-rata' ? [candidates] : [
+        candidates.filter((p) => p.kind === (options.policy === 'protect-background' ? 'background' : 'dc')),
+        candidates.filter((p) => p.kind !== (options.policy === 'protect-background' ? 'background' : 'dc')),
+      ];
+      for (const tier of tiers) {
+        const requests = tier.map((p) => p.remainingHours / Math.max(1, p.plannedFinishMonth - m));
+        const total = requests.reduce((a, b) => a + b, 0);
+        const factor = total === 0 ? 0 : Math.min(1, available / total);
+        tier.forEach((p, i) => {
+          const served = requests[i] * factor;
+          p.remainingHours = Math.max(0, p.remainingHours - served); p.servedHours += served;
+          available -= served; used += served;
+          if (served > 0) allocations.push({ month: m, packageId: p.id, region: p.region, trade: p.trade, hours: served });
+          if (p.remainingHours < 1e-8) { p.remainingHours = 0; p.completionMonth = m + 1; }
+        });
+      }
+      monthly.push({ month: m, resource, capacityHours: cap, allocatedHours: cap === null ? null : used,
+        backlogHours: cap === null ? null : state.filter((p) => `${p.region}:${p.trade}` === resource && p.releaseMonth <= m).reduce((sum, p) => sum + p.remainingHours, 0) });
+    }
+  }
+  return { packages: state.map((p) => {
+    const delayMonths = p.completionMonth === null ? null : Math.max(0, p.completionMonth - p.plannedFinishMonth);
+    return { ...p, delayMonths, escalationCAD: delayMonths === null || p.uncommittedExposureCAD === undefined ? null : escalation(p.uncommittedExposureCAD, options.annualEscalation, delayMonths),
+      siteOverheadCAD: delayMonths === null || p.incrementalSiteOverheadCADPerMonth === undefined ? null : delayMonths * p.incrementalSiteOverheadCADPerMonth };
+  }), allocations, monthly, tailHours: state.reduce((sum, p) => sum + p.remainingHours, 0),
+    qualification: 'Uncalibrated monthly resource scenario; missing capacity leaves completion and costs unknown. Unfinished hours remain in the horizon tail.' };
+}
+export function pairedSchedule(packages: ResourcePackage[], options: ScheduleOptions) {
+  const baseline = schedulePackages(packages.filter((p) => p.kind === 'background'), options);
+  const withDC = schedulePackages(packages, options);
+  const zeroDC = !packages.some((p) => p.kind === 'dc' && p.hours > 0);
+  const impacts = baseline.packages.map((base) => {
+    const added = withDC.packages.find((p) => p.id === base.id)!;
+    return { packageId: base.id,
+      incrementalDelayMonths: zeroDC ? 0 : base.completionMonth === null || added.completionMonth === null ? null : added.completionMonth - base.completionMonth,
+      incrementalEscalationCAD: zeroDC ? 0 : base.escalationCAD === null || added.escalationCAD === null ? null : added.escalationCAD - base.escalationCAD,
+      incrementalSiteOverheadCAD: zeroDC ? 0 : base.siteOverheadCAD === null || added.siteOverheadCAD === null ? null : added.siteOverheadCAD - base.siteOverheadCAD };
+  });
+  return { options, baseline, withDC, impacts };
 }

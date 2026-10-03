@@ -104,6 +104,11 @@ from .readiness import audit_program_readiness, require_release_ready
 from .research_surface import build_research_surface_manifest
 from .source_freshness import build_source_freshness_report
 from .practical_route import build_practical_evidence_route
+from .planning_benchmark import run_planning_benchmark, OUTPUT as PLANNING_BENCHMARK_OUTPUT
+from .vintage_linkage import run_vintage_linkage, OUTPUT as VINTAGE_LINKAGE_OUTPUT
+from .full_schedule_proxy import build_full_schedule_proxy
+from .full_schedule_comparison import run_full_schedule_comparison, OUTPUT as FULL_SCHEDULE_COMPARISON_OUTPUT
+from .historical_intake import register_snapshot, load_snapshots, select_snapshot, build_snapshot_readiness, OUTPUT as SNAPSHOT_READINESS_OUTPUT
 from .pspe_lineage import build_pspe_method_lineage
 from .retrieval import retrieve
 from .schemas import ValidationError
@@ -461,6 +466,18 @@ def main() -> None:
         help="build the reconstructed treatment, prospective project and narrow revision gate",
     )
     practical_route_parser.add_argument("--as-of", default=utc_today)
+
+    subparsers.add_parser("run-planning-benchmark", help="run frozen retrospective Alberta planning backtests without authorizing estimates")
+    vintage_parser = subparsers.add_parser("audit-vintage-linkage", help="audit archived vintages and draft project/permit linkage without changing models")
+    vintage_parser.add_argument("--verify-raw", action="store_true", help="also verify local raw blobs and reviewed description hashes")
+    subparsers.add_parser("build-full-schedule-proxy", help="build v0.2 with full-schedule allocation and retained out-of-window ledger")
+    subparsers.add_parser("run-full-schedule-comparison", help="compare frozen baseline/project/permit/combined arms using proxy v0.2")
+    intake_parser = subparsers.add_parser("register-historical-snapshot", help="register an immutable normalized snapshot after raw-file verification")
+    intake_parser.add_argument("descriptor", type=Path)
+    selection_parser = subparsers.add_parser("select-historical-snapshot", help="select one whole source snapshot available at an exact UTC-aware date")
+    selection_parser.add_argument("source_id")
+    selection_parser.add_argument("--as-of", required=True)
+    subparsers.add_parser("build-historical-snapshot-readiness", help="build per-origin snapshot selections and an acquisition queue")
 
     canada_coverage_parser = subparsers.add_parser(
         "build-canada-cross-domain-coverage",
@@ -1569,6 +1586,26 @@ def main() -> None:
                 root / "data/registry/sources.json", args.as_of, output_path
             )
             print(json.dumps({"status": report["status"], "output": str(output_path), "source_count": report["source_count"], "stale_count": report["stale_count"]}))
+        elif args.command == "register-historical-snapshot":
+            descriptor = args.descriptor if args.descriptor.is_absolute() else root / args.descriptor
+            print(json.dumps(register_snapshot(root, descriptor)))
+        elif args.command == "select-historical-snapshot":
+            print(json.dumps(select_snapshot(load_snapshots(root), args.source_id, args.as_of)))
+        elif args.command == "build-historical-snapshot-readiness":
+            report = build_snapshot_readiness(root, root / SNAPSHOT_READINESS_OUTPUT)
+            print(json.dumps({"status": report["status"], "snapshot_count": report["snapshot_count"], "complete_source_snapshot_origins": report["complete_source_snapshot_origins"], "missing_source_origin_pairs": report["missing_source_origin_pairs"], "output": SNAPSHOT_READINESS_OUTPUT}))
+        elif args.command == "build-full-schedule-proxy":
+            report, _, _ = build_full_schedule_proxy(root, root)
+            print(json.dumps({"status": report["status"], "project_allocation_totals_cad": report["project_allocation_totals_cad"], "output_manifest": report["output_manifest"]}))
+        elif args.command == "run-full-schedule-comparison":
+            report = run_full_schedule_comparison(root, root / FULL_SCHEDULE_COMPARISON_OUTPUT)
+            print(json.dumps({"status": report["status"], "arms": {name: value["metrics"] for name, value in report["arms"].items()}, "historical_comparison": report["historical_comparison"]}))
+        elif args.command == "audit-vintage-linkage":
+            report, verification = run_vintage_linkage(root, root / VINTAGE_LINKAGE_OUTPUT, args.verify_raw)
+            print(json.dumps({"status": report["status"], "permit_review_count": len(report["included_permit_review"]), "raw_verification": verification, "output": VINTAGE_LINKAGE_OUTPUT}))
+        elif args.command == "run-planning-benchmark":
+            report = run_planning_benchmark(root, root / PLANNING_BENCHMARK_OUTPUT)
+            print(json.dumps({"status": report["status"], "metrics": report["metrics"], "point_error_checks": report["point_error_checks"], "output": PLANNING_BENCHMARK_OUTPUT}))
         elif args.command == "build-practical-evidence-route":
             report = build_practical_evidence_route(
                 root,

@@ -26,10 +26,11 @@ def refresh(root: Path, today: date, update=None) -> dict:
             continue
         try:
             result = (update or update_source)(root, entry['id'], today, old)
-            results[entry['id']] = {**result, 'last_success': today.isoformat(), 'last_attempt': today.isoformat(), 'status': 'checked'}
+            results[entry['id']] = {**result, 'last_success': today.isoformat(), 'last_attempt': today.isoformat(), 'status': 'checked', 'review_due': (today + timedelta(days=entry['checkEveryDays'])).isoformat()}
         except Exception as exc:
             # Never publish a failed parse, zero-filled substitute, or sensitive exception text.
-            results[entry['id']] = {**old, 'last_attempt': today.isoformat(), 'status': 'error', 'error_type': type(exc).__name__}
+            results[entry['id']] = {**old, 'last_attempt': today.isoformat(), 'status': 'error', 'error_type': type(exc).__name__, 'reason': 'source_fetch_or_validation_failed_last_good_retained'}
+            print(json.dumps({'source_id': entry['id'], 'status': 'error', 'reason': results[entry['id']]['reason'], 'error_type': type(exc).__name__}), file=sys.stderr)
     report = {'version': policy['version'], 'sources': results}
     receipt_path.parent.mkdir(parents=True, exist_ok=True)
     temporary = receipt_path.with_suffix('.tmp')
@@ -53,7 +54,7 @@ def update_source(root: Path, source_id: str, today: date, previous: dict) -> di
     if not raw.is_absolute():
         raw = root / raw
     if record.content_hash == previous.get('content_hash'):
-        return {**previous, 'changed': False}
+        return {**previous, 'retrieved_at': record.retrieved_at, 'changed': False}
     with tempfile.TemporaryDirectory(prefix='construction-feed-') as directory:
         stage = Path(directory)
         outputs = []

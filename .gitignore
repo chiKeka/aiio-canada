@@ -63,3 +63,6 @@ CLAUDE.md
 
 # Redistribution terms are not yet confirmed; retain only the hash receipt.
 /data/raw/alberta_major_projects/*.csv
+
+# Historical evidence captures are local; version provenance and derived reviews.
+/data/raw/historical_evidence_20260905/

@@ -1,4 +1,10 @@
 'use client';
+import Link from 'next/link';
+
+import {
+  scenarioMoney as money,
+  scenarioRate,
+} from '@/lib/public-presentation.mjs';
 
 import { useState } from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
@@ -26,10 +32,6 @@ const steps = [
   'What to do',
 ];
 const card = 'rounded-lg border border-line bg-surface p-4';
-const money = (value: number | undefined) =>
-  value === undefined
-    ? 'Unavailable'
-    : `$${value.toLocaleString(undefined, { maximumFractionDigits: 1 })}M`;
 const config = {
   baseline_mom_pct: { label: 'Baseline % MoM', color: '#446c99' },
   ai_increment_mom_pct: { label: 'AI scenario pp MoM', color: '#8b5916' },
@@ -263,7 +265,7 @@ export function GuidedProjectStory({
                     <span>
                       {item.allocation === null
                         ? 'Withheld'
-                        : `${item.allocation.toFixed(3)} pp`}
+                        : `${scenarioRate(item.allocation)} pp`}
                     </span>
                   </span>
                   <span className="mt-1 block text-xs text-subtle">
@@ -340,12 +342,17 @@ export function GuidedProjectStory({
             </div>
             <div className={card}>
               <p className="text-sm">
-                Proxy-planning validation: {planningChecks} checks passed.
+                <Link
+                  href="/methods#planning-gates"
+                  className="text-brand underline"
+                >
+                  Planning checks: {planningChecks} passed
+                </Link>
+                .
               </p>
               <p className="mt-2 text-sm text-subtle">
-                Independent estimate and capacity evidence still needed.
-                AI-attributable effects and mitigation savings are not
-                established.
+                Obtain an independent estimate and supplier capacity evidence
+                before the next approval.
               </p>
               <Button
                 className="mt-3 border border-line bg-workspace text-ink"

@@ -31,6 +31,28 @@ class SourceFreshnessTests(unittest.TestCase):
             self.assertEqual(report["status"], "degraded")
             self.assertEqual(report["stale_source_ids"], ["TORONTO_CLEARED_BUILDING_PERMITS"])
 
+    def test_receipt_success_and_failure_are_separate_from_observation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            registry_path = root / "data/registry/sources.json"
+            registry_path.parent.mkdir(parents=True)
+            registry = json.loads((ROOT / "data/registry/sources.json").read_text())
+            registry["sources"] = [registry["sources"][1]]
+            registry["sources"][0]["last_verified"] = "2026-01-01"
+            registry_path.write_text(json.dumps(registry))
+            receipts = root / "data/model-runs/construction-source-refresh.json"
+            receipts.parent.mkdir(parents=True)
+            receipts.write_text(json.dumps({"sources": {"TORONTO_CLEARED_BUILDING_PERMITS": {
+                "last_success": "2026-09-01", "last_attempt": "2026-09-20", "status": "error",
+                "observation_date": "2026-08-01"}}}))
+            report = build_source_freshness_report(registry_path, "2026-09-20")
+            item = report["sources"][0]
+            self.assertEqual(item["age_days"], 19)
+            self.assertEqual(item["last_success"], "2026-09-01")
+            self.assertEqual(item["last_attempt"], "2026-09-20")
+            self.assertEqual(item["observation_date"], "2026-08-01")
+            self.assertEqual(item["freshness_state"], "stale")
+
     def test_unknown_frequency_fails_closed(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "sources.json"

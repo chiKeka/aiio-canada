@@ -16,7 +16,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - name: Check out repository
@@ -35,11 +35,15 @@ jobs:
         run: npm run lint
 
       - name: Test project cashflow and shared inputs
-        run: npm run test:planning
+        run: |
+          npm run test:planning
+          npm run test:delivery
 
       - name: Test construction refresh and briefing
         run: |
           npm run construction:publish
+          npm run test:construction
+          npm run test:evidence-health
           npm run test:construction-refresh
           npm run test:briefing
 
@@ -73,17 +77,23 @@ jobs:
       - name: Test graph, scenarios, schemas, and release controls
         run: npm run research:test
 
+      - name: Verify frozen planning validation packet
+        run: PYTHONPATH=research/src python3 research/scripts/freeze_planning_validation.py --check
+
       - name: Build native Next.js deployment
         run: npm run build
 
       - name: Build Sites-compatible deployment
         run: npm run build:sites
 
+      - name: Install portable Chromium
+        run: npx playwright-core install --with-deps chromium
+
       - name: Start production application for browser verification
         run: |
           npm start -- --hostname 127.0.0.1 --port 3002 > /tmp/aiio-next.log 2>&1 &
           for attempt in {1..30}; do
-            if curl --fail --silent http://127.0.0.1:3002/api/health >/dev/null; then
+            if curl --fail --silent http://127.0.0.1:3002/api/availability >/dev/null; then
               exit 0
             fi
             sleep 1
@@ -94,11 +104,24 @@ jobs:
       - name: Audit public routes for blocking accessibility defects
         env:
           AIIO_BASE_URL: http://127.0.0.1:3002
-          CHROME_EXECUTABLE: /usr/bin/google-chrome
         run: npm run test:a11y
 
       - name: Verify executive briefing and snapshot workflow
         env:
           AIIO_BASE_URL: http://127.0.0.1:3002
-          CHROME_EXECUTABLE: /usr/bin/google-chrome
         run: npm run test:executive
+
+      - name: Verify construction overview and revision failure recovery
+        env:
+          AIIO_BASE_URL: http://127.0.0.1:3002
+        run: npm run test:construction-browser
+
+      - name: Upload browser diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: construction-browser-diagnostics
+          path: |
+            /tmp/aiio-next.log
+            /tmp/alberta-overview-*.png
+          if-no-files-found: ignore

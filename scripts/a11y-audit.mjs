@@ -1,34 +1,42 @@
 import AxeBuilder from '@axe-core/playwright';
 import { chromium } from 'playwright-core';
 
-const baseUrl = process.env.AIIO_BASE_URL ?? 'http://127.0.0.1:3002';
-const executablePath = process.env.CHROME_EXECUTABLE ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+import { baseUrl, browserOptions } from './browser-config.mjs';
 const routes = [
   '/',
+  '/delivery',
+  '/construction',
+  '/project-scenario',
   '/research',
   '/evidence',
   '/pressure',
   '/scenario',
   '/methods',
+  '/historical-analog',
   '/digest',
   '/downloads',
   '/status',
 ];
 const blockingImpacts = new Set(['serious', 'critical']);
 
-const browser = await chromium.launch({ executablePath, headless: true });
+const browser = await chromium.launch(browserOptions());
 const context = await browser.newContext({ reducedMotion: 'reduce' });
 const page = await context.newPage();
 const report = [];
 
 try {
-  for (const route of routes) {
-    await page.goto(`${baseUrl}${route}`, { waitUntil: 'networkidle' });
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const route of routes) {
+    await page.goto(`${baseUrl}${route}`, { waitUntil: 'domcontentloaded' });
+    await page.getByRole('main').waitFor({ state: 'visible' });
+    await page.evaluate(() => document.fonts.ready);
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
       .analyze();
     report.push({
       route,
+      width,
       violations: results.violations.map((violation) => ({
         id: violation.id,
         impact: violation.impact,
@@ -41,14 +49,15 @@ try {
         })),
       })),
     });
+    }
   }
 } finally {
   await context.close();
   await browser.close();
 }
 
-const blockers = report.flatMap(({ route, violations }) =>
-  violations.filter(({ impact }) => blockingImpacts.has(impact)).map((violation) => ({ route, ...violation })),
+const blockers = report.flatMap(({ route, width, violations }) =>
+  violations.filter(({ impact }) => blockingImpacts.has(impact)).map((violation) => ({ route, width, ...violation })),
 );
 
 console.log(JSON.stringify({ baseUrl, routes: report, blockingViolations: blockers }, null, 2));
