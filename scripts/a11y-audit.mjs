@@ -6,6 +6,7 @@ const routes = [
   '/',
   '/delivery',
   '/construction',
+  '/construction/pilot',
   '/project-scenario',
   '/research',
   '/evidence',

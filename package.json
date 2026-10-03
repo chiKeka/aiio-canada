@@ -108,7 +108,9 @@
     "test:project-demand": "node --test tests/project-demand-model.test.mjs",
     "test:construction": "node --experimental-strip-types --test tests/construction-model.test.mjs tests/enabling-infrastructure.test.mjs",
     "test:construction-browser": "node scripts/alberta-overview-test.mjs && node scripts/construction-refresh-workflow-test.mjs",
-    "test:evidence-health": "node --test tests/evidence-health.test.mjs"
+    "test:evidence-health": "node --test tests/evidence-health.test.mjs",
+    "test:alberta-pilot-browser": "node scripts/alberta-pilot-browser-check.mjs",
+    "test:pilot-stress": "node --experimental-strip-types --test tests/pilot-stress.test.mjs tests/alberta-pilot.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
