@@ -56,7 +56,7 @@
     "power:planning:provinces": "PYTHONPATH=research/src python3 -m aiio.cli --root . run-provincial-power-planning data/manual/provincial_power_planning_extract_2026_09.json data/model-runs/provincial_power_planning_contract_v0.1.json data/processed/provincial_power_planning_metrics.csv",
     "digest:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-latest-digest",
     "digest:audit": "PYTHONPATH=research/src python3 -m aiio.cli --root . audit-digest-cadence",
-    "evidence:refresh-weekly": "python3 research/scripts/weekly_evidence_refresh.py --root .",
+    "evidence:refresh-weekly": "python3 research/scripts/review_evidence_refresh.py --root .",
     "research-surface:build": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-research-surface-manifest",
     "sources:freshness": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-source-freshness-report",
     "evidence:practical-route": "PYTHONPATH=research/src python3 -m aiio.cli --root . build-practical-evidence-route",

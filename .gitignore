@@ -66,3 +66,8 @@ CLAUDE.md
 
 # Historical evidence captures are local; version provenance and derived reviews.
 /data/raw/historical_evidence_20260905/
+
+# Weekly review candidates retain source bytes locally; commit hash receipts only.
+/data/review-candidates/weekly-evidence-*/data/raw/**/*
+!/data/review-candidates/weekly-evidence-*/data/raw/**/
+!/data/review-candidates/weekly-evidence-*/data/raw/**/*.manifest.json

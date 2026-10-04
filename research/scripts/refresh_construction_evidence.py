@@ -6,8 +6,45 @@ import json
 import shutil
 import sys
 import tempfile
+import ssl
+import time
+from urllib.error import HTTPError, URLError
 from datetime import date, datetime, UTC, timedelta
 from pathlib import Path
+
+
+def failure_diagnostic(exc: Exception, route: str | None) -> dict:
+    """Log the public registered route and typed transport details, never exception text."""
+    result = {'registered_retrieval_url': route, 'error_type': type(exc).__name__}
+    if isinstance(exc, HTTPError):
+        result['http_status'] = exc.code
+    elif isinstance(exc, URLError):
+        reason = exc.reason
+        result['transport_reason_class'] = type(reason).__name__
+        if isinstance(getattr(reason, 'errno', None), int):
+            result['transport_errno'] = reason.errno
+    return result
+
+
+def transient_fetch_error(exc: Exception) -> bool:
+    if isinstance(exc, HTTPError):
+        return exc.code == 429 or 500 <= exc.code < 600
+    if isinstance(exc, URLError):
+        # Retain ordinary certificate verification; TLS failures require investigation.
+        return isinstance(exc.reason, OSError) and not isinstance(exc.reason, ssl.SSLError)
+    return isinstance(exc, TimeoutError)
+
+
+def fetch_with_retry(operation, source_id: str, route: str | None, *, attempts: int = 3, wait=time.sleep):
+    for attempt in range(1, attempts + 1):
+        try:
+            return operation()
+        except Exception as exc:
+            retrying = attempt < attempts and transient_fetch_error(exc)
+            print(json.dumps({'source_id': source_id, 'attempt': attempt, 'retrying': retrying, **failure_diagnostic(exc, route)}), file=sys.stderr)
+            if not retrying:
+                raise
+            wait(min(2 ** (attempt - 1), 4))
 
 
 def is_due(previous: dict, today: date, interval: int) -> bool:
@@ -20,18 +57,21 @@ def refresh(root: Path, today: date, update=None) -> dict:
     receipt_path = root / 'data/model-runs/construction-source-refresh.json'
     previous = json.loads(receipt_path.read_text()) if receipt_path.exists() else {'sources': {}}
     results = dict(previous['sources'])
+    registry_path = root / 'data/registry/sources.json'
+    routes = {source['source_id']: source.get('retrieval_url') for source in json.loads(registry_path.read_text())['sources']} if registry_path.exists() else {}
     for entry in policy['sources']:
         old = results.get(entry['id'], {})
         if entry['mode'] != 'structured_feed' or not is_due(old, today, entry['checkEveryDays']):
             continue
         try:
             result = (update or update_source)(root, entry['id'], today, old)
-            results[entry['id']] = {**result, 'last_success': today.isoformat(), 'last_attempt': today.isoformat(), 'status': 'checked', 'review_due': (today + timedelta(days=entry['checkEveryDays'])).isoformat()}
+            results[entry['id']] = {**{key: value for key, value in result.items() if key not in {'error_type', 'reason', 'http_status', 'transport_reason_class', 'transport_errno'}}, 'last_success': today.isoformat(), 'last_attempt': today.isoformat(), 'status': 'checked', 'review_due': (today + timedelta(days=entry['checkEveryDays'])).isoformat()}
         except Exception as exc:
             # Never publish a failed parse, zero-filled substitute, or sensitive exception text.
-            results[entry['id']] = {**old, 'last_attempt': today.isoformat(), 'status': 'error', 'error_type': type(exc).__name__, 'reason': 'source_fetch_or_validation_failed_last_good_retained'}
-            print(json.dumps({'source_id': entry['id'], 'status': 'error', 'reason': results[entry['id']]['reason'], 'error_type': type(exc).__name__}), file=sys.stderr)
-    report = {'version': policy['version'], 'sources': results}
+            results[entry['id']] = {**{key: value for key, value in old.items() if key not in {'error_type', 'http_status', 'transport_reason_class', 'transport_errno'}}, 'last_attempt': today.isoformat(), 'status': 'error', 'reason': 'source_fetch_or_validation_failed_last_good_retained', **failure_diagnostic(exc, routes.get(entry['id']))}
+            print(json.dumps({'source_id': entry['id'], **results[entry['id']]}), file=sys.stderr)
+    failed = [source_id for source_id, result in results.items() if result.get('status') == 'error']
+    report = {'version': policy['version'], 'status': 'partial_refresh' if failed else 'checks_completed', 'failed_source_ids': failed, 'sources': results}
     receipt_path.parent.mkdir(parents=True, exist_ok=True)
     temporary = receipt_path.with_suffix('.tmp')
     temporary.write_text(json.dumps(report, indent=2, sort_keys=True)+'\n')
@@ -49,7 +89,7 @@ def update_source(root: Path, source_id: str, today: date, previous: dict) -> di
     from aiio.labour import run_labour_recruitment_pressure
     from aiio.public_projects import run_public_project_exposure
     registry = {s.source_id: s for s in load_registry(root / 'data/registry/sources.json')}
-    record = fetch_major_projects(root / 'data/raw') if source_id == 'ALBERTA_MAJOR_PROJECTS' else retrieve(registry[source_id], root / 'data/raw')
+    record = fetch_with_retry(lambda: fetch_major_projects(root / 'data/raw') if source_id == 'ALBERTA_MAJOR_PROJECTS' else retrieve(registry[source_id], root / 'data/raw'), source_id, registry[source_id].retrieval_url)
     raw = Path(record.archive_path)
     if not raw.is_absolute():
         raw = root / raw
@@ -117,7 +157,9 @@ def main():
     parser.add_argument('--as-of', type=date.fromisoformat, default=datetime.now(UTC).date())
     args = parser.parse_args()
     report = refresh(args.root.resolve(), args.as_of)
-    print(json.dumps({'source_checks': report['sources']}, indent=2))
+    print(json.dumps({'status': report['status'], 'failed_source_ids': report['failed_source_ids'], 'source_checks': report['sources']}, indent=2))
+    if report['failed_source_ids']:
+        raise SystemExit(1)
 
 if __name__ == '__main__':
     main()

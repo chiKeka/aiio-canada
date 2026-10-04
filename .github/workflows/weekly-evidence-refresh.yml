@@ -50,7 +50,7 @@ jobs:
           EDITION_DATE: ${{ inputs.edition_date }}
         run: |
           if [ -n "$EDITION_DATE" ]; then
-            python3 research/scripts/weekly_evidence_refresh.py --root . --edition-date "$EDITION_DATE"
+            python3 research/scripts/review_evidence_refresh.py --root . --edition-date "$EDITION_DATE"
           else
             npm run evidence:refresh-weekly
           fi
@@ -68,12 +68,14 @@ jobs:
             data/model-runs/construction-source-refresh.json
             data/model-runs/weekly-source-refresh.json
             public/data/source-receipts.json
+            data/review-candidates/weekly-evidence-*/manifest.json
+            data/review-candidates/weekly-evidence-*/refresh.log
           if-no-files-found: ignore
 
       - name: Verify refreshed evidence and application
         run: |
           npm run research:validate
-          npm run digest:audit
+          python3 research/scripts/review_evidence_refresh.py --root . --check-candidates
           npm run research:test
           npm run test:briefing
           npm run test:construction-refresh
@@ -100,7 +102,7 @@ jobs:
           git config user.name "aiio-evidence-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
-          git add data/raw data/processed data/model-runs data/digests public/data/latest-digest.json public/data/source-freshness.json public/data/source-receipts.json public/data/research-surface.json public/data/construction
+          git add data/raw data/processed data/model-runs data/digests data/review-candidates public/data/latest-digest.json public/data/source-freshness.json public/data/source-receipts.json public/data/research-surface.json public/data/construction
           git commit -m "Refresh weekly evidence ${EDITION}"
           git push origin "$BRANCH"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
@@ -110,10 +112,11 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         run: |
           gh pr create \
+            --draft \
             --base main \
             --head "${{ steps.branch.outputs.branch }}" \
             --title "Weekly evidence refresh — ${{ steps.branch.outputs.edition }}" \
-            --body "Automated refresh of registered official evidence sources. All generated outputs passed registry validation, research tests, lint, the Next.js build, and the Sites build. No model parameter or frozen release is promoted automatically. Review source changes, classifications, limitations, and the dated digest before merging."
+            --body "Automated refresh of registered official evidence sources. All generated outputs passed registry validation, research tests, lint, the Next.js build, and the Sites build. No model parameter or frozen release is promoted automatically. New processed evidence and the dated digest remain isolated review candidates; the published digest and frozen research packet are preserved. Review source changes, classifications, limitations, and candidate hashes before any promotion."
 
       - name: Record no-change run
         if: steps.changes.outputs.changed == 'false'
