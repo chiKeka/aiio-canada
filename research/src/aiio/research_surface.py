@@ -25,6 +25,7 @@ ARTIFACTS = [
     ("frozen_release_bundle", "public/data/latest.json", "frozen_release"),
     ("frozen_release_manifest", "public/data/manifest.json", "governance"),
     ("latest_digest_pointer", "public/data/latest-digest.json", "governance"),
+    ("reviewed_digest", "public/data/reviewed-digest.json", "reviewed_evidence_note"),
     ("program_gates", "data/governance/program-gates.json", "governance"),
     ("executive_monthly_escalation", "data/model-runs/executive_monthly_escalation_current.json", "withheld_model_output"),
     ("source_registry", "data/registry/sources.json", "source_provenance"),
@@ -73,7 +74,13 @@ def sha256_file(path: Path) -> str:
 def build_research_surface_manifest(root: Path, output_path: Path | None) -> dict[str, Any]:
     root = root.resolve()
     artifacts = []
-    for artifact_id, relative_path, evidence_role in ARTIFACTS:
+    digest = json.loads((root / "public/data/latest-digest.json").read_text(encoding="utf-8"))
+    digest_artifacts = []
+    if digest.get("status") == "approved":
+        from datetime import date
+        edition = date.fromisoformat(digest["edition_date"]).isoformat()
+        digest_artifacts = [("reviewed_digest_manifest", f"data/digests/{edition}.manifest.json", "provenance"), ("digest_editorial_approval", f"data/digests/{edition}.approval.json", "governance")]
+    for artifact_id, relative_path, evidence_role in [*ARTIFACTS, *digest_artifacts]:
         path = root / relative_path
         if not path.is_file():
             raise ValidationError(f"research-surface artifact is missing: {relative_path}")

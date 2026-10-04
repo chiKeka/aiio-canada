@@ -1,6 +1,6 @@
 {
-  "artifact_count": 53,
-  "artifact_manifest_sha256": "sha256:f924623a4183f8195ebacba7d480056b39a169de9b0c90b644a090b85a741d12",
+  "artifact_count": 56,
+  "artifact_manifest_sha256": "sha256:155cce7ee170ec42558ff1346bd97f0aa58f316bda3f892cf09c88c32ce48f3c",
   "artifacts": [
     {
       "artifact_id": "source_receipts",
@@ -90,7 +90,13 @@
       "artifact_id": "latest_digest_pointer",
       "evidence_role": "governance",
       "path": "public/data/latest-digest.json",
-      "sha256": "sha256:fed4bf0b4129729b675b1ad9e822b8180121701015ae88967c1dff631288bd7a"
+      "sha256": "sha256:147be1b9e6085e25983a7891dcce2e324a2de93a62eee550a79e1515fc56bf0b"
+    },
+    {
+      "artifact_id": "reviewed_digest",
+      "evidence_role": "reviewed_evidence_note",
+      "path": "public/data/reviewed-digest.json",
+      "sha256": "sha256:11e0e23d9e3cea42dc7b14eca75a83baf9a08a1280acdc89d1cab3cff7476940"
     },
     {
       "artifact_id": "program_gates",
@@ -319,6 +325,18 @@
       "evidence_role": "governance",
       "path": "data/model-runs/quebec_pqi_parser_review_package_v0.1.json",
       "sha256": "sha256:6f1d2816c2d1ae47a2152304639f083b82f09a1ca8e95135d44ff28b6f10097c"
+    },
+    {
+      "artifact_id": "reviewed_digest_manifest",
+      "evidence_role": "provenance",
+      "path": "data/digests/2026-10-03.manifest.json",
+      "sha256": "sha256:24138b8ce390c63cba27bf79a8f288b4cde0e5996c4d83df6fab07d913db59b2"
+    },
+    {
+      "artifact_id": "digest_editorial_approval",
+      "evidence_role": "governance",
+      "path": "data/digests/2026-10-03.approval.json",
+      "sha256": "sha256:410894a42f0f9e16ff44a7013104eea114eecf9f1093acba2d7c0051d5327ab9"
     }
   ],
   "frozen_release_id": "AIIO_RELEASE_0_6_0_DEV",

@@ -7,9 +7,10 @@ import {
   ResearchShell,
 } from '@/components/site-shell';
 import releaseData from '@/public/data/latest.json';
+import reviewedDigest from '@/public/data/reviewed-digest.json';
 
 export default function DigestPage() {
-  const digest = releaseData.digest;
+  const digest = reviewedDigest;
   return (
     <ResearchShell>
       <PageIntro
@@ -23,18 +24,38 @@ export default function DigestPage() {
             <div className="flex items-center gap-2">
               <BookOpen className="size-4 text-brand" />
               <span className="font-mono text-xs uppercase tracking-[0.13em] text-brand">
-                Latest edition
+                Reviewed evidence edition
               </span>
             </div>
             <h2 className="mt-3 text-2xl font-medium tracking-[-0.03em]">
               Alberta evidence watch
             </h2>
           </div>
-          <p className="flex items-center gap-2 font-mono text-xs text-subtle">
+          <p
+            data-testid="reviewed-digest-status"
+            className="flex items-center gap-2 font-mono text-xs text-subtle"
+          >
             <CalendarDays className="size-4" />
             {digest.edition_date} · {digest.status}
           </p>
         </div>
+        <aside
+          className="mb-6 rounded-lg border border-line bg-workspace p-4 text-sm leading-6 text-subtle"
+          aria-label="Evidence review and frozen model vintage"
+        >
+          <p>
+            Approved for this evidence digest through internal editorial review.
+            This is not independent model validation or approval to change model
+            parameters.
+          </p>
+          <p className="mt-2" data-testid="frozen-model-vintage">
+            Frozen model release: {releaseData.manifest.version} · created{' '}
+            {releaseData.manifest.created_at.slice(0, 10)} · embedded digest
+            vintage {releaseData.digest.edition_date}. These frozen model inputs
+            are separate from the reviewed evidence edition above.
+          </p>
+          <p className="mt-2">{digest.review_scope}</p>
+        </aside>
         <div className="space-y-5">
           {digest.items.map((item) => (
             <article
@@ -44,7 +65,7 @@ export default function DigestPage() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <EvidencePill status={item.evidence_status} />
                 <span className="font-mono text-[10px] text-subtle">
-                  {item.source_id}
+                  {item.sources.map((source) => source.source_id).join(' · ')}
                 </span>
               </div>
               <h2 className="mt-5 text-xl font-medium tracking-[-0.015em]">
@@ -68,19 +89,32 @@ export default function DigestPage() {
                   </p>
                 </div>
               </div>
-              <a
-                className="mt-6 inline-flex items-center gap-1 text-xs font-medium text-brand hover:underline"
-                href={item.source_url}
-                rel="noreferrer"
-                target="_blank"
+              <ul
+                className="mt-6 flex flex-wrap gap-x-5 gap-y-3"
+                aria-label={`Official sources for ${item.headline}`}
               >
-                Open official source <ArrowUpRight className="size-3" />
-              </a>
+                {item.sources.map((source) => (
+                  <li key={`${source.source_id}-${source.source_url}`}>
+                    <a
+                      className="inline-flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+                      href={source.source_url}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      {source.source_id}{' '}
+                      <ArrowUpRight className="size-3" aria-hidden="true" />
+                      <span className="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </article>
           ))}
         </div>
         <p className="mt-8 rounded-lg border border-line bg-workspace p-4 text-sm text-subtle">
-          {digest.promotion_rule}
+          Evidence-digest approval does not automatically change model values.
+          Any proposed model promotion requires validation, the applicable
+          review gate and a separate versioned release.
         </p>
       </section>
       <SiteFooter />
