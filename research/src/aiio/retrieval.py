@@ -6,6 +6,7 @@ import urllib.request
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Callable
 
 from .paths import repository_path
 from .schemas import SourceRecord, ValidationError
@@ -24,7 +25,7 @@ class RetrievalRecord:
     result: str
 
 
-def retrieve(source: SourceRecord, raw_root: Path) -> RetrievalRecord:
+def retrieve(source: SourceRecord, raw_root: Path, *, validate_content: Callable[[bytes], None] | None = None) -> RetrievalRecord:
     if source.access_method not in {
         "api_json",
         "bulk_zip",
@@ -47,6 +48,10 @@ def retrieve(source: SourceRecord, raw_root: Path) -> RetrievalRecord:
         content = response.read()
         effective_url = response.geturl()
         content_type = response.headers.get_content_type()
+
+    # Validate candidate payloads before recording a successful verification.
+    if validate_content is not None:
+        validate_content(content)
 
     digest = hashlib.sha256(content).hexdigest()
     suffix = _suffix_for(source.access_method, content_type)

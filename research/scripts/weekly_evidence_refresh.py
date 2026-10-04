@@ -1,11 +1,63 @@
 from __future__ import annotations
 
 import argparse
+import csv
+import io
 import json
 import subprocess
 import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
+from dataclasses import asdict
+
+
+def refresh_canadabuys(root: Path, checked_date: str, *, fetcher=None):
+    """Verify registered candidate CSVs only; never rebuild/promote outcome evidence."""
+    from aiio.adapters.canadabuys import TENDER_SOURCE_ID, AWARD_SOURCE_ID, CONTRACT_SOURCE_ID, TENDER_REQUIRED_FIELDS, AWARD_REQUIRED_FIELDS, CONTRACT_REQUIRED_FIELDS
+    from aiio.retrieval import retrieve
+    from aiio.registry import load_registry
+    from aiio.schemas import ValidationError
+
+    sources = {source.source_id: source for source in load_registry(root / "data/registry/sources.json")}
+    fetcher = fetcher or retrieve
+    results = {}
+    failures = []
+    for source_id, fields in ((TENDER_SOURCE_ID, TENDER_REQUIRED_FIELDS), (AWARD_SOURCE_ID, AWARD_REQUIRED_FIELDS), (CONTRACT_SOURCE_ID, CONTRACT_REQUIRED_FIELDS)):
+        def validate(content, fields=fields, source_id=source_id):
+            reader = csv.DictReader(io.StringIO(content.decode("utf-8-sig")))
+            missing = fields - set(reader.fieldnames or ())
+            if missing or next(reader, None) is None:
+                raise ValidationError(f"{source_id}: empty CSV or missing required fields {sorted(missing)}")
+        try:
+            result = record_fetch(root / "data/model-runs/weekly-source-refresh.json", source_id, checked_date, lambda: fetcher(sources[source_id], root / "data/raw", validate_content=validate))
+            results[source_id] = asdict(result)
+        except Exception:
+            failures.append(source_id)
+    if failures:
+        raise ValidationError(f"CanadaBuys refresh failed for {', '.join(failures)}; last-good evidence retained")
+    return results
+
+
+def independent_refresh_checks(root: Path, checked_date: str, *, procurement=None, construction=None):
+    """A failed feed group must not prevent independent groups from being checked."""
+    failures = []
+    try:
+        (procurement or refresh_canadabuys)(root, checked_date)
+    except Exception as exc:
+        failures.append({'group': 'canadabuys', 'error_type': type(exc).__name__})
+    completed = (construction or subprocess.run)([sys.executable, str(root / 'research/scripts/refresh_construction_evidence.py'), '--root', str(root), '--as-of', checked_date], cwd=root, check=False)
+    if completed.returncode:
+        failures.append({'group': 'construction', 'returncode': completed.returncode})
+    return failures
+
+
+def partial_refresh_summary(root: Path, failures: list) -> dict:
+    failed_sources = []
+    for name in ('weekly-source-refresh.json', 'construction-source-refresh.json'):
+        path = root / 'data/model-runs' / name
+        if path.exists():
+            failed_sources.extend(source_id for source_id, receipt in json.loads(path.read_text()).get('sources', {}).items() if receipt.get('status') == 'error')
+    return {'status': 'partial_refresh' if failures or failed_sources else 'review_pr_required', 'failed_source_ids': sorted(set(failed_sources)), 'failed_feed_groups': failures}
 
 
 def record_fetch(receipt_path: Path, source_id: str, checked_date: str, operation):
@@ -14,9 +66,9 @@ def record_fetch(receipt_path: Path, source_id: str, checked_date: str, operatio
     old = report["sources"].get(source_id, {})
     try:
         result = operation()
-        report["sources"][source_id] = {**old, "last_attempt": checked_date, "last_success": checked_date, "status": "checked"}
+        report["sources"][source_id] = {**{key: value for key, value in old.items() if key not in {"error_type", "reason", "http_status"}}, "last_attempt": checked_date, "last_success": checked_date, "status": "checked"}
     except Exception as exc:
-        report["sources"][source_id] = {**old, "last_attempt": checked_date, "status": "error", "error_type": type(exc).__name__, "reason": "source_fetch_failed_last_good_retained"}
+        report["sources"][source_id] = {**old, "last_attempt": checked_date, "status": "error", "error_type": type(exc).__name__, "http_status": getattr(exc, "code", None), "reason": "source_fetch_failed_last_good_retained"}
         print(json.dumps({"source_id": source_id, **report["sources"][source_id]}), file=sys.stderr)
         raise
     finally:
@@ -32,6 +84,7 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--edition-date", type=date.fromisoformat, default=datetime.now(UTC).date())
     parser.add_argument("--check-receipts", action="store_true", help="Offline read-only check of local receipts; no fetch, edition, commit, or publication")
+    parser.add_argument("--canadabuys-only", action="store_true", help="Fetch and validate registered candidate CSVs and operational receipts only; no evidence promotion")
     args = parser.parse_args()
     root = args.root.resolve()
     sys.path.insert(0, str(root / "research" / "src"))
@@ -53,7 +106,19 @@ def main() -> None:
         print(json.dumps({"mode": "offline_receipt_check", "evaluated_at": checked_date, "source_count": report["source_count"], "stale_source_ids": report["stale_source_ids"], "writes": False, "network": False}, indent=2))
         return
     raw_root = root / "data" / "raw"
-    subprocess.run([sys.executable, str(root / "research/scripts/refresh_construction_evidence.py"), "--root", str(root), "--as-of", checked_date], cwd=root, check=True)
+    if args.canadabuys_only:
+        failures = []
+        try:
+            canadabuys = refresh_canadabuys(root, checked_date)
+        except Exception as exc:
+            canadabuys = {}
+            failures.append({'group': 'canadabuys', 'error_type': type(exc).__name__})
+        build_source_freshness_report(root / "data/registry/sources.json", checked_date, root / "public/data/source-receipts.json")
+        print(json.dumps({**partial_refresh_summary(root, failures), "source_ids": list(canadabuys), "automatic_model_change": False}, indent=2))
+        if failures:
+            raise SystemExit(1)
+        return
+    refresh_failures = independent_refresh_checks(root, checked_date)
 
     receipt_path = root / "data/model-runs/weekly-source-refresh.json"
     def fetch_with_receipt(source_id, operation):
@@ -151,6 +216,7 @@ def main() -> None:
                 f"{reports['montreal']['data_centre_candidate_count']} Montréal candidate permit records. "
                 f"The aligned comparison panel contains {panel_report['row_count']} market-quarter-asset rows; "
                 f"the descriptive association uses {association['result']['observation_count']} rows."
+                + (" Independent construction/procurement feed checks were partial; failed sources retain last-good values and are identified in the operational receipts." if refresh_failures else "")
             ),
             "model_implication": (
                 "Retain the refreshed records as administrative activity proxies and review record-level changes. "
@@ -199,7 +265,10 @@ def main() -> None:
     )
     subprocess.run([sys.executable, str(root / "scripts/build-construction-inputs.py"), "--root", str(root)], cwd=root, check=True)
     surface = build_research_surface_manifest(root, root / "public/data/research-surface.json")
-    print(json.dumps({"status": "review_pr_required", "edition_date": as_of, "candidate_counts": {"edmonton": edmonton_report["data_centre_candidate_count"], **{city: reports[city]["data_centre_candidate_count"] for city in reports}}, "comparison_panel_rows": panel_report["row_count"], "research_surface_artifacts": surface["artifact_count"], "automatic_model_change": False}, indent=2, sort_keys=True))
+    summary = partial_refresh_summary(root, refresh_failures)
+    print(json.dumps({**summary, "edition_date": as_of, "candidate_counts": {"edmonton": edmonton_report["data_centre_candidate_count"], **{city: reports[city]["data_centre_candidate_count"] for city in reports}}, "comparison_panel_rows": panel_report["row_count"], "research_surface_artifacts": surface["artifact_count"], "automatic_model_change": False}, indent=2, sort_keys=True))
+    if summary['status'] == 'partial_refresh':
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
