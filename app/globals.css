@@ -463,3 +463,8 @@
 @media print {
   .executive-export-controls, .executive-export-controls * { visibility: hidden !important; }
 }
+
+@media print {
+  [data-testid="project-assessment-workspace"] > details { display: none !important; }
+  #project-assessment-print-record pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt; }
+}

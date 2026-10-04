@@ -26,7 +26,11 @@ import {
   resolveFocus,
 } from '@/lib/assessment-record';
 import { ExecutiveDecisionBrief } from '@/components/executive-decision-brief';
-import { ProjectAssumptionsDrawer } from '@/components/project-assumptions-drawer';
+import { ProjectAssessmentWorkspace } from '@/components/project-assessment-workspace';
+import {
+  ProjectAssumptionsDrawer,
+  type ProjectConfiguration,
+} from '@/components/project-assumptions-drawer';
 import { Button } from '@/components/ui/button';
 import {
   MonthlyEscalationOutlook,
@@ -49,9 +53,16 @@ import {
   type SpendingProfile,
 } from '@/lib/project-cashflow';
 
-type View = 'outlook' | 'cockpit' | 'walkthrough' | 'evidence' | 'brief';
+type View =
+  | 'assessment'
+  | 'outlook'
+  | 'cockpit'
+  | 'walkthrough'
+  | 'evidence'
+  | 'brief';
 
 const views: { id: View; label: string; icon: typeof Gauge }[] = [
+  { id: 'assessment', label: 'Assess my project', icon: Route },
   { id: 'walkthrough', label: 'Guided story', icon: Route },
   { id: 'outlook', label: 'Overview', icon: Activity },
   { id: 'cockpit', label: 'Scenario comparison', icon: Gauge },
@@ -71,6 +82,8 @@ type ExecutiveReadiness = {
       next_step: string | null;
     }[];
   };
+  releaseVintage?: string;
+  freshnessAsOf?: string;
   currentSources: number;
   totalSources: number;
   trackedProjects: number;
@@ -85,7 +98,7 @@ export function ExecutiveCockpit({
 }: {
   readiness: ExecutiveReadiness;
 }) {
-  const [view, setView] = useState<View>('walkthrough');
+  const [view, setView] = useState<View>('assessment');
   const [assetId, setAssetId] = useState<AssetId>('hospital');
   const [metroId, setMetroId] = useState<MetroId>('CMA_835');
   const [budgetMillions, setBudgetMillions] = useState(1200);
@@ -250,12 +263,39 @@ export function ExecutiveCockpit({
     window.setTimeout(() => setShareState('Share inputs'), 1800);
   };
 
+  const configuration: ProjectConfiguration = {
+    projectName,
+    assetId,
+    metroId,
+    budgetMillions,
+    startYear,
+    duration,
+    priceBasis,
+    approvalStage,
+    contingencyPct,
+    spendingProfile,
+    assumptions,
+  };
+  const applyConfiguration = (next: ProjectConfiguration) => {
+    setProjectName(next.projectName);
+    setAssetId(next.assetId);
+    setMetroId(next.metroId);
+    setBudgetMillions(next.budgetMillions);
+    setStartYear(next.startYear);
+    setDuration(next.duration);
+    setPriceBasis(next.priceBasis);
+    setApprovalStage(next.approvalStage);
+    setContingencyPct(next.contingencyPct);
+    setSpendingProfile(next.spendingProfile);
+    setAssumptions(next.assumptions);
+  };
   return (
     <WorkspaceShell
       context={
         <>
           <span className="font-medium text-ink">Alberta pilot</span>
-          <span className="mx-2">/</span>Executive workspace
+          <span className="mx-2">/</span>
+          {view === 'assessment' ? 'Project assessment' : 'Executive workspace'}
         </>
       }
       navigation={
@@ -284,24 +324,26 @@ export function ExecutiveCockpit({
         </nav>
       }
       actions={
-        <>
-          <Button
-            variant="outline"
-            className="h-10 bg-surface"
-            onClick={shareAssessment}
-          >
-            <Clipboard className="size-4" />
-            {shareState}
-          </Button>
-          <Button
-            aria-label="Open decision brief"
-            className="h-10"
-            onClick={() => setView('brief')}
-          >
-            <Printer className="size-4" />
-            Prepare brief
-          </Button>
-        </>
+        view === 'assessment' ? null : (
+          <>
+            <Button
+              variant="outline"
+              className="h-10 bg-surface"
+              onClick={shareAssessment}
+            >
+              <Clipboard className="size-4" />
+              {shareState}
+            </Button>
+            <Button
+              aria-label="Open decision brief"
+              className="h-10"
+              onClick={() => setView('brief')}
+            >
+              <Printer className="size-4" />
+              Prepare brief
+            </Button>
+          </>
+        )
       }
     >
       <header className="workspace-heading mb-6 flex flex-wrap items-start justify-between gap-4">
@@ -318,62 +360,77 @@ export function ExecutiveCockpit({
             price basis · {releaseData.manifest.version}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            className="h-10 bg-surface"
-            aria-pressed={Boolean(comparison)}
-            onClick={() =>
-              setComparison(
-                comparison
-                  ? null
-                  : {
-                      inputs: structuredClone(decisionInputs),
-                      assessment: structuredClone(assessment),
-                      market: METROS[metroId],
-                    },
-              )
-            }
-          >
-            {comparison ? 'Clear pinned configuration' : 'Pin configuration'}
-          </Button>
-          <ProjectAssumptionsDrawer
-            value={{
-              projectName,
-              assetId,
-              metroId,
-              budgetMillions,
-              startYear,
-              duration,
-              priceBasis,
-              approvalStage,
-              contingencyPct,
-              spendingProfile,
-              assumptions,
-            }}
-            onApply={(next) => {
-              setProjectName(next.projectName);
-              setAssetId(next.assetId);
-              setMetroId(next.metroId);
-              setBudgetMillions(next.budgetMillions);
-              setStartYear(next.startYear);
-              setDuration(next.duration);
-              setPriceBasis(next.priceBasis);
-              setApprovalStage(next.approvalStage);
-              setContingencyPct(next.contingencyPct);
-              setSpendingProfile(next.spendingProfile);
-              setAssumptions(next.assumptions);
-            }}
-          />
-        </div>
+        {view !== 'assessment' ? (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              className="h-10 bg-surface"
+              aria-pressed={Boolean(comparison)}
+              onClick={() =>
+                setComparison(
+                  comparison
+                    ? null
+                    : {
+                        inputs: structuredClone(decisionInputs),
+                        assessment: structuredClone(assessment),
+                        market: METROS[metroId],
+                      },
+                )
+              }
+            >
+              {comparison ? 'Clear pinned configuration' : 'Pin configuration'}
+            </Button>
+            <ProjectAssumptionsDrawer
+              value={{
+                projectName,
+                assetId,
+                metroId,
+                budgetMillions,
+                startYear,
+                duration,
+                priceBasis,
+                approvalStage,
+                contingencyPct,
+                spendingProfile,
+                assumptions,
+              }}
+              onApply={(next) => {
+                setProjectName(next.projectName);
+                setAssetId(next.assetId);
+                setMetroId(next.metroId);
+                setBudgetMillions(next.budgetMillions);
+                setStartYear(next.startYear);
+                setDuration(next.duration);
+                setPriceBasis(next.priceBasis);
+                setApprovalStage(next.approvalStage);
+                setContingencyPct(next.contingencyPct);
+                setSpendingProfile(next.spendingProfile);
+                setAssumptions(next.assumptions);
+              }}
+            />
+          </div>
+        ) : null}
       </header>
-      <ScenarioInterpretation
-        assessment={assessment}
-        inputs={decisionInputs}
-        contingencyPct={contingencyPct}
-      />
+      {view !== 'assessment' ? (
+        <p className="mb-4 rounded-lg border border-line bg-surface p-4 text-sm text-subtle">
+          This view uses the separate budget sensitivity model. Return to Assess my project for package scheduling and exposed commitment results.
+        </p>
+      ) : null}
+      {view !== 'assessment' ? (
+        <ScenarioInterpretation
+          assessment={assessment}
+          inputs={decisionInputs}
+          contingencyPct={contingencyPct}
+        />
+      ) : null}
       <div className="min-w-0">
-        {view === 'outlook' ? (
+        {view === 'assessment' ? (
+          <ProjectAssessmentWorkspace
+            configuration={configuration}
+            onApply={applyConfiguration}
+            readiness={readiness}
+          />
+        ) : view === 'outlook' ? (
           <MonthlyEscalationOutlook
             selectedMitigations={selectedMitigations}
             setSelectedMitigations={setSelectedMitigations}
@@ -442,7 +499,7 @@ export function ExecutiveCockpit({
           />
         )}
       </div>
-      {view !== 'brief' ? (
+      {view !== 'brief' && view !== 'assessment' ? (
         <ExecutiveDecisionBrief record={record} visible={false} />
       ) : null}
     </WorkspaceShell>

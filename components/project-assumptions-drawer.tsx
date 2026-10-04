@@ -54,9 +54,11 @@ const rateFields = [
 export function ProjectAssumptionsDrawer({
   value,
   onApply,
+  mode = 'legacy',
 }: {
   value: ProjectConfiguration;
   onApply: (next: ProjectConfiguration) => void;
+  mode?: 'legacy' | 'assessment';
 }) {
   const [open, setOpen] = useState(false);
   const [draftDefaults, setDraftDefaults] = useState(value);
@@ -78,11 +80,13 @@ export function ProjectAssumptionsDrawer({
         render={<Button variant="outline" className="h-10 bg-surface" />}
       >
         <SlidersHorizontal className="size-4" />
-        Edit assumptions
+        {mode === 'assessment' ? 'Edit project' : 'Edit assumptions'}
       </SheetTrigger>
       <SheetContent className="gap-0 border-line bg-surface text-ink data-[side=right]:w-full data-[side=right]:sm:max-w-[480px]">
         <SheetHeader className="border-b border-line px-6 py-6 pr-12">
-          <SheetTitle className="text-lg">Project & assumptions</SheetTitle>
+          <SheetTitle className="text-lg">
+            {mode === 'assessment' ? 'Your project' : 'Project & assumptions'}
+          </SheetTitle>
           <SheetDescription>
             Changes update the assessment only when you apply them.
           </SheetDescription>
@@ -109,7 +113,8 @@ export function ProjectAssumptionsDrawer({
               return;
             }
             const assumptions = { ...draftDefaults.assumptions };
-            for (const [key] of rateFields) assumptions[key] = number(key);
+            if (mode === 'legacy')
+              for (const [key] of rateFields) assumptions[key] = number(key);
             onApply({
               projectName: text('projectName').trim(),
               assetId: text('assetId') as AssetId,
@@ -248,31 +253,34 @@ export function ProjectAssumptionsDrawer({
                 </NativeSelect>
               </Field>
             </fieldset>
-            <fieldset className="grid grid-cols-2 gap-4 border-t border-line pt-5">
-              <legend className="pr-2 font-semibold">
-                Scenario assumptions
-              </legend>
-              <p className="col-span-2 text-xs leading-5 text-subtle">
-                These are planning assumptions, not measured AI effects.
-                Scope-matched calibration takes precedence when available.
-              </p>
-              {rateFields.map(([key, label, min, max, step]) => (
-                <Field key={key} label={label}>
-                  <Input
-                    name={key}
-                    type="number"
-                    min={min}
-                    max={max}
-                    step={step}
-                    defaultValue={draftDefaults.assumptions[key]}
-                    required
-                  />
-                </Field>
-              ))}
-            </fieldset>
+            {mode === 'legacy' ? (
+              <fieldset className="grid grid-cols-2 gap-4 border-t border-line pt-5">
+                <legend className="pr-2 font-semibold">
+                  Scenario assumptions
+                </legend>
+                <p className="col-span-2 text-xs leading-5 text-subtle">
+                  These are planning assumptions, not measured AI effects.
+                  Scope-matched calibration takes precedence when available.
+                </p>
+                {rateFields.map(([key, label, min, max, step]) => (
+                  <Field key={key} label={label}>
+                    <Input
+                      name={key}
+                      type="number"
+                      min={min}
+                      max={max}
+                      step={step}
+                      defaultValue={draftDefaults.assumptions[key]}
+                      required
+                    />
+                  </Field>
+                ))}
+              </fieldset>
+            ) : null}
             <p className="rounded-lg bg-caution-soft p-3 text-xs leading-5 text-caution">
-              Contingency stays separate. Sensitivity is not a confidence
-              interval, and no mitigation savings are credited.
+              {mode === 'assessment'
+                ? 'Contingency stays separate. Project budget does not establish package quantities, available crews or data-centre impacts.'
+                : 'Contingency stays separate. Sensitivity is not a confidence interval, and no mitigation savings are credited.'}
             </p>
             {error ? (
               <p role="alert" className="text-sm text-destructive">

@@ -32,7 +32,8 @@ export const ASSETS = {
   },
 } as const;
 
-export const METROS = { CMA_825: 'Calgary region', CMA_835: 'Edmonton region' } as const;
+export const METROS = {
+  OTHER: 'Other / unknown region', CMA_825: 'Calgary region', CMA_835: 'Edmonton region' } as const;
 
 const GRAPH_TO_LABOUR_ID: Record<string, string> = {
   TRADE_CONCRETE: 'trade_concrete', TRADE_ELECTRICIANS: 'trade_electricians',

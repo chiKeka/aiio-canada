@@ -120,7 +120,9 @@ export function AlbertaExecutive({ data }: { data: ConstructionData }) {
           </ol>
           <div className="mt-5 flex flex-wrap gap-4 text-sm font-semibold text-brand">
             <Link href="/delivery">Open delivery decisions →</Link>
-            <Link href="/project-scenario">Explore project scenarios →</Link>
+            <Link href="/project-scenario?view=assessment">
+              Assess my project →
+            </Link>
           </div>
         </section>
       </div>

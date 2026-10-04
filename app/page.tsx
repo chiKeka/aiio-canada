@@ -48,11 +48,11 @@ export default async function Home({
         <nav aria-label="Start exploring" className="grid gap-3 sm:grid-cols-3">
           <Link
             className="rounded-lg bg-brand p-5 font-semibold text-white"
-            href="/project-scenario?view=walkthrough"
+            href="/project-scenario?view=assessment"
           >
-            Start the guided story →
+            Assess my project →
             <span className="mt-2 block text-sm font-normal">
-              An editable example, with assumptions explained.
+              Your packages, shared resources and delivery options.
             </span>
           </Link>
           <Link
