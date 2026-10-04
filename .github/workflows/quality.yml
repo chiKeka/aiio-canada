@@ -129,6 +129,11 @@ jobs:
           AIIO_BASE_URL: http://127.0.0.1:3002
         run: npm run test:project-assessment-browser
 
+      - name: Verify reviewed evidence digest and frozen release boundaries
+        env:
+          AIIO_BASE_URL: http://127.0.0.1:3002
+        run: npm run test:digest-browser
+
       - name: Upload browser diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -139,4 +144,5 @@ jobs:
             /tmp/alberta-overview-*.png
             /tmp/alberta-pilot-*.png
             /tmp/project-assessment-*.png
+            /tmp/reviewed-digest-*.png
           if-no-files-found: ignore

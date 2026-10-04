@@ -85,7 +85,7 @@ from .comparison_market_panel import build_comparison_market_panel
 from .comparison_market_association import run_comparison_market_association
 from .pspc_outcomes import normalize_pspc_outcomes
 from .treatment_source_feasibility import run_treatment_source_feasibility
-from .digest import build_digest, find_latest_digest_items, validate_digest_cadence
+from .digest import build_digest, find_latest_digest_items, validate_digest_cadence, publish_reviewed_digest
 from .historical_envelope import run_historical_reference_envelope
 from .historical_analog import run_historical_analog_matrix
 from .labour import run_labour_recruitment_pressure
@@ -1532,7 +1532,9 @@ def main() -> None:
                 output,
                 edition_date,
                 source_registry_path=root / "data" / "registry" / "sources.json",
+                approval_receipt_path=output.with_suffix('.approval.json'),
             )
+            publish_reviewed_digest(root, args.items_path.resolve(), manifest, output.with_suffix('.approval.json'))
             print(
                 json.dumps(
                     {
@@ -1553,7 +1555,9 @@ def main() -> None:
                 output,
                 edition_date,
                 source_registry_path=root / "data" / "registry" / "sources.json",
+                approval_receipt_path=output.with_suffix('.approval.json'),
             )
+            publish_reviewed_digest(root, items_path.resolve(), manifest, output.with_suffix('.approval.json'))
             print(
                 json.dumps(
                     {

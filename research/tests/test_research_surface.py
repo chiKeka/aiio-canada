@@ -34,8 +34,14 @@ class ResearchSurfaceManifestTests(unittest.TestCase):
     def test_committed_manifest_reconciles_and_remains_non_authorizing(self) -> None:
         manifest = validate_research_surface_manifest(ROOT, COMMITTED)
         self.assertEqual(manifest["surface_id"], SURFACE_ID)
-        self.assertEqual(manifest["artifact_count"], len(ARTIFACTS))
-        self.assertEqual(len(manifest["artifacts"]), len(ARTIFACTS))
+        pointer = json.loads((ROOT / "public/data/latest-digest.json").read_text())
+        approved_extras = 2 if pointer.get("status") == "approved" else 0
+        self.assertEqual(manifest["artifact_count"], len(ARTIFACTS) + approved_extras)
+        self.assertEqual(len(manifest["artifacts"]), manifest["artifact_count"])
+        if approved_extras:
+            paths = {item["path"] for item in manifest["artifacts"]}
+            self.assertIn(f"data/digests/{pointer['edition_date']}.approval.json", paths)
+            self.assertIn(f"data/digests/{pointer['edition_date']}.manifest.json", paths)
         boundary = manifest["publication_boundary"]
         self.assertFalse(boundary["is_frozen_public_release"])
         self.assertFalse(boundary["decision_grade_ready"])

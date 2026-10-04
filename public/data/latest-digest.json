@@ -1,7 +1,7 @@
 {
   "automatic_model_change": false,
-  "digest_id": "AIIO_DIGEST_2026_09_03",
-  "edition_date": "2026-09-03",
+  "digest_id": "AIIO_DIGEST_2026_10_03",
+  "edition_date": "2026-10-03",
   "item_count": 1,
   "schema_version": "1.0.0",
   "source_ids": [
@@ -10,5 +10,5 @@
     "TORONTO_CLEARED_BUILDING_PERMITS",
     "VANCOUVER_ISSUED_BUILDING_PERMITS"
   ],
-  "status": "review"
+  "status": "approved"
 }
