@@ -169,7 +169,7 @@ try {
     /no later than the project start/,
   );
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
-  await page.goto(`${baseUrl}/project-scenario?basis=2041-01`, { waitUntil: 'networkidle' });
+  await page.goto(`${baseUrl}/project-scenario?view=outlook&basis=2041-01`, { waitUntil: 'networkidle' });
   await page
     .getByRole('button', { name: 'Open decision brief', exact: true })
     .click();
@@ -180,7 +180,7 @@ try {
     true,
   );
   assert.match(await brief.innerText(), /withheld/);
-  await page.goto(`${baseUrl}/project-scenario`, { waitUntil: 'networkidle' });
+  await page.goto(`${baseUrl}/project-scenario?view=outlook`, { waitUntil: 'networkidle' });
   await page.setViewportSize({ width: 390, height: 844 });
   await page
     .getByRole('button', { name: 'Edit assumptions', exact: true })

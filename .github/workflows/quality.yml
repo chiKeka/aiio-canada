@@ -43,6 +43,7 @@ jobs:
         run: |
           npm run construction:publish
           npm run test:construction
+          npm run test:project-assessment
           npm run test:pilot-stress
           npm run test:dependency-security
           npm run test:evidence-health
@@ -123,6 +124,11 @@ jobs:
           AIIO_BASE_URL: http://127.0.0.1:3002
         run: npm run test:alberta-pilot-browser
 
+      - name: Verify project assessment edits, exports and accessibility
+        env:
+          AIIO_BASE_URL: http://127.0.0.1:3002
+        run: npm run test:project-assessment-browser
+
       - name: Upload browser diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -132,4 +138,5 @@ jobs:
             /tmp/aiio-next.log
             /tmp/alberta-overview-*.png
             /tmp/alberta-pilot-*.png
+            /tmp/project-assessment-*.png
           if-no-files-found: ignore

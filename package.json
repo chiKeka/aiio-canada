@@ -111,7 +111,9 @@
     "test:evidence-health": "node --test tests/evidence-health.test.mjs",
     "test:alberta-pilot-browser": "node scripts/alberta-pilot-browser-check.mjs",
     "test:pilot-stress": "node --experimental-strip-types --test tests/pilot-stress.test.mjs tests/alberta-pilot.test.mjs",
-    "test:dependency-security": "node scripts/verify-vendored-security.mjs && node --test tests/braces-security.test.mjs tests/esbuild-kit-compatibility.test.mjs"
+    "test:dependency-security": "node scripts/verify-vendored-security.mjs && node --test tests/braces-security.test.mjs tests/esbuild-kit-compatibility.test.mjs",
+    "test:project-assessment": "node --experimental-strip-types --test tests/project-assessment*.test.mjs",
+    "test:project-assessment-browser": "node scripts/project-assessment-browser-check.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
