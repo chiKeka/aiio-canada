@@ -82,6 +82,8 @@ type ExecutiveReadiness = {
       next_step: string | null;
     }[];
   };
+  releaseVintage?: string;
+  freshnessAsOf?: string;
   currentSources: number;
   totalSources: number;
   trackedProjects: number;

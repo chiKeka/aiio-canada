@@ -11,3 +11,5 @@ The optional $50M school fixture, including $8M variable electrical exposure, is
 The phase catalogue retains release hashes and review qualifications. Independent empirical review remains pending. This change does not promote refresh candidates, change the deployed pilot, or authorize a merge or deployment.
 
 Numerical contracts and portable desktop/mobile browser checks are included in quality CI. Current-input JSON and print exports are generated from the same assessment record. Draft retention and reset are verified with the browser harness.
+
+The production-ready refinement leads with budget, entered exposure, contingency and paired result cards. Short status lines retain conditional-use, missing-input, verification-date and frozen-release qualifications. Detailed methodology and phase evidence are expandable, and exports retain the complete assessment record. The final browser harness verifies that refresh attempts do not advance the displayed frozen release date.

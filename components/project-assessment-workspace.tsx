@@ -272,6 +272,8 @@ export function ProjectAssessmentWorkspace({
     currentSources: number;
     totalSources: number;
     proxyPlanning: unknown;
+    releaseVintage?: string;
+    freshnessAsOf?: string;
   };
 }) {
   const [draft, setDraft] = useState<Draft>(freshDraft);
@@ -582,7 +584,7 @@ export function ProjectAssessmentWorkspace({
           <div>
             <p className="text-sm text-subtle">Assess my project</p>
             <h2 id="owner-project-heading" className="text-2xl font-semibold">
-              {configuration.projectName}
+              Project inputs
             </h2>
           </div>
           <div className="print:hidden">
@@ -608,9 +610,8 @@ export function ProjectAssessmentWorkspace({
           Load hypothetical $50M school example
         </button>
         <p className="mt-3 max-w-3xl leading-7">
-          Project context starts with editable scenario defaults; replace them
-          with your project. Then add the packages and shared resources you can
-          support. A project budget alone cannot establish an AI cost effect.
+          Replace the sample inputs with your project. Add supported package
+          quantities below.
         </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <Field label="Project location">
@@ -641,31 +642,61 @@ export function ProjectAssessmentWorkspace({
         aria-labelledby="owner-result-heading"
         data-testid="project-assessment-result"
       >
-        <p className="text-sm text-subtle">
-          Your assessment ·{' '}
-          {result?.qualified === 'conditional'
-            ? 'Conditional scenario'
-            : 'Evidence needed'}
-        </p>
-        <h2 id="owner-result-heading" className="mt-1 text-xl font-semibold">
-          {result?.matches.length
-            ? 'Check the shared work window and exposed commitments'
-            : 'A quantified AI effect is not established'}
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="rounded-full bg-paper px-3 py-1 font-medium">
+            {result?.qualified === 'conditional'
+              ? 'Conditional scenario'
+              : 'Evidence needed'}
+          </span>
+          <span className="text-subtle">User inputs · not a forecast</span>
+        </div>
+        <h2 id="owner-result-heading" className="mt-3 text-xl font-semibold">
+          {input.project.supportedContext === false
+            ? 'Unsupported context · qualitative only'
+            : result?.qualified === 'conditional'
+              ? 'Cost & schedule comparison'
+              : 'AI effect not established'}
         </h2>
-        <p className="mt-3 leading-7">
-          The base budget is {money(configuration.budgetMillions * 1e6)}.{' '}
-          {knownExposure
-            ? `${money(exposed)} is entered as variable package exposure.`
-            : 'Remaining package exposure is not established.'}{' '}
-          The {configuration.contingencyPct}% contingency is a separate reserve,
-          not an added AI cost. Exposure is money potentially subject to a
-          mechanism, not an additional cost.
+        <dl className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div>
+            <dt className="text-sm text-subtle">Base budget</dt>
+            <dd className="mt-1 text-xl font-semibold">
+              {money(configuration.budgetMillions * 1e6)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-subtle">Entered variable exposure</dt>
+            <dd className="mt-1 text-xl font-semibold">
+              {knownExposure ? money(exposed) : 'Unknown'}
+              <p className="text-xs font-normal text-subtle">At risk, not added cost</p>
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-subtle">Contingency reserve</dt>
+            <dd className="mt-1 text-xl font-semibold">
+              {configuration.contingencyPct}%
+              <p className="text-xs font-normal text-subtle">Separate from added cost</p>
+            </dd>
+          </div>
+        </dl>
+        <p className="mt-4 text-sm text-subtle">
+          {result?.qualified === 'conditional'
+            ? 'Hours, shared capacity and pricing are entered assumptions. Confirm them before committing.'
+            : input.project.supportedContext === false
+              ? 'Quantified use supports Alberta schools, hospitals and government buildings only.'
+              : 'Add work hours, shared capacity and remaining commitments to quantify.'}
         </p>
-        <p className="mt-2 text-sm text-subtle">
-          Nearby development alone is insufficient: shared contractor catchment,
-          trade and overlapping work windows must be explicit. Unmeasured
-          capacity remains unknown. Supplier and utility links remain
-          qualitative without supported commitments.
+        <p
+          className="mt-2 text-xs text-subtle"
+          data-testid="assessment-evidence-status"
+        >
+          Sources verified:{' '}
+          {readiness
+            ? `${readiness.currentSources}/${readiness.totalSources}`
+            : 'unknown'}
+          {readiness?.freshnessAsOf ? ` as of ${readiness.freshnessAsOf}` : ''}{' '}
+          · Release: {readiness?.releaseVintage ?? 'unknown'} · Independent
+          review pending
         </p>
         {evaluated.error ? (
           <p className="mt-3 text-danger">{evaluated.error}</p>
@@ -696,9 +727,7 @@ export function ProjectAssessmentWorkspace({
                       <dd>{displayMonth(result.cases[key].completionMonth)}</dd>
                     </div>
                     <div>
-                      <dt className="text-subtle">
-                        Additional delay versus baseline
-                      </dt>
+                      <dt className="text-subtle">Delay vs baseline</dt>
                       <dd data-testid={`${key}-delay`}>
                         {key !== 'baseline' && !draft.dcId
                           ? 'No AI work selected'
@@ -710,9 +739,7 @@ export function ProjectAssessmentWorkspace({
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-subtle">
-                        Additional conditional cost versus baseline
-                      </dt>
+                      <dt className="text-subtle">Added cost vs baseline</dt>
                       <dd data-testid={`${key}-cost`}>
                         {key !== 'baseline' && !draft.dcId
                           ? 'No AI work selected'
@@ -725,19 +752,12 @@ export function ProjectAssessmentWorkspace({
                       </dd>
                     </div>
                   </dl>
-                  <p className="mt-3 text-xs text-subtle">
-                    {key === 'baseline'
-                      ? 'Same owner packages and background demand; selected AI work excluded.'
-                      : key === 'withDC'
-                        ? 'Same inputs with selected AI package demand included.'
-                        : 'Same inputs with only the mitigation controls below changed; improvement is not assumed.'}
-                  </p>
                 </article>
               ))}
             </div>
             <details className="mt-5">
               <summary className="cursor-pointer font-medium">
-                Package completion, remaining work and cost components
+                Package results & cost breakdown
               </summary>
               <div className="mt-3 overflow-x-auto">
                 <a
@@ -776,7 +796,15 @@ export function ProjectAssessmentWorkspace({
                       (key) =>
                         result.cases[key].packageResults.map((item) => (
                           <tr key={`${key}-${item.id}`}>
-                            <td className="border-b border-line p-2">{key}</td>
+                            <td className="border-b border-line p-2">
+                              {
+                                {
+                                  baseline: 'Baseline',
+                                  withDC: 'With AI',
+                                  mitigation: 'Mitigation',
+                                }[key]
+                              }
+                            </td>
                             <td className="border-b border-line p-2">
                               {draft.packages.find(
                                 (pack) => pack.id === item.id,
@@ -823,13 +851,16 @@ export function ProjectAssessmentWorkspace({
             </details>
             <details className="mt-5">
               <summary className="cursor-pointer font-medium">
-                Why this result and what remains uncertain
+                Assumptions, evidence & next steps
               </summary>
               <div className="mt-3 space-y-3 text-sm leading-6">
                 <p>
-                  Package scope → shared catchment and trade → overlapping work
-                  window → capacity allocation and completion → exposed
-                  commitments → conditional escalation and overhead.
+                  Shared trade demand → package completion → exposed commitments
+                  → cost. Baseline excludes selected AI work; mitigation changes
+                  only your selected controls. Proximity alone does not
+                  establish competition. Unknown quantities and capacity stay
+                  unknown. Supplier and utility impacts remain qualitative
+                  without costed commitments.
                 </p>
                 <p>
                   {result.matches.length} explicit package match
@@ -878,12 +909,10 @@ export function ProjectAssessmentWorkspace({
       </section>
       <details className={panelClass}>
         <summary className="cursor-pointer text-lg font-semibold">
-          1. Add package scope and commitments
+          1. Packages & commitments
         </summary>
         <p className="mt-3 text-sm leading-6 text-subtle">
-          Leave unsupported inputs blank. Budgets are never converted
-          automatically into labour hours or quantities. Each package retains
-          its own evidence or assumption basis.
+          Leave unknowns blank. Budgets do not supply work quantities.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <Field label="Confirmed shared contractor catchment">
@@ -922,8 +951,8 @@ export function ProjectAssessmentWorkspace({
                 {item.name}
               </summary>
               <p className="mt-3 text-sm text-subtle">
-                Selecting fixed commitments sets variable exposure to zero. If
-                terms become variable, enter the remaining exposure explicitly.
+                Fixed terms set variable exposure to $0. Re-enter exposure when
+                terms change.
               </p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Numeric
@@ -1070,12 +1099,11 @@ export function ProjectAssessmentWorkspace({
       </details>
       <details className={panelClass}>
         <summary className="cursor-pointer text-lg font-semibold">
-          2. Test a shared resource and selected AI phase
+          2. Shared resources & AI phase
         </summary>
         <p className="mt-3 text-sm text-subtle">
-          Registry projects are candidates, not measured phase demand. Specify
-          the same catchment, trade and overlapping work window only where
-          justified.
+          Nearby projects need a shared resource pool to create competition.
+          Phase demand is unverified.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Selected data-centre phase">
@@ -1194,103 +1222,117 @@ export function ProjectAssessmentWorkspace({
             <p>
               Candidate: {candidate.name} · {candidate.location} ·{' '}
               {candidate.stage} · registry as of {candidate.registryAsOf}.
-              Published context does not supply package hours, phase costs or
-              contractor capacity.
+              Hours, phase costs and capacity are unverified.
             </p>
-            <p>
-              {candidate.reportedWindowQualification}{' '}
-              {candidate.costQualification}
-            </p>
-            <ul className="list-disc space-y-2 pl-5">
-              {candidate.sourceRefs.map((source) => (
-                <li key={source.id}>
-                  <a href={source.href} className="text-brand underline">
-                    {source.id}
-                  </a>{' '}
-                  · {source.status} · {source.reviewStatus}. {source.note}
-                </li>
-              ))}
-            </ul>
-            {candidate.enablingAssetLinks.length ? (
-              <details>
-                <summary className="cursor-pointer font-semibold">
-                  Linked enabling infrastructure and payer evidence
-                </summary>
-                <div className="mt-3 space-y-4">
-                  {candidate.enablingAssetLinks.map((asset) => (
-                    <article
-                      className="rounded-lg border border-line p-3"
-                      key={asset.id}
-                    >
-                      <h4 className="font-semibold">{asset.id}</h4>
-                      <p>
-                        {asset.aiPhaseIds.length
-                          ? `Linked phase: ${asset.aiPhaseIds.join(', ')}`
-                          : 'Site-level evidence; exact phase attribution unresolved.'}{' '}
-                        · {asset.publicationStatus}
-                      </p>
-                      <dl className="mt-2 grid gap-2 sm:grid-cols-2">
-                        {(
-                          [
-                            'scope',
-                            'incrementality',
-                            'costCad',
-                            'payer',
-                            'funding',
-                            'aiCapexMembership',
-                            'inServiceMilestone',
-                          ] as const
-                        ).map((key) => (
-                          <div key={key}>
-                            <dt className="text-subtle">{key}</dt>
-                            <dd>
-                              {asset[key].value === null
-                                ? 'Unknown'
-                                : typeof asset[key].value === 'string' ||
-                                    typeof asset[key].value === 'number'
-                                  ? String(asset[key].value)
-                                  : JSON.stringify(asset[key].value)}{' '}
-                              · {asset[key].status}. {asset[key].note}
-                            </dd>
-                          </div>
-                        ))}
-                      </dl>
-                      <p className="mt-2">
-                        {asset.sourceRefs.map((source, i) => (
-                          <span key={source.id}>
-                            {i ? ' · ' : ''}
-                            <a
-                              href={source.href}
-                              className="text-brand underline"
-                            >
-                              {source.id}
-                            </a>{' '}
-                            ({source.reviewStatus})
-                          </span>
-                        ))}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-              </details>
-            ) : null}
-            <p>
-              The JSON export retains this record, its evidence statuses and
-              provenance. Linked enabling costs are not automatically added to
-              your budget or counted again within AI CAPEX.
-            </p>
+            <details>
+              <summary className="cursor-pointer font-medium">
+                Phase sources & scope
+              </summary>
+              <p>
+                {candidate.reportedWindowQualification}{' '}
+                {candidate.costQualification}
+              </p>
+              <ul className="list-disc space-y-2 pl-5">
+                {candidate.sourceRefs.map((source) => (
+                  <li key={source.id}>
+                    <a href={source.href} className="text-brand underline">
+                      {source.id}
+                    </a>{' '}
+                    · {source.status} · {source.reviewStatus}. {source.note}
+                  </li>
+                ))}
+              </ul>
+              {candidate.enablingAssetLinks.length ? (
+                <details>
+                  <summary className="cursor-pointer font-semibold">
+                    Linked enabling infrastructure and payer evidence
+                  </summary>
+                  <div className="mt-3 space-y-4">
+                    {candidate.enablingAssetLinks.map((asset) => (
+                      <article
+                        className="rounded-lg border border-line p-3"
+                        key={asset.id}
+                      >
+                        <h4 className="font-semibold">{asset.id}</h4>
+                        <p>
+                          {asset.aiPhaseIds.length
+                            ? `Linked phase: ${asset.aiPhaseIds.join(', ')}`
+                            : 'Site-level evidence; exact phase attribution unresolved.'}{' '}
+                          · {asset.publicationStatus}
+                        </p>
+                        <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                          {(
+                            [
+                              'scope',
+                              'incrementality',
+                              'costCad',
+                              'payer',
+                              'funding',
+                              'aiCapexMembership',
+                              'inServiceMilestone',
+                            ] as const
+                          ).map((key) => (
+                            <div key={key}>
+                              <dt className="text-subtle">
+                                {
+                                  {
+                                    scope: 'Scope',
+                                    incrementality: 'Baseline or additional',
+                                    costCad: 'Cost (CAD)',
+                                    payer: 'Payer',
+                                    funding: 'Funding',
+                                    aiCapexMembership: 'Included in AI CAPEX',
+                                    inServiceMilestone: 'Service milestone',
+                                  }[key]
+                                }
+                              </dt>
+                              <dd>
+                                {asset[key].value === null
+                                  ? 'Unknown'
+                                  : typeof asset[key].value === 'string' ||
+                                      typeof asset[key].value === 'number'
+                                    ? String(asset[key].value)
+                                    : JSON.stringify(asset[key].value)}{' '}
+                                · {asset[key].status}. {asset[key].note}
+                              </dd>
+                            </div>
+                          ))}
+                        </dl>
+                        <p className="mt-2">
+                          {asset.sourceRefs.map((source, i) => (
+                            <span key={source.id}>
+                              {i ? ' · ' : ''}
+                              <a
+                                href={source.href}
+                                className="text-brand underline"
+                              >
+                                {source.id}
+                              </a>{' '}
+                              ({source.reviewStatus})
+                            </span>
+                          ))}
+                        </p>
+                      </article>
+                    ))}
+                  </div>
+                </details>
+              ) : null}
+              <p>
+                The JSON export retains this record, its evidence statuses and
+                provenance. Linked enabling costs are not automatically added to
+                your budget or counted again within AI CAPEX.
+              </p>
+            </details>
           </div>
         ) : null}
       </details>
       <details className={panelClass}>
         <summary className="cursor-pointer text-lg font-semibold">
-          3. Compare procurement, timing and capacity choices
+          3. Mitigation & pricing
         </summary>
         <p className="mt-3 text-sm leading-6 text-subtle">
-          Baseline and selected AI cases share the same owner packages.
-          Mitigation is a separate case; moving dates or adding supply can help,
-          have no effect, or create another constraint. No material price
-          premium is inferred.
+          Test timing, procurement or capacity changes. Improvement is not
+          assumed.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Numeric
