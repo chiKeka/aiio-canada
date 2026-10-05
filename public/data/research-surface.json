@@ -1,12 +1,12 @@
 {
   "artifact_count": 56,
-  "artifact_manifest_sha256": "sha256:155cce7ee170ec42558ff1346bd97f0aa58f316bda3f892cf09c88c32ce48f3c",
+  "artifact_manifest_sha256": "sha256:99075fdfe0752b5ebb7e39c2fe3b4a3899798f0fe164a21a9b62fb4f7ca6d242",
   "artifacts": [
     {
       "artifact_id": "source_receipts",
       "evidence_role": "governance",
       "path": "public/data/source-receipts.json",
-      "sha256": "sha256:7febfe823eb8967ed651d690b7f293b02937dab22728419b59dc2f9240044e99"
+      "sha256": "sha256:7f031c773bb923b10cca4f87eedd7d2286819532dead8df11e98c6f90f8a0995"
     },
     {
       "artifact_id": "enabling_infrastructure",
