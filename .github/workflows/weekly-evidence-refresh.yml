@@ -72,6 +72,25 @@ jobs:
             data/review-candidates/weekly-evidence-*/refresh.log
           if-no-files-found: ignore
 
+      - name: Retain private source bytes for evidence review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-review-source-bytes
+          # Public registered feeds only; no Alberta archive whose redistribution
+          # terms remain unresolved. Keep these out of Git and public deployment.
+          path: |
+            data/review-candidates/weekly-evidence-*/data/raw/canadabuys_award_notices_fy2026_2027/*.csv
+            data/review-candidates/weekly-evidence-*/data/raw/canadabuys_contract_history_fy2026_2027/*.csv
+            data/review-candidates/weekly-evidence-*/data/raw/canadabuys_tender_notices_fy2026_2027/*.csv
+            data/review-candidates/weekly-evidence-*/data/raw/edmonton_general_building_permits/*.json
+            data/review-candidates/weekly-evidence-*/data/raw/vancouver_issued_building_permits/*.json
+            data/review-candidates/weekly-evidence-*/data/raw/toronto_cleared_building_permits/*.json
+            data/review-candidates/weekly-evidence-*/data/raw/montreal_construction_permits/*.json
+          compression-level: 9
+          retention-days: 1
+          if-no-files-found: warn
+
       - name: Verify refreshed evidence and application
         run: |
           npm run research:validate
