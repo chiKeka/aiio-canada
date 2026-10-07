@@ -111,7 +111,7 @@
     "test:evidence-health": "node --test tests/evidence-health.test.mjs",
     "test:alberta-pilot-browser": "node scripts/alberta-pilot-browser-check.mjs",
     "test:pilot-stress": "node --experimental-strip-types --test tests/pilot-stress.test.mjs tests/alberta-pilot.test.mjs",
-    "test:dependency-security": "node scripts/verify-vendored-security.mjs && node --test tests/braces-security.test.mjs tests/esbuild-kit-compatibility.test.mjs",
+    "test:dependency-security": "node scripts/verify-vendored-security.mjs && node --test tests/braces-security.test.mjs tests/esbuild-kit-compatibility.test.mjs tests/oct7-dependency-security.test.mjs",
     "test:project-assessment": "node --experimental-strip-types --test tests/project-assessment*.test.mjs",
     "test:project-assessment-browser": "node scripts/project-assessment-browser-check.mjs",
     "test:digest-browser": "node scripts/digest-workflow-test.mjs"
@@ -169,9 +169,17 @@
   "overrides": {
     "undici": "7.29.1",
     "miniflare": {
-      "sharp": "0.35.4"
+      "sharp": "0.35.5"
     },
     "@esbuild-kit/core-utils": "$@esbuild-kit/core-utils",
-    "braces": "$braces"
+    "braces": "$braces",
+    "@modelcontextprotocol/sdk": "1.31.0",
+    "postcss-selector-parser": "7.1.6",
+    "proxy-addr": "2.0.8",
+    "sharp": "0.35.5",
+    "source-map-js": "1.2.2",
+    "oxfmt": {
+      "tinypool": "2.1.2"
+    }
   }
 }
