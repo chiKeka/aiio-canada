@@ -31,6 +31,13 @@ try {
     assert.equal(download.suggestedFilename(), 'alberta-cal3-windsong-pilot.json');
     const payload = JSON.parse(await readFile(await download.path(), 'utf8'));
     assert.ok(payload.evidence && payload.input && payload.result, 'export includes evidence, inputs, result');
+    assert.equal(payload.outcomeInterpretation.contractorCostPressure.amountCAD, null);
+    assert.equal(payload.outcomeInterpretation.taxpayerCostExposure.amountCAD, null);
+    assert.equal(payload.outcomeInterpretation.enteredExposurePricing.amountCAD, null);
+    assert.equal(payload.outcomeInterpretation.deliveryRisk.incrementalDelayMonths, payload.result.cases[0].incrementalDelayMonths);
+    assert.match(await page.getByTestId('project-outcomes').innerText(), /Contractor cost pressure.*Taxpayer cost exposure.*Delivery risk/s);
+    assert.match(await page.getByTestId('windsong-contract-context').innerText(), /560 Osborne Drive SW.*Airdrie/);
+    assert.equal(payload.contractContext.location, '560 Osborne Drive SW, Airdrie, Alberta');
     assert.ok(payload.result.cases && payload.thresholdResult.thresholds, 'export contains reverse-stress evidence');
     assert.ok(!JSON.stringify(payload).includes('additionalCAD'), 'normalized pilot does not export a dollar premium');
     return payload;

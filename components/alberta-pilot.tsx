@@ -7,6 +7,11 @@ import {
   pilotEvidence,
   pilotMonthLabel,
 } from '@/lib/alberta-pilot';
+import { ProjectOutcomeSummary } from '@/components/project-outcome-summary';
+import {
+  interpretProjectOutcomes,
+  windsongContractContext,
+} from '@/lib/project-outcomes';
 import { reverseStress } from '@/lib/pilot-stress';
 
 const controlClass =
@@ -30,6 +35,10 @@ export function AlbertaPilot() {
   });
   const result = reverseStress(input);
   const scenario = result.cases[0];
+  const outcomeInterpretation = interpretProjectOutcomes({
+    incrementalDelayMonths: scenario?.incrementalDelayMonths ?? null,
+    scenarioPricingCAD: null,
+  });
   const thresholdInput = {
     ...input,
     capacityCandidates: [5, 7.5, 10, 12.5, 15, 20, 25, 100],
@@ -42,6 +51,8 @@ export function AlbertaPilot() {
         JSON.stringify(
           {
             evidence: pilotEvidence,
+            outcomeInterpretation,
+            contractContext: windsongContractContext,
             input,
             result,
             thresholdInput,
@@ -69,6 +80,7 @@ export function AlbertaPilot() {
       <Link href="/construction" className="text-brand underline">
         Back to construction workspace
       </Link>
+      <ProjectOutcomeSummary outcomes={outcomeInterpretation} schoolContext />
       <section className={panelClass} aria-labelledby="pilot-facts">
         <h2 id="pilot-facts" className="text-lg font-semibold">
           Observed project accounting

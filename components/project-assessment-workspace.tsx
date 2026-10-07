@@ -19,6 +19,8 @@ import {
   type ProjectAssessmentInput,
   type OwnerPackage,
 } from '@/lib/project-assessment';
+import { ProjectOutcomeSummary } from '@/components/project-outcome-summary';
+import { interpretProjectOutcomes } from '@/lib/project-outcomes';
 import { dcPhaseCatalogue } from '@/lib/project-assessment-catalogue';
 
 const storageKey = 'aiio-project-owner-draft-v1';
@@ -494,6 +496,10 @@ export function ProjectAssessmentWorkspace({
   const knownExposure = draft.packages.some(
     (item) => item.uncommittedCAD !== null && item.commitment === 'variable',
   );
+  const outcomeInterpretation = interpretProjectOutcomes({
+    incrementalDelayMonths: result?.impacts.withDC.delayMonths ?? null,
+    scenarioPricingCAD: result?.impacts.withDC.totalAdditionalCAD ?? null,
+  });
   const record = (createdAt?: string) => ({
     schemaVersion: 'project-owner-assessment-v1',
     ...(createdAt ? { createdAt } : {}),
@@ -501,6 +507,7 @@ export function ProjectAssessmentWorkspace({
     draft,
     inputs: input,
     result,
+    outcomeInterpretation,
     catalogueCandidate: candidate ?? null,
     readiness: readiness ?? null,
     qualification:
@@ -668,14 +675,18 @@ export function ProjectAssessmentWorkspace({
             <dt className="text-sm text-subtle">Entered variable exposure</dt>
             <dd className="mt-1 text-xl font-semibold">
               {knownExposure ? money(exposed) : 'Unknown'}
-              <p className="text-xs font-normal text-subtle">At risk, not added cost</p>
+              <p className="text-xs font-normal text-subtle">
+                At risk, not added cost
+              </p>
             </dd>
           </div>
           <div>
             <dt className="text-sm text-subtle">Contingency reserve</dt>
             <dd className="mt-1 text-xl font-semibold">
               {configuration.contingencyPct}%
-              <p className="text-xs font-normal text-subtle">Separate from added cost</p>
+              <p className="text-xs font-normal text-subtle">
+                Separate from added cost
+              </p>
             </dd>
           </div>
         </dl>
@@ -698,6 +709,9 @@ export function ProjectAssessmentWorkspace({
           · Release: {readiness?.releaseVintage ?? 'unknown'} · Independent
           review pending
         </p>
+        <div className="mt-5">
+          <ProjectOutcomeSummary outcomes={outcomeInterpretation} />
+        </div>
         {evaluated.error ? (
           <p className="mt-3 text-danger">{evaluated.error}</p>
         ) : null}
@@ -739,7 +753,9 @@ export function ProjectAssessmentWorkspace({
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-subtle">Added cost vs baseline</dt>
+                      <dt className="text-subtle">
+                        Entered exposure pricing vs baseline
+                      </dt>
                       <dd data-testid={`${key}-cost`}>
                         {key !== 'baseline' && !draft.dcId
                           ? 'No AI work selected'
