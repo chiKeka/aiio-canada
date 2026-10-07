@@ -46,6 +46,10 @@ try {
     return record;
   }
   const initial = await exported(true);
+  assert.equal(initial.outcomeInterpretation.contractorCostPressure.amountCAD, null);
+  assert.equal(initial.outcomeInterpretation.taxpayerCostExposure.amountCAD, null);
+  assert.equal(initial.outcomeInterpretation.deliveryRisk.incrementalDelayMonths, initial.result.impacts.withDC.delayMonths);
+  assert.match(await page.getByTestId('project-outcomes').innerText(), /Contractor cost pressure.*Taxpayer cost exposure.*Delivery risk/s);
   assert.equal(initial.result.qualified, 'qualitative');
   const evidenceStatus = await page
     .getByTestId('assessment-evidence-status')
@@ -89,6 +93,10 @@ try {
   assert.equal(fixture.result.qualified, 'conditional');
   assert.ok(fixture.result.impacts.withDC.delayMonths > 0);
   assert.ok(fixture.result.impacts.withDC.totalAdditionalCAD > 0);
+  assert.equal(fixture.outcomeInterpretation.taxpayerCostExposure.amountCAD, null, 'priced exposure does not establish taxpayer liability');
+  assert.equal(fixture.outcomeInterpretation.enteredExposurePricing.amountCAD, fixture.result.impacts.withDC.totalAdditionalCAD);
+  assert.equal(fixture.outcomeInterpretation.deliveryRisk.incrementalDelayMonths, fixture.result.impacts.withDC.delayMonths);
+  assert.match(await page.getByTestId('project-outcomes').innerText(), new RegExp(`${fixture.result.impacts.withDC.delayMonths} months of conditional incremental delay`));
   assert.match(
     await page.getByTestId('withDC-delay').innerText(),
     new RegExp(`^${fixture.result.impacts.withDC.delayMonths} months$`),
