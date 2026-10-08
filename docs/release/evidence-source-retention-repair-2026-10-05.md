@@ -1,0 +1,11 @@
+# Evidence refresh source-byte retention repair
+
+The October 5 manual refresh succeeded and opened draft PR17. Its candidate checker verified source bytes on the runner, but the existing uploaded receipt artifact includes only manifests and logs. Candidate raw archives are intentionally ignored by Git. Once that runner exits, reviewers cannot download its original captured bytes, and a fresh checkout honestly reports those archives unavailable for byte verification.
+
+This draft adds a separate private Actions artifact for seven registered public feeds: the four municipal permit sources and three CanadaBuys CSV sources. It includes Edmonton metadata, compresses at level 9 and expires after one day. Reviewers must download the artifact into their authorized local checkout before expiry and verify the candidate manifest hashes. The retention window is deliberately short; extending retention is a separate operational decision. No raw source files enter Git or the public deployment, and no Alberta archive with unresolved redistribution terms is selected.
+
+The artifact step runs even after partial fetch failure, preserving any acquired source bytes. Empty acquisition warns instead of concealing the original fetch diagnostic. Existing schedules, runner configuration, permissions, review gates, frozen data, approved digest and publication behavior remain unchanged. This is a repair draft, not a deployed workflow change.
+
+For a future run after this repair is approved, retrieve both `evidence-refresh-receipts` and `evidence-review-source-bytes` from that same run ID. The source artifact preserves its candidate-directory paths. Copy into the checkout and run `python3 research/scripts/review_evidence_refresh.py --root . --check-candidates`; require an empty missing-raw list for the edition under review. Availability of captured bytes does not independently validate classification, stable project identity, spending, causal effects or model outputs.
+
+October 5 recovery is reported separately with actual hash-match outcomes. New download bytes must never substitute for an unavailable pinned capture, and CKAN acquisition timestamps must not be backdated to manufacture a historical archive.
