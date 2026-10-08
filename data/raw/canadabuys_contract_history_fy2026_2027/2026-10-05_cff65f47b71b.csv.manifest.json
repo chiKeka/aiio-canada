@@ -1,0 +1,13 @@
+{
+  "archive_path": "data/review-candidates/weekly-evidence-2026-10-05-20261005T213708522752Z/data/raw/canadabuys_contract_history_fy2026_2027/2026-10-05_cff65f47b71b.csv",
+  "byte_length": 5739528,
+  "content_hash": "sha256:cff65f47b71b7c5e4ccbd7b96b0a1de9f15ab71d63ba0150fb18fe6a264eba27",
+  "content_type": "application/octet-stream",
+  "effective_url": "https://canadabuys.canada.ca/opendata/pub/2026-2027-contractHistory-contratsOctroyes.csv",
+  "original_archive_path": "data/raw/canadabuys_contract_history_fy2026_2027/2026-10-05_cff65f47b71b.csv",
+  "result": "success",
+  "retrieval_id": "RET_CANADABUYS_CONTRACT_HISTORY_FY2026_2027_cff65f47b71b7c5e",
+  "retrieved_at": "2026-10-05T21:37:10+00:00",
+  "review_status": "candidate_only_not_release_promoted",
+  "source_id": "CANADABUYS_CONTRACT_HISTORY_FY2026_2027"
+}
