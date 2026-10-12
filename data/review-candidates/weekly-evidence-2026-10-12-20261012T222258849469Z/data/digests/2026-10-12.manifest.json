@@ -1,0 +1,25 @@
+{
+  "automatic_model_change": false,
+  "digest_id": "AIIO_DIGEST_2026_10_12",
+  "edition_date": "2026-10-12",
+  "item_count": 1,
+  "item_ids": [
+    "MUNICIPAL_DATA_CENTRE_PERMIT_REFRESH_2026_10_12"
+  ],
+  "items_sha256": "sha256:12cefe5d9a32e7be49c3cb59277fd3e60c2202b6189d83cfbddb921110520c6d",
+  "markdown_sha256": "sha256:c3ce9f421c729359fad969f5271455d82aeb0ed6744a93eeeed87324784cfbd0",
+  "publication_boundary": {
+    "baseline_changed": false,
+    "model_parameters_changed": false,
+    "release_required_for_promotion": true
+  },
+  "schema_version": "1.0.0",
+  "source_ids": [
+    "EDMONTON_GENERAL_BUILDING_PERMITS",
+    "MONTREAL_CONSTRUCTION_PERMITS",
+    "TORONTO_CLEARED_BUILDING_PERMITS",
+    "VANCOUVER_ISSUED_BUILDING_PERMITS"
+  ],
+  "source_registry_sha256": "sha256:4bea23fa75e7311e5a2b59f2c1b81432c3902f2e0cd72d55759c98ad6f03edcf",
+  "status": "review"
+}

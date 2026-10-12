@@ -18,11 +18,11 @@
         "checkEveryDays": 7,
         "mode": "structured_feed",
         "observationPeriod": "2026-08-31",
-        "lastChecked": "2026-10-03",
+        "lastChecked": "2026-10-12",
         "checkBasis": "Refresh receipt",
-        "lastAttempt": "2026-10-03",
+        "lastAttempt": "2026-10-12",
         "lastCheckFailed": false,
-        "nextCheckDue": "2026-10-10",
+        "nextCheckDue": "2026-10-19",
         "sourceUrl": "https://www.majorprojects.alberta.ca/"
       },
       {
@@ -32,11 +32,11 @@
         "checkEveryDays": 7,
         "mode": "structured_feed",
         "observationPeriod": "2026-03-31",
-        "lastChecked": "2026-10-03",
+        "lastChecked": "2026-10-12",
         "checkBasis": "Refresh receipt",
-        "lastAttempt": "2026-10-03",
+        "lastAttempt": "2026-10-12",
         "lastCheckFailed": false,
-        "nextCheckDue": "2026-10-10",
+        "nextCheckDue": "2026-10-19",
         "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410044401"
       },
       {
@@ -46,11 +46,11 @@
         "checkEveryDays": 7,
         "mode": "structured_feed",
         "observationPeriod": "2026-06-30",
-        "lastChecked": "2026-10-03",
+        "lastChecked": "2026-10-12",
         "checkBasis": "Refresh receipt",
-        "lastAttempt": "2026-10-03",
+        "lastAttempt": "2026-10-12",
         "lastCheckFailed": false,
-        "nextCheckDue": "2026-10-10",
+        "nextCheckDue": "2026-10-19",
         "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901"
       },
       {
