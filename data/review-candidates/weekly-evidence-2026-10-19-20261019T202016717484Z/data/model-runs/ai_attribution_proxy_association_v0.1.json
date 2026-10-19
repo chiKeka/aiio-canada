@@ -1,0 +1,61 @@
+{
+  "design": "Calgary-minus-Edmonton paired quarter/asset differences with asset fixed effects and non-residential investment difference control",
+  "input_manifest": {
+    "panel_report_sha256": "sha256:ca10f6555a83e19081f5a4519ded3a7988b2cb24b1468a1148df4fdc222b3db5",
+    "panel_sha256": "sha256:95879cf23601d5476463af4a21305f63d779da96c66504847bd71a5b635e53bc"
+  },
+  "limitations": [
+    "The exposure is reconstructed from one costed under-construction project and a small set of permit candidates.",
+    "The design has two Alberta markets, cannot establish parallel counterfactual trends, and may reflect unobserved Calgary-Edmonton differences.",
+    "Repeated asset rows share the same market-quarter exposure and do not represent independent treatment events.",
+    "Coefficients are sensitivity diagnostics and must not populate the executive calibrated forecast."
+  ],
+  "outcome": "BCPI year-over-year percentage-point difference; market bid-price proxy, not project cost outturn",
+  "publication_boundary": {
+    "ai_attributable_effect": null,
+    "causal_interpretation_authorized": false,
+    "descriptive_association_authorized": true,
+    "executive_calibration_authorized": false
+  },
+  "results": [
+    {
+      "coefficient": -0.148416,
+      "coefficient_unit": "Calgary-minus-Edmonton BCPI year-over-year percentage points per CAD 1B reconstructed quarterly exposure difference",
+      "confidence_interval_95": [
+        -0.21221,
+        -0.084621
+      ],
+      "observation_count": 99,
+      "proxy_case": "low",
+      "r_squared": 0.200084,
+      "robust_standard_error": 0.032548
+    },
+    {
+      "coefficient": -0.10277,
+      "coefficient_unit": "Calgary-minus-Edmonton BCPI year-over-year percentage points per CAD 1B reconstructed quarterly exposure difference",
+      "confidence_interval_95": [
+        -0.146937,
+        -0.058602
+      ],
+      "observation_count": 99,
+      "proxy_case": "central",
+      "r_squared": 0.200086,
+      "robust_standard_error": 0.022535
+    },
+    {
+      "coefficient": -0.083516,
+      "coefficient_unit": "Calgary-minus-Edmonton BCPI year-over-year percentage points per CAD 1B reconstructed quarterly exposure difference",
+      "confidence_interval_95": [
+        -0.119404,
+        -0.047628
+      ],
+      "observation_count": 99,
+      "proxy_case": "high",
+      "r_squared": 0.200088,
+      "robust_standard_error": 0.01831
+    }
+  ],
+  "run_id": "AIIO_E2_ALBERTA_PROXY_ASSOCIATION_0_1",
+  "schema_version": "1.0.0",
+  "status": "descriptive_proxy_association"
+}

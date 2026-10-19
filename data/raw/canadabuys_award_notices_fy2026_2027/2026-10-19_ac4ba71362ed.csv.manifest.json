@@ -1,0 +1,13 @@
+{
+  "archive_path": "data/review-candidates/weekly-evidence-2026-10-19-20261019T202016717484Z/data/raw/canadabuys_award_notices_fy2026_2027/2026-10-19_ac4ba71362ed.csv",
+  "byte_length": 16397340,
+  "content_hash": "sha256:ac4ba71362edd3236bf0664167a36e0ef56c30825da5702c13d525823bbd97b7",
+  "content_type": "application/octet-stream",
+  "effective_url": "https://canadabuys.canada.ca/opendata/pub/2026-2027-awardNotice-avisAttribution.csv",
+  "original_archive_path": "data/raw/canadabuys_award_notices_fy2026_2027/2026-10-19_ac4ba71362ed.csv",
+  "result": "success",
+  "retrieval_id": "RET_CANADABUYS_AWARD_NOTICES_FY2026_2027_ac4ba71362edd323",
+  "retrieved_at": "2026-10-19T20:20:18+00:00",
+  "review_status": "candidate_only_not_release_promoted",
+  "source_id": "CANADABUYS_AWARD_NOTICES_FY2026_2027"
+}

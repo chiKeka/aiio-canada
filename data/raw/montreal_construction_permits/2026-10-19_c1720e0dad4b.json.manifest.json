@@ -1,0 +1,25 @@
+{
+  "archive_path": "data/review-candidates/weekly-evidence-2026-10-19-20261019T202016717484Z/data/raw/montreal_construction_permits/2026-10-19_c1720e0dad4b.json",
+  "byte_length": 14070,
+  "content_hash": "sha256:c1720e0dad4b8772759b0eced1adb3c7d06db708cda670687a1fccd0b3a4b74c",
+  "excluded_fields": [
+    "emplacement",
+    "longitude",
+    "latitude",
+    "loc_x",
+    "loc_y"
+  ],
+  "original_archive_path": "data/raw/montreal_construction_permits/2026-10-19_c1720e0dad4b.json",
+  "query_terms": [
+    "centre de donn\u00e9es",
+    "centre donn\u00e9es",
+    "data center"
+  ],
+  "resource_id": "5232a72d-235a-48eb-ae20-bb9d501300ad",
+  "result": "success",
+  "retrieval_id": "RET_MONTREAL_CONSTRUCTION_PERMITS_c1720e0dad4b8772",
+  "retrieved_at": "2026-10-19T20:21:13+00:00",
+  "review_status": "candidate_only_not_release_promoted",
+  "row_count": 15,
+  "source_id": "MONTREAL_CONSTRUCTION_PERMITS"
+}
