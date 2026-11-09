@@ -1,0 +1,13 @@
+{
+  "archive_path": "data/review-candidates/weekly-evidence-2026-11-09-20261109T234053825142Z/data/raw/alberta_major_projects/2026-11-09_6e30987dc0c8.csv",
+  "byte_length": 992586,
+  "content_hash": "sha256:6e30987dc0c88ed9572a10fade97c90c25a91168057b5cee90381f740f78a226",
+  "content_type": "text/csv",
+  "effective_url": "https://www.majorprojects.alberta.ca/BulkAction",
+  "original_archive_path": "data/raw/alberta_major_projects/2026-11-09_6e30987dc0c8.csv",
+  "result": "success",
+  "retrieval_id": "RET_ALBERTA_MAJOR_PROJECTS_6e30987dc0c88ed9",
+  "retrieved_at": "2026-11-09T23:41:03+00:00",
+  "review_status": "candidate_only_not_release_promoted",
+  "source_id": "ALBERTA_MAJOR_PROJECTS"
+}

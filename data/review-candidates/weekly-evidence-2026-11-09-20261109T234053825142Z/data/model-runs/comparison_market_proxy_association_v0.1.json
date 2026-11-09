@@ -1,0 +1,34 @@
+{
+  "design": "Pooled Vancouver-Toronto-Montreal market-quarter-asset panel with market, quarter and asset fixed effects",
+  "exposure": "log(1 + classified data-centre permit records issued in market-quarter)",
+  "input_manifest": {
+    "panel_report_sha256": "sha256:3e4a71dc173a1cbd0d0781ea800ac5b185ac23dc90c2d5f33183236599d6651a",
+    "panel_sha256": "sha256:d952d74e32286bbefc0c295e1a55657c92ff850fa0938f2d91e241d1bbf19fd0"
+  },
+  "limitations": [
+    "Permit records are administrative proxies and may duplicate underlying projects across trades or revisions.",
+    "Toronto is cleared-permit only and therefore right-censored relative to Vancouver and Montreal issued-permit feeds.",
+    "A three-market observational association cannot establish an AI-attributable causal effect.",
+    "Repeated asset rows share one market-quarter exposure; robust errors do not solve the small number of markets."
+  ],
+  "outcome": "BCPI year-over-year percent change",
+  "publication_boundary": {
+    "ai_attributable_effect": null,
+    "causal_interpretation_authorized": false,
+    "descriptive_association_authorized": true,
+    "executive_calibration_authorized": false
+  },
+  "result": {
+    "coefficient": 0.787739,
+    "confidence_interval_95": [
+      0.406726,
+      1.168751
+    ],
+    "observation_count": 444,
+    "r_squared": 0.798073,
+    "robust_standard_error": 0.194394
+  },
+  "run_id": "AIIO_E2_COMPARISON_MARKET_PROXY_ASSOCIATION_0_1",
+  "schema_version": "1.0.0",
+  "status": "descriptive_proxy_association"
+}
