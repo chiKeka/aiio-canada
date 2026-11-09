@@ -1,0 +1,23 @@
+{
+  "archive_path": "data/review-candidates/weekly-evidence-2026-11-09-20261109T234053825142Z/data/raw/toronto_cleared_building_permits/2026-11-09_18e58b13d66a.json",
+  "byte_length": 80373,
+  "content_hash": "sha256:18e58b13d66a6c0a8208256deca7e77e988b8390ff28503d2550a91a12b382f1",
+  "excluded_fields": [
+    "STREET_NUM",
+    "STREET_NAME",
+    "POSTAL",
+    "GEO_ID",
+    "BUILDER_NAME"
+  ],
+  "original_archive_path": "data/raw/toronto_cleared_building_permits/2026-11-09_18e58b13d66a.json",
+  "query_terms": [
+    "data center"
+  ],
+  "resource_id": "a96c0ba4-3026-402b-b09d-5b1268b8f810",
+  "result": "success",
+  "retrieval_id": "RET_TORONTO_CLEARED_BUILDING_PERMITS_18e58b13d66a6c0a",
+  "retrieved_at": "2026-11-09T23:41:35+00:00",
+  "review_status": "candidate_only_not_release_promoted",
+  "row_count": 59,
+  "source_id": "TORONTO_CLEARED_BUILDING_PERMITS"
+}
