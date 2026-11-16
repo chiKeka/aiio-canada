@@ -1,0 +1,11 @@
+{
+  "retrieval_id": "RET_ALBERTA_MAJOR_PROJECTS_89533706fc8a41ab",
+  "source_id": "ALBERTA_MAJOR_PROJECTS",
+  "retrieved_at": "2026-11-16T23:38:16+00:00",
+  "effective_url": "https://www.majorprojects.alberta.ca/BulkAction",
+  "content_hash": "sha256:89533706fc8a41ab85c6a7ab9de913f79969adbbcce71de1f17e45713b93e6c6",
+  "content_type": "text/csv",
+  "byte_length": 995763,
+  "archive_path": "data/raw/alberta_major_projects/2026-11-16_89533706fc8a.csv",
+  "result": "success"
+}
