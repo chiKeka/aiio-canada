@@ -1,0 +1,35 @@
+{
+  "as_of_date": "2026-11-16",
+  "broad_screen_row_count": 55,
+  "classification_counts": {
+    "excluded_false_positive": 42,
+    "explicit_data_centre_reference": 13
+  },
+  "data_centre_candidate_count": 13,
+  "data_centre_candidate_reported_value_total_cad_proxy": 141771751.65,
+  "evidence_status": "observed_permit_fields_with_inferred_keyword_classification",
+  "explicit_ai_reference_count": 0,
+  "input_sha256": "sha256:f83ea20535f549098a9539ba06b19c0b352ad4f032dd09a8f750b7d07dd46865",
+  "limitations": [
+    "The dataset starts in 2017 and records initial issuance rather than construction progress.",
+    "Project value is an applicant estimate and may be zero, incomplete, revised or overlap related permits.",
+    "Classification is a disclosed text/category rule; AI specificity is not imputed.",
+    "Personal and precise location fields are excluded from the processed artifact."
+  ],
+  "model_id": "AIIO_VANCOUVER_DATA_CENTRE_PERMIT_PROXY_0_1",
+  "output_sha256": "sha256:07cbe76ff205a80f5b57824d7b4afe8952946b7300345464fafc3f4f23edc712",
+  "publication_boundary": {
+    "causal_effect_authorized": false,
+    "proxy_exposure_authorized": true,
+    "realized_ai_construction_treatment_authorized": false,
+    "realized_construction_spend_authorized": false,
+    "reason": "Issued permits and declared project values indicate authorized activity, not realized quarterly expenditure or labour hours; text does not establish AI use.",
+    "status": "municipal_permit_activity_proxy_only"
+  },
+  "retrieval_manifest_sha256": "sha256:958554d81cc4fca9023c371b63573d7d2b9cd89aaa2c2bc1b0b045aae4340043",
+  "schema_version": "0.1.0",
+  "source_ids": [
+    "VANCOUVER_ISSUED_BUILDING_PERMITS"
+  ],
+  "transformation_id": "TR_VANCOUVER_DATA_CENTRE_PERMIT_PROXY_0_1"
+}
